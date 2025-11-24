@@ -1,0 +1,540 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Account Name" xml:space="preserve">
+    <value>ຊື່ບັດປະຕິບັດ</value>
+  </data>
+  <data name="Account Number" xml:space="preserve">
+    <value>ເລກບັດ</value>
+  </data>
+  <data name="Accumulated bonus" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບ</value>
+  </data>
+  <data name="Active Left" xml:space="preserve">
+    <value>ປິ່ນຂໍແບບປະຕິບັດ</value>
+  </data>
+  <data name="Active Right" xml:space="preserve">
+    <value>ປິ່ນສະດວກດ້ານຂວາ</value>
+  </data>
+  <data name="Address Information" xml:space="preserve">
+    <value>ຂໍໍາລັງສະເກີບຂໍໍາລັງ</value>
+  </data>
+  <data name="Address on the Id Card" xml:space="preserve">
+    <value>ບັດໃນບັດປະຈົບ</value>
+  </data>
+  <data name="Adjusted from HOLD Bill" xml:space="preserve">
+    <value>ປັບໃຊ້ເປັນບັດHOLD</value>
+  </data>
+  <data name="Adjuster" xml:space="preserve">
+    <value>ຜູ້ປັບໃຊ້</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>ຈຳນວນ</value>
+  </data>
+  <data name="Amount Received" xml:space="preserve">
+    <value>ຈຳນວນທີ່ເຂົ້າຮັບ</value>
+  </data>
+  <data name="Amount to Top-Up" xml:space="preserve">
+    <value>ຈຳນວນເພີ່ມເຕີມ</value>
+  </data>
+  <data name="Amount to Transfer" xml:space="preserve">
+    <value>ຈຳນວນສ່ອມຕໍ່</value>
+  </data>
+  <data name="Application form has been Submitted" xml:space="preserve">
+    <value>ໃບລົງຄະແນນໄດ້ຖືກສົ່ງແລ້ວ</value>
+  </data>
+  <data name="Apply through the center" xml:space="preserve">
+    <value>ລົງຄະແນນຜ່ານສູນ</value>
+  </data>
+  <data name="Arrange for delivery" xml:space="preserve">
+    <value>ຈັດລຽງສໍາລັບການສົ່ງ</value>
+  </data>
+  <data name="Auto Transfer" xml:space="preserve">
+    <value>ສ່ອມຕໍ່ອະໂຕໍ່</value>
+  </data>
+  <data name="Autoship" xml:space="preserve">
+    <value>ສໍາລັບສົ່ງອະໂຕໍ່</value>
+  </data>
+  <data name="Balance" xml:space="preserve">
+    <value>ສະຖານທີ່</value>
+  </data>
+  <data name="Balance Score" xml:space="preserve">
+    <value>ຄະແນນສະຖານທີ່</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>ບັນຊີ</value>
+  </data>
+  <data name="Bank Information" xml:space="preserve">
+    <value>ຂໍໍາລັງຂໍໍາລັງບັນຊີ</value>
+  </data>
+  <data name="Bank Transfer" xml:space="preserve">
+    <value>ສ່ອມຕໍ່ຜ່ານບັນຊີ</value>
+  </data>
+  <data name="Beneficiary" xml:space="preserve">
+    <value>ຜູ້ເປັນໃນບັນຊີ</value>
+  </data>
+  <data name="Beneficiary Card Number" xml:space="preserve">
+    <value>ເລກບັດຂອງຜູ້ເປັນໃນບັນຊີ</value>
+  </data>
+  <data name="Bill Expiry Date" xml:space="preserve">
+    <value>ວັນທີສໍາເລັດບັດ</value>
+  </data>
+  <data name="Bill Number" xml:space="preserve">
+    <value>ເລກບັດ</value>
+  </data>
+  <data name="Branch" xml:space="preserve">
+    <value>ສະກັດ</value>
+  </data>
+  <data name="Branch Address" xml:space="preserve">
+    <value>ບັດທີ່ສະກັດ</value>
+  </data>
+  <data name="Branch Code" xml:space="preserve">
+    <value>ເຄື່ອງຈັກສະກັດ</value>
+  </data>
+  <data name="Business Name" xml:space="preserve">
+    <value>ຊື່ສະເລີຍດິບ</value>
+  </data>
+  <data name="Business Position" xml:space="preserve">
+    <value>ຕຳແໜ່ງສະເລີຍດິບ</value>
+  </data>
+  <data name="Businessman" xml:space="preserve">
+    <value>ຄົນດໍາລັບສະເລີຍດິບ</value>
+  </data>
+  <data name="Center Code" xml:space="preserve">
+    <value>ເຄື່ອງຈັກສູນ</value>
+  </data>
+  <data name="Center/Mobile Code" xml:space="preserve">
+    <value>ເຄື່ອງຈັກສູນ/ເຄື່ອງຈັກມືເບິ່ງ</value>
+  </data>
+  <data name="Citizen Number" xml:space="preserve">
+    <value>ເລກປະຊາຊົນ</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>ເຄື່ອງຈັກ</value>
+  </data>
+  <data name="Copy of Bank Account Book" xml:space="preserve">
+    <value>ສຳເນົາບັນຊີບັດ</value>
+  </data>
+  <data name="Copy of Id Card" xml:space="preserve">
+    <value>ສຳເນົາບັດປະຈົບ</value>
+  </data>
+  <data name="Countries Conducting Business" xml:space="preserve">
+    <value>ປະເທດທີ່ສໍາເລັດບັນຊີ</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>ປະເທດ</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>ເງິນເອົາ</value>
+  </data>
+  <data name="Current Address" xml:space="preserve">
+    <value>ບັດປະຈົບ</value>
+  </data>
+  <data name="Current Month Maintenance" xml:space="preserve">
+    <value>ບໍລິການປະຈົບໃນເດືອນນີ້</value>
+  </data>
+  <data name="Daily Points" xml:space="preserve">
+    <value>ຄະແນນເລະລົດ</value>
+  </data>
+  <data name="Daily points entry" xml:space="preserve">
+    <value>ຄະແນນເລະລົດປະຈົບ</value>
+  </data>
+  <data name="Daily Sales Report for Members" xml:space="preserve">
+    <value>ລາຍງານຍອດບັນຊີເພາະສະບັດປະຈົບ</value>
+  </data>
+  <data name="Daily sales report for members1" xml:space="preserve">
+    <value>ລາຍງານຄະແນນຄະແນນສະລາຍປະກັນ</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>ວັນທີ</value>
+  </data>
+  <data name="Date of Birth" xml:space="preserve">
+    <value>ວັນເລກເບີ້ງ</value>
+  </data>
+  <data name="Date1" xml:space="preserve">
+    <value>ວັນທີ</value>
+  </data>
+  <data name="Debit" xml:space="preserve">
+    <value>ຈິໄອກ</value>
+  </data>
+  <data name="Deduct" xml:space="preserve">
+    <value>ສ່ອມ</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>ລາຍລະອຽດ</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>ລົດລະວ່າງ</value>
+  </data>
+  <data name="Dispensations" xml:space="preserve">
+    <value>ຄະດົງກະທົບ</value>
+  </data>
+  <data name="Document" xml:space="preserve">
+    <value>ເອກະສານ</value>
+  </data>
+  <data name="Document Date" xml:space="preserve">
+    <value>ວັນທີເອກະສານ</value>
+  </data>
+  <data name="Document Number" xml:space="preserve">
+    <value>ເລກເອກະສານ</value>
+  </data>
+  <data name="Document Verification" xml:space="preserve">
+    <value>ການເຊັກບັດປະຈົບ</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>ເອກະສານ</value>
+  </data>
+  <data name="E-wallet" xml:space="preserve">
+    <value>ສະກຸດອິເລັ຋</value>
+  </data>
+  <data name="E-wallet Transactions from Company" xml:space="preserve">
+    <value>ຂໍໍາລັງສະກຸດອິເລັ຋ຈາກບັນຊີ</value>
+  </data>
+  <data name="E-wallet Transfer" xml:space="preserve">
+    <value>ສ່ອມຕໍ່ຜ່ານສະກຸດອິເລັ຋</value>
+  </data>
+  <data name="E-wallet Transferable Balance" xml:space="preserve">
+    <value>ສະຖານທີ່ເສອມໄດ້ຜ່ານສະກຸດອິເລັ຋</value>
+  </data>
+  <data name="Eligibility Date" xml:space="preserve">
+    <value>ວັນທີສໍາລັບສິດສະເລີຍ</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>ອີເມວ</value>
+  </data>
+  <data name="Expiration Date" xml:space="preserve">
+    <value>ວັນທີສໍາເລັດ</value>
+  </data>
+  <data name="Expiry Date" xml:space="preserve">
+    <value>ວັນທີສໍາເລັດ</value>
+  </data>
+  <data name="Female" xml:space="preserve">
+    <value>ຜູ້ຍິງ</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>ການກວດສະແດງ</value>
+  </data>
+  <data name="Flash Tracking Number" xml:space="preserve">
+    <value>ເລກບັດທີ່ສໍາເລັດ</value>
+  </data>
+  <data name="From date" xml:space="preserve">
+    <value>ຈາກວັນທີ</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>ເພດ</value>
+  </data>
+  <data name="General Information" xml:space="preserve">
+    <value>ຂໍໍາລັງຂໍໍາລັງສໍາລັບສະເລີຍດິບ</value>
+  </data>
+  <data name="ID Card Number" xml:space="preserve">
+    <value>ເລກບັດປະຈົບ</value>
+  </data>
+  <data name="Individual/Company" xml:space="preserve">
+    <value>ບຸກຄົມ/ບັນຊີ</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>ລາຍການ</value>
+  </data>
+  <data name="Job Title" xml:space="preserve">
+    <value>ຕຳແໜ່ງງານ</value>
+  </data>
+  <data name="Last Update" xml:space="preserve">
+    <value>ປ່ອນທີ່ສຸດ</value>
+  </data>
+  <data name="Left" xml:space="preserve">
+    <value>ຂວາ</value>
+  </data>
+  <data name="Lifetime Bonus" xml:space="preserve">
+    <value>ຄະແນນສະດວກ</value>
+  </data>
+  <data name="Loan" xml:space="preserve">
+    <value>ກູ້ເງິນ</value>
+  </data>
+  <data name="Matching bonus" xml:space="preserve">
+    <value>ຄະແນນຄົບປະຕິບັດ</value>
+  </data>
+  <data name="Member Code" xml:space="preserve">
+    <value>ລະບົບບັດປະຕິບັດ</value>
+  </data>
+  <data name="Member ID" xml:space="preserve">
+    <value>ບັດປະຕິບັດ</value>
+  </data>
+  <data name="Mobile Number" xml:space="preserve">
+    <value>ເບິ່ງໂລກ</value>
+  </data>
+  <data name="Monthly cycle" xml:space="preserve">
+    <value>ວົງສະກຸດເດືອນ</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>ຊື່</value>
+  </data>
+  <data name="New Password" xml:space="preserve">
+    <value>ລະຫັດຜໃໝ່</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>ບໍ່</value>
+  </data>
+  <data name="Old Password" xml:space="preserve">
+    <value>ລະຫັດຜເກົ່າ</value>
+  </data>
+  <data name="Other Details" xml:space="preserve">
+    <value>ລາຍລະອຽດອື່ນໆ</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>ລະຫັດຜ່ອນ</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>ຄ່າໃຊ້ຈ່າຍ</value>
+  </data>
+  <data name="Payment Amount" xml:space="preserve">
+    <value>ຈຳນວນເງິນໃຊ້ຈ່າຍ</value>
+  </data>
+  <data name="Payment cycle" xml:space="preserve">
+    <value>ວົງສະກຸດເງິນ</value>
+  </data>
+  <data name="Payment Method" xml:space="preserve">
+    <value>ວິທີການເງິນໃຊ້ຈ່າຍ</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>ເບິ່ງໂລກ</value>
+  </data>
+  <data name="Points deduction history" xml:space="preserve">
+    <value>ປະຖູອອດສະຖານ</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>ລາຄາ</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>ຜະລິດຕະພອນ</value>
+  </data>
+  <data name="Purchase type" xml:space="preserve">
+    <value>ປະເພດປ່ອນບັດ</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>ຈຳນວນ</value>
+  </data>
+  <data name="Receipt Date" xml:space="preserve">
+    <value>ວັນທີເລກບັດ</value>
+  </data>
+  <data name="Receipt Number" xml:space="preserve">
+    <value>ເລກບັດປະຕິບັດ</value>
+  </data>
+  <data name="Receipt Status" xml:space="preserve">
+    <value>ສະຖານທີ່ຂອງບັດ</value>
+  </data>
+  <data name="Receiving Member Code" xml:space="preserve">
+    <value>ລະບົບບັດທີ່ລະບົບ</value>
+  </data>
+  <data name="Reference Number" xml:space="preserve">
+    <value>ເລກອໍໍາລັງ</value>
+  </data>
+  <data name="Referral Fee" xml:space="preserve">
+    <value>ເອກະສານແນະນະ</value>
+  </data>
+  <data name="Referral fee1" xml:space="preserve">
+    <value>ເອກະສານແນະນະ</value>
+  </data>
+  <data name="Referrer Code" xml:space="preserve">
+    <value>ເຄື່ອງຈັກແນະນະ</value>
+  </data>
+  <data name="Referrer ID" xml:space="preserve">
+    <value>ບັດປະຕິບັດ</value>
+  </data>
+  <data name="Referrer Left" xml:space="preserve">
+    <value>ຄະແນນຂວາ</value>
+  </data>
+  <data name="Referrer Name" xml:space="preserve">
+    <value>ຊື່ສະປອນ</value>
+  </data>
+  <data name="Referrer Right" xml:space="preserve">
+    <value>ຄະແນນຂວາ</value>
+  </data>
+  <data name="Registration Date" xml:space="preserve">
+    <value>ວັນທີສະເລີຍດິບ</value>
+  </data>
+  <data name="Registration Rights" xml:space="preserve">
+    <value>ສິດສະເລີຍດິບ</value>
+  </data>
+  <data name="Remaining" xml:space="preserve">
+    <value>ຍັງຄໍາຄໍາ</value>
+  </data>
+  <data name="Remaining Balance" xml:space="preserve">
+    <value>ຄໍາຄໍາອີ່</value>
+  </data>
+  <data name="Remaining Quantity" xml:space="preserve">
+    <value>ຄໍາຄໍາຈຳນວນ</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>ຈົດປະຕິບັດ</value>
+  </data>
+  <data name="Report Type" xml:space="preserve">
+    <value>ປະເພດລາຍງານ</value>
+  </data>
+  <data name="Report type1" xml:space="preserve">
+    <value>ປະເພດລາຍງານ</value>
+  </data>
+  <data name="Special Bonus" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບ</value>
+  </data>
+  <data name="Strong Team Bonus" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບສະເລີຍ</value>
+  </data>
+  <data name="Team Bonus" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບ</value>
+  </data>
+  <data name="To date" xml:space="preserve">
+    <value>ຈົບວັນທີ</value>
+  </data>
+  <data name="Total bonus" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບ</value>
+  </data>
+  <data name="Total bonus1" xml:space="preserve">
+    <value>ຄະແນນສະເລີຍດິບ</value>
+  </data>
+  <data name="View all" xml:space="preserve">
+    <value>ເບີ່ງທັງໝົດ</value>
+  </data>
+  <data name="View by date range" xml:space="preserve">
+    <value>ເບີ່ງຕາມປະເພດວັນທີ</value>
+  </data>
+  <data name="View by month" xml:space="preserve">
+    <value>ເບີ່ງຕາມເດືອນ</value>
+  </data>
+  <data name="View by transfer cycle" xml:space="preserve">
+    <value>ເບີ່ງຕາມວົງສະກຸດຜ່ານ</value>
+  </data>
+  <data name="View Details" xml:space="preserve">
+    <value>ເບີ່ງລາຍລະອຽດ</value>
+  </data>
+  <data name="View Monthly" xml:space="preserve">
+    <value>ເບີ່ງປະຈົບດຸງປະຈົບປະຈົບ</value>
+  </data>
+  <data name="Visitors Origin" xml:space="preserve">
+    <value>ແຫລ່ງເຊື່ອບອລອລອ</value>
+  </data>
+  <data name="Where do our visitors come from" xml:space="preserve">
+    <value>ຂອງປະຈົບພະສະທົດຂອງປະເທດ</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>ແມ່ນ</value>
+  </data>
+  <data name="Your business information" xml:space="preserve">
+    <value>ຂໍໍາລັງຂໍໍາລັງສະເລີຍດິບ</value>
+  </data>
+</root>

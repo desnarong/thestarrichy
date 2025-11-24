@@ -1,0 +1,83 @@
+@{
+    ViewData["Title"] = "เกิดข้อผิดพลาด";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body text-center py-5">
+                    <!-- Error Icon -->
+                    <div class="error-icon mb-4">
+                        <i class="fa fa-exclamation-circle text-danger" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <!-- Error Message -->
+                    <h2 class="text-danger mb-3">เกิดข้อผิดพลาด</h2>
+                    
+                    <div class="alert alert-danger">
+                        @ViewBag.ErrorMessage
+                    </div>
+
+                    <p class="text-muted mb-4">
+                        กรุณาลองใหม่อีกครั้ง หรือติดต่อฝ่ายบริการลูกค้า
+                    </p>
+
+                    <!-- Action Buttons -->
+                    <div class="btn-group-vertical w-100" role="group">
+                        <button onclick="history.back()" class="btn btn-primary btn-lg mb-2">
+                            <i class="fa fa-arrow-left"></i> ย้อนกลับ
+                        </button>
+                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2">
+                            <i class="fa fa-shopping-bag"></i> คำสั่งซื้อของฉัน
+                        </a>
+                        <a href="/" class="btn btn-outline-primary btn-lg">
+                            <i class="fa fa-home"></i> กลับหน้าหลัก
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Support -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fa fa-question-circle"></i> ต้องการความช่วยเหลือ?
+                    </h6>
+                    <p class="card-text text-muted mb-2">
+                        ติดต่อฝ่ายบริการลูกค้า:
+                    </p>
+                    <ul class="list-unstyled mb-0">
+                        <li><i class="fa fa-phone"></i> โทร: 02-XXX-XXXX</li>
+                        <li><i class="fa fa-envelope"></i> อีเมล: support@example.com</li>
+                        <li><i class="fa fa-clock"></i> เวลาทำการ: จันทร์-ศุกร์ 9:00-18:00</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .error-icon i {
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @@keyframes shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-10px);
+            }
+            75% {
+                transform: translateX(10px);
+            }
+        }
+
+        .btn-group-vertical .btn {
+            border-radius: 0.5rem !important;
+        }
+    </style>
+}

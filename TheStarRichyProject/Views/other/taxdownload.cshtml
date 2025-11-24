@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "ดาวน์โหลดเอกสารภาษี";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-tax-download">ดาวน์โหลดเอกสารภาษี</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- ค้นหาเอกสาร -->
+                <div class="mb-4">
+                    <h5 data-key="t-search-documents">ค้นหาเอกสาร</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-document-type">ประเภทเอกสาร :</label>
+                        <div class="col-lg-10 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="document_type" id="tax_invoice" value="" checked>
+                                <label class="form-check-label" for="tax_invoice" data-key="t-tax-invoice">ใบกำกับภาษี</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="document_type" id="tax_report" value="">
+                                <label class="form-check-label" for="tax_report" data-key="t-tax-report">รายงานสรุปภาษี</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-from-date">จากวันที่ :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-to-date">ถึงวันที่ :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- รายการเอกสาร -->
+                <div>
+                    <h5 data-key="t-document-list">รายการเอกสาร</h5>
+                    <div class="table-responsive mt-3">
+                        <table id="data-table-responsive" class="table table-striped table-bordered"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#data-table-responsive").DataTable({
+            "responsive": true,
+            "processing": true,
+            "serverSide": false,
+            "filter": false,
+            "orderMulti": false,
+            "ordering": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            "pageLength": 25,
+            "destroy": true,
+            "searching": false,
+            "contentType": "application/json; charset=utf-8",
+            "columns": [
+                { title: "รหัสเอกสาร", "data": '', "targets": 0, "orderable": true, "data-key": "t-document-code" },
+                { title: "วันที่เอกสาร", "data": '', "data-key": "t-document-date" },
+                { title: "ประเภทเอกสาร", "data": '', "data-key": "t-document-type" },
+                { title: "ยอดรวม", "data": '', "data-key": "t-amount" },
+                { title: "สถานะ", "data": '', "data-key": "t-status" },
+                { title: "ดาวน์โหลด", "data": '', "data-key": "t-download" }
+            ],
+        });
+    });
+</script>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

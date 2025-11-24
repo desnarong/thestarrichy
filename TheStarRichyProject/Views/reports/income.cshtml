@@ -1,0 +1,114 @@
+﻿@{
+    ViewData["Title"] = "รายได้";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-daily-sales-report">รายงานยอดขายรายวันสำหรับสมาชิก</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- ข้อมูลทั่วไป -->
+                <div class="mb-4">
+                    <h5 data-key="t-general-info">ข้อมูลทั่วไป</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-accumulated-bonus">โบนัสสะสม :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="0.00" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-purchase-type">ประเภทการสั่งซื้อ :</label>
+                        <div class="col-lg-10 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="report_type" id="daily_points" value="" checked>
+                                <label class="form-check-label" for="daily_points" data-key="t-daily-points-entry">บันทึกคะแนนรายวัน</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="report_type" id="points_deduction" value="">
+                                <label class="form-check-label" for="points_deduction" data-key="t-points-deduction-history">ประวัติการหักคะแนน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-report-type">ประเภทรายงาน :</label>
+                        <div class="col-lg-10 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="report_format" id="daily" value="" checked>
+                                <label class="form-check-label" for="daily" data-key="t-daily">รายวัน</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="report_format" id="weekly" value="">
+                                <label class="form-check-label" for="weekly" data-key="t-weekly">รายสัปดาห์</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="report_format" id="monthly" value="">
+                                <label class="form-check-label" for="monthly" data-key="t-monthly">รายเดือน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-from-date">จากวันที่ :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-to-date">ถึงวันที่ :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-12 col-md-12 col-form-label text-danger" data-key="t-message">ข้อความแจ้งเตือน</label>
+                    </div>
+                </div>
+
+                <!-- รายงาน -->
+                <div>
+                    <h5 data-key="t-report">รายงาน</h5>
+                    <div class="table-responsive mt-3">
+                        <table id="data-table-responsive" class="table table-striped table-bordered"></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $("#data-table-responsive").DataTable({
+            "responsive": true,
+            "processing": true,
+            "serverSide": false,
+            "filter": false,
+            "orderMulti": false,
+            "ordering": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            "pageLength": 25,
+            "destroy": true,
+            "searching": false,
+            "contentType": "application/json; charset=utf-8",
+            "columns": [
+                { title: "วันที่", "data": '', "targets": 0, "orderable": true, "data-key": "t-date" },
+                { title: "ถึงวันที่", "data": '', "data-key": "t-to-date" },
+                { title: "รอบการจ่ายเงิน", "data": '', "data-key": "t-payment-cycle" },
+                { title: "ประเภท", "data": '', "data-key": "t-type" },
+                { title: "ค่าธรรมเนียมผู้อ้างอิง", "data": '', "data-key": "t-referral-fee" },
+                { title: "โบนัสทีม", "data": '', "data-key": "t-team-bonus" },
+                { title: "โบนัสทีมแข็งแกร่ง", "data": '', "data-key": "t-strong-team-bonus" },
+                { title: "โบนัสจับคู่", "data": '', "data-key": "t-matching-bonus" },
+                { title: "โบนัสพิเศษ", "data": '', "data-key": "t-special-bonus" },
+                { title: "ยอดโบนัสทั้งหมด", "data": '', "data-key": "t-total-bonus" }
+            ],
+        });
+    });
+</script>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

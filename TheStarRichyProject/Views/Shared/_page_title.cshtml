@@ -1,0 +1,52 @@
+﻿<!-- start page title -->
+<style>
+    .page-title-right {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 1rem; /* Adjust spacing between datetime and breadcrumb */
+    }
+
+    #datetime {
+        white-space: nowrap; /* Prevent text wrapping */
+    }
+</style>
+<div class="row">
+    <div class="col-12">
+        <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+            <h4 class="mb-sm-0">@ViewBag.ptitle</h4>
+
+            <div class="page-title-right d-flex align-items-center">
+                <div id="datetime" class="me-3"></div>
+                <ol class="breadcrumb m-0">
+                    <li class="breadcrumb-item"><a href="javascript: void(0);">@ViewBag.pagetitle</a></li>
+                    <li class="breadcrumb-item active">@ViewBag.ptitle</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- end page title -->
+<script>
+    
+    function updateDateTime() {
+        const fixedDate = new Date();
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            weekday: 'long',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false,
+            timeZone: 'Asia/Bangkok'
+        };
+        const formattedDateTime = fixedDate.toLocaleString('th-TH', options);
+        document.getElementById('datetime').textContent = formattedDateTime;
+    }
+    // Update every second
+    setInterval(updateDateTime, 1000);
+    // Initial call
+    updateDateTime();
+</script>

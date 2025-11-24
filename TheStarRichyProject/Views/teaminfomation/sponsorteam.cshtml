@@ -1,0 +1,194 @@
+@{
+    ViewBag.Title = "ทีมสปอนเซอร์";
+    ViewBag.pTitle = "Sponsor Team";
+    ViewBag.pageTitle = "ทีมสปอนเซอร์";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="searchInput" class="form-control" 
+                                   placeholder="ค้นหารหัสหรือชื่อสมาชิก...">
+                            <button class="btn btn-primary" onclick="searchTeam()">
+                                <i class="ri-search-line"></i> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-success" onclick="exportToExcel()">
+                            <i class="ri-file-excel-line"></i> Export
+                        </button>
+                        <button class="btn btn-info" onclick="loadTeam()">
+                            <i class="ri-refresh-line"></i> รีเฟรช
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-primary">
+                <h5 class="card-title text-white mb-0">
+                    <i class="ri-team-line"></i> รายชื่อทีมสปอนเซอร์
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped" id="teamTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th>#</th>
+                                <th>รหัสสมาชิก</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>วันที่สมัคร</th>
+                                <th>PV</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teamTableBody">
+                            <tr>
+                                <td colspan="7" class="text-center py-5">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 text-muted">กำลังโหลดข้อมูล...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentMemberCode = '';
+    let teamData = [];
+
+    $(document).ready(function() {
+        loadCurrentMember();
+    });
+
+    async function loadCurrentMember() {
+        try {
+            const response = await fetch('/home/GetMemberInfo');
+            const data = await response.json();
+            
+            if (data) {
+                const memberInfo = JSON.parse(data);
+                currentMemberCode = memberInfo.memberInfo[0].membercode;
+                await loadTeam();
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showError('ไม่สามารถโหลดข้อมูลสมาชิกได้');
+        }
+    }
+
+    async function loadTeam() {
+        try {
+            const response = await fetch(`/teaminfomation/GetSponsorTeam?memberCode=${currentMemberCode}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to load team');
+            }
+            
+            const result = await response.json();
+            teamData = Array.isArray(result) ? result : [];
+            renderTable(teamData);
+        } catch (error) {
+            console.error('Error:', error);
+            showError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        }
+    }
+
+    function renderTable(data) {
+        const tbody = $('#teamTableBody');
+        tbody.empty();
+
+        if (!data || data.length === 0) {
+            tbody.html(`
+                <tr>
+                    <td colspan="7" class="text-center py-5">
+                        <i class="ri-user-search-line ri-3x text-muted"></i>
+                        <p class="mt-2 text-muted">ไม่พบข้อมูลทีม</p>
+                    </td>
+                </tr>
+            `);
+            return;
+        }
+
+        data.forEach((member, index) => {
+            const statusClass = member.status === 'Active' ? 'success' : 'secondary';
+            const statusText = member.status === 'Active' ? 'ใช้งาน' : 'ไม่ใช้งาน';
+            
+            tbody.append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${member.membercode || 'N/A'}</strong></td>
+                    <td>${member.idcardname || 'N/A'}</td>
+                    <td>${formatDate(member.registerdate)}</td>
+                    <td><span class="badge bg-info">${member.personalpv || 0}</span></td>
+                    <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-primary" onclick="viewDetail('${member.membercode}')">
+                            <i class="ri-eye-line"></i>
+                        </button>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    function searchTeam() {
+        const keyword = $('#searchInput').val().toLowerCase().trim();
+        
+        if (!keyword) {
+            renderTable(teamData);
+            return;
+        }
+
+        const filtered = teamData.filter(m => 
+            (m.membercode && m.membercode.toLowerCase().includes(keyword)) ||
+            (m.idcardname && m.idcardname.toLowerCase().includes(keyword))
+        );
+
+        renderTable(filtered);
+    }
+
+    function viewDetail(memberCode) {
+        window.location.href = `/teaminfomation/teambinary?code=${memberCode}`;
+    }
+
+    function exportToExcel() {
+        alert('ฟีเจอร์ Export กำลังพัฒนา');
+    }
+
+    function formatDate(dateStr) {
+        if (!dateStr) return 'N/A';
+        const date = new Date(dateStr);
+        return date.toLocaleDateString('th-TH');
+    }
+
+    function showError(message) {
+        $('#teamTableBody').html(`
+            <tr>
+                <td colspan="7" class="text-center py-5 text-danger">
+                    <i class="ri-error-warning-line ri-3x"></i>
+                    <p class="mt-2">${message}</p>
+                </td>
+            </tr>
+        `);
+    }
+</script>
+}

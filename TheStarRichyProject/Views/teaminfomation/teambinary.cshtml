@@ -1,0 +1,268 @@
+@{
+    ViewBag.Title = "ทีมไบนารี่";
+    ViewBag.pTitle = "Team Binary";
+    ViewBag.pageTitle = "ทีมไบนารี่";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-12 mb-3">
+        <div class="card">
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="memberCodeSearch" class="form-control" 
+                                   placeholder="ค้นหารหัสสมาชิก...">
+                            <button class="btn btn-primary" onclick="searchMember()">
+                                <i class="ri-search-line"></i> ค้นหา
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-6 text-end">
+                        <button class="btn btn-info" onclick="loadCurrentMember()">
+                            <i class="ri-refresh-line"></i> รีเฟรช
+                        </button>
+                        <button class="btn btn-secondary" onclick="goToParent()">
+                            <i class="ri-arrow-up-line"></i> สายงานบน
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-info">
+                <h5 class="card-title text-white mb-0">
+                    <i class="ri-organization-chart"></i> โครงสร้างทีมไบนารี่
+                </h5>
+            </div>
+            <div class="card-body">
+                <div id="binaryTreeContainer" class="text-center"></div>
+                <div id="loadingIndicator" class="text-center py-5 d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2 text-muted">กำลังโหลดข้อมูล...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    let currentMemberCode = '';
+    let parentMemberCode = '';
+
+    $(document).ready(function() {
+        loadCurrentMember();
+    });
+
+    async function loadCurrentMember() {
+        try {
+            const response = await fetch('/home/GetMemberInfo');
+            const data = await response.json();
+            
+            if (data) {
+                const memberInfo = JSON.parse(data);
+                currentMemberCode = memberInfo.memberInfo[0].membercode;
+                loadBinaryTeam(currentMemberCode);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('danger', 'ไม่สามารถโหลดข้อมูลสมาชิกได้');
+        }
+    }
+
+    async function loadBinaryTeam(memberCode) {
+        try {
+            showLoading(true);
+            
+            const response = await fetch(`/teaminfomation/GetBinaryTeam?memberCode=${memberCode}`);
+            
+            if (!response.ok) {
+                throw new Error('Failed to load binary team');
+            }
+            
+            const result = await response.json();
+            renderBinaryTree(result, memberCode);
+        } catch (error) {
+            console.error('Error:', error);
+            showAlert('danger', 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
+        } finally {
+            showLoading(false);
+        }
+    }
+
+    function renderBinaryTree(data, centerCode) {
+        const container = $('#binaryTreeContainer');
+        container.empty();
+
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
+            return;
+        }
+
+        const center = data.find(m => m.membercode === centerCode) || data[0];
+        const left = data.find(m => m.position === 'L');
+        const right = data.find(m => m.position === 'R');
+
+        let html = `
+            <div class="binary-tree">
+                <div class="tree-level">
+                    ${renderNode(center, 'center')}
+                </div>
+                <div class="tree-level mt-4">
+                    <div class="row justify-content-center">
+                        <div class="col-md-6">${renderNode(left, 'left')}</div>
+                        <div class="col-md-6">${renderNode(right, 'right')}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        container.html(html);
+    }
+
+    function renderNode(member, position) {
+        if (!member) {
+            return `
+                <div class="node-card empty">
+                    <div class="text-muted">
+                        <i class="ri-user-add-line ri-3x mb-2"></i>
+                        <p>ว่าง</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        const positionColor = position === 'left' ? 'success' : position === 'right' ? 'warning' : 'info';
+        
+        return `
+            <div class="node-card ${positionColor}" onclick="loadBinaryTeam('${member.membercode}')">
+                <div class="position-badge badge bg-${positionColor}">
+                    ${position === 'left' ? 'ซ้าย' : position === 'right' ? 'ขวา' : 'ศูนย์กลาง'}
+                </div>
+                <img src="${member.profileImage || '/assets/images/users/avatar-1.jpg'}" 
+                     class="node-avatar" alt="${member.idcardname}">
+                <div class="node-info">
+                    <h6 class="mb-1">${member.idcardname || 'N/A'}</h6>
+                    <p class="text-muted mb-1 small">${member.membercode}</p>
+                    <p class="text-${positionColor} mb-0"><strong>PV: ${member.personalpv || 0}</strong></p>
+                </div>
+            </div>
+        `;
+    }
+
+    function searchMember() {
+        const memberCode = $('#memberCodeSearch').val().trim();
+        if (!memberCode) {
+            showAlert('warning', 'กรุณากรอกรหัสสมาชิก');
+            return;
+        }
+        loadBinaryTeam(memberCode);
+    }
+
+    async function goToParent() {
+        // Implement logic to go to parent node
+        showAlert('info', 'ฟีเจอร์นี้กำลังพัฒนา');
+    }
+
+    function showLoading(show) {
+        if (show) {
+            $('#loadingIndicator').removeClass('d-none');
+            $('#binaryTreeContainer').addClass('d-none');
+        } else {
+            $('#loadingIndicator').addClass('d-none');
+            $('#binaryTreeContainer').removeClass('d-none');
+        }
+    }
+
+    function showAlert(type, message) {
+        const alertClass = `alert-${type}`;
+        const alert = `
+            <div class="alert ${alertClass} alert-dismissible fade show" role="alert">
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+
+        const alertContainer = $('#binaryTreeContainer').parent();
+        alertContainer.prepend(alert);
+        
+        setTimeout(() => {
+            $('.alert').alert('close');
+        }, 3000);
+    }
+</script>
+
+<style>
+.binary-tree {
+    padding: 20px;
+}
+
+.tree-level {
+    margin: 20px 0;
+}
+
+.node-card {
+    background: #fff;
+    border: 2px solid #e3e6f0;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    min-height: 220px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.node-card:not(.empty):hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+}
+
+.node-card.success { border-color: #28a745; }
+.node-card.warning { border-color: #ffc107; }
+.node-card.info { border-color: #17a2b8; }
+
+.node-card.empty {
+    border-style: dashed;
+    opacity: 0.5;
+}
+
+.position-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.75rem;
+}
+
+.node-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 15px;
+    object-fit: cover;
+    border: 4px solid #fff;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.node-info h6 {
+    font-weight: 600;
+    color: #333;
+}
+
+.node-info p {
+    margin-bottom: 5px;
+}
+</style>
+}

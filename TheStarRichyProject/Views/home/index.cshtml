@@ -1,0 +1,1562 @@
+﻿@using TheStarRichyProject.Helper
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewBag.Title = "Dashboards";
+    ViewBag.pTitle = "Dashboard";
+    ViewBag.pageTitle = "Dashboards";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var cookieValue = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.UserInfoKey);
+    var userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
+
+}
+
+<style>
+    .m-b-43 {
+        margin-bottom: 43px !important;
+    }
+
+    .m-b-150 {
+        margin-bottom: 150px !important;
+    }
+
+    .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+        margin-bottom: 0rem;
+    }
+
+    .alert {
+        --vz-alert-padding-x: 0.8rem;
+        --vz-alert-padding-y: 0.4rem;
+        --vz-alert-margin-bottom: 0rem;
+        border-radius: var(--vz-border-radius-xxl);
+        padding: var(--vz-alert-padding-y) var(--vz-alert-padding-x);
+    }
+
+    .bg-pink {
+        --vz-bg-opacity: 1;
+        background-color: var(--vz-pink) !important;
+    }
+
+    .border-pink {
+        --vz-border-opacity: 1;
+        border-color: var(--vz-pink) !important;
+    }
+
+    .text-pink {
+        color: var(--vz-pink) !important;
+    }
+
+    .text-purple {
+        color: var(--vz-purple) !important;
+    }
+
+    .bg-purple {
+        --vz-bg-opacity: 1;
+        background-color: var(--vz-vertical-menu-sub-item-color) !important;
+    }
+
+    .border-purple {
+        --vz-border-opacity: 1;
+        border-color: var(--vz-vertical-menu-sub-item-color) !important;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .modal-content {
+        background-color: rgba(0, 0, 0, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .message-content {
+        color: white;
+        padding: 20px;
+        min-height: 200px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 1.1rem;
+    }
+
+    .message-navigation {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .message-counter {
+        color: white;
+        font-size: 0.9rem;
+    }
+
+    .btn-nav {
+        min-width: 100px;
+    }
+
+    .message-type-label {
+        color: #ffc107;
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+    }
+</style>
+
+<div class="row mb-3 pb-1">
+    <div class="col-12">
+        <div class="d-flex align-items-lg-center flex-lg-row flex-column">
+            <div class="flex-grow-1">
+                <h4 class="fs-16 mb-1">Good Morning, @userinfo.idcardname</h4>
+                <p class="text-muted mb-0">ข่าวสาร</p>
+            </div>
+        </div><!-- end card header -->
+    </div>
+    <!--end col-->
+</div>
+<div class="row">
+    <div class="col">
+        <div class="h-100">
+            <div class="row">
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="text-center">
+                                <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
+                                    <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow" alt="user-profile-image">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-xl-12">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-membercode">รหัสนักธุรกิจ</strong></h6>
+                                </div>
+                                <div class="col-xl-12 col-md-12">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="membercode"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-name">ชื่อ</strong></h6>
+                                </div>
+                                <div class="col-xl-12">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="idcardname"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-personalpv">คะแนนส่วนตัว</strong></h6>
+                                </div>
+                                <div class="col-xl-12">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="personalPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-positionname">ตำแหน่งแพ็คเกจ</strong></h6>
+                                    <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong id="positionName"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-thainame">ตำแหน่งคุณวุฒิ</strong></h6>
+                                    <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong id="thaiName"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-sponsername">ชื่อผู้แนะนำ</strong></h6>
+                                    <div class="alert bg-success border-success h6 text-white material-shadow text-center mb-1" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong id="sponsername"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-bwdleftpv">คะแนนยกมา-ซ้าย</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="bwdLeftPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-bwdrightpv">คะแนนยกมา-ขวา</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="bwdRightPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-danger mb-1" data-key="t-presentleftpv">คะแนนคำนวณ-ซ้าย</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="presentLeftPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-danger mb-1" data-key="t-presentrightpv">คะแนนคำนวณ-ขวา</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="presentRightPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-warning mb-1" data-key="t-newleftpv">คะแนนมาใหม่-ซ้าย</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="newLeftPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong class="text-warning mb-1" data-key="t-newrightpv">คะแนนมาใหม่-ขวา</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="newRightPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-totalleftbalanceteam">คะแนนทีมงานแนะนำตรงสะสมด้านซ้าย</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalLeftBalanceTeam"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-totalrightbalanceteam">คะแนนทีมงานแนะนำตรงสะสมด้านขวา</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalRightBalanceTeam"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-totalnewmonthleftpv">คะแนนมาใหม่สะสมเดือนด้านซ้าย</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalNewMonthLeftPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-12 text-center">
+                                    <h6 class="mb-1"><strong class="text-secondary mb-1" data-key="t-totalnewmonthrightpv">คะแนนมาใหม่สะสมเดือนด้านขวา</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalNewMonthRightPV"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-totalbonus">โบนัสสะสม</strong></h6>
+                                    <div class="alert bg-success border-success h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalBonus"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-totalbalance">คะแนนบาล๊านซ์ในเดือน</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="totalBalance"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-leftcountactive">สมาชิกแอคทีพซ้าย (คน)</strong></h6>
+                                    <div class="alert bg-pink border-pink h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="leftCountActive"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-rigthcountactive">สมาชิกแอคทีพขวา (คน)</strong></h6>
+                                    <div class="alert bg-pink border-pink h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="rigthCountActive"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="EstimatePositionContainer" class="row">
+
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-ewallet">ยอด E-wallet</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="ewallet"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-holdpv">PV ค้างแจงยอด</strong></h6>
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="holdPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-qualifydate">วันครบบคุณสมบัติ</strong></h6>
+                                    <div class="alert bg-success border-success h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="qualifyDate"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-firstqdate">เดือนที่เริ่มรักษายอด</strong></h6>
+                                    <div class="alert bg-success border-success h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="firstQdate"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-currentmonth">การรักษายอดเดือน</strong></h6>
+                                </div>
+                                <div class="col-xl-6 mb-1 text-center">
+                                    <h6 class="mb-1"><strong id="currentMonth1" class="text-dark"></strong></h6>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-pink" data-key="t-currentmonthqualifypv">รับรายได้เดือน</strong></h6>
+                                    <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="lastmonthQualifyPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong id="lastCMonth" class="text-dark"></strong></h6>
+                                    <div class="alert bg-danger border-danger h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="lastmonthStatus"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-currentmonth">การรักษายอดเดือน</strong></h6>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong id="currentMonth" class="text-dark"></strong></h6>
+                                </div>
+                                <div class="col-xl-6">
+                                    <h6 class="mb-1"><strong class="text-danger" data-key="t-currentmonthqualifypv">รับรายได้เดือน</strong></h6>
+                                    <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="currentMonthQualifyPV"></strong>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 text-center">
+                                    <h6 class="mb-1"><strong id="nextCMonth" class="text-dark"></strong></h6>
+                                    <div class="alert bg-danger border-danger h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong id="currentmonthStatus"></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+            </div>
+            <!--end row-->
+            <div class="row">
+                <div class="col-xxl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0 text-secondary fs-15 fw-semibold" data-key="t-lefturl">ลิ้งค์สมัครด้านซ้าย</h6>
+                        </div>
+                        <div class="card-body">
+                            <a id="leftURL" href="#" target="_blank" class="text-danger fs-15"></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xxl-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="card-title mb-0 text-secondary fs-15 fw-semibold" data-key="t-righturl">ลิ้งค์สมัครด้านขวา</h6>
+                        </div>
+                        <div class="card-body">
+                            <a id="rightURL" href="#" target="_blank" class="text-danger fs-15"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Member Team Total Position Package -->
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-15 fw-semibold">สรุปยอดทีมงานตามตำแหน่งแพ็คเกจ</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="positionPackageContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <!-- Member Team Total Position Ranking -->
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-15 fw-semibold">สรุปยอดทีมงานตามตำแหน่งคุณวุฒิ</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="positionRankingContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <!-- Member Team By Region -->
+                <div class="col-xxl-3">
+                    <div class="row">
+                        <div class="col-xxl-12">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-15 fw-semibold">สรุปจำนวนทีมงานตามภาค (คน)</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div id="regionContainer">
+                                            <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                        </div>
+                                    </div>
+                                </div><!-- end card body -->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xxl-12">
+                            <div class="card">
+                                <div class="card-header align-items-center d-flex">
+                                    <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-15 fw-semibold">ยอดขายใต้สายงานตามภาค (บาท)</h4>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div id="regionbuyContainer">
+                                            <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                        </div>
+                                    </div>
+                                </div><!-- end card body -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Member Team Buy Product -->
+                <div class="col-xxl-3">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-15 fw-semibold">สรุป 10 อันดับสินค้าขายดีใต้สายงาน</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="buyproductContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- Member Team New Buy Product -->
+                <div class="col-xxl-7">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary fs-15 fw-semibold">ยอดซื้อใต้สายงานล่าสุด</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="teamNewBuyContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <!-- Member Team New Register -->
+                <div class="col-xxl-5">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary fs-15 fw-semibold">สมาชิกสมัครล่าสุด</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="teamNewRegisterContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <!-- IncomeByPeriod -->
+                <div class="col-xxl-5">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="card-title mb-0 flex-grow-1 text-secondary fs-15 fw-semibold">สรุปสถิติการรับโบนัส</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="incomeByPeriodContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+                <!-- News -->
+                <div class="col-xxl-7">
+                    <div class="card">
+                        <div class="card-header align-items-center d-flex">
+                            <h4 class="mb-0 flex-grow-1 text-secondary fs-15 fw-semibold">ข่าวสารนักธุระกิจ</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div id="newsContainer">
+                                    <!-- <div class="row"> จะถูกเพิ่มโดย JavaScript -->
+                                </div>
+                            </div>
+                        </div><!-- end card body -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-labelledby="messageModalLabel" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-white mx-auto" id="messageModalLabel"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="message-type-label d-none" id="messageTypeLabel"></div>
+                <div class="message-content" id="messageContent">
+                    <!-- ข้อความจะแสดงที่นี่ -->
+                </div>
+            </div>
+            <div class="modal-footer message-navigation">
+                <span class="message-counter" id="messageCounter">1 / 1</span>
+                <div>
+                    <button type="button" class="btn btn-secondary btn-nav" id="prevBtn" onclick="showPreviousMessage()">
+                        ก่อนหน้า
+                    </button>
+                    <button type="button" class="btn btn-primary btn-nav ms-2" id="nextBtn" onclick="showNextMessage()">
+                        ถัดไป
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const language = localStorage.getItem("language");
+    let allMessages = [];
+    let currentMessageIndex = 0;
+    let messageModal = null;
+
+    // Function to get cookie by name
+    function getCookie(name) {
+        var value = "; " + document.cookie;
+        var parts = value.split("; " + name + "=");
+
+        //console.log(parts.pop().split(";").shift());
+
+        if (parts.length == 2) return parts.pop().split(";").shift();
+        return null;
+    }
+
+    function getColor(index) {
+        // อาร์เรย์ของคลาส CSS (เรียงตามที่ระบุ)
+        const colorClasses = [
+            'color-blue',    // ฟ้า
+            'color-golden',  // เหลืองทอง
+            'color-navy',    // น้ำเงิน
+            'color-purple',  // ม่วง
+            'color-green',   // เขียว
+            'color-red',     // แดง
+            'color-pink',    // ชมพู
+            'color-gray',    // เทา
+            'color-brown',   // น้ำตาล
+            'color-black'    // ดำ
+        ];
+        return colorClasses[index];
+    }
+
+    // ฟังก์ชันตัดข้อความ
+    function truncateText(text, maxLength = 100) {
+        if (!text) return '';
+        if (text.length <= maxLength) return text;
+        return text.substring(0, maxLength) + '...';
+    }
+
+    var memberinfo;
+    $(document).ready(function () {
+        const fp = flatpickr(".dash-filter-picker", {
+            mode: "range",
+            dateFormat: "d M, Y",
+            defaultDate: [
+                // Start of the current month
+                new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                // End of the current month
+                new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0)
+            ]
+        });
+
+        $('#countdownModal').modal('show');
+
+        // Load member info from API
+        async function loadMemberInfo() {
+            /*if (!token) {
+                window.location.href = '/Auth/Login';
+                return;
+            }*/
+
+
+            try {
+                const response = await fetch('/home/GetMemberInfo', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //const data = await response.json();
+                const member = await response.json();
+                if (member) {
+                    memberinfo = member;
+                    //console.info(member);
+                    //console.log('JWT Token:', member);
+                    // Update UI with member data
+                    $('#user-profile-image').attr('src', '/' + member.memberPositionPicture || 'N/A');
+                    $('#membercode').text(member.membercode || 'N/A');
+                    $('#idcardname').text(member.idcardname || 'N/A');
+                    $('#personalPV').text(formatNumberWithComma(member.personalPV || '0'));
+                    $('#positionName').text(member.positionName || 'N/A');//position1
+                    $('#thaiName').text(member.thaiName || 'N/A');//thaiName
+                    $('#sponsername').text(member.sponsername || 'N/A');//sponsername
+                    $('#bwdLeftPV').text(formatNumberWithComma(member.bwdLeftPV || '0'));
+                    $('#bwdRightPV').text(formatNumberWithComma(member.bwdRightPV || '0'));
+                    $('#presentLeftPV').text(formatNumberWithComma(member.presentLeftPV || '0'));
+                    $('#presentRightPV').text(formatNumberWithComma(member.presentRightPV || '0'));
+                    $('#newLeftPV').text(formatNumberWithComma(member.newLeftPV || '0'));
+                    $('#newRightPV').text(formatNumberWithComma(member.newRightPV || '0'));
+                    $('#totalLeftBalanceTeam').text(formatNumberWithComma(member.totalLeftBalanceTeam || '0'));
+                    $('#totalRightBalanceTeam').text(formatNumberWithComma(member.totalRightBalanceTeam || '0'));
+                    $('#totalNewMonthLeftPV').text(formatNumberWithComma(member.totalNewMonthLeftPV || '0'));
+                    $('#totalNewMonthRightPV').text(formatNumberWithComma(member.totalNewMonthRightPV || '0'));
+
+                    $('#totalBonus').text(formatNumberWithComma(member.totalBonus || '0'));
+                    $('#totalBalance').text(formatNumberWithComma(member.totalBalance || '0'));
+                    $('#leftCountActive').text(Number(member.leftCountActive || '0').toLocaleString("en-US"));
+                    $('#rigthCountActive').text(Number(member.rigthCountActive || '0').toLocaleString("en-US"));
+                    $('#ewallet').text(formatNumberWithComma(member.ewallet || '0'));
+                    $('#holdPV').text(formatNumberWithComma(member.holdPV || '0'));
+                    $('#qualifyDate').text(member.qualifyDate || 'N/A');
+                    $('#firstQdate').text(member.firstQdate || 'N/A');
+                    $('#currentMonth').text(member.currentMonth || 'N/A');
+                    $('#nextCMonth').text(member.nextCMonth || 'N/A');
+                    $('#currentMonthQualifyPV').text(formatNumberWithComma(member.currentMonthQualifyPV || '0'));
+                    $('#currentMonth1').text(member.currentMonth1 || 'N/A');
+                    $('#currentmonthStatus').text(member.currentMonthStatus || 'N/A');
+                    $('#lastmonthQualifyPV').text(formatNumberWithComma(member.lastmonthQualifyPV || '0'));
+                    $('#lastCMonth').text(member.lastCMonth || 'N/A');
+                    $('#lastmonthStatus').text(member.lastMonthStatus || 'N/A');
+                    $('#leftURL').html(member.leftURL || 'N/A');
+                    $('#leftURL').attr('href', member.leftURL || 'N/A');
+                    $('#rightURL').html(member.rightURL || 'N/A');
+                    $('#rightURL').attr('href', member.rightURL || 'N/A');
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        //Member Team Total Position Package
+        async function loadMemberTeamTotalPositionPackage() {
+            try {
+                const response = await fetch('/home/GetMemberTeamTotalPositionPackage', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //{Membercode: 'S00000029', M24_X8: '01', Positionname: 'Star', Totalmember: 7}
+                //const data = await response.json();
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#positionPackageContainer');
+
+                    let totalMembersSum = 0; // ตัวแปรสำหรับเก็บผลรวม
+
+                    // คำนวณผลรวมก่อน
+                    $.each(data, function (index, item) {
+                        const totalmember = parseInt(item.Totalmember); // แปลงเป็นตัวเลข
+                        if (totalmember) totalMembersSum += totalmember; // เพิ่มเฉพาะเมื่อเป็นตัวเลขที่ถูกต้อง
+                    });
+
+                    // สร้าง HTML สำหรับผลรวมและเพิ่มไว้ด้านบน
+                    const totalHtml = `
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-danger" data-key="t-totalmember">จำนวนสมาชิกทั้งหมด</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${Number(totalMembersSum || '0').toLocaleString("en-US")}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // เพิ่มผลรวมไว้ด้านบนสุดของ container
+                    $positionContainer.prepend(totalHtml);
+
+                    $.each(data, function (index, item) {
+                        const positionname = item.Positionname;
+                        const totalmember = item.Totalmember;
+                        let positionkey = item.Positionname;
+                        let positioncolor = "text-success";
+
+                        if (positionname === "No Position") {
+                            positionkey = "noposition";
+                        } else if (positionname === "Star") {
+                            positionkey = "star";
+                            positioncolor = "text-info";
+                        } else if (positionname === "Silver Star") {
+                            positionkey = "silverstar";
+                            positioncolor = "text-pink";
+                        } else if (positionname === "Gold Star") {
+                            positionkey = "goldstar";
+                            positioncolor = "text-warning";
+                        }
+
+                        // สร้าง HTML สำหรับ row
+                        const rowHtml = `
+                            <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                                <div class="col-xl-6">
+                                    <h6><strong class="${positioncolor}" data-key="t-${positionkey}">${positionname}</strong></h6>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong>${Number(totalmember || '0').toLocaleString("en-US")}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+
+                        // เพิ่ม row เข้าใน container
+                        $positionContainer.append(rowHtml);
+                    });
+                    //console.info(memberinfo);
+                    $positionContainer.append(`<hr>`);
+                    $positionContainer.append(`
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-secondary" data-key="t-totalmember_buy">จำนวนคนที่ซื้อสินค้า</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${Number(memberinfo.totalmember_buy || '0').toLocaleString("en-US")}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-danger" data-key="t-totalmember_notbuy">จำนวนคนที่ไม่ซื้อสินค้า</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${Number(memberinfo.totalmember_notbuy || '0').toLocaleString("en-US")}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                    $positionContainer.append(`<hr><h4 class="card-title mb-0 flex-grow-1 text-secondary text-center">สรุปยอดซื้อทีมงานในเดือนปัจจุบัน</h4><hr>`);
+                    $positionContainer.append(`
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-pink" data-key="t-totalmember_buy_month">จำนวนคนที่รักษายอด</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${Number(memberinfo.totalmember_buy_month || '0').toLocaleString("en-US")}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-success" data-key="t-amountBUY_Month">ยอดเงิน</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${formatNumberWithComma(memberinfo.amountBUY_Month || '0')}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-danger" data-key="t-pvbuY_Month">จำนวนคะแนน</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${formatNumberWithComma(memberinfo.pvbuY_Month || '0')}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+
+                    $positionContainer.append(`<hr><h4 class="card-title mb-0 flex-grow-1 text-secondary text-center">สรุปยอดขายทีมงานทั้งหมด</h4><hr>`);
+                    $positionContainer.append(`
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-success" data-key="t-amountBUY">ยอดเงิน</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${formatNumberWithComma(memberinfo.amountBUY || '0')}</strong>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                            <div class="col-xl-6">
+                                <h6><strong class="text-danger" data-key="t-pvbuy">จำนวนคะแนน</strong></h6>
+                            </div>
+                            <div class="col-xl-6">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${formatNumberWithComma(memberinfo.pvbuy || '0')}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        //Member Team Total Position Ranking
+        async function loadMemberTeamTotalPositionRanking() {
+            try {
+                const response = await fetch('/home/GetMemberTeamTotalPositionRanking', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //{Membercode: 'S00000029', M24_X8: '01', Positionname: 'Star', Totalmember: 7}
+                //const data = await response.json();
+                const data = await response.json();
+                if (data) {
+                    //console.info(memberinfo);
+                    const $positionContainer = $('#positionRankingContainer');
+
+                    // สร้าง HTML สำหรับผลรวมและเพิ่มไว้ด้านบน
+                    const totalHtml = `
+                        <div class="row d-flex align-items-center justify-content-center">
+                            <div class="col-xl-7">
+                                <h6><strong class="text-danger" data-key="t-totalmember">จำนวนตำแหน่งคุณวุฒิทั้งหมด</strong></h6>
+                            </div>
+                            <div class="col-xl-5">
+                                <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                    <strong>${Number(memberinfo.sumranking || '0').toLocaleString("en-US")}</strong>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    // เพิ่มผลรวมไว้ด้านบนสุดของ container
+                    $positionContainer.prepend(totalHtml);
+
+                    $.each(data, function (index, item) {
+                        const levelcode = item.LevelCode;
+                        const positionname = item.Positionname;
+                        const totalmember = item.Totalmember;
+                        let positionkey = item.Positionname;
+                        let positioncolor = "text-success";
+
+                        if (positionname === "Super Star") {
+                            positionkey = "superstar";
+                            positioncolor = "text-success";
+                        } else if (positionname === "Double Gold Star") {
+                            positionkey = "doublegoldstar";
+                            positioncolor = "text-info";
+                        } else if (positionname === "Triple Gold Star") {
+                            positionkey = "triplegoldstar";
+                            positioncolor = "text-purple";
+                        } else if (positionname === "Platinum Star") {
+                            positionkey = "platinumstar";
+                            positioncolor = "text-warning";
+                        } else if (positionname === "Pearl Star") {
+                            positionkey = "pearlstar";
+                            positioncolor = "text-gray";
+                        } else if (positionname === "Ruby Star") {
+                            positionkey = "triplegoldstar";
+                            positioncolor = "text-black";
+                        } else if (positionname === "Sapphire Star") {
+                            positionkey = "sapphirestar";
+                            positioncolor = "text-success";
+                        } else if (positionname === "Emerald Star") {
+                            positionkey = "emeraldstar";
+                            positioncolor = "text-info";
+                        } else if (positionname === "Diamond Star") {
+                            positionkey = "diamondstar";
+                            positioncolor = "text-purple";
+                        } else if (positionname === "Executive Diamond Star") {
+                            positionkey = "executivediamondstar";
+                            positioncolor = "text-warning";
+                        } else if (positionname === "Double Diamond Star") {
+                            positionkey = "doublediamondstar";
+                            positioncolor = "text-brown";
+                        } else if (positionname === "Triple Diamond Star") {
+                            positionkey = "triplediamondstar";
+                            positioncolor = "text-pink";
+                        } else if (positionname === "Crown Diamond Star") {
+                            positionkey = "crowndiamondstar";
+                            positioncolor = "text-danger";
+                        }
+
+                        if (levelcode !== '00') {
+                            // สร้าง HTML สำหรับ row
+                            const rowHtml = `
+                                <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                                    <div class="col-xl-7">
+                                        <h6><strong class="${positioncolor}" data-key="t-${positionkey}">${positionname}</strong></h6>
+                                    </div>
+                                    <div class="col-xl-5">
+                                        <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                            <strong>${Number(totalmember || '0').toLocaleString("en-US")}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            `;
+                            // เพิ่ม row เข้าใน container
+                            $positionContainer.append(rowHtml);
+                        }
+                    });
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        //Member Team By Region
+        async function loadMemberTeamByRegion() {
+            try {
+                const response = await fetch('/home/GetMemberTeamByRegion', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //{Membercode: 'S00000029', M24_X8: '01', Positionname: 'Star', Totalmember: 7}
+                //const data = await response.json();
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#regionContainer');
+
+                    $.each(data, function (index, item) {
+                        const regionid = item.Region_ID;
+                        const totalmember = item.TotalMember_Region;
+                        const regionname = item.Region_name;
+                        let regioncolor = "text-danger";
+
+                        if (regionid == 1) {
+                            regioncolor = "text-brown";
+                        } else if (regionid == 2) {
+                            regioncolor = "text-info";
+                        } else if (regionid == 3) {
+                            regioncolor = "text-success";
+                        } else if (regionid == 4) {
+                            regioncolor = "text-pink";
+                        } else if (regionid == 5) {
+                            regioncolor = "text-gray";
+                        } else if (regionid == 6) {
+                            regioncolor = "text-purple";
+                        }
+
+                        // สร้าง HTML สำหรับ row
+                        const rowHtml = `
+                            <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                                <div class="col-xl-6">
+                                    <h6><strong class="${regioncolor}">${regionname}</strong></h6>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong>${Number(totalmember || '0').toLocaleString("en-US")}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        // เพิ่ม row เข้าใน container
+                        $positionContainer.append(rowHtml);
+                    });
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        //Member Team By Region Buy
+        async function loadMemberTeamByRegionBuy() {
+            try {
+                const response = await fetch('/home/GetMemberTeamByRegionBuy', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //{Membercode: 'S00000029', M24_X8: '01', Positionname: 'Star', Totalmember: 7}
+                //const data = await response.json();
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#regionbuyContainer');
+
+                    $.each(data, function (index, item) {
+                        const regionid = item.Region_ID;
+                        const totalmember = item.SUMRegionAmount;
+                        const regionname = item.Region_Name;
+                        let regioncolor = "text-danger";
+
+                        if (regionid == 1) {
+                            regioncolor = "text-brown";
+                        } else if (regionid == 2) {
+                            regioncolor = "text-info";
+                        } else if (regionid == 3) {
+                            regioncolor = "text-success";
+                        } else if (regionid == 4) {
+                            regioncolor = "text-pink";
+                        } else if (regionid == 5) {
+                            regioncolor = "text-gray";
+                        } else if (regionid == 6) {
+                            regioncolor = "text-purple";
+                        }
+
+                        // สร้าง HTML สำหรับ row
+                        const rowHtml = `
+                            <div class="row d-flex align-items-center justify-content-center mb-1 mt-1">
+                                <div class="col-xl-6">
+                                    <h6><strong class="${regioncolor}">${regionname}</strong></h6>
+                                </div>
+                                <div class="col-xl-6">
+                                    <div class="alert bg-info border-info h6 text-white material-shadow text-center" style="border-radius: var(--vz-border-radius-xl);" role="alert">
+                                        <strong>${formatNumberWithComma(totalmember || '0')}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        // เพิ่ม row เข้าใน container
+                        $positionContainer.append(rowHtml);
+                    });
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        //Member Team Buy Product
+        async function loadMemberTeamBuyProduct() {
+            try {
+                const response = await fetch('/home/GetMemberTeamBuyProduct', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                //{Membercode: 'S00000029', M24_X8: '01', Positionname: 'Star', Totalmember: 7}
+                //const data = await response.json();
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#buyproductContainer');
+
+                    let tableHtml = '<table class="table table-borderless">';
+                    $.each(data.slice(0, 10), function (index, item) {
+                        const productid = item.Num;
+                        const totalmember = item.Quantity;
+                        const productname = item.ProductName;
+                        let productcolor = getColor(index);
+                        let productunit = item.UnitThai;
+                        if (language === 'th') productunit = item.UnitThai;
+                        else productunit = item.UnitEng;
+
+                        tableHtml += `
+                            <tr>
+                                <td class="p-1 pb-2"><strong class="${productcolor}">${productid}</strong></td>
+                                <td class="p-1"><strong class="${productcolor}">${productname}</strong></td>
+                                <td class="p-1"><strong class="${productcolor}">${Number(totalmember || '0').toLocaleString("en-US")} ${productunit}</strong></td>
+                            </tr>
+                        `;
+                    });
+                    tableHtml += '</table>';
+                    // เพิ่ม row เข้าใน container
+                    $positionContainer.append(tableHtml);
+
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+        //EstimatePosition
+        async function loadMemberEstimatePosition() {
+            try {
+                const response = await fetch('/home/GetMemberEstimatePosition', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                const data = await response.json();
+                if (data) {
+                    const $positionContainer = $('#EstimatePositionContainer');
+                    let tableHtml = '';
+                    $.each(data.slice(0, 3), function (index, item) {
+                        const productid = item.Num;
+                        const totalmember = item.Quantity;
+                        const productname = item.ProductName;
+                        let productcolor = getColor(index);
+                        let productunit = item.UnitThai;
+                        if (language === 'th') productunit = item.UnitThai;
+                        else productunit = item.UnitEng;
+
+                        tableHtml += `<hr />
+                            <div class="col-xl-6">
+                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-nextposition">คุณวุฒิที่คาดว่าจะขึ้น</strong></h6>
+                                <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" role="alert">
+                                    <strong>${(item.EstimatePosistion || 'N/A')}</strong>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-estweakleg">คะแนนตำแหน่ง</strong></h6>
+                                <div class="alert bg-purple border-purple h6 text-white material-shadow text-center mb-1" role="alert">
+                                    <strong>${formatNumberWithComma(item.EstimatetWeakleg || '0')}</strong>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-weakleg">คะแนนทำเพิ่มด้านซ้าย</strong></h6>
+                                <div class="alert bg-danger border-danger h6 text-white material-shadow text-center mb-1" role="alert">
+                                    <strong>${formatNumberWithComma(item.LeftEstimate || '0')}</strong>
+                                </div>
+                            </div>
+                            <div class="col-xl-6">
+                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-weakleg">คะแนนทำเพิ่มด้านขวา</strong></h6>
+                                <div class="alert bg-danger border-danger h6 text-white material-shadow text-center mb-1" role="alert">
+                                    <strong>${formatNumberWithComma(item.RightEstimate || '0')}</strong>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    tableHtml += '';
+                    // เพิ่ม row เข้าใน container
+                    $positionContainer.append(tableHtml);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+        //Member Team New Buy Product
+        async function loadMemberTeamNewBuyProduct() {
+            try {
+                const response = await fetch('/home/GetMemberTeamNewBuy', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#teamNewBuyContainer');
+
+                    let tableHtml = `
+                    <table class="table table-borderless">
+                        <thead class="text-secondary" style="background-color: #e6f3ff;">
+                            <tr>
+                                <th class="p-2 text-center" data-key="t-no">ลำดับที่</th>
+                                <th class="p-2 text-center" data-key="t-levelno">ชั้นที่</th>
+                                <th class="p-2" data-key="t-date">วันที่</th>
+                                <th class="p-2" data-key="t-name">ชื่อ</th>
+                                <th class="p-2 text-ceneter" data-key="t-amount">จำนวนเงิน</th>
+                                <th class="p-2 text-ceneter" data-key="t-pv">คะแนน</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
+                    $.each(data.slice(0, 10), function (index, item) {
+                        const productid = item.Num;
+                        const level = item.LEVELBUY;
+                        const orderdate = new Date(item.OrderDateTime).toLocaleString('th-TH', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            // ถ้าต้องการวินาทีด้วย:
+                            second: '2-digit',
+                            hour12: false
+                        });
+                        const dlname = item.DLName;
+                        const amount = Number(item.Amount || '0').toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                        const pv = Number(item.PV || '0').toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        });
+                        let productcolor = "";
+
+                        tableHtml += `
+                            <tr>
+                                <td class="p-2 text-secondary text-center"><strong class="${productcolor}">${productid}</strong></td>
+                                <td class="p-2 text-secondary text-center"><strong class="${productcolor}">${level}</strong></td>
+                                <td class="p-2"><strong class="${productcolor}">${orderdate}</strong></td>
+                                <td class="p-2"><strong class="${productcolor}">${dlname}</strong></td>
+                                <td class="p-2 text-right"><strong class="${productcolor}">${amount}</strong></td>
+                                <td class="p-2 text-right"><strong class="${productcolor}">${pv}</strong></td>
+                            </tr>
+                        `;
+                    });
+                    tableHtml += `
+                        </tbody>
+                    </table>`;
+                    // เพิ่มตารางเข้าใน container
+                    $positionContainer.append(tableHtml);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+        //Member Team New Register
+        async function loadMemberTeamNewRegister() {
+            try {
+                const response = await fetch('/home/GetMemberTeamNewRegister', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#teamNewRegisterContainer');
+
+                    let tableHtml = `
+                    <table class="table table-borderless">
+                        <thead class="text-secondary" style="background-color: rgb(249 235 210) !important;">
+                            <tr>
+                                <th class="p-2 text-center" data-key="t-no">ลำดับที่</th>
+                                <th class="p-2 text-center" data-key="t-levelno">ชั้นที่</th>
+                                <th class="p-2" data-key="t-date">วันที่</th>
+                                <th class="p-2" data-key="t-name">ชื่อ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
+                    $.each(data.slice(0, 10), function (index, item) {
+                        const productid = item.Num;
+                        const level = item.LEVELTeam;
+                        const orderdate = new Date(item.Regisdatetime).toLocaleString('th-TH', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            // ถ้าต้องการวินาทีด้วย:
+                            second: '2-digit',
+                            hour12: false
+                        });
+                        const dlname = item.Name;
+                        let productcolor = "";
+
+                        tableHtml += `
+                            <tr>
+                                <td class="p-2 text-secondary text-center"><strong class="${productcolor}">${productid}</strong></td>
+                                <td class="p-2 text-secondary text-center"><strong class="${productcolor}">${level}</strong></td>
+                                <td class="p-2"><strong class="${productcolor}">${orderdate}</strong></td>
+                                <td class="p-2"><strong class="${productcolor}">${dlname}</strong></td>
+                            </tr>
+                        `;
+                    });
+                    tableHtml += `
+                        </tbody>
+                    </table>`;
+                    // เพิ่มตารางเข้าใน container
+                    $positionContainer.append(tableHtml);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+        //incomeByPeriod
+        async function loadincomeByPeriod() {
+            try {
+                const response = await fetch('/home/GetIncomeByPeriod', {
+                    method: 'GET',
+                    credentials: 'include' // ส่ง Cookie ไปด้วย
+                });
+                const data = await response.json();
+                if (data) {
+                    //console.info(data);
+                    const $positionContainer = $('#incomeByPeriodContainer');
+
+                    let tableHtml = `
+                    <table class="table table-border">
+                        <thead class="text-secondary">
+                            <tr>
+                                <th class="p-2" width="40%" data-key="t-period">รอบการรับโบนัส</th>
+                                <th class="p-2" width="60%" data-key="t-totalbonusperiod">รายได้</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    `;
+
+                    $.each(data, function (index, item) {
+                        const productid = item.Num;
+                        const period = item.period;
+                        let periodname = "";
+                        let productcolor = "";
+                        if (period == "9_months") periodname = "9 เดือน";
+                        else if (period == "1_year") periodname = "1 ปี";
+                        else if (period == "2_year") periodname = "2 ปี";
+                        else if (period == "1_months") periodname = "1 เดือน";
+                        else if (period == "2_months") periodname = "2 เดือน";
+                        else if (period == "3_months") periodname = "3 เดือน";
+                        else if (period == "4_months") periodname = "4 เดือน";
+                        else if (period == "5_months") periodname = "5 เดือน";
+                        else if (period == "6_months") periodname = "6 เดือน";
+                        else if (period == "7_months") periodname = "7 เดือน";
+                        else if (period == "8_months") periodname = "8 เดือน";
+                        else if (period == "10_months") periodname = "10 เดือน";
+                        else if (period == "11_months") periodname = "11 เดือน";
+                        tableHtml += `
+                            <tr>
+                                <td class="p-2 text-secondary"><strong class="${productcolor}">${periodname}</strong></td>
+                                <td class="p-2 text-secondary"><strong class="${productcolor}">${formatNumberWithComma(item.TotalBonusPeriod)}</strong></td>
+                            </tr>
+                        `;
+                    });
+                    tableHtml += `
+                        </tbody>
+                    </table>`;
+                    // เพิ่มตารางเข้าใน container
+                    $positionContainer.append(tableHtml);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        document.getElementById('leftURL').addEventListener('click', function (e) {
+            e.preventDefault(); // ป้องกันการเปิดลิงก์
+            const url = this.href;
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert("คัดลอกลิงก์เรียบร้อยแล้ว!");
+                })
+                .catch(err => {
+                    alert("ไม่สามารถคัดลอกลิงก์ได้: " + err);
+                });
+        });
+
+        document.getElementById('rightURL').addEventListener('click', function (e) {
+            e.preventDefault(); // ป้องกันการเปิดลิงก์
+            const url = this.href;
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert("คัดลอกลิงก์เรียบร้อยแล้ว!");
+                })
+                .catch(err => {
+                    alert("ไม่สามารถคัดลอกลิงก์ได้: " + err);
+                });
+        });
+
+        // เตรียมข้อความทั้งหมดจากข้อมูล
+        function prepareMessages(data) {
+            allMessages = [];
+            const textMaxLength = 150; // กำหนดความยาวสูงสุดของข้อความ
+
+            data.slice(0, 10).forEach((item, index) => {
+                // เพิ่มข้อความแต่ละประเภท
+                if (item.LastMonthStatusMessage) {
+                    allMessages.push({
+                        type: 'สถานะเดือนที่แล้ว',
+                        message: truncateText(item.LastMonthStatusMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+                if (item.CurrentMonthStatusMessage) {
+                    allMessages.push({
+                        type: 'สถานะเดือนนี้',
+                        message: truncateText(item.CurrentMonthStatusMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+                if (item.SendIDcardMessage) {
+                    allMessages.push({
+                        type: 'ข้อความบัตรประชาชน',
+                        message: truncateText(item.SendIDcardMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+                if (item.SendBankMessage) {
+                    allMessages.push({
+                        type: 'ข้อความธนาคาร',
+                        message: truncateText(item.SendBankMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+                if (item.SendKYCMessage) {
+                    allMessages.push({
+                        type: 'ข้อความ KYC',
+                        message: truncateText(item.SendKYCMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+                if (item.SendHoldExpireMessage) {
+                    allMessages.push({
+                        type: 'ข้อความหมดอายุการระงับ',
+                        message: truncateText(item.SendHoldExpireMessage, textMaxLength),
+                        originalIndex: index
+                    });
+                }
+            });
+
+            return allMessages;
+        }
+
+        // แสดงข้อความใน Modal
+        function showMessage(index) {
+            if (allMessages.length === 0) {
+                alert('ไม่มีข้อความที่จะแสดง');
+                return;
+            }
+
+            currentMessageIndex = index;
+            const message = allMessages[currentMessageIndex];
+
+            // อัปเดตเนื้อหา
+            document.getElementById('messageTypeLabel').textContent = message.type;
+            document.getElementById('messageContent').textContent = message.message;
+            document.getElementById('messageCounter').textContent = `${currentMessageIndex + 1} / ${allMessages.length}`;
+
+            // จัดการปุ่มนำทาง
+            document.getElementById('prevBtn').disabled = currentMessageIndex === 0;
+            document.getElementById('nextBtn').disabled = currentMessageIndex === allMessages.length - 1;
+
+            // เปลี่ยนข้อความปุ่มถัดไปเป็น "ปิด" ถ้าเป็นข้อความสุดท้าย
+            if (currentMessageIndex === allMessages.length - 1) {
+                document.getElementById('nextBtn').textContent = 'ปิด';
+                document.getElementById('nextBtn').onclick = function () {
+                    messageModal.hide();
+                };
+            } else {
+                document.getElementById('nextBtn').textContent = 'ถัดไป';
+                document.getElementById('nextBtn').onclick = showNextMessage;
+            }
+        }
+
+        // แสดงข้อความถัดไป
+        window.showNextMessage = function () {
+            if (currentMessageIndex < allMessages.length - 1) {
+                showMessage(currentMessageIndex + 1);
+            }
+        }
+
+        // แสดงข้อความก่อนหน้า
+        window.showPreviousMessage = function () {
+            if (currentMessageIndex > 0) {
+                showMessage(currentMessageIndex - 1);
+            }
+        }
+
+        // โหลดข้อมูลและแสดง Modal
+        async function loadAndShowMessages() {
+            try {
+                const response = await fetch('/home/GetMemberMessages', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+
+                if (data && data.length > 0) {
+                    prepareMessages(data);
+
+                    if (allMessages.length > 0) {
+                        // เริ่มต้น Modal
+                        if (!messageModal) {
+                            messageModal = new bootstrap.Modal(document.getElementById('messageModal'));
+                        }
+
+                        // แสดงข้อความแรก
+                        showMessage(0);
+                        messageModal.show();
+                    } else {
+                        alert('ไม่พบข้อความที่ต้องแสดง');
+                    }
+                } else {
+                    alert('ไม่มีข้อมูลจาก API');
+                }
+            } catch (error) {
+                console.error('Error loading messages:', error);
+                alert('เกิดข้อผิดพลาดในการโหลดข้อความ');
+            }
+        }
+
+        (async () => {
+            await loadAndShowMessages();
+            await loadMemberInfo();
+            await loadMemberTeamTotalPositionPackage();
+            await loadMemberTeamTotalPositionRanking();
+            await loadMemberTeamByRegion();
+            await loadMemberTeamByRegionBuy();
+            await loadMemberTeamBuyProduct();
+            await loadMemberTeamNewBuyProduct();
+            await loadMemberTeamNewRegister();
+            await loadincomeByPeriod();
+            await loadMemberEstimatePosition();
+        })();
+    });
+
+    function formatNumberWithComma(value) {
+        return Number(value).toLocaleString("en-US", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+</script>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

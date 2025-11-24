@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "TheStarRichyProject\\TheStarRichyProject.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "TheStarRichyApi\\TheStarRichyApi.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

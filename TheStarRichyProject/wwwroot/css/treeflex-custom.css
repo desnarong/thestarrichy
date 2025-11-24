@@ -1,0 +1,132 @@
+.mlm_level_a{
+    color: rgb(37,35,35,50%);
+}
+  
+.mlm_level_b{
+    color: rgb(37,35,35,50%);
+}
+
+.mlm_level_c{
+    color: rgb(37,35,35,50%);
+}
+
+.mlm_level_d{
+    color: rgb(37,35,35,50%);
+}
+
+.mlm_level_e{
+    color: rgb(37,35,35,50%);
+}
+
+.mlm_color_purle{
+    color: rgba(223, 23, 206, 0.5);
+}
+  
+.mlm_color_yellow {
+    color: rgb(185, 197, 16, 0.7);
+}
+
+.mlm_color_bule{
+    color: rgba(28, 196, 226, 0.5);
+}
+
+.mlm_color_red{
+    color: rgba(201, 21, 21, 0.5);
+}
+
+.mlm_color_green{
+    color: rgba(18, 214, 45, 0.5);
+}
+
+.mlm_color_default{
+    color: rgb(37,35,35,0.5);
+}
+
+.mlm_name_icon{
+    background-color: rgba(219, 197, 197, 0.5);
+    padding:2px;
+}
+
+.tf-nc{
+    border: none !important;
+    max-width:50px;
+    padding-right:0 !important;
+    padding-left:0 !important;
+}
+  
+.tf-tree li {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    padding: 0 0;
+    position: relative;
+}
+
+.tf-tree li ul {
+    margin-bottom: 1em;
+}
+
+.tf-custom .tf-nc:before,
+.tf-custom .tf-nc:after {
+    border-radius: 50px 20px;
+}
+
+.icon-w40 {
+    width: 40px;
+    height: 40px;
+    margin: 2px;
+}
+
+
+.platinum-lv{
+    content:url("../images/icons/tree-icon/1_Platinum_40x40.gif");
+}
+
+.gold-lv{
+    content:url("../images/icons/tree-icon/1_Gold5_40x40.gif");
+}
+
+.sliver-lv{
+    content:url("../images/icons/tree-icon/1_Silver_40x40.gif");
+}
+
+.manager-lv{
+    content:url("../images/icons/tree-icon/1_Manager_40x40.gif");
+}
+
+.buyer-lv{
+    content:url("../images/icons/tree-icon/Buyer_40x40.gif");
+}
+
+.empty-lv{
+    content:url("../images/icons/tree-icon/1_Empty_20x20.gif");
+}
+
+@media (max-width: 575.98px) {
+    .tf-nc{
+        border: none !important;
+        /* max-width:25px; */
+        padding-right:0 !important;
+        padding-left:0 !important;
+    }
+
+    .fa-2x {
+        font-size: 1.3em;
+    }
+
+    .tf-tree {
+        /* margin-left: -10px;
+        margin-right: -20px; */
+    }
+
+    .min-w50 {
+        min-width:40px;
+    }
+
+    .icon-w40 {
+        width: 32px;
+        height: 32px;
+        margin: 2px;
+    }
+ }

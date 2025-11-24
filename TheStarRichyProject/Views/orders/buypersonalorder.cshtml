@@ -1,0 +1,988 @@
+﻿@model TheStarRichyProject.Models.BuyPersonalOrderViewModel
+@{
+    ViewData["Title"] = " ซื้อสินค้าแบบ Topup/รักษายอด ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Custom CSS -->
+<style>
+    /* Product Card Styling */
+    .product-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        height: 100%;
+        margin-bottom: unset;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+
+    .card-img-top-wrapper {
+        position: relative;
+        height: 100%;
+        max-height: 336.44px;
+        width: 100%;
+        overflow: hidden;
+        border-radius: 8px 8px 0 0;
+        background: #f8f9fa;
+    }
+
+        .card-img-top-wrapper img {
+            transition: transform 0.3s ease;
+        }
+
+    @@media (max-width: 480px) {
+        .card-img-top-wrapper {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 1/1;
+        }
+    }
+
+    .product-card:hover .card-img-top-wrapper img {
+        transform: scale(1.1);
+    }
+
+    /* Quantity Controls with +/- buttons */
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+        justify-content: space-between;
+    }
+
+    .qty-btn {
+        width: 32px;
+        height: 32px;
+        border: 1px solid #d1d5db;
+        background: white;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 16px;
+        font-weight: 600;
+        color: #6c757d;
+        padding: 0;
+    }
+
+        .qty-btn:hover:not(:disabled) {
+            background: #405189;
+            color: white;
+            border-color: #405189;
+        }
+
+        .qty-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+
+    .qty-input {
+        width: 80%;
+        height: 32px;
+        text-align: center;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+        .qty-input:focus {
+            border-color: #405189;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(64, 81, 137, 0.1);
+        }
+
+        .qty-input::-webkit-inner-spin-button,
+        .qty-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .qty-input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+    .cart-summary-sticky {
+        position: sticky;
+        top: 80px;
+        z-index: 100;
+    }
+
+    .stock-badge {
+        font-size: 11px;
+        padding: 4px 10px;
+        border-radius: 4px;
+        font-weight: 600;
+    }
+
+        .stock-badge.in-stock {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .stock-badge.low-stock {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .stock-badge.out-of-stock {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+    .list-group-item.active {
+        background-color: #405189;
+        border-color: #405189;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .list-group-item.active:hover {
+        background-color: #2f3e73;
+    }
+
+    .card-title {
+        font-size: 14px;
+    }
+</style>
+
+<!-- Header -->
+<div class="row mb-3">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-personal-order">ซื้อสินค้าแบบ Topup/รักษายอด</h4>
+            </div>
+            <div class="card-block p-3">
+                <div class="row">
+                    <div class="col-6">
+                        <!-- Member Search -->
+                        <h6 class="font-weight-bold mb-1">
+                            <i class="bx bx-search-alt"></i> <span data-key="t-search-member-code">ค้นหารหัสสมาชิก</span>
+                        </h6>
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text"
+                                       id="memberCodeInput"
+                                       class="form-control"
+                                       data-key="t-member-code-placeholder"
+                                       placeholder="รหัสสมาชิก..."
+                                       autocomplete="off">
+                                <button type="button"
+                                        id="btnSearchMember"
+                                        class="btn btn-primary">
+                                    <i class="bx bx-search"></i>
+                                </button>
+                            </div>
+
+                            <div class="row mt-1">
+                                <div class="col-6">
+                                    <div class="mt-1">
+                                        <label data-key="t-member-code">รหัส:</label>
+                                        <input type="text" class="form-control" id="resultDLCode" disabled>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label data-key="t-member-name">ชื่อ:</label>
+                                        <input type="text" class="form-control" id="resultDLName" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mt-1">
+                                        <label data-key="t-register-date">วันที่สมัคร:</label>
+                                        <input type="text" class="form-control" id="resultRegisterDate" disabled>
+                                    </div>
+                                    <div class="mt-1">
+                                        <label data-key="t-operator-code">รหัสผู้ทำรายการ:</label>
+                                        <input type="text" class="form-control" id="memberCode" value="@Model.Membercode" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <!-- Center Search -->
+                        <h6 class="font-weight-bold mb-1">
+                            <i class="bx bx-search-alt"></i> <span data-key="t-hybrid-gold-code">รหัส Hybrid gold</span>
+                        </h6>
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <input type="text"
+                                       id="centerCodeInput"
+                                       class="form-control"
+                                       autocomplete="off">
+                                <button type="button"
+                                        id="btnSearchCenter"
+                                        class="btn btn-primary">
+                                    <i class="bx bx-search"></i>
+                                </button>
+                            </div>
+
+                            <div class="row mt-1">
+                                <div class="col-6">
+                                    <div class="mt-1">
+                                        <label data-key="t-hybrid-gold-code">รหัส Hybrid gold:</label>
+                                        <input type="text" class="form-control" id="resultCenterID" disabled>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="mt-1">
+                                        <label data-key="t-hybrid-gold-name">ชื่อ Hybrid gold:</label>
+                                        <input type="text" class="form-control" id="resultCenterName" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <form method="get" action="/Orders/BuyPersonalOrder" id="filterForm">
+        <div class="col-sm-12">
+            <div class="card shadow-sm mb-3">
+                <div class="card-body">
+                    <!-- Search Box -->
+                    <div class="row g-2 align-items-end">
+                        <!-- ช่องค้นหา -->
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold mb-1" data-key="t-search-product">ค้นหาสินค้า</label>
+                            <input type="text"
+                                   class="form-control"
+                                   name="search"
+                                   data-key="t-search-product-placeholder"
+                                   placeholder="ค้นหาชื่อสินค้า..."
+                                   value="@Model.SearchKeyword">
+                        </div>
+
+                        <!-- ประเภทสินค้า -->
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold mb-1" data-key="t-product-type">ประเภทสินค้า</label>
+                            <select name="producttype" class="form-select">
+                                <option value="0" data-key="t-all">ทั้งหมด</option>
+                                <option value="1" data-key="t-promotion">โปรโมชั่น</option>
+                                <option value="2" data-key="t-best-seller">ขายดี</option>
+                                <option value="3" data-key="t-new-arrival">มาใหม่</option>
+                            </select>
+                        </div>
+
+                        <!-- จัดเรียงตาม -->
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold mb-1" data-key="t-sort-by">จัดเรียงตาม</label>
+                            <select name="sortorder" class="form-select">
+                                <option value="0" data-key="t-latest">ล่าสุด</option>
+                                <option value="1" data-key="t-oldest">เก่าสุด</option>
+                                <option value="2" data-key="t-price-low-high">ราคาต่ำ-สูง</option>
+                                <option value="3" data-key="t-price-high-low">ราคาสูง-ต่ำ</option>
+                                <option value="4" data-key="t-pv-low-high">PV ต่ำ-สูง</option>
+                                <option value="5" data-key="t-pv-high-low">PV สูง-ต่ำ</option>
+                            </select>
+                        </div>
+
+                        <!-- ปุ่มค้นหาและรีเฟรช -->
+                        <div class="col-md-2">
+                            <div class="d-flex gap-1">
+                                <button type="submit" class="btn btn-primary flex-fill">
+                                    <i class="bx bx-search"></i> <span data-key="t-search">ค้นหา</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary flex-fill" onclick="location.reload();">
+                                    <i class="bx bx-refresh"></i> <span data-key="t-refresh">รีเฟรช</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hidden input for groupId -->
+        <input type="hidden" name="groupCode" id="groupCode" value="@Model.SelectedGroupCode">
+    </form>
+</div>
+
+<!-- เพิ่ม row ใหม่สำหรับแสดงผลแนวนอน -->
+<div class="row">
+    <!-- Sidebar: Categories & Search -->
+    <div class="col-md-2">
+        <div class="card shadow-sm mb-1">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 text-white">
+                    <i class='bx bx-layer'></i> <span data-key="t-product-category">หมวดหมู่สินค้า</span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <!-- Categories -->
+                <div class="list-group">
+                    @foreach (var group in Model.ProductGroups)
+                    {
+                        <a href="javascript:void(0);"
+                           onclick="selectCategory('@group.ProductGroupCode')"
+                           class="list-group-item list-group-item-action @(Model.SelectedGroupCode == group.ProductGroupCode ? "active" : "")">
+                            <i class="bx bx-tag"></i> @group.ProductGroupThaiName
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content: Products Grid -->
+    <div class="col-md-8">
+        @if (Model.Products.Any())
+        {
+            <div class="row">
+                @foreach (var product in Model.Products)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card product-card shadow-sm h-100">
+                            <!-- Product Image -->
+                            <div class="card-img-top-wrapper">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="/@product.ImageUrl"
+                                         class="card-img-top"
+                                         alt="@product.ProductName"
+                                         style="width: 100%; height: 100%; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="d-flex align-items-center justify-content-center h-100">
+                                        <i class="bx bx-image fa-3x text-muted"></i>
+                                    </div>
+                                }
+                            </div>
+
+                            <!-- Product Info -->
+                            <div class="card-body">
+                                <h6 class="card-title">@product.ProductName</h6>
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <middle class="text-muted"><span data-key="t-code">รหัส</span>: @product.ProductId</middle>
+                                    <div class="text-right">
+                                        <h5 class="text-success mb-0">฿@product.Price.ToString("N2")</h5>
+                                        <small class="text-muted">PV: @product.PV.ToString("N0")</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Quantity Controls & Add to Cart -->
+                            <div class="card-footer bg-white">
+                                @if (product.LimitPerMembercode == "None" || product.LimitPerMembercode == "0")
+                                {
+                                    <!-- กรณี None หรือ 0 - ซื้อได้ไม่จำกัด (ตามสต็อก) -->
+                                    <div class="quantity-controls">
+                                        <button type="button"
+                                                class="qty-btn btn-decrease"
+                                                data-product-id="@product.ProductId">
+                                            <i class="bx bx-minus"></i>
+                                        </button>
+                                        <input type="number"
+                                               class="qty-input product-quantity"
+                                               value="1"
+                                               min="1"
+                                               data-product-id="@product.ProductId"
+                                               data-limit="0">
+                                        <button type="button"
+                                                class="qty-btn btn-increase"
+                                                data-product-id="@product.ProductId"
+                                                data-max="0">
+                                            <i class="bx bx-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" class="form-control btn btn-primary btn-add-to-cart"
+                                            data-product-id="@product.ProductId">
+                                        <i class="bx bx-cart"></i> <span data-key="t-add-product">เพิ่มสินค้า</span>
+                                    </button>
+                                }
+                                else
+                                {
+                                    <!-- จำกัด 2 ชิ้นขึ้นไป - แสดงปุ่มเพิ่ม/ลด แต่จำกัดตามที่กำหนด -->
+                                    <div class="quantity-controls">
+                                        <button type="button"
+                                                class="qty-btn btn-decrease"
+                                                data-product-id="@product.ProductId">
+                                            <i class="bx bx-minus"></i>
+                                        </button>
+                                        <input type="number"
+                                               class="qty-input product-quantity"
+                                               value="1"
+                                               min="1"
+                                               max="@int.Parse(product.LimitPerMembercode ?? "0")"
+                                               data-product-id="@product.ProductId"
+                                               data-limit="@product.LimitPerMembercode">
+                                        <button type="button"
+                                                class="qty-btn btn-increase"
+                                                data-product-id="@product.ProductId"
+                                                data-max="@int.Parse(product.LimitPerMembercode ?? "0")">
+                                            <i class="bx bx-plus"></i>
+                                        </button>
+                                    </div>
+                                    <button type="button" class="form-control btn btn-primary btn-add-to-cart"
+                                            data-product-id="@product.ProductId"
+                                            data-limit="@product.LimitPerMembercode">
+                                        <i class="bx bx-cart"></i> <span data-key="t-add-product">เพิ่มสินค้า</span> (<span data-key="t-limited">จำกัด</span> @product.LimitPerMembercode <span data-key="t-pieces">ชิ้น</span>)
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-info text-center py-5">
+                <i class="bx bx-info-circle fa-3x mb-3"></i>
+                <h5 data-key="t-no-products-found">ไม่พบสินค้า</h5>
+                <p data-key="t-try-change-category">ลองเปลี่ยนหมวดหมู่หรือคำค้นหาใหม่</p>
+            </div>
+        }
+    </div>
+
+    <!-- Cart Summary (Right Sidebar) -->
+    <div class="col-md-2">
+        <div class="card shadow-sm cart-summary-sticky">
+            <div class="card-header bg-success">
+                <h6 class="mb-0 text-white">
+                    <i class="bx bx-shopping-cart"></i> <span data-key="t-summary">สรุปยอด</span>
+                </h6>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" data-key="t-quantity">จำนวน:</td>
+                        <td class="text-right"><strong id="summaryItems">@Model.TotalItems</strong> <span data-key="t-items">รายการ</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted" data-key="t-total-price">ราคารวม:</td>
+                        <td class="text-right">
+                            <h5 class="text-success mb-0"><strong id="summaryTotal">฿ @Model.TotalPrice.ToString("N2")</strong></h5>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">PV:</td>
+                        <td class="text-right"><strong id="summaryPV">@Model.TotalPV.ToString("N0")</strong></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted" data-key="t-delivery-fee">ค่าจัดส่ง:</td>
+                        <td class="text-right"><strong id="shippingFee">@Model.ShippingFee().ToString("N0")</strong></td>
+                    </tr>
+                </table>
+
+                <hr />
+
+                <!-- ปุ่มเปิด Modal -->
+                <button id="btnViewCart" type="button" class="btn btn-success btn-block form-control">
+                    <i class="bx bx-shopping-cart"></i> <span data-key="t-view-cart">ดูตะกร้า</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function selectCategory(groupCode) {
+        document.getElementById('groupCode').value = groupCode;
+        document.getElementById('filterForm').submit();
+    }
+</script>
+
+<!-- Cart Modal -->
+<div class="modal fade" id="cartModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: var(--vz-heading-color);">
+                    <i class="bx bx-cart"></i> <span data-key="t-shopping-cart">ตะกร้าสินค้า</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="cartItemsContainer"></div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <h5><span data-key="t-total">ยอดรวม</span>: <span class="text-success" id="modalTotal">฿0.00</span></h5>
+                    <small class="text-muted">PV: <span id="modalPV">0</span></small>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">
+                        <span data-key="t-close">ปิด</span>
+                    </button>
+                    <button type="button" class="btn btn-success" id="btnConfirmOrder">
+                        <i class="bx bx-check"></i> <span data-key="t-payment">ชำระเงิน</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // ⭐ เพิ่มส่วนนี้ (บรรทัดแรก)
+            let selectedDL = null;
+            let selectedCenter = null;
+
+            // โหลด DL/Center ที่บันทึกไว้
+            const savedDL = sessionStorage.getItem('selectedDL');
+            const savedCenter = sessionStorage.getItem('selectedCenter');
+            if (savedDL) {
+                selectedDL = JSON.parse(savedDL);
+                $('#resultDLCode').val(selectedDL.dlCode).css('background-color', '#d4edda');
+                $('#resultDLName').val(selectedDL.dlName).css('background-color', '#d4edda');
+                $('#resultRegisterDate').val(selectedDL.registerDate).css('background-color', '#d4edda');
+            }
+            if (savedCenter) {
+                selectedCenter = JSON.parse(savedCenter);
+                $('#resultCenterID').val(selectedCenter.centerCode).css('background-color', '#d4edda');
+                $('#resultCenterName').val(selectedCenter.centerName).css('background-color', '#d4edda');
+            }
+            // ===================================
+            // QUANTITY +/- BUTTONS
+            // ===================================
+            // Decrease quantity
+            $('.btn-decrease').click(function() {
+                const productId = $(this).data('product-id');
+                const input = $(`.product-quantity[data-product-id="${productId}"]`);
+                const currentVal = parseInt(input.val());
+                if (currentVal > 1) {
+                    input.val(currentVal - 1);
+                }
+            });
+
+            // Increase quantity
+            $('.btn-increase').click(function() {
+                const productId = $(this).data('product-id');
+                const maxQty = parseInt($(this).data('max'));
+                const input = $(`.product-quantity[data-product-id="${productId}"]`);
+                const currentVal = parseInt(input.val());
+                if (currentVal < maxQty || maxQty == 0) {
+                    input.val(currentVal + 1);
+                } else {
+                    showNotification('warning', `ไม่สามารถเพิ่มได้เกิน ${maxQty} ชิ้น`);
+                }
+            });
+
+            // ===================================
+            // ADD TO CART (แก้ไข)
+            // ===================================
+            $('.btn-add-to-cart').click(function() {
+                // ⭐ เช็ค DL
+                if (!selectedDL || !selectedDL.dlCode) {
+                    showNotification('warning', '⚠️ กรุณาค้นหาและเลือกรหัสสมาชิก (DL) ก่อนเพิ่มสินค้า');
+                    $('#memberCodeInput').focus();
+                    return;
+                }
+
+                const productId = $(this).data('product-id');
+                const quantityInput = $(`.product-quantity[data-product-id="${productId}"]`);
+                const quantity = quantityInput.length > 0 ? parseInt(quantityInput.val()) : 1;
+                const limit = $(this).data('limit');
+
+                // ตรวจสอบจำนวนที่เลือก
+                if (isNaN(quantity) || quantity < 1) {
+                    showNotification('warning', 'กรุณาระบุจำนวนสินค้า');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/Orders/AddToCart',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        limit: limit,
+                        dlCode: selectedDL.dlCode,
+                        dlName: selectedDL.dlName,
+                        registerDate: selectedDL.registerDate,
+                        centerCode: selectedCenter ? selectedCenter.centerCode : '',
+                        centerName: selectedCenter ? selectedCenter.centerName : ''
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            updateCartSummary();
+                            if (typeof window.updateHeaderCartBadge === 'function') {
+                                window.updateHeaderCartBadge();
+                            }
+                            showNotification('success', response.message || 'เพิ่มสินค้าลงตะกร้าเรียบร้อย');
+
+                            // รีเซ็ตจำนวนกลับเป็น 1
+                            if (quantityInput.length > 0) {
+                                quantityInput.val(1);
+                            }
+                        } else {
+                            showNotification('error', response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showNotification('error', 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
+                        console.error('AddToCart Error:', error);
+                    }
+                });
+            });
+
+            // ===================================
+            // CART MODAL
+            // ===================================
+            $('#btnViewCart').click(function() {
+                loadCartItems();
+                $('#cartModal').modal('show');
+            });
+
+            // ===================================
+            // CONFIRM ORDER (แก้ไข - ล้าง DL/Center)
+            // ===================================
+            $('#btnConfirmOrder').click(function() {
+                $.ajax({
+                    url: '/Orders/GetCart',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success && response.items && response.items.length > 0) {
+                            window.location.href = '/Orders/CheckoutInfo';
+                        } else {
+                            showNotification('error', 'กรุณาเลือกสินค้าก่อนดำเนินการต่อ');
+                        }
+                    }
+                });
+            });
+
+
+            // ===================================
+            // LOAD CART ITEMS
+            // ===================================
+            function loadCartItems() {
+                $.ajax({
+                    url: '/Orders/GetCart',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            renderCartItems(response.items);
+                            $('#modalTotal').text('฿ ' + (response.totalPrice || 0).toFixed(2));
+                            $('#modalPV').text((response.totalPV || 0).toFixed(0));
+                            $('#modalBV').text((response.totalBV || 0).toFixed(0));
+                        }
+                    }
+                });
+            }
+
+            // ===================================
+            // RENDER CART ITEMS
+            // ===================================
+            function renderCartItems(items) {
+                let html = '';
+
+                if (!items || items.length === 0) {
+                    html = '<div class="alert alert-info">ตะกร้าว่างเปล่า</div>';
+                } else {
+                    html = '<table class="table">';
+                    html += '<thead><tr><th>สินค้า</th><th>ราคา</th><th>จำนวน</th><th>รวม</th><th></th></tr></thead>';
+                    html += '<tbody>';
+
+                    items.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>
+                                    <strong>${item.productName}</strong><br>
+                                    <small class="text-muted">${item.productCode || item.productID}</small>
+                                </td>
+                                <td>฿${item.price.toFixed(2)}</td>
+                                <td>
+                                    <input type="number"
+                                           class="form-control form-control-sm cart-item-quantity"
+                                           value="${item.quantity}"
+                                           min="1"
+                                           data-product-id="${item.productID || item.productId}"
+                                           style="width: 80px;">
+                                </td>
+                                <td><strong>฿${(item.price * item.quantity).toFixed(2)}</strong></td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm btn-remove-item"
+                                            data-product-id="${item.productID || item.productId}">
+                                        <i class="bx bx-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    html += '</tbody></table>';
+                }
+
+                $('#cartItemsContainer').html(html);
+
+                // Bind events
+                $('.cart-item-quantity').change(function() {
+                    updateCartQuantity($(this).data('product-id'), $(this).val());
+                });
+
+                $('.btn-remove-item').click(function() {
+                    removeFromCart($(this).data('product-id'));
+                });
+            }
+
+            // ===================================
+            // UPDATE CART QUANTITY
+            // ===================================
+            function updateCartQuantity(productId, quantity) {
+                $.ajax({
+                    url: '/Orders/UpdateCart',
+                    type: 'POST',
+                    data: { productId: productId, quantity: quantity },
+                    success: function(response) {
+                        if (response.success) {
+                            loadCartItems();
+                            updateCartSummary();
+
+                            // Update header cart
+                            if (typeof window.updateHeaderCartBadge === 'function') {
+                                window.updateHeaderCartBadge();
+                            }
+                        }
+                    }
+                });
+            }
+
+            // ===================================
+            // REMOVE FROM CART
+            // ===================================
+            function removeFromCart(productId) {
+                if (confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?')) {
+                    $.ajax({
+                        url: '/Orders/RemoveFromCart',
+                        type: 'POST',
+                        data: { productId: productId },
+                        success: function(response) {
+                            if (response.success) {
+                                loadCartItems();
+                                updateCartSummary();
+
+                                // Update header cart
+                                if (typeof window.updateHeaderCartBadge === 'function') {
+                                    window.updateHeaderCartBadge();
+                                }
+
+                                showNotification('success', 'ลบสินค้าออกจากตะกร้าแล้ว');
+                            }
+                        }
+                    });
+                }
+            }
+
+            // ===================================
+            // UPDATE CART SUMMARY
+            // ===================================
+            function updateCartSummary() {
+                $.ajax({
+                    url: '/Orders/GetCart',
+                    type: 'GET',
+                    success: function(response) {
+                        if (response.success) {
+                            $('#summaryItems').text(response.itemCount || 0);
+                            $('#summaryTotal').text('฿ ' + (response.totalPrice || 0).toFixed(2));
+                            $('#summaryPV').text((response.totalPV || 0).toFixed(0));
+                            $('#summaryBV').text((response.totalBV || 0).toFixed(0));
+                            $('#shippingFee').text((response.deliveryfee || 0).toFixed(2));
+                            // //member
+                            // if(response.memberCode)
+                            // {
+                            //     $('#memberCodeInput').val(response.memberCode);
+                            //     $('#btnSearchMember').click();
+                            // }
+                            
+                            // if(response.centerCode){
+                            //     $('#centerCodeInput').val(response.centerCode);
+                            //     $('#btnSearchCenter').click();
+                            // }
+                        }
+                    }
+                });
+            }
+
+            // ===================================
+            // SHOW NOTIFICATION
+            // ===================================
+            function showNotification(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                const notification = $(`
+                    <div class="alert ${alertClass} alert-dismissible fade show"
+                         role="alert"
+                         style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                        <i class="fa ${icon}"></i> ${message}
+                    </div>
+                `);
+                // const notification = $(`
+                //     <div class="alert ${alertClass} alert-dismissible fade show"
+                //          role="alert"
+                //          style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                //         <i class="fa ${icon}"></i> ${message}
+                //         <button type="button" class="close" data-dismiss="alert">
+                //             <span>&times;</span>
+                //         </button>
+                //     </div>
+                // `);
+
+                $('body').append(notification);
+
+                setTimeout(function() {
+                    notification.fadeOut(function() {
+                        $(this).remove();
+                    });
+                }, 3000);
+            }
+
+            // ===================================
+            // SEARCH MEMBER BY CODE (แก้ไข)
+            // ===================================
+            $('#btnSearchMember').click(function() {
+                searchMemberByCode();
+            });
+
+            $('#memberCodeInput').keypress(function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    searchMemberByCode();
+                }
+            });
+
+            function searchMemberByCode() {
+                const dlcode = $('#memberCodeInput').val().trim();
+                if (!dlcode) {
+                    showMemberError('กรุณาระบุรหัสสมาชิก');
+                    return;
+                }
+
+                $('#btnSearchMember').prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin"></i>');
+                $('#memberSearchResult').hide();
+                $('#memberSearchError').hide();
+
+                $.ajax({
+                    url: '/Orders/SearchMemberForSale',
+                    type: 'GET',
+                    data: { dlcode: dlcode },
+                    success: function(response) {
+                        if (response.success) {
+                            // ⭐ บันทึก DL
+                            selectedDL = {
+                                dlCode: response.data.dlCode || dlcode,
+                                dlName: response.data.dlName || '-',
+                                registerDate: response.data.registerDate || '-'
+                            };
+                            sessionStorage.setItem('selectedDL', JSON.stringify(selectedDL));
+
+                            $('#resultDLCode').val(selectedDL.dlCode).css('background-color', '#d4edda');
+                            $('#resultDLName').val(selectedDL.dlName).css('background-color', '#d4edda');
+                            $('#resultRegisterDate').val(selectedDL.registerDate).css('background-color', '#d4edda');
+                        } else {
+                            //showMemberError(response.message || 'ไม่พบรหัสสมาชิก');
+                            showNotification('warning', response.message || 'ไม่พบรหัสสมาชิก');
+                            $('#resultDLCode').val('');
+                            $('#resultDLName').val('');
+                            $('#resultRegisterDate').val('');
+                            selectedDL = null;
+                            sessionStorage.removeItem('selectedDL');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showMemberError('เกิดข้อผิดพลาดในการค้นหา');
+                        console.error('Search error:', error);
+                    },
+                    complete: function() {
+                        $('#btnSearchMember').prop('disabled', false).html('<i class="bx bx-search"></i>');
+                    }
+                });
+            }
+
+            function showMemberError(message) {
+                $('#errorMessage').text(message);
+                $('#memberSearchError').fadeIn();
+                $('#memberSearchResult').hide();
+            }
+
+            $('#memberCodeInput').on('input', function() {
+                $('#memberSearchResult').hide();
+                $('#memberSearchError').hide();
+            });
+
+            // ===================================
+            // SEARCH CENTER BY CODE (แก้ไข)
+            // ===================================
+            $('#btnSearchCenter').click(function() {
+                searchCenterByCode();
+            });
+
+            $('#centerCodeInput').keypress(function(e) {
+                if (e.which === 13) {
+                    e.preventDefault();
+                    searchCenterByCode();
+                }
+            });
+
+            function searchCenterByCode() {
+                const centerCode = $('#centerCodeInput').val().trim();
+                if (!centerCode) {
+                    showMemberError('กรุณาระบุรหัส Hybrid gold');
+                    return;
+                }
+
+                $('#btnSearchCenter').prop('disabled', true).html('<i class="bx bx-loader-alt bx-spin"></i>');
+                $('#memberSearchResult').hide();
+                $('#memberSearchError').hide();
+
+                $.ajax({
+                    url: '/Orders/SearchCenters',
+                    type: 'GET',
+                    data: { centercode: centerCode },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            // ⭐ บันทึก Center
+                            selectedCenter = {
+                                centerCode: response.data.dlCode || memberCode,
+                                centerName: response.data.dlName || '-'
+                            };
+                            sessionStorage.setItem('selectedCenter', JSON.stringify(selectedCenter));
+
+                            $('#resultCenterID').val(selectedCenter.centerCode).css('background-color', '#d4edda');
+                            $('#resultCenterName').val(selectedCenter.centerName).css('background-color', '#d4edda');
+                        } else {
+                            showMemberError(response.message || 'ไม่พบรหัส Hybrid gold');
+                            showNotification('warning', response.message || 'ไม่พบรหัส Hybrid gold');
+                            $('#resultCenterID').val('');
+                            $('#resultCenterName').val('');
+                            selectedCenter = null;
+                            sessionStorage.removeItem('selectedCenter');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showMemberError('เกิดข้อผิดพลาดในการค้นหา');
+                        console.error('Search error:', error);
+                    },
+                    complete: function() {
+                        $('#btnSearchCenter').prop('disabled', false).html('<i class="bx bx-search"></i>');
+                    }
+                });
+            }
+
+            // $('#centerCodeInput').on('input', function() {
+            //     // $('#memberSearchResult').hide();
+            //     // $('#memberSearchError').hide();
+            // });
+        });
+    </script>
+
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

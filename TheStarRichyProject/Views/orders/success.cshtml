@@ -1,0 +1,365 @@
+@{
+    ViewData["Title"] = "สั่งซื้อสำเร็จ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var summary = ViewBag.OrderSummary as TheStarRichyProject.Models.OrderSummaryData;
+    var orderID = ViewBag.OrderID as string;
+}
+
+<!-- Custom CSS -->
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 50px auto;
+        text-align: center;
+    }
+
+    .success-icon {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        margin: 0 auto 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: scaleIn 0.5s ease-out;
+    }
+
+    .success-icon i {
+        font-size: 60px;
+        color: white;
+    }
+
+    @@keyframes scaleIn {
+        0% {
+            transform: scale(0);
+            opacity: 0;
+        }
+        50% {
+            transform: scale(1.1);
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .success-title {
+        font-size: 32px;
+        font-weight: bold;
+        color: #198754;
+        margin-bottom: 15px;
+    }
+
+    .order-id-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 30px 0;
+        border-left: 4px solid #198754;
+    }
+
+    .order-id-box h5 {
+        margin: 0;
+        color: #6c757d;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+
+    .order-id-box .order-number {
+        font-size: 24px;
+        font-weight: bold;
+        color: #405189;
+        margin-top: 10px;
+    }
+
+    .order-summary-section {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-top: 30px;
+        text-align: left;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .summary-row:last-child {
+        border-bottom: none;
+        padding-top: 20px;
+        margin-top: 10px;
+        border-top: 2px solid #405189;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .product-list {
+        max-height: 400px;
+        overflow-y: auto;
+        margin-top: 15px;
+    }
+
+    .product-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .product-item:last-child {
+        border-bottom: none;
+    }
+
+    .product-info {
+        flex: 1;
+    }
+
+    .product-name {
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 5px;
+    }
+
+    .product-details {
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .product-price {
+        font-weight: 600;
+        color: #405189;
+        text-align: right;
+    }
+
+    .action-buttons {
+        margin-top: 40px;
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        min-width: 200px;
+        padding: 12px 30px;
+        font-weight: 600;
+    }
+
+    .info-section {
+        background: #e7f1ff;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .info-section h6 {
+        color: #405189;
+        margin-bottom: 15px;
+    }
+
+    .info-section ul {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    .info-section li {
+        margin-bottom: 8px;
+        color: #495057;
+    }
+
+    .delivery-info {
+        background: #fff3cd;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ffc107;
+        margin: 15px 0;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="success-container">
+        <!-- Success Icon -->
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <!-- Success Title -->
+        <h1 class="success-title">สั่งซื้อสำเร็จ!</h1>
+        <p class="text-muted">ขอบคุณที่ใช้บริการ ระบบได้รับคำสั่งซื้อของคุณเรียบร้อยแล้ว</p>
+
+        <!-- Order ID -->
+        <div class="order-id-box">
+            <h5>เลขที่คำสั่งซื้อ</h5>
+            <div class="order-number">@orderID</div>
+            <small class="text-muted">กรุณาเก็บเลขที่คำสั่งซื้อนี้ไว้สำหรับการติดตาม</small>
+        </div>
+
+        @if (summary != null)
+        {
+            <!-- Order Summary -->
+            <div class="order-summary-section">
+                <h4 class="mb-4">
+                    <i class="fas fa-shopping-bag"></i> สรุปรายการสั่งซื้อ
+                </h4>
+
+                <!-- Products List -->
+                <div class="product-list">
+                    @foreach (var item in summary.Items)
+                    {
+                        <div class="product-item">
+                            <div class="product-info">
+                                <div class="product-name">@item.ProductName</div>
+                                <div class="product-details">
+                                    <span>฿@item.Price.ToString("N2")</span>
+                                    <span class="mx-2">×</span>
+                                    <span>@item.Quantity ชิ้น</span>
+                                    <span class="mx-2">|</span>
+                                    <span>PV: @item.PV</span>
+                                </div>
+                            </div>
+                            <div class="product-price">
+                                ฿@item.TotalPrice.ToString("N2")
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <hr class="my-4">
+
+                <!-- Summary Totals -->
+                <div class="summary-row">
+                    <span>ยอดรวมสินค้า</span>
+                    <span>฿@summary.TotalAmount.ToString("N2")</span>
+                </div>
+                <div class="summary-row">
+                    <span>PV รวม</span>
+                    <span>@summary.TotalPV.ToString("N0")</span>
+                </div>
+                <div class="summary-row">
+                    <span>ค่าจัดส่ง</span>
+                    <span>
+                        @if (summary.ShippingFee == 0)
+                        {
+                            <span class="text-success">ฟรี</span>
+                        }
+                        else
+                        {
+                            <span>฿@summary.ShippingFee.ToString("N2")</span>
+                        }
+                    </span>
+                </div>
+                <div class="summary-row">
+                    <span>ยอดรวมทั้งหมด</span>
+                    <span class="text-primary">฿@summary.GrandTotal.ToString("N2")</span>
+                </div>
+
+                <!-- Delivery Info -->
+                <div class="delivery-info">
+                    <h6 class="mb-2">
+                        <i class="fas fa-truck"></i> ข้อมูลการจัดส่ง
+                    </h6>
+                    <div class="mb-1">
+                        <strong>วิธีการ:</strong> @summary.DeliveryMethod
+                    </div>
+                    @if (!string.IsNullOrEmpty(summary.DeliveryInfo.FullAddress))
+                    {
+                        <div class="mb-1">
+                            <strong>ที่อยู่:</strong> @($"{summary.DeliveryInfo.FullAddress} {summary.DeliveryInfo.SubDistrict} {summary.DeliveryInfo.District} {summary.DeliveryInfo.Province} {summary.DeliveryInfo.PostalCode}")
+                        </div>
+                    }
+                    @if (!string.IsNullOrEmpty(summary.DeliveryInfo.PhoneNumber))
+                    {
+                        <div>
+                            <strong>เบอร์โทร:</strong> @summary.DeliveryInfo.PhoneNumber
+                        </div>
+                    }
+                </div>
+
+                <!-- Payment Info -->
+                <div class="info-section">
+                    <h6><i class="fas fa-credit-card"></i> ข้อมูลการชำระเงิน</h6>
+                    <div class="mb-2">
+                        <strong>วิธีชำระเงิน:</strong> @summary.PaymentMethod
+                    </div>
+                    <div>
+                        <strong>สถานะ:</strong> 
+                        <span class="badge bg-success">ชำระเงินสำเร็จ</span>
+                    </div>
+                </div>
+
+                <!-- Next Steps -->
+                <div class="info-section">
+                    <h6><i class="fas fa-info-circle"></i> ขั้นตอนต่อไป</h6>
+                    <ul>
+                        <li>ระบบจะส่ง SMS/Email แจ้งเตือนให้คุณทราบ</li>
+                        <li>คำสั่งซื้อจะถูกจัดเตรียมภายใน 1-2 วันทำการ</li>
+                        <li>@(summary.DeliveryMethod == "Delivery" ? "สินค้าจะถูกจัดส่งภายใน 3-5 วันทำการ" : "คุณสามารถมารับสินค้าได้ที่สาขาที่เลือก")</li>
+                        <li>ติดตามสถานะคำสั่งซื้อได้ที่เมนู "ประวัติการสั่งซื้อ"</li>
+                        @if (summary.SendInvoice)
+                        {
+                            <li>ใบเสร็จจะถูกจัดส่งพร้อมกับสินค้า</li>
+                        }
+                        else
+                        {
+                            <li>ใบเสร็จอิเล็กทรอนิกส์จะถูกส่งไปที่ Email ของคุณ</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <a href="/orders/buypersonalorder" class="btn btn-primary btn-action">
+                    <i class="fas fa-shopping-cart"></i> สั่งซื้อสินค้าต่อ
+                </a>
+                <a href="/reports/orderhistory" class="btn btn-outline-primary btn-action">
+                    <i class="fas fa-history"></i> ดูประวัติการสั่งซื้อ
+                </a>
+                <a href="/home/index" class="btn btn-outline-secondary btn-action">
+                    <i class="fas fa-home"></i> กลับหน้าหลัก
+                </a>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="info-section" style="margin-top: 40px;">
+                <h6><i class="fas fa-headset"></i> ต้องการความช่วยเหลือ?</h6>
+                <p class="mb-2">หากมีข้อสงสัยเกี่ยวกับคำสั่งซื้อ กรุณาติดต่อ:</p>
+                <p class="mb-1">
+                    <i class="fas fa-phone"></i> โทร: 02-123-4567
+                </p>
+                <p class="mb-1">
+                    <i class="fas fa-envelope"></i> Email: support@thestarrichy.com
+                </p>
+                <p class="mb-0">
+                    <i class="fas fa-clock"></i> เวลาทำการ: จันทร์-ศุกร์ 9:00-18:00 น.
+                </p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // แสดง confetti animation (optional)
+            showConfetti();
+
+            function showConfetti() {
+                // TODO: Add confetti library or animation
+                console.log('Order completed successfully!');
+            }
+
+            // Print Order
+            window.printOrder = function() {
+                window.print();
+            };
+        });
+    </script>
+}

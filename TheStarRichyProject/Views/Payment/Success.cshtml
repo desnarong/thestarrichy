@@ -1,0 +1,150 @@
+@{
+    ViewData["Title"] = "ชำระเงินสำเร็จ";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-body text-center py-5">
+                    <!-- Success Icon -->
+                    <div class="success-icon mb-4">
+                        <i class="fa fa-check-circle text-success" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <!-- Success Message -->
+                    <h2 class="text-success mb-3">ชำระเงินสำเร็จ!</h2>
+                    <p class="text-muted mb-4">ขอบคุณสำหรับการชำระเงิน</p>
+
+                    <!-- Transaction Details -->
+                    <div class="transaction-details bg-light p-4 rounded mb-4">
+                        <div class="row mb-3">
+                            <div class="col-6 text-left">
+                                <strong>จำนวนเงิน:</strong>
+                            </div>
+                            <div class="col-6 text-right">
+                                <span class="text-success h4">฿ @ViewBag.Amount</span>
+                            </div>
+                        </div>
+
+                        <hr />
+
+                        <div class="row mb-2">
+                            <div class="col-6 text-left text-muted">
+                                <small>รหัสคำสั่งซื้อ:</small>
+                            </div>
+                            <div class="col-6 text-right">
+                                <strong>@ViewBag.OrderId</strong>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <div class="col-6 text-left text-muted">
+                                <small>รหัสธุรกรรม:</small>
+                            </div>
+                            <div class="col-6 text-right">
+                                <small class="font-monospace">@ViewBag.TransactionId</small>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(ViewBag.TxnNo))
+                        {
+                            <div class="row mb-2">
+                                <div class="col-6 text-left text-muted">
+                                    <small>เลขที่ธุรกรรมธนาคาร:</small>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <small class="font-monospace">@ViewBag.TxnNo</small>
+                                </div>
+                            </div>
+                        }
+
+                        <div class="row">
+                            <div class="col-6 text-left text-muted">
+                                <small>วันที่:</small>
+                            </div>
+                            <div class="col-6 text-right">
+                                <small>@DateTime.Now.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        คำสั่งซื้อของคุณกำลังดำเนินการ
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="btn-group-vertical w-100" role="group">
+                        <a href="/Orders/Detail?id=@ViewBag.OrderId" class="btn btn-primary btn-lg mb-2">
+                            <i class="fa fa-list"></i> ดูรายละเอียดคำสั่งซื้อ
+                        </a>
+                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2">
+                            <i class="fa fa-shopping-bag"></i> คำสั่งซื้อของฉัน
+                        </a>
+                        <a href="/" class="btn btn-outline-primary btn-lg">
+                            <i class="fa fa-home"></i> กลับหน้าหลัก
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Additional Info -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h6 class="card-title">
+                        <i class="fa fa-envelope"></i> อีเมลยืนยัน
+                    </h6>
+                    <p class="card-text text-muted mb-0">
+                        เราได้ส่งอีเมลยืนยันการชำระเงินไปยังอีเมลของคุณแล้ว
+                        หากมีคำถามหรือข้อสงสัย กรุณาติดต่อฝ่ายบริการลูกค้า
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // แสดง animation เมื่อโหลดหน้า
+            $('.success-icon i').hide().fadeIn(800);
+            
+            // Confetti effect (ถ้าต้องการ)
+            // You can add confetti.js library here
+        });
+    </script>
+
+    <style>
+        .success-icon i {
+            animation: scaleIn 0.5s ease-in-out;
+        }
+
+        @@keyframes scaleIn {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .transaction-details {
+            border: 2px solid #e9ecef;
+        }
+
+        .font-monospace {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+        }
+
+        .btn-group-vertical .btn {
+            border-radius: 0.5rem !important;
+        }
+    </style>
+}

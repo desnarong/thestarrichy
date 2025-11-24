@@ -1,0 +1,425 @@
+﻿@{
+    ViewData["Title"] = "สมาชิก";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-member-register">ลงทะเบียนสมาชิก</h4>
+            </div>
+            <div class="card-block p-3">
+                <div class="row mb-3">
+                    <div class="col-lg-2 text-end">
+                        <button class="btn btn-primary me-2" data-key="t-save">บันทึก</button>
+                        <button class="btn btn-danger" data-key="t-cancel">ยกเลิก</button>
+                    </div>
+                    <div class="col-lg-10">
+                        <label class="col-form-label text-danger" data-key="t-member-register-warn">คำเตือนการลงทะเบียนสมาชิก</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <!-- General Information -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 data-key="t-general-information">ข้อมูลทั่วไป</h5>
+                            </div>
+                            <div class="card-block p-3">
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-country">ประเทศ</label>
+                                    <div class="col-md-8">
+                                        <select name="country" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ</label>
+                                    <div class="col-md-8">
+                                        <select name="business_country" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-referrer-code">รหัสผู้อ้างอิง</label>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" value="S00000029" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label"></label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked />
+                                            <label class="form-check-label" for="referrer_left" data-key="t-referrer-left">ด้านซ้าย</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" />
+                                            <label class="form-check-label" for="referrer_right" data-key="t-referrer-right">ด้านขวา</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-referrer-name">ชื่อผู้อ้างอิง</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="Star1" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-upline-code">รหัสอัพไลน์</label>
+                                    <div class="col-md-6">
+                                        <input type="text" class="form-control" value="S00033042" />
+                                    </div>
+                                    <div class="col-md-2">
+                                        <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-upline-name">ชื่ออัพไลน์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="Star1" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-upline-side">ด้านอัพไลน์</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="upline_side" id="uplineside_left" checked />
+                                            <label class="form-check-label" for="uplineside_left" data-key="t-referrer-left">ด้านซ้าย</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="upline_side" id="uplineside_right" />
+                                            <label class="form-check-label" for="uplineside_right" data-key="t-referrer-right">ด้านขวา</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="business_type" id="businessman" checked />
+                                            <label class="form-check-label" for="businessman" data-key="t-businessman">นักธุรกิจ</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="business_type" id="user" />
+                                            <label class="form-check-label" for="user" data-key="t-user">ผู้ใช้</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-user-code">รหัสผู้ใช้</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-registration-date">วันที่สมัคร</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="01-10-2565" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-title">คำนำหน้า</label>
+                                    <div class="col-md-8">
+                                        <select name="title" class="form-control">
+                                            <option value="1">บริษัท</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="ฐิตาภรณ์ บุณรงค์" readonly />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="Star1" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-date-of-birth">วันเกิด</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="14-09-2547" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-citizen-number">เลขบัตรประชาชน/เลขหนังสือเดินทาง</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="3341900571937" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-gender">เพศ</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="gender" id="male" checked />
+                                            <label class="form-check-label" for="male" data-key="t-male">ชาย</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="gender" id="female" />
+                                            <label class="form-check-label" for="female" data-key="t-female">หญิง</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-language">ภาษา</label>
+                                    <div class="col-md-8">
+                                        <select name="language" class="form-control">
+                                            <option value="1">บริษัท</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-yes" checked />
+                                            <label class="form-check-label" for="sms_news_updates-yes" data-key="t-yes">ใช่</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-no" />
+                                            <label class="form-check-label" for="sms_news_updates-no" data-key="t-no">ไม่ใช่</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-membership-type">ประเภทสมาชิก</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="membership_type" id="individual" checked />
+                                            <label class="form-check-label" for="individual" data-key="t-individual">บุคคล</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="membership_type" id="legal_entity" />
+                                            <label class="form-check-label" for="legal_entity" data-key="t-legal-entity">นิติบุคคล</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-marital-status">สถานะสมรส</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="marital_status" id="marital" checked />
+                                            <label class="form-check-label" for="marital" data-key="t-marital">สมรส</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="marital_status" id="single" />
+                                            <label class="form-check-label" for="single" data-key="t-single">โสด</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-spouses-name">ชื่อคู่สมรส</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-document-verification">การตรวจสอบเอกสาร</label>
+                                    <div class="col-md-8">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 data-key="t-address-information">ข้อมูลที่อยู่</h5>
+                            </div>
+                            <div class="card-block p-3">
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-address-on-the-id-card">ที่อยู่ตามบัตรประชาชน</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" rows="3">126 หมู่ที่ 13 ต.นิคมสร้างตนเองลำโดมน้อย อ.สิรินธร</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-province">จังหวัด</label>
+                                    <div class="col-md-8">
+                                        <select name="province_id_card" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-current-address">ที่อยู่ปัจจุบัน</label>
+                                    <div class="col-md-8">
+                                        <textarea class="form-control" rows="3">51/353 ถนนราษฎร์บูรณะ แขวงบางปะกอก เขตราษฎร์บูรณะ</textarea>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-province">จังหวัด</label>
+                                    <div class="col-md-8">
+                                        <select name="province_current" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="0925955695" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-home-phone">โทรศัพท์บ้าน</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="-" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-email">อีเมล</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-line-id">Line ID</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bank Information -->
+                    <div class="col-lg-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 data-key="t-bank-information">ข้อมูลธนาคาร</h5>
+                            </div>
+                            <div class="card-block p-3">
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-bank">ธนาคาร</label>
+                                    <div class="col-md-8">
+                                        <select name="bank" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-account-number">เลขที่บัญชี</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-account-name">ชื่อบัญชี</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-branch">สาขา</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-yes" checked />
+                                            <label class="form-check-label" for="auto_transfer-yes" data-key="t-yes">ใช่</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-no" />
+                                            <label class="form-check-label" for="auto_transfer-no" data-key="t-no">ไม่ใช่</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-autoship">Autoship</label>
+                                    <div class="col-md-8">
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="autoship" id="deduct" checked />
+                                            <label class="form-check-label" for="deduct" data-key="t-deduct">หัก</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input type="radio" class="form-check-input" name="autoship" id="not_deducted" />
+                                            <label class="form-check-label" for="not_deducted" data-key="t-not-deducted">ไม่หัก</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-position">ตำแหน่ง</label>
+                                    <div class="col-md-8">
+                                        <select name="position" class="form-control">
+                                            <option value="1">ประเทศไทย</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-apply-through-the-center">สมัครผ่านศูนย์</label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" value="34350" />
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน</label>
+                                    <div class="col-md-8">
+                                        <img class="img-fluid" src="/img/gallery/gallery-1.jpg" alt="">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร</label>
+                                    <div class="col-md-8">
+                                        <img class="img-fluid" src="/img/gallery/gallery-1.jpg" alt="">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-application-form-submitted">ใบสมัครที่ส่งแล้ว</label>
+                                    <div class="col-md-8">
+                                        <img class="img-fluid" src="/img/gallery/gallery-1.jpg" alt="">
+                                    </div>
+                                </div>
+                                <div class="form-group row mb-3">
+                                    <label class="col-md-4 col-form-label" data-key="t-picture">รูปภาพ</label>
+                                    <div class="col-md-8">
+                                        <img class="img-fluid" src="/img/gallery/gallery-1.jpg" alt="">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

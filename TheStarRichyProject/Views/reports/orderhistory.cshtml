@@ -1,0 +1,195 @@
+﻿@{
+    ViewData["Title"] = "ประวัติการสั่งซื้อ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <!-- Nav Pills -->
+        <ul class="nav nav-pills mb-4 d-flex flex-wrap">
+            <li class="nav-item">
+                <a href="#nav-tab1" data-bs-toggle="tab" class="nav-link active" data-key="t-personal-sales">การขายส่วนตัว</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab2" data-bs-toggle="tab" class="nav-link" data-key="t-sales-breakdown">รายละเอียดการขาย</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab3" data-bs-toggle="tab" class="nav-link" data-key="t-hold-purchase">การสั่งซื้อแบบถือครอง</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab4" data-bs-toggle="tab" class="nav-link" data-key="t-pending-orders">คำสั่งซื้อที่รอดำเนินการ</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab5" data-bs-toggle="tab" class="nav-link" data-key="t-ewallet-transactions">ธุรกรรม E-wallet จากบริษัท</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab6" data-bs-toggle="tab" class="nav-link" data-key="t-member-registration-center">การลงทะเบียนสมาชิกผ่านศูนย์</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab7" data-bs-toggle="tab" class="nav-link" data-key="t-stock">สต็อก</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab8" data-bs-toggle="tab" class="nav-link" data-key="t-hold-summary-product">สรุปการถือครองตามสินค้า</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab9" data-bs-toggle="tab" class="nav-link" data-key="t-sales-summary-product">สรุปการขายตามสินค้า</a>
+            </li>
+            <li class="nav-item">
+                <a href="#nav-tab10" data-bs-toggle="tab" class="nav-link" data-key="t-transaction-history">ประวัติการทำธุรกรรม</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="nav-tab1" class="row tab-pane fade show active">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-personal-sales">การขายส่วนตัว</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab1" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab2" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-sales-breakdown">รายละเอียดการขาย</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab2" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab3" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-hold-purchase">การสั่งซื้อแบบถือครอง</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab3" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab4" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-pending-orders">คำสั่งซื้อที่รอดำเนินการ</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab4" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab5" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-ewallet-transactions">ธุรกรรม E-wallet จากบริษัท</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab5" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab6" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-member-registration-center">การลงทะเบียนสมาชิกผ่านศูนย์</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab6" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab7" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-stock">สต็อก</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab7" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab8" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-hold-summary-product">สรุปการถือครองตามสินค้า</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab8" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab9" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-sales-summary-product">สรุปการขายตามสินค้า</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab9" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="nav-tab10" class="row tab-pane fade">
+                <div class="col-md-12 col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 data-key="t-transaction-history">ประวัติการทำธุรกรรม</h4>
+                        </div>
+                        <div class="card-block p-3">
+                            <div class="table-responsive">
+                                <partial name="_orderhistorytab10" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+    });
+</script>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

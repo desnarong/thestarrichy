@@ -1,0 +1,540 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Account Name" xml:space="preserve">
+    <value>ឈ្មោះគណនី</value>
+  </data>
+  <data name="Account Number" xml:space="preserve">
+    <value>លេខគណនី</value>
+  </data>
+  <data name="Accumulated bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ប្រមូល</value>
+  </data>
+  <data name="Active Left" xml:space="preserve">
+    <value>សកម្មខាងឆ្វេង</value>
+  </data>
+  <data name="Active Right" xml:space="preserve">
+    <value>សកម្មខាងស្ដាំ</value>
+  </data>
+  <data name="Address Information" xml:space="preserve">
+    <value>ព័ត៌មានអាសយដ្ឋាន</value>
+  </data>
+  <data name="Address on the Id Card" xml:space="preserve">
+    <value>អាសយដ្ឋាននៅលើកាតអត្តសញ្ញាណប័ណ្ណ</value>
+  </data>
+  <data name="Adjusted from HOLD Bill" xml:space="preserve">
+    <value>កែតម្រូវពីវិក័យប័ត្រ HOLD</value>
+  </data>
+  <data name="Adjuster" xml:space="preserve">
+    <value>អ្នកកែតម្រូវ</value>
+  </data>
+  <data name="Amount" xml:space="preserve">
+    <value>ចំនួន</value>
+  </data>
+  <data name="Amount Received" xml:space="preserve">
+    <value>ចំនួនដែលទទួលបាន</value>
+  </data>
+  <data name="Amount to Top-Up" xml:space="preserve">
+    <value>ចំនួនដែលត្រូវបញ្ចូល</value>
+  </data>
+  <data name="Amount to Transfer" xml:space="preserve">
+    <value>ចំនួនសម្រាប់បញ្ជូន</value>
+  </data>
+  <data name="Application form has been Submitted" xml:space="preserve">
+    <value>បែបបទដាក់ពាក្យបានដាក់ស្នើរហើយ</value>
+  </data>
+  <data name="Apply through the center" xml:space="preserve">
+    <value>ដាក់ពាក្យតាមមជ្ឍមណ្ឌល</value>
+  </data>
+  <data name="Arrange for delivery" xml:space="preserve">
+    <value>រៀបចំសម្រាប់ការដឹកជញ្ជូន</value>
+  </data>
+  <data name="Auto Transfer" xml:space="preserve">
+    <value>ការបញ្ជូនដោយស្វ័យប្រវត្តិ</value>
+  </data>
+  <data name="Autoship" xml:space="preserve">
+    <value>ការដឹកជញ្ជូនដោយស្វ័យប្រវត្តិ</value>
+  </data>
+  <data name="Balance" xml:space="preserve">
+    <value>សមតុល្យ</value>
+  </data>
+  <data name="Balance Score" xml:space="preserve">
+    <value>ពិន្ទុសមតុល្យ</value>
+  </data>
+  <data name="Bank" xml:space="preserve">
+    <value>ធនាគារ</value>
+  </data>
+  <data name="Bank Information" xml:space="preserve">
+    <value>ព័ត៌មានធនាគារ</value>
+  </data>
+  <data name="Bank Transfer" xml:space="preserve">
+    <value>ការបញ្ជូនប្រាក់តាមធនាគារ</value>
+  </data>
+  <data name="Beneficiary" xml:space="preserve">
+    <value>អ្នកទទួលអត្ថប្រយោជន៍</value>
+  </data>
+  <data name="Beneficiary Card Number" xml:space="preserve">
+    <value>លេខកាតរបស់អ្នកទទួលអត្ថប្រយោជន៍</value>
+  </data>
+  <data name="Bill Expiry Date" xml:space="preserve">
+    <value>ថ្ងៃផុតកំណត់វិក័យប័ត្រ</value>
+  </data>
+  <data name="Bill Number" xml:space="preserve">
+    <value>លេខវិក័យប័ត្រ</value>
+  </data>
+  <data name="Branch" xml:space="preserve">
+    <value>សាខា</value>
+  </data>
+  <data name="Branch Address" xml:space="preserve">
+    <value>អាសយដ្ឋានសាខា</value>
+  </data>
+  <data name="Branch Code" xml:space="preserve">
+    <value>កូដសាខា</value>
+  </data>
+  <data name="Business Name" xml:space="preserve">
+    <value>ឈ្មោះអាជីវកម្ម</value>
+  </data>
+  <data name="Business Position" xml:space="preserve">
+    <value>មុខតំណែងអាជីវកម្ម</value>
+  </data>
+  <data name="Businessman" xml:space="preserve">
+    <value>ជនជាតិអាជីវកម្ម</value>
+  </data>
+  <data name="Center Code" xml:space="preserve">
+    <value>កូដមជ្ឍមណ្ឌល</value>
+  </data>
+  <data name="Center/Mobile Code" xml:space="preserve">
+    <value>កូដមជ្ឍមណ្ឌល/កូដចល័ត</value>
+  </data>
+  <data name="Citizen Number" xml:space="preserve">
+    <value>លេខអ្នកប្រជាជន</value>
+  </data>
+  <data name="Code" xml:space="preserve">
+    <value>កូដ</value>
+  </data>
+  <data name="Copy of Bank Account Book" xml:space="preserve">
+    <value>ច្បាប់ចម្លងនៃសៀវភៅគណនីធនាគារ</value>
+  </data>
+  <data name="Copy of Id Card" xml:space="preserve">
+    <value>ច្បាប់ចម្លងនៃកាតអត្តសញ្ញាណ</value>
+  </data>
+  <data name="Countries Conducting Business" xml:space="preserve">
+    <value>ប្រទេសដែលធ្វើអាជីវកម្ម</value>
+  </data>
+  <data name="Country" xml:space="preserve">
+    <value>ប្រទេស</value>
+  </data>
+  <data name="Credit" xml:space="preserve">
+    <value>ឥណទាន</value>
+  </data>
+  <data name="Current Address" xml:space="preserve">
+    <value>អាសយដ្ឋានបច្ចុប្បន្ន</value>
+  </data>
+  <data name="Current Month Maintenance" xml:space="preserve">
+    <value>ការថែទាំខែបច្ចុប្បន្ន</value>
+  </data>
+  <data name="Daily Points" xml:space="preserve">
+    <value>ពិន្ទុប្រចាំថ្ងៃ</value>
+  </data>
+  <data name="Daily points entry" xml:space="preserve">
+    <value>ការចុះបញ្ជីពិន្ទុប្រចាំថ្ងៃ</value>
+  </data>
+  <data name="Daily Sales Report for Members" xml:space="preserve">
+    <value>របាយការណ៍លក់ប្រចាំថ្ងៃសម្រាប់សមាជិក</value>
+  </data>
+  <data name="Daily sales report for members1" xml:space="preserve">
+    <value>របាយការណ៍លក់ប្រចាំថ្ងៃសម្រាប់សមាជិក</value>
+  </data>
+  <data name="Date" xml:space="preserve">
+    <value>ថ្ងៃ</value>
+  </data>
+  <data name="Date of Birth" xml:space="preserve">
+    <value>ថ្ងៃខែឆ្នាំកំណើត</value>
+  </data>
+  <data name="Date1" xml:space="preserve">
+    <value>ថ្ងៃ</value>
+  </data>
+  <data name="Debit" xml:space="preserve">
+    <value>ឥណពន្ធ</value>
+  </data>
+  <data name="Deduct" xml:space="preserve">
+    <value>កាត់បន្ថយ</value>
+  </data>
+  <data name="Details" xml:space="preserve">
+    <value>ព័ត៌មានលម្អិត</value>
+  </data>
+  <data name="Discount" xml:space="preserve">
+    <value>ការបញ្ចុះតម្លៃ</value>
+  </data>
+  <data name="Dispensations" xml:space="preserve">
+    <value>ការផ្តល់អនុសាសន៍</value>
+  </data>
+  <data name="Document" xml:space="preserve">
+    <value>ឯកសារ</value>
+  </data>
+  <data name="Document Date" xml:space="preserve">
+    <value>ថ្ងៃបរិយាយឯកសារ</value>
+  </data>
+  <data name="Document Number" xml:space="preserve">
+    <value>លេខឯកសារ</value>
+  </data>
+  <data name="Document Verification" xml:space="preserve">
+    <value>ការត្រួតពិនិត្យឯកសារ</value>
+  </data>
+  <data name="Documents" xml:space="preserve">
+    <value>ឯកសារ</value>
+  </data>
+  <data name="E-wallet" xml:space="preserve">
+    <value>កាបូបអេឡិចត្រូនិច</value>
+  </data>
+  <data name="E-wallet Transactions from Company" xml:space="preserve">
+    <value>ប្រតិបត្ដិការ E-wallet ពីក្រុមហ៊ុន</value>
+  </data>
+  <data name="E-wallet Transfer" xml:space="preserve">
+    <value>ការបញ្ជូនតាម E-wallet</value>
+  </data>
+  <data name="E-wallet Transferable Balance" xml:space="preserve">
+    <value>សមតុល្យអាចបញ្ជូនតាម E-wallet</value>
+  </data>
+  <data name="Eligibility Date" xml:space="preserve">
+    <value>ថ្ងៃសិទ្ធិ</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>អ៊ីមែល</value>
+  </data>
+  <data name="Expiration Date" xml:space="preserve">
+    <value>ថ្ងៃផុតកំណត់</value>
+  </data>
+  <data name="Expiry Date" xml:space="preserve">
+    <value>ថ្ងៃផុតកំណត់</value>
+  </data>
+  <data name="Female" xml:space="preserve">
+    <value>ស្ត្រី</value>
+  </data>
+  <data name="Filter" xml:space="preserve">
+    <value>ស៊ប់</value>
+  </data>
+  <data name="Flash Tracking Number" xml:space="preserve">
+    <value>លេខតាមដានប្រញាប់</value>
+  </data>
+  <data name="From date" xml:space="preserve">
+    <value>ចាប់ពីថ្ងៃ</value>
+  </data>
+  <data name="Gender" xml:space="preserve">
+    <value>ភេទ</value>
+  </data>
+  <data name="General Information" xml:space="preserve">
+    <value>ព័ត៌មានទូទៅ</value>
+  </data>
+  <data name="ID Card Number" xml:space="preserve">
+    <value>លេខកាតអត្តសញ្ញាណ</value>
+  </data>
+  <data name="Individual/Company" xml:space="preserve">
+    <value>បុគ្គល/ក្រុមហ៊ុន</value>
+  </data>
+  <data name="Item" xml:space="preserve">
+    <value>ធាតុ</value>
+  </data>
+  <data name="Job Title" xml:space="preserve">
+    <value>ចំណងជើងការងារ</value>
+  </data>
+  <data name="Last Update" xml:space="preserve">
+    <value>ការអាប់ដេតចុងក្រោយ</value>
+  </data>
+  <data name="Left" xml:space="preserve">
+    <value>ឆ្វេង</value>
+  </data>
+  <data name="Lifetime Bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ជីវិត</value>
+  </data>
+  <data name="Loan" xml:space="preserve">
+    <value>ការខ្ចីប្រាក់</value>
+  </data>
+  <data name="Matching bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ត្រូវគ្នា</value>
+  </data>
+  <data name="Member Code" xml:space="preserve">
+    <value>កូដសមាជិក</value>
+  </data>
+  <data name="Member ID" xml:space="preserve">
+    <value>លេខអត្តសញ្ញាណសមាជិក</value>
+  </data>
+  <data name="Mobile Number" xml:space="preserve">
+    <value>លេខទូរស័ព្ទចល័ត</value>
+  </data>
+  <data name="Monthly cycle" xml:space="preserve">
+    <value>វគ្គខែ</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>ឈ្មោះ</value>
+  </data>
+  <data name="New Password" xml:space="preserve">
+    <value>លេខសម្ងាត់ថ្មី</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>មិនមាន</value>
+  </data>
+  <data name="Old Password" xml:space="preserve">
+    <value>លេខសម្ងាត់ចាស់</value>
+  </data>
+  <data name="Other Details" xml:space="preserve">
+    <value>ព័ត៌មានផ្សេងទៀត</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>លេខសម្ងាត់</value>
+  </data>
+  <data name="Payment" xml:space="preserve">
+    <value>ការទូទាត់</value>
+  </data>
+  <data name="Payment Amount" xml:space="preserve">
+    <value>ចំនួនប្រាក់ដែលបានទូទាត់</value>
+  </data>
+  <data name="Payment cycle" xml:space="preserve">
+    <value>វគ្គការទូទាត់</value>
+  </data>
+  <data name="Payment Method" xml:space="preserve">
+    <value>វិធីសាស្ត្រការទូទាត់</value>
+  </data>
+  <data name="Phone Number" xml:space="preserve">
+    <value>លេខទូរស័ព្ទ</value>
+  </data>
+  <data name="Points deduction history" xml:space="preserve">
+    <value>ប្រវត្តិការ៉ាន់ពិន្ទុ</value>
+  </data>
+  <data name="Price" xml:space="preserve">
+    <value>តម្លៃ</value>
+  </data>
+  <data name="Product" xml:space="preserve">
+    <value>ផលិតផល</value>
+  </data>
+  <data name="Purchase type" xml:space="preserve">
+    <value>ប្រភេទការទិញ</value>
+  </data>
+  <data name="Quantity" xml:space="preserve">
+    <value>ចំនួន</value>
+  </data>
+  <data name="Receipt Date" xml:space="preserve">
+    <value>ថ្ងៃដែលបានទទួល</value>
+  </data>
+  <data name="Receipt Number" xml:space="preserve">
+    <value>លេខវិក័យប័ត្រ</value>
+  </data>
+  <data name="Receipt Status" xml:space="preserve">
+    <value>ស្ថានភាពវិក័យប័ត្រ</value>
+  </data>
+  <data name="Receiving Member Code" xml:space="preserve">
+    <value>កូដសមាជិកដែលទទួលបាន</value>
+  </data>
+  <data name="Reference Number" xml:space="preserve">
+    <value>លេខយោង</value>
+  </data>
+  <data name="Referral Fee" xml:space="preserve">
+    <value>គ្រឿងសង្ហារិម</value>
+  </data>
+  <data name="Referral fee1" xml:space="preserve">
+    <value>គ្រឿងសង្ហារិម</value>
+  </data>
+  <data name="Referrer Code" xml:space="preserve">
+    <value>កូដអ្នកយោង</value>
+  </data>
+  <data name="Referrer ID" xml:space="preserve">
+    <value>លេខអត្តសញ្ញាណអ្នកយោង</value>
+  </data>
+  <data name="Referrer Left" xml:space="preserve">
+    <value>ឆ្វេងអ្នកយោង</value>
+  </data>
+  <data name="Referrer Name" xml:space="preserve">
+    <value>ឈ្មោះអ្នកយោង</value>
+  </data>
+  <data name="Referrer Right" xml:space="preserve">
+    <value>ស្តាំអ្នកយោង</value>
+  </data>
+  <data name="Registration Date" xml:space="preserve">
+    <value>ថ្ងៃចុះឈ្មោះ</value>
+  </data>
+  <data name="Registration Rights" xml:space="preserve">
+    <value>សិទ្ធិចុះឈ្មោះ</value>
+  </data>
+  <data name="Remaining" xml:space="preserve">
+    <value>នៅសល់</value>
+  </data>
+  <data name="Remaining Balance" xml:space="preserve">
+    <value>សមតុល្យនៅសល់</value>
+  </data>
+  <data name="Remaining Quantity" xml:space="preserve">
+    <value>ចំនួននៅសល់</value>
+  </data>
+  <data name="Remember me" xml:space="preserve">
+    <value>ចងចាំខ្ញុំ</value>
+  </data>
+  <data name="Report Type" xml:space="preserve">
+    <value>ប្រភេទរបាយការណ៍</value>
+  </data>
+  <data name="Report type1" xml:space="preserve">
+    <value>ប្រភេទរបាយការណ៍</value>
+  </data>
+  <data name="Special Bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ពិសេស</value>
+  </data>
+  <data name="Strong Team Bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ក្រុមយ៉ាងមាំមួន</value>
+  </data>
+  <data name="Team Bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់ក្រុម</value>
+  </data>
+  <data name="To date" xml:space="preserve">
+    <value>ចូលថ្ងៃ</value>
+  </data>
+  <data name="Total bonus" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់សរុប</value>
+  </data>
+  <data name="Total bonus1" xml:space="preserve">
+    <value>ប្រាក់រង្វាន់សរុប</value>
+  </data>
+  <data name="View all" xml:space="preserve">
+    <value>មើលទាំងអស់</value>
+  </data>
+  <data name="View by date range" xml:space="preserve">
+    <value>មើលតាមលក្ខណៈថ្ងៃ</value>
+  </data>
+  <data name="View by month" xml:space="preserve">
+    <value>មើលតាមខែ</value>
+  </data>
+  <data name="View by transfer cycle" xml:space="preserve">
+    <value>មើលតាមវគ្គការបញ្ជូន</value>
+  </data>
+  <data name="View Details" xml:space="preserve">
+    <value>មើលព័ត៌មានលម្អិត</value>
+  </data>
+  <data name="View Monthly" xml:space="preserve">
+    <value>មើលប្រចាំខែ</value>
+  </data>
+  <data name="Visitors Origin" xml:space="preserve">
+    <value>ប្រភពអ្នកចូលចិត្ត</value>
+  </data>
+  <data name="Where do our visitors come from" xml:space="preserve">
+    <value>អ្នកចូលចិត្តរបស់យើងមកពីណា</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>បាទ/ចាស</value>
+  </data>
+  <data name="Your business information" xml:space="preserve">
+    <value>ព័ត៌មានអាជីវកម្មរបស់អ្នក</value>
+  </data>
+</root>

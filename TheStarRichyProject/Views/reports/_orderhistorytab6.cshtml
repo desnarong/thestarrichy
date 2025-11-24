@@ -1,0 +1,28 @@
+﻿<table id="table-tab6" class="table table-striped table-bordered"></table>
+
+<script>
+    $(document).ready(function () {
+        $("#table-tab6").DataTable({
+            "responsive": true,
+            "processing": true,
+            "serverSide": false,
+            "filter": false,
+            "orderMulti": false,
+            "ordering": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            "pageLength": 25,
+            "destroy": true,
+            "searching": false,
+            "contentType": "application/json; charset=utf-8",
+            "columns": [
+                { title: "รหัสสมาชิก", "data": '', "targets": 0, "orderable": true, "data-key": "t-member-code" },
+                { title: "ชื่อสมาชิก", "data": '', "data-key": "t-member-name" },
+                { title: "วันที่สมัคร", "data": '', "data-key": "t-registration-date" },
+                { title: "PV", "data": '', "data-key": "t-pv" },
+                { title: "รหัสผู้อ้างอิง", "data": '', "data-key": "t-referrer-id" },
+                { title: "ชื่อผู้อ้างอิง", "data": '', "data-key": "t-referrer-name" },
+                { title: "ดำเนินการโดย", "data": '', "data-key": "t-processed-by" }
+            ],
+        });
+    });
+</script>

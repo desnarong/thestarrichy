@@ -1,0 +1,213 @@
+@{
+    ViewData["Title"] = "ชำระเงินผ่าน QR Code";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h3 class="mb-0">
+                        <i class="fa fa-qrcode"></i> ชำระเงินผ่าน QR Code
+                    </h3>
+                </div>
+                <div class="card-body text-center">
+                    <!-- จำนวนเงิน -->
+                    <h2 class="text-primary mb-4">
+                        ฿ @ViewBag.Amount?.ToString("N2")
+                    </h2>
+
+                    <!-- QR Code -->
+                    <div class="qr-container mb-4">
+                        <canvas id="qrcode" style="margin: 0 auto;"></canvas>
+                    </div>
+
+                    <!-- ข้อมูลธุรกรรม -->
+                    <div class="transaction-info text-muted mb-4">
+                        <p class="mb-2">
+                            <strong>รหัสคำสั่งซื้อ:</strong> @ViewBag.OrderId
+                        </p>
+                        <p class="mb-2">
+                            <strong>รหัสธุรกรรม:</strong> 
+                            <span id="transactionId">@ViewBag.TransactionId</span>
+                        </p>
+                        @if (!string.IsNullOrEmpty(ViewBag.AccountName))
+                        {
+                            <p class="mb-2">
+                                <strong>บัญชีปลายทาง:</strong> @ViewBag.AccountName
+                            </p>
+                        }
+                    </div>
+
+                    <!-- คำแนะนำ -->
+                    <div class="alert alert-info">
+                        <i class="fa fa-info-circle"></i>
+                        กรุณาสแกน QR Code ด้วยแอปพลิเคชันธนาคารของคุณ
+                    </div>
+
+                    <!-- สถานะ -->
+                    <div id="statusAlert" class="alert alert-warning">
+                        <i class="fa fa-clock"></i>
+                        <span id="statusText">รอการชำระเงิน...</span>
+                    </div>
+
+                    <!-- Loading Spinner -->
+                    <div id="loadingSpinner" class="mb-3" style="display:none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                        <p class="mt-2">กำลังตรวจสอบสถานะ...</p>
+                    </div>
+
+                    <!-- ปุ่มยกเลิก -->
+                    <form method="post" action="/Payment/Cancel" id="cancelForm" class="mt-4">
+                        <input type="hidden" name="transactionId" value="@ViewBag.TransactionId" />
+                        <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
+                        <button type="button" class="btn btn-outline-danger" id="btnCancel">
+                            <i class="fa fa-times"></i> ยกเลิกการชำระเงิน
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- คำอธิบาย -->
+            <div class="card mt-3">
+                <div class="card-body">
+                    <h5 class="card-title">วิธีชำระเงิน</h5>
+                    <ol class="mb-0">
+                        <li>เปิดแอปพลิเคชันธนาคารของคุณ</li>
+                        <li>เลือกเมนู "สแกน QR Code" หรือ "จ่ายเงิน"</li>
+                        <li>สแกน QR Code ที่แสดงด้านบน</li>
+                        <li>ตรวจสอบจำนวนเงินและยืนยันการชำระเงิน</li>
+                        <li>รอระบบตรวจสอบการชำระเงิน (ประมาณ 5-10 วินาที)</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- QRCode.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            const transactionId = '@ViewBag.TransactionId';
+            const orderId = '@ViewBag.OrderId';
+            let checkInterval;
+
+            QRCode.toCanvas(
+                document.getElementById('qrcode'),
+                '@ViewBag.QrCode',
+                {
+                    width: 300,
+                    margin: 2
+                },
+                function (error) {
+                    if (error) {
+                        console.error('QR error:', error);
+                    }
+                }
+            );
+
+            // เช็คสถานะการชำระเงินทุก 5 วินาที
+            checkInterval = setInterval(checkPaymentStatus, 10000);
+
+            // เช็คสถานะทันทีเมื่อโหลดหน้า
+            checkPaymentStatus();
+
+            function checkPaymentStatus() {
+                $.ajax({
+                    url: '/Payment/CheckStatus',
+                    type: 'GET',
+                    data: { transactionId: transactionId },
+                    success: function(response) {
+                        console.log('Payment status:', response);
+
+                        if (response.success) {
+                            if (response.status === 'PAID') {
+                                // ชำระเงินสำเร็จ
+                                clearInterval(checkInterval);
+                                $('#statusAlert')
+                                    .removeClass('alert-warning')
+                                    .addClass('alert-success');
+                                $('#statusText').html('<i class="fa fa-check-circle"></i> ชำระเงินสำเร็จ!');
+                                $('#btnCancel').prop('disabled', true);
+                                
+                                // แสดง loading
+                                $('#loadingSpinner').show();
+
+                                // Redirect ไปหน้า Success
+                                setTimeout(function() {
+                                    window.location.href = `/Payment/Success?transactionId=${transactionId}&orderId=${orderId}`;
+                                }, 2000);
+                            } 
+                            else if (response.status === 'CANCELLED' || response.status === 'EXPIRED') {
+                                // ยกเลิกหรือหมดอายุ
+                                clearInterval(checkInterval);
+                                $('#statusAlert')
+                                    .removeClass('alert-warning')
+                                    .addClass('alert-danger');
+                                $('#statusText').html('<i class="fa fa-times-circle"></i> การชำระเงินถูกยกเลิกหรือหมดอายุ');
+                                $('#btnCancel').prop('disabled', true);
+                            }
+                        } else {
+                            console.error('Check status failed:', response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX error:', error);
+                    }
+                });
+            }
+
+            // ปุ่มยกเลิก
+            $('#btnCancel').click(function() {
+                if (confirm('คุณต้องการยกเลิกการชำระเงินใช่หรือไม่?')) {
+                    clearInterval(checkInterval);
+                    $('#cancelForm').submit();
+                }
+            });
+
+            // ทำความสะอาดเมื่อออกจากหน้า
+            $(window).on('beforeunload', function() {
+                if (checkInterval) {
+                    clearInterval(checkInterval);
+                }
+            });
+        });
+    </script>
+
+    <style>
+        .qr-container {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .transaction-info p {
+            font-size: 0.9rem;
+        }
+
+        .card {
+            border-radius: 15px;
+        }
+
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+        }
+
+        #statusAlert {
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .spinner-border {
+            width: 3rem;
+            height: 3rem;
+        }
+    </style>
+}

@@ -1,0 +1,309 @@
+﻿@using TheStarRichyProject.Helper
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var permissionsKey = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.PermissionsKey);
+    var jsonString = JsonConvert.DeserializeObject<string>(permissionsKey);
+    dynamic permissions = JsonConvert.DeserializeObject<dynamic>(jsonString);
+}
+
+<!-- ========== App Menu ========== -->
+<div class="app-menu navbar-menu">
+    <!-- LOGO -->
+    <div class="navbar-brand-box" style="padding: 0;">
+        <!-- Dark Logo-->
+        <a href="@Url.Action("Index", "Dashboard")" class="logo logo-dark">
+            <span class="logo-sm">
+                <img src="~/images/logo.png" alt="" height="60">
+            </span>
+            <span class="logo-lg">
+                <img src="~/assets/images/fulllogo1.png" alt="" height="70">
+            </span>
+        </a>
+        <!-- Light Logo-->
+        <a href="@Url.Action("Index", "Dashboard")" class="logo logo-light">
+            <span class="logo-sm">
+                <img src="~/images/logo.png" alt="" height="60">
+            </span>
+            <span class="logo-lg">
+                <img src="~/assets/images/fulllogo1.png" alt="" height="70">
+            </span>
+        </a>
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+            <i class="ri-record-circle-line"></i>
+        </button>
+    </div>
+    @if (permissions.CloseSystemflag.ToString() == "0")
+    {
+        <div id="scrollbar">
+            <div class="container-fluid">
+
+                <div id="two-column-menu">
+                </div>
+                <ul class="navbar-nav" id="navbar-nav">
+                    <li class="menu-title"><span data-key="t-menu">Menu</span></li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="@Url.Action("index", "home")">
+                            <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">แดชบอร์ด</span>
+                        </a>
+                    </li>
+                    @{
+                        var hideall = (permissions.M1.ToString() != "Y" && permissions.Registerflag.ToString() != "1") ||
+                            (permissions.M3.ToString() != "Y" && permissions.Registerflag.ToString() != "1" && permissions.MemberType.ToString() != "00");
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarmember" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarmember">
+                                <i class="ri-user-3-line"></i> <span data-key="t-member">สมาชิก</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarmember">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M1.ToString() != "Y" && permissions.Registerflag.ToString() != "1")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("index", "member")" class="nav-link" data-key="t-personalinformation"> ข้อมูลส่วนบุคคล </a>
+                                        </li>
+                                    }
+
+                                    @if (permissions.M3.ToString() != "Y" && permissions.Registerflag.ToString() != "1" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("register", "member")" class="nav-link" data-key="t-register"> ลงทะเบียน </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+                    @{
+                        hideall = (permissions.M4.ToString() != "Y" && permissions.Registerflag.ToString() != "1" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M5.ToString() != "Y" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M6.ToString() != "Y" && permissions.MemberType.ToString() != "00");
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarteaminfomation" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarteaminfomation">
+                                <i class="ri-team-line"></i> <span data-key="t-teaminfomation"> ข้อมูลทีม </span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarteaminfomation">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M4.ToString() != "Y" && permissions.Registerflag.ToString() != "1" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("teambinary", "teaminfomation")" class="nav-link" data-key="t-teambinary"> ทีมไบนารี่ </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M5.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("sponsorteam", "teaminfomation")" class="nav-link" data-key="t-sponsorteam"> ทีมสปอนเซอร์ </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M6.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("leftteam", "teaminfomation")" class="nav-link" data-key="t-leftteam"> ทีมซ้าย </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("rightteam", "teaminfomation")" class="nav-link" data-key="t-rightteam"> ทีมขวา </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+                    @{
+                        hideall = (permissions.M7.ToString() != "Y" && permissions.SaleFlag.ToString() != "0") ||
+                            (permissions.M8.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M9.ToString() != "Y" && permissions.Ewalletflag.ToString() != "0" && permissions.MemberType.ToString() != "00");
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarorder" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarorder">
+                                <i class="ri-shopping-basket-line"></i> <span data-key="t-order">คำสั่ง</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarorder">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M7.ToString() != "Y" && permissions.SaleFlag.ToString() != "0")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("buypersonalorder", "orders")" class="nav-link" data-key="t-buypersonalorder"> ซื้อสินค้าแบบ Topup/รักษายอด </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("buyhurryactive", "orders")" class="nav-link" data-key="t-buyhurryactive"> ซื้อสินค้าแบบ Hurry Active </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M8.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("buyholdorder", "orders")" class="nav-link" data-key="t-buyholdorder"> ซื้อสินค้าแบบ Hold ยอด </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+                    @{
+                        hideall = (permissions.M7.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.PaymentFlag.ToString() != "1" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M10.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M9.ToString() != "Y" && permissions.Ewalletflag.ToString() != "0" && permissions.MemberType.ToString() != "00");
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarbuyorders" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarbuyorders">
+                                <i class="ri-shopping-cart-line"></i> <span data-key="t-sidebarbuyorders">คำสั่งซื้อ</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarbuyorders">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M7.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.PaymentFlag.ToString() != "1" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("buyorderbyewallet", "buyorders")" class="nav-link" data-key="t-buyorderbyewallet"> Buy Orderbye Wallet </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M10.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("saleorderfromhold", "buyorders")" class="nav-link" data-key="t-saleorderfromhold"> Sale Order From Hold </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M9.ToString() != "Y" && permissions.Ewalletflag.ToString() != "0" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("ewallettransfer", "buyorders")" class="nav-link" data-key="t-ewallettransfer"> การโอนอีวอลเล็ต </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+                    @{
+                        hideall = (permissions.M13.ToString() != "Y" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M11.ToString() != "Y" && permissions.MemberType.ToString() != "00");
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarreports" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarreports">
+                                <i class="ri-shopping-cart-line"></i> <span data-key="t-sidebarreports">รายงาน</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarreports">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M13.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("income", "reports")" class="nav-link" data-key="t-income"> รายได้ </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("pointhistory", "reports")" class="nav-link" data-key="t-pointhistory"> ประวัติคะแนน </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M11.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> ประวัติการสั่งซื้อ ส่วนตัว</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> ประวัติการสั่งซื้อ HOLD</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> รายงานสั่งซื้อรอดำเนินการ</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("salereport", "reports")" class="nav-link" data-key="t-salereport"> รายงานการขาย </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("registerapplication", "reports")" class="nav-link" data-key="t-registerapplication"> Register Application </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("historyofpromotion", "reports")" class="nav-link" data-key="t-historyofpromotion"> ประวัติการส่งเสริมการขาย </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M11.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("travelpoints", "reports")" class="nav-link" data-key="t-travelpoints"> คะแนนท่องเที่ยว </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+
+                    @{
+                        hideall = (permissions.M14.ToString() != "Y" && permissions.MemberType.ToString() != "00") ||
+                            (permissions.M15.ToString() != "Y" && permissions.MemberType.ToString() != "00");
+
+
+                    }
+                    @if (hideall)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link menu-link" href="#sidebarother" data-bs-toggle="collapse" role="button"
+                               aria-expanded="false" aria-controls="sidebarother">
+                                <i class="ri-filter-line"></i> <span data-key="t-other">อื่น</span>
+                            </a>
+                            <div class="collapse menu-dropdown" id="sidebarother">
+                                <ul class="nav nav-sm flex-column">
+                                    @if (permissions.M14.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("changepassword", "other")" class="nav-link" data-key="t-changepassword"> เปลี่ยนรหัสผ่าน </a>
+                                        </li>
+                                    }
+                                    @if (permissions.M15.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("taxdownload", "other")" class="nav-link" data-key="t-taxdownload"> ดาวน์โหลดภาษี </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("documents", "other")" class="nav-link" data-key="t-documents"> เอกสาร </a>
+                                        </li>
+                                    }
+
+                                    <li class="nav-item">
+                                        <a href="javascript:;" class="nav-link" data-key="t-returntomainwebsite"> กลับสู่เว็บไซต์หลัก </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <!-- end Dashboard Menu -->
+                    }
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="@Url.Action("Logout", "Auth")">
+                            <i class="mdi mdi-logout"></i> <span data-key="t-logout">ออกจากระบบ</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- Sidebar -->
+        </div>
+    }
+
+    <div class="sidebar-background"></div>
+</div>
+<!-- Left Sidebar End -->
+<!-- Vertical Overlay-->
+<div class="vertical-overlay"></div>

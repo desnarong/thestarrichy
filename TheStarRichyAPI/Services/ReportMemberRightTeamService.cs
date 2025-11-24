@@ -1,0 +1,181 @@
+﻿using System.Data.SqlClient;
+using System.Security.Claims;
+using BCrypt.Net;
+using Microsoft.AspNetCore.SignalR.Protocol;
+
+namespace TheStarRichyApi.Services
+{
+    public interface IReportMemberRightTeamService
+    {
+        Task<List<dynamic>> GetDisplayAsync();
+    }
+    public class ReportMemberRightTeamService : IReportMemberRightTeamService
+    {
+        private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
+        public ReportMemberRightTeamService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        {
+            _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
+        }
+        public async Task<string> GetPermissionAsync(string column, string memberCode)
+        {
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+            string MemberPermission = "";
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    await con.OpenAsync();
+                    string query = $"SELECT {column}  from M06_permission where M06_PX1=@Membercode";
+
+                    using (SqlCommand command = new SqlCommand(query, con))
+                    {
+                        command.Parameters.AddWithValue("@Membercode", memberCode);
+
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    if (!reader.IsDBNull(0))
+                                    {
+                                        MemberPermission = reader.GetString(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Log exception in production
+            }
+
+            return MemberPermission;
+        }
+        public async Task<string> GetPasskeyAsync(string column)
+        {
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+            string password = "";
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    await con.OpenAsync();
+                    string query = $"SELECT {column} FROM S02";
+                    using (SqlCommand command = new SqlCommand(query, con))
+                    {
+                        using (SqlDataReader reader = await command.ExecuteReaderAsync())
+                        {
+                            if (reader.HasRows)
+                            {
+                                while (await reader.ReadAsync())
+                                {
+                                    if (!reader.IsDBNull(0))
+                                    {
+                                        password = reader.GetString(0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // Log exception in production
+            }
+
+            return password;
+        }
+        public async Task<List<dynamic>> GetDisplayAsync()
+        {
+            // Get Passkey from header
+            string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
+            if (string.IsNullOrEmpty(passkey))
+            {
+                return new List<dynamic> { new { Membercode = "" } };
+            }
+
+            string passwordEncode1 = await GetPasskeyAsync("Passkey1");
+            string passwordEncode2 = await GetPasskeyAsync("Passkey2");
+
+            // Verify Passkey
+            if (passkey != passwordEncode1 && passkey != passwordEncode2)
+            {
+                return new List<dynamic> { new { Membercode = "" } };
+            }
+
+            // Get Membercode from JWT
+            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(memberCode))
+            {
+                return new List<dynamic> { new { Membercode = "" } };
+            }
+
+            var result = new List<dynamic>();
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+
+            try
+            {
+                using (var con = new SqlConnection(connectionString))
+                {
+                    await con.OpenAsync();
+
+                    string Memberpermission = await GetPermissionAsync("M16", memberCode);
+ 
+
+                    string query = "SELECT  aa.Membercode, aa.LevelName,  aa.MemberRightCode,aa.MemberRightName,aa.RegisterDate";
+                    query += ",aa.QualifyDate,aa.SIDE,aa.PositionName,aa.PrestigeRankingEngName  ,aa.PersonalPV,aa.PVLeft,aa.PVRight,aa.SponserName1 AS SponserName,aa.Qualify,";
+                    query += "aa.LastMonthQualifyPV,aa.PresentMonthQualifyPV,aa.LeftCountActive,aa.RightCountActive,aa.Travelpoint1,aa.Travelpoint2,COALESCE( aa.TotalBalance, 0) as TotalBalance ";
+                    query += " FROM [000_Member_RightTeam] aa (nolock) ";
+
+                    if (Memberpermission != "Y")
+                    {
+                        query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.MemberRightCode  ";
+                    }
+                    query += " where aa.Membercode = @Membercode";
+                    query += " ORDER BY aa.Item,aa.MemberRightCode ";
+
+                    using (var command = new SqlCommand(query, con))
+                    {
+                        command.Parameters.AddWithValue("@Membercode", memberCode);
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                // Create a dynamic object (ExpandoObject) to store row data
+                                dynamic row = new System.Dynamic.ExpandoObject();
+                                var rowDict = (IDictionary<string, object>)row;
+
+                                // Read each column dynamically
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string columnName = reader.GetName(i);
+                                    object columnValue = reader.GetValue(i);
+                                    rowDict[columnName] = columnValue;
+                                }
+
+                                result.Add(row);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                return new List<dynamic> { new { Membercode = "", Error = "An error occurred while fetching data" } };
+            }
+
+            return result.Count > 0 ? result : new List<dynamic> { new { Membercode = "" } };
+        }
+    }
+}

@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html lang="th" data-layout="vertical" data-sidebar-visibility="show" data-topbar="dark" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable" data-layout-style="default" data-bs-theme="light" data-layout-width="fluid" data-layout-position="fixed">
+<plasmo-csui></plasmo-csui>
+<plasmo-csui id="plasmo-inspector"></plasmo-csui>
+<head>
+    @Html.Partial("~/Views/Shared/_title_meta.cshtml")
+    @RenderSection("styles", required: false)
+    @Html.Partial("~/Views/Shared/_head_css.cshtml")
+</head>
+<body>
+    <!-- Begin page -->
+    <div id="layout-wrapper">
+        @Html.Partial("~/Views/Shared/_menu.cshtml")
+
+        <!-- ============================================================== -->
+        <!-- Start right Content here -->
+        <!-- ============================================================== -->
+        <div class="main-content">
+
+            <div class="page-content">
+                <div class="container-fluid">
+                    @Html.Partial("~/Views/Shared/_page_title.cshtml")
+
+                    @RenderBody()
+                </div>
+            </div>
+
+            @RenderSection("externalhtml", required: false)
+            @Html.Partial("~/Views/Shared/_footer.cshtml")
+        </div>
+    </div>
+
+    <!-- end auth-page-wrapper -->
+    @*<div class="modal fade show" id="promotionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="true" aria-modal="true" style="padding-right: 15px; display: block;">
+        <div class="modal-dialog modal-lg py-5" role="document">
+            <div class="modal-content" style="background-color: #0000;-webkit-box-shadow: none;">
+                <div class="modal-header p-0 border-0">
+                    <h5 class="modal-title text-white mx-auto" id="exampleModalLabel">Close in <font id="cool_down">20</font> seconds</h5>
+                    <button type="button" class="close px-0 ml-0 mr-1" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="text-danger" aria-hidden="true" style="font-size: 2em;line-height: 5px;">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img src="~/assets/images/popup/popup.jpg" alt="" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+    @Html.Partial("~/Views/Shared/_vendor_scripts.cshtml")
+
+    @RenderSection("scripts", required: false)
+</body>
+</html>

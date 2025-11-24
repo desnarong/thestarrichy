@@ -1,0 +1,149 @@
+﻿@{
+    ViewData["Title"] = "สั่งซื้อสินค้า";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header text-center">
+                <h4 data-key="t-top-up-ewallet-online">เติมเงิน E-wallet ออนไลน์</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- ข้อมูลทั่วไป -->
+                <div class="mb-4">
+                    <h5 data-key="t-general-info">ข้อมูลทั่วไป</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-reference-number">เลขที่อ้างอิง :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-date">วันที่ :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-code">รหัส :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-name">ชื่อ :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-purchase-type">ประเภทการเติมเงิน :</label>
+                        <div class="col-lg-10 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="purchase_type" id="top_up_maintenance" value="" checked>
+                                <label class="form-check-label" for="top_up_maintenance" data-key="t-top-up-maintenance">เติมเงิน/รักษายอด</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="purchase_type" id="hurry_active" value="">
+                                <label class="form-check-label" for="hurry_active" data-key="t-hurry-active">แอคทีฟด่วน</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="purchase_type" id="hold" value="">
+                                <label class="form-check-label" for="hold" data-key="t-hold">ถือครอง</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- การชำระเงิน -->
+                <div class="mb-4">
+                    <h5 data-key="t-payment">การชำระเงิน</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment">การชำระเงิน :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="payment_method" id="transfer_money" value="" checked>
+                                <label class="form-check-label" for="transfer_money" data-key="t-transfer-money">โอนเงิน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-bank-transfer">ธนาคารที่โอน :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <select class="form-control">
+                                <option value="0" title="เลือก">เลือก</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-account-number">เลขที่บัญชี :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-amount-to-top-up">จำนวนเงินที่เติม :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment-slip-1">สลิปชำระเงิน 1 :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="file" class="form-control" value="" />
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment-slip-2">สลิปชำระเงิน 2 :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="file" class="form-control" value="" />
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment-slip-3">สลิปชำระเงิน 3 :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="file" class="form-control" value="" />
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment-slip-4">สลิปชำระเงิน 4 :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="file" class="form-control" value="" />
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-payment-slip-5">สลิปชำระเงิน 5 :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="file" class="form-control" value="" />
+                        </div>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3 text-end">
+                        <div class="col-lg-12 col-md-12">
+                            <button class="btn btn-primary me-2" data-key="t-save">บันทึก</button>
+                            <button class="btn btn-primary" data-key="t-cancel">ยกเลิก</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

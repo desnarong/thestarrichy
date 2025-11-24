@@ -1,0 +1,156 @@
+﻿@{
+    ViewData["Title"] = "สั่งซื้อสินค้า";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-sale-order-from-hold">สั่งซื้อจากใบสั่งถือครอง</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- ข้อมูลสมาชิก -->
+                <div class="mb-4">
+                    <h5 data-key="t-member-info">ข้อมูลสมาชิก</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-member-code">รหัสสมาชิก :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <div class="col-md-2 mt-1">
+                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-code">รหัส :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                        <div class="col-lg-2 col-md-6"></div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-registration-date">วันที่สมัคร :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-name">ชื่อ :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-expiration-date">วันหมดอายุ :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" disabled />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3 text-end">
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary me-2" data-key="t-transfer">โอน</button>
+                            <button class="btn btn-danger" data-key="t-cancel">ยกเลิก</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- รายการสินค้า -->
+                <div class="mb-4">
+                    <h5 data-key="t-product-list">รายการสินค้า</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-purchase-type">ประเภทการสั่งซื้อ :</label>
+                        <div class="col-lg-10 col-md-6">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="purchase_type" id="top_up_maintenance" value="" checked>
+                                <label class="form-check-label" for="top_up_maintenance" data-key="t-top-up-maintenance">เติมเงิน/รักษายอด</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="purchase_type" id="hurry_active" value="">
+                                <label class="form-check-label" for="hurry_active" data-key="t-hurry-active">แอคทีฟด่วน</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-product-code">รหัสสินค้า :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-product-name">ชื่อสินค้า :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-quantity">จำนวน :</label>
+                        <div class="col-lg-3 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                        <div class="col-md-2">
+                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                        </div>
+                    </div>
+                    <div class="table-responsive mt-3">
+                        <table id="data-table-responsive" class="table table-striped table-bordered"></table>
+                    </div>
+                </div>
+
+                <!-- สรุปยอด -->
+                <div>
+                    <h5 data-key="t-summary">สรุปยอด</h5>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-total-amount">ยอดรวม :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row mb-3">
+                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-total-pv">PV รวม :</label>
+                        <div class="col-lg-4 col-md-6">
+                            <input type="text" class="form-control" value="" />
+                        </div>
+                    </div>
+                    <div class="form-group row mt-3 text-end">
+                        <div class="col-lg-12">
+                            <button class="btn btn-primary me-2" data-key="t-save">บันทึก</button>
+                            <button class="btn btn-danger me-2" data-key="t-cancel">ยกเลิก</button>
+                            <button class="btn btn-primary" data-key="t-save-new-item">บันทึกรายการใหม่</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#data-table-responsive").DataTable({
+            "responsive": true,
+            "processing": true,
+            "serverSide": false,
+            "filter": false,
+            "orderMulti": false,
+            "ordering": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            "pageLength": 25,
+            "destroy": true,
+            "searching": false,
+            "contentType": "application/json; charset=utf-8",
+            "columns": [
+                { title: "รหัสสินค้า", "data": '', "targets": 0, "orderable": true, "data-key": "t-product-code" },
+                { title: "ชื่อสินค้า", "data": '', "data-key": "t-product-name" },
+                { title: "ราคาขาย", "data": '', "data-key": "t-selling-price" },
+                { title: "จำนวน PV", "data": '', "data-key": "t-quantity-of-pv" },
+                { title: "จำนวน", "data": '', "data-key": "t-quantity" },
+                { title: "ยอดรวม", "data": '', "data-key": "t-total-amount" },
+                { title: "PV รวม", "data": '', "data-key": "t-total-pv" },
+                { title: "ยอดคงเหลือ", "data": '', "data-key": "t-remaining-balance" },
+                { title: "เลขที่ใบสั่งถือครอง", "data": '', "data-key": "t-hold-invoice-number" },
+                { title: "วันหมดอายุใบสั่ง", "data": '', "data-key": "t-invoice-expiration-date" },
+                { title: "รหัสชุดสินค้า", "data": '', "data-key": "t-product-bundle-code" }
+            ],
+        });
+    });
+</script>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

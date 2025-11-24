@@ -1,0 +1,926 @@
+@{
+    ViewData["Title"] = "ชำระเงิน - Step 3/3";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var summary = ViewBag.OrderSummary as TheStarRichyProject.Models.OrderSummaryData;
+    var orderID = ViewBag.OrderID as string;
+}
+
+<!-- Custom CSS -->
+<style>
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #999;
+    }
+
+    .step.active .step-circle {
+        background: #405189;
+        color: white;
+    }
+
+    .step.completed .step-circle {
+        background: #198754;
+        color: white;
+    }
+
+    .payment-box {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .payment-info-box {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    .order-summary-card {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: sticky;
+        top: 20px;
+    }
+
+    .status-pending {
+        color: #ffc107;
+    }
+
+    .status-success {
+        color: #198754;
+    }
+
+    .status-failed {
+        color: #dc3545;
+    }
+
+    .countdown-timer {
+        font-size: 24px;
+        font-weight: bold;
+        color: #dc3545;
+        margin: 20px 0;
+    }
+
+    .product-item {
+        border-bottom: 1px solid #e0e0e0;
+        padding: 10px 0;
+    }
+
+        .product-item:last-child {
+            border-bottom: none;
+        }
+
+    /* 🔧 CSS เพิ่มเติมสำหรับ payment.cshtml */
+    /* เพิ่มใน <style> section หรือไฟล์ CSS */
+
+    /* Payment Logos */
+    .payment-logo-header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+        .payment-logo-header img {
+            max-width: 250px;
+            height: auto;
+        }
+
+    .payment-cards-logos {
+        text-align: center;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+        .payment-cards-logos img {
+            max-height: 40px;
+            height: auto;
+            width: auto;
+        }
+
+    /* PromptPay Logo */
+    .promptpay-logo {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+
+        .promptpay-logo img {
+            max-width: 150px;
+            height: auto;
+        }
+
+    /* QR Code Container */
+    .qr-code-container {
+        background: white;
+        padding: unset !important;
+        border-radius: 12px;
+        display: inline-block;
+        box-shadow: unset !important;
+        margin: unset !important;
+        min-height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* QR Code Canvas */
+    #qrCodeCanvas {
+        display: inline-block !important;
+        padding: 15px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+        #qrCodeCanvas img {
+            display: block !important;
+            margin: 0 auto !important;
+            border-radius: 4px;
+        }
+
+    /* Countdown Timer */
+    .countdown-timer {
+        text-align: center;
+        font-size: 18px;
+        font-weight: 600;
+        color: #405189;
+        margin: 20px 0;
+        padding: 12px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
+        border-radius: 8px;
+        border-left: 4px solid #405189;
+    }
+
+    #timeRemaining {
+        font-size: 24px;
+        color: #dc3545;
+        font-family: 'Courier New', monospace;
+        margin-left: 8px;
+    }
+
+    /* Payment Status */
+    .status-pending {
+        color: #ffc107;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .status-success {
+        color: #198754;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    .status-failed {
+        color: #dc3545;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    /* Payment Info Box */
+    .payment-info-box {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 25px;
+        text-align: left;
+        border: 1px solid #dee2e6;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+        .payment-info-box h6 {
+            color: #405189;
+            font-weight: 600;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .payment-info-box ol {
+            padding-left: 20px;
+            margin: 0;
+        }
+
+            .payment-info-box ol li {
+                margin-bottom: 8px;
+                font-size: 14px;
+                color: #495057;
+                line-height: 1.6;
+            }
+
+    /* Loading Spinner in QR Container */
+    .qr-code-container .spinner-border {
+        width: 3rem;
+        height: 3rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 576px) {
+        .payment-logo-header img {
+            max-width: 200px;
+        }
+
+        .promptpay-logo img {
+            max-width: 120px;
+        }
+
+        .payment-cards-logos img {
+            max-height: 32px;
+        }
+
+        .qr-code-container {
+            min-height: 300px;
+            padding: 15px;
+        }
+
+        #qrCodeCanvas {
+            padding: 10px;
+        }
+
+        .countdown-timer {
+            font-size: 16px;
+        }
+
+        #timeRemaining {
+            font-size: 20px;
+        }
+    }
+
+    /* Animation for QR Code */
+    @@keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    #qrCodeCanvas {
+        animation: fadeInScale 0.3s ease-out;
+    }
+
+    /* Error/Warning Alert in QR Container */
+    .qr-code-container .alert {
+        margin: 0;
+        max-width: 350px;
+    }
+
+        .qr-code-container .alert .btn {
+            margin-top: 10px;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step completed">
+                    <div class="step-circle">1</div>
+                    <div>เลือกสินค้า</div>
+                </div>
+                <div class="step completed">
+                    <div class="step-circle">2</div>
+                    <div>ข้อมูลการจัดส่ง</div>
+                </div>
+                <div class="step active">
+                    <div class="step-circle">3</div>
+                    <div>ชำระเงิน</div>
+                </div>
+            </div>
+
+            @if (summary != null)
+            {
+                <!-- Main Content -->
+                <div class="row">
+                    <!-- Left Column: Payment -->
+                    <div class="col-lg-8">
+                        <div class="payment-box">
+                            <h4 class="mb-3">
+                                <i class="fas fa-credit-card"></i>
+                                @summary.PaymentMethod
+                            </h4>
+
+                            <!-- Payment Status -->
+                            <div id="paymentStatus" class="mb-3">
+                                <span class="status-pending">
+                                    <i class="fas fa-clock fa-spin"></i> รอการชำระเงิน
+                                </span>
+                            </div>
+
+                            <!-- PromptPay QR Code -->
+                            @if (summary.PaymentMethod == "PromptPay")
+                            {
+                                <div id="qrCodeSection">
+                                    <!-- ✅ Header with Background -->
+                                    <div style="background: #123c6a; padding: 10px; margin: -10px -10px 10px -10px; border-radius: 12px 12px 0 0; justify-self: center; width: 500px;">
+                                        <img src="~/images/payment/thai_qr_payment_logo-01.jpg"
+                                             alt="Thai QR Payment"
+                                             style="max-width: 200px; display: block; margin: 0 auto;">
+                                    </div>
+
+                                    <!-- ✅ PromptPay Logo -->
+                                    <div class="text-center mb-2">
+                                        <img src="~/images/payment/promptpay2.png" alt="PromptPay" style="max-width: 150px; height: auto;">
+                                    </div>
+
+                                    <p class="text-muted text-center">สแกน QR Code เพื่อชำระเงิน</p>
+
+                                    <!-- ✅ QR Code Display -->
+                                    <div class="qr-code-container" id="qrCodeDisplay">
+                                        <!-- QR Code จะแสดงที่นี่ -->
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Countdown Timer -->
+                                    <div class="countdown-timer" id="countdownTimer">
+                                        เหลือเวลา: <span id="timeRemaining">15:00</span>
+                                    </div>
+
+                                    <!-- Payment Instructions -->
+                                    <div class="payment-info-box">
+                                        <h6><i class="fas fa-info-circle"></i> วิธีการชำระเงิน</h6>
+                                        <ol class="mb-0">
+                                            <li>เปิดแอพธนาคารหรือแอพ Mobile Banking</li>
+                                            <li>เลือกเมนู "สแกน QR Code"</li>
+                                            <li>สแกน QR Code ด้านบน</li>
+                                            <li>ตรวจสอบยอดเงินและยืนยันการชำระเงิน</li>
+                                            <li>รอสักครู่ ระบบจะตรวจสอบการชำระเงินอัตโนมัติ</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            }
+
+                            <!-- Credit Card Form -->
+                            @if (summary.PaymentMethod == "CreditCard")
+                            {
+                                <div id="creditCardSection">
+                                    <!-- ✅ Header with Background -->
+                                    <div style="background: #123c6a; padding: 10px; margin: -10px -10px 10px -10px; border-radius: 12px 12px 0 0; justify-self: center; width: 500px;">
+                                        <img src="~/images/payment/thai_qr_payment_logo-01.jpg"
+                                             alt="Thai QR Payment"
+                                             style="max-width: 200px; display: block; margin: 0 auto;">
+                                    </div>
+
+                                    <!-- ✅ Payment Card Logos -->
+                                    <div class="text-center mb-4">
+                                        <img src="~/images/payment/visa_pos_fc.png" alt="VISA" style="max-height: 40px; margin: 0 8px;">
+                                        <img src="~/images/payment/mc_symbol_opt_73_1x.png" alt="Mastercard" style="max-height: 40px; margin: 0 8px;">
+                                        <img src="~/images/payment/unionpay_logo.png" alt="UnionPay" style="max-height: 40px; margin: 0 8px;">
+                                    </div>
+
+                                    <form id="creditCardForm">
+                                        <div class="mb-3 text-start">
+                                            <label class="form-label">หมายเลขบัตร</label>
+                                            <input type="text" class="form-control" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                        </div>
+                                        <div class="mb-3 text-start">
+                                            <label class="form-label">ชื่อบนบัตร</label>
+                                            <input type="text" class="form-control" id="cardName" placeholder="JOHN DOE" required>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6 mb-3 text-start">
+                                                <label class="form-label">วันหมดอายุ</label>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <select class="form-select" id="expMonth" required>
+                                                            <option value="">เดือน</option>
+                                                            @for (int i = 1; i <= 12; i++)
+                                                            {
+                                                                <option value="@i.ToString("D2")">@i.ToString("D2")</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <select class="form-select" id="expYear" required>
+                                                            <option value="">ปี</option>
+                                                            @for (int i = 0; i < 10; i++)
+                                                            {
+                                                                var year = DateTime.Now.Year + i;
+                                                                <option value="@year">@year</option>
+                                                            }
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 mb-3 text-start">
+                                                <label class="form-label">CVV</label>
+                                                <input type="text" class="form-control" id="cvv" placeholder="123" maxlength="4" required>
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-lg w-100" id="btnPayCredit">
+                                            <i class="fas fa-lock"></i> ชำระเงิน ฿@summary.GrandTotal.ToString("N2")
+                                        </button>
+                                    </form>
+                                </div>
+                            }
+
+                            <!-- Action Buttons -->
+                            <div class="mt-4">
+                                <button type="button" class="btn btn-outline-secondary" onclick="window.location.href='/orders/checkoutinfo'">
+                                    <i class="fas fa-arrow-left"></i> กลับไปแก้ไข
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Order Summary -->
+                    <div class="col-lg-4">
+                        <div class="order-summary-card">
+                            <h5 class="mb-3">สรุปคำสั่งซื้อ</h5>
+
+                            <div class="mb-2">
+                                <small class="text-muted">เลขที่ออเดอร์</small>
+                                <div class="fw-bold">@orderID</div>
+                            </div>
+
+                            <hr>
+
+                            <h6 class="mb-2">รายการสินค้า (@summary.Items.Sum(x=>x.Quantity) รายการ)</h6>
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                @foreach (var item in summary.Items)
+                                {
+                                    <div class="product-item">
+                                        <div class="d-flex justify-content-between">
+                                            <div class="flex-grow-1">
+                                                <small class="fw-bold">@item.ProductName</small><br>
+                                                <small class="text-muted">
+                                                    ฿@item.Price.ToString("N2") x @item.Quantity
+                                                </small>
+                                            </div>
+                                            <div class="text-end">
+                                                <small class="fw-bold">฿@item.TotalPrice.ToString("N2")</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ยอดรวมสินค้า</span>
+                                <span>฿@summary.TotalAmount.ToString("N2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>PV</span>
+                                <span>@summary.TotalPV.ToString("N0")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ค่าจัดส่ง</span>
+                                <span>
+                                    @if (summary.ShippingFee == 0)
+                                    {
+                                        <span class="text-success">ฟรี</span>
+                                    }
+                                    else
+                                    {
+                                        <span>฿@summary.ShippingFee.ToString("N2")</span>
+                                    }
+                                </span>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="h5">ยอดรวมทั้งหมด</span>
+                                <span class="h5 text-primary">฿@summary.GrandTotal.ToString("N2")</span>
+                            </div>
+
+                            <hr>
+
+                            <div class="mb-2">
+                                <small class="text-muted">การจัดส่ง</small>
+                                <div>@summary.DeliveryMethod</div>
+                                @if (!string.IsNullOrEmpty(summary.DeliveryInfo.FullAddress))
+                                {
+                                    <small class="text-muted">@($"{summary.DeliveryInfo.FullAddress} {summary.DeliveryInfo.SubDistrict} {summary.DeliveryInfo.District} {summary.DeliveryInfo.Province} {summary.DeliveryInfo.PostalCode}")</small>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // =========================================
+            // Variables
+            // =========================================
+            let orderID = '@orderID';
+            let paymentMethod = '@summary?.PaymentMethod';
+            let paymentID = null;
+            let checkInterval = null;
+            let countdownInterval = null;  // ✅ เพิ่ม
+            let countdown = 900; // 15 minutes
+
+            console.log('Order ID:', orderID);
+            console.log('Payment Method:', paymentMethod);
+
+            // =========================================
+            // Initialize
+            // =========================================
+            initializePayment();
+
+            function initializePayment() {
+                if (paymentMethod === 'PromptPay') {
+                    createPromptPayPayment();
+                } else if (paymentMethod === 'CreditCard') {
+                    setupCreditCardForm();
+                }
+            }
+
+            // =========================================
+            // PromptPay Payment
+            // =========================================
+
+            function createPromptPayPayment() {
+                $.ajax({
+                    url: '/orders/CreatePayment',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        orderID: orderID,
+                        paymentMethod: 'PromptPay'
+                    }),
+                    success: function (response) {
+                        console.log('CreatePayment response:', response);
+
+                        if (response.success) {
+                            paymentID = response.paymentID;
+
+                            // ✅ เช็คว่ามี QR Code หรือไม่
+                            if (response.qrCodeData && response.qrCodeData.length > 0) {
+                                displayQRCode(response.qrCodeData);
+                                startPaymentStatusCheck();
+                                startCountdown();
+                            } else {
+                                // ไม่มี QR Code
+                                $('#qrCodeDisplay').html(`
+                                    <div class="alert alert-danger">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        ไม่สามารถสร้าง QR Code ได้<br>
+                                        <small>กรุณาตรวจสอบการตั้งค่า KBank หรือลองใหม่อีกครั้ง</small><br>
+                                        <button class="btn btn-primary mt-2" onclick="window.location.reload()">
+                                            <i class="fas fa-redo"></i> ลองใหม่
+                                        </button>
+                                    </div>
+                                `);
+                                showNotification('error', 'ไม่สามารถสร้าง QR Code ได้');
+                            }
+                        } else {
+                            $('#qrCodeDisplay').html(`
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-times-circle"></i> ${response.message || 'ไม่สามารถสร้าง QR Code ได้'}
+                                </div>
+                            `);
+                            showNotification('error', response.message || 'ไม่สามารถสร้าง QR Code ได้');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('CreatePayment error:', xhr);
+                        $('#qrCodeDisplay').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                เกิดข้อผิดพลาด: ${xhr.responseJSON?.message || 'Unknown error'}<br>
+                                <button class="btn btn-primary mt-2" onclick="window.location.reload()">
+                                    <i class="fas fa-redo"></i> ลองใหม่
+                                </button>
+                            </div>
+                        `);
+                        showNotification('error', 'เกิดข้อผิดพลาด: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                    }
+                });
+            }
+
+            // ✅ แก้ไข displayQRCode() รองรับ Thai QR String
+            function displayQRCode(qrCodeData) {
+                console.log('QR Code Data:', qrCodeData);
+                console.log('QR Code Length:', qrCodeData ? qrCodeData.length : 0);
+
+                // Clear previous content
+                $('#qrCodeDisplay').empty();
+
+                // ถ้าเป็น Base64 Image
+                if (qrCodeData.startsWith('data:image') || qrCodeData.startsWith('iVBOR')) {
+                    const qrImg = `<img src="data:image/png;base64,${qrCodeData}" alt="QR Code" class="img-fluid">`;
+                    $('#qrCodeDisplay').html(qrImg);
+                    console.log('Displaying Base64 QR Image');
+                }
+                // ✅ ถ้าเป็น Thai QR String (00020101...)
+                else if (qrCodeData.startsWith('00020101')) {
+                    try {
+                        // สร้าง div สำหรับ QR Code
+                        const qrDiv = $('<div id="qrCodeCanvas" style="display:inline-block;padding:10px;background:white;border-radius:8px;"></div>');
+                        $('#qrCodeDisplay').append(qrDiv);
+
+                        // สร้าง QR Code จาก String
+                        new QRCode(document.getElementById('qrCodeCanvas'), {
+                            text: qrCodeData,
+                            width: 300,
+                            height: 300,
+                            colorDark: '#000000',
+                            colorLight: '#ffffff',
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+
+                        console.log('QR Code generated successfully from Thai QR String');
+                    } catch (error) {
+                        console.error('Error generating QR Code:', error);
+                        $('#qrCodeDisplay').html(`
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                ไม่สามารถสร้าง QR Code ได้<br>
+                                <small>กรุณารีเฟรชหน้าใหม่</small><br>
+                                <button class="btn btn-primary mt-2" onclick="window.location.reload()">
+                                    <i class="fas fa-redo"></i> ลองใหม่
+                                </button>
+                            </div>
+                        `);
+                    }
+                }
+                // ถ้าเป็น URL
+                else if (qrCodeData.startsWith('http')) {
+                    $('#qrCodeDisplay').html(`
+                        <div class="alert alert-info">
+                            <i class="fas fa-external-link-alt"></i>
+                            <a href="${qrCodeData}" target="_blank" class="alert-link">
+                                คลิกที่นี่เพื่อชำระเงิน
+                            </a>
+                        </div>
+                    `);
+                    console.log('Displaying QR Payment URL');
+                }
+                // กรณีอื่นๆ
+                else {
+                    console.error('Unknown QR Code format:', qrCodeData.substring(0, 50));
+                    $('#qrCodeDisplay').html(`
+                        <div class="alert alert-danger">
+                            <i class="fas fa-times-circle"></i>
+                            รูปแบบ QR Code ไม่ถูกต้อง<br>
+                            <small>${qrCodeData.substring(0, 50)}...</small><br>
+                            <button class="btn btn-primary mt-2" onclick="window.location.reload()">
+                                <i class="fas fa-redo"></i> ลองใหม่
+                            </button>
+                        </div>
+                    `);
+                }
+            }
+
+            function startPaymentStatusCheck() {
+                console.log('Start checking payment status for:', paymentID);
+
+                checkInterval = setInterval(function () {
+                    checkPaymentStatus();
+                }, 3000); // ทุก 3 วินาที
+            }
+
+            // ✅ แก้ไข checkPaymentStatus() เช็ค status หลายแบบ
+            function checkPaymentStatus() {
+                if (!paymentID) {
+                    console.error('PaymentID is null');
+                    return;
+                }
+
+                $.ajax({
+                    url: '/orders/GetPaymentStatus',
+                    type: 'GET',
+                    data: { paymentId: paymentID },
+                    success: function (response) {
+                        console.log('Payment status:', response);
+
+                        if (response.success) {
+                            // ✅ เช็คทั้ง 3 แบบ: Success, Paid, Completed
+                            const isPaid =
+                                response.status === 'Success' ||
+                                response.status === 'Paid' ||
+                                response.status === 'Completed' ||
+                                response.paymentStatus === 'Success' ||
+                                response.paymentStatus === 'Paid' ||
+                                response.paymentStatus === 'Completed' ||
+                                response.orderStatus === 'Paid' ||
+                                response.orderStatus === 'Completed';
+
+                            const isFailed =
+                                response.status === 'Failed' ||
+                                response.status === 'Expired' ||
+                                response.status === 'Cancelled' ||
+                                response.paymentStatus === 'Failed' ||
+                                response.paymentStatus === 'Expired' ||
+                                response.paymentStatus === 'Cancelled';
+
+                            if (isPaid) {
+                                clearInterval(checkInterval);
+                                if (countdownInterval) {
+                                    clearInterval(countdownInterval);
+                                }
+                                paymentSuccess();
+                            } else if (isFailed) {
+                                clearInterval(checkInterval);
+                                if (countdownInterval) {
+                                    clearInterval(countdownInterval);
+                                }
+                                paymentFailed(response.message || 'การชำระเงินล้มเหลว');
+                            }
+                            // ถ้ายัง Pending → รอต่อ
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Check payment status error:', xhr);
+                    }
+                });
+            }
+
+            function paymentSuccess() {
+                $('#paymentStatus').html('<span class="status-success"><i class="fas fa-check-circle"></i> ชำระเงินสำเร็จ</span>');
+                $('#countdownTimer').html('<span class="text-success">ชำระเงินสำเร็จแล้ว</span>');
+
+                showNotification('success', 'ชำระเงินสำเร็จ! กำลังไปหน้าถัดไป...');
+
+                setTimeout(function () {
+                    window.location.href = '/orders/success?orderID=' + orderID;
+                }, 2000);
+            }
+
+            function paymentFailed(message) {
+                $('#paymentStatus').html('<span class="status-failed"><i class="fas fa-times-circle"></i> การชำระเงินล้มเหลว</span>');
+                showNotification('error', message || 'การชำระเงินล้มเหลว กรุณาลองใหม่อีกครั้ง');
+            }
+
+            // ✅ แก้ไข startCountdown() ป้องกัน memory leak
+            function startCountdown() {
+                countdownInterval = setInterval(function () {  // ✅ เก็บ ID
+                    countdown--;
+                    const minutes = Math.floor(countdown / 60);
+                    const seconds = countdown % 60;
+                    $('#timeRemaining').text(`${minutes}:${seconds < 10 ? '0' : ''}${seconds}`);
+
+                    if (countdown <= 0) {
+                        clearInterval(checkInterval);
+                        clearInterval(countdownInterval);  // ✅ clear ตัวเอง
+                        $('#paymentStatus').html('<span class="status-failed"><i class="fas fa-times-circle"></i> QR Code หมดอายุแล้ว</span>');
+                        $('#qrCodeDisplay').html(`
+                            <div class="alert alert-warning">
+                                <i class="fas fa-clock"></i> QR Code หมดอายุแล้ว<br>
+                                <button class="btn btn-primary mt-2" onclick="window.location.reload()">
+                                    <i class="fas fa-redo"></i> สร้าง QR Code ใหม่
+                                </button>
+                            </div>
+                        `);
+                        showNotification('error', 'QR Code หมดอายุแล้ว กรุณาสร้างใหม่');
+                    }
+                }, 1000);
+            }
+
+            // =========================================
+            // Credit Card Payment
+            // =========================================
+
+            function setupCreditCardForm() {
+                $('#creditCardForm').submit(function (e) {
+                    e.preventDefault();
+
+                    const cardNumber = $('#cardNumber').val().replace(/\s/g, '');
+                    const cardName = $('#cardName').val();
+                    const expMonth = $('#expMonth').val();
+                    const expYear = $('#expYear').val();
+                    const cvv = $('#cvv').val();
+
+                    // Validate
+                    if (!cardNumber || !cardName || !expMonth || !expYear || !cvv) {
+                        showNotification('error', 'กรุณากรอกข้อมูลให้ครบถ้วน');
+                        return;
+                    }
+
+                    // Disable button
+                    $('#btnPayCredit').prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังดำเนินการ...');
+
+                    $.ajax({
+                        url: '/orders/CreatePayment',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({
+                            orderID: orderID,
+                            paymentMethod: 'CreditCard',
+                            cardNumber: cardNumber,
+                            cardHolderName: cardName,
+                            expiryMonth: expMonth,
+                            expiryYear: expYear,
+                            cvv: cvv
+                        }),
+                        success: function (response) {
+                            console.log('Credit card payment response:', response);
+
+                            if (response.success) {
+                                paymentID = response.paymentID;
+
+                                // บัตรเครดิตอาจได้รับ response ทันที หรือต้อง polling
+                                if (response.status === 'Success' || response.status === 'Paid') {
+                                    paymentSuccess();
+                                } else {
+                                    // ต้อง polling
+                                    startPaymentStatusCheck();
+                                }
+                            } else {
+                                $('#btnPayCredit').prop('disabled', false).html('<i class="fas fa-lock"></i> ชำระเงิน');
+                                showNotification('error', response.message || 'ไม่สามารถชำระเงินได้');
+                            }
+                        },
+                        error: function (xhr) {
+                            console.error('Credit card payment error:', xhr);
+                            $('#btnPayCredit').prop('disabled', false).html('<i class="fas fa-lock"></i> ชำระเงิน');
+                            showNotification('error', 'เกิดข้อผิดพลาด: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                        }
+                    });
+                });
+
+                // Format card number (xxxx xxxx xxxx xxxx)
+                $('#cardNumber').on('input', function () {
+                    let value = $(this).val().replace(/\s/g, '');
+                    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                    $(this).val(formattedValue);
+                });
+
+                // CVV only numbers
+                $('#cvv').on('input', function () {
+                    this.value = this.value.replace(/[^0-9]/g, '');
+                });
+            }
+
+            // =========================================
+            // Notification Helper
+            // =========================================
+
+            function showNotification(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+                const notification = $(`
+                    <div class="alert ${alertClass} alert-dismissible fade show"
+                         role="alert"
+                         style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <i class="fas ${icon}"></i> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+
+                $('body').append(notification);
+
+                setTimeout(function () {
+                    notification.fadeOut(function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+        });
+    </script>
+}

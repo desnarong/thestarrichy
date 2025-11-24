@@ -1,0 +1,53 @@
+﻿@{
+    ViewData["Title"] = "เอกสาร";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-documents">เอกสาร</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- begin widget-list -->
+                <div class="widget-list widget-list-rounded">
+                    <!-- begin widget-list-item -->
+                    <a href="#" class="widget-list-item">
+                        <div class="widget-list-media">
+                            <i class="fas fa-link" style="background-color: var(--vz-warning); color: var(--vz-white);"></i>
+                        </div>
+                        <div class="widget-list-content">
+                            <h4 class="widget-list-title" data-key="t-regulation">1. กฎระเบียบ</h4>
+                        </div>
+                        <div class="widget-list-action text-nowrap text-right text-muted" data-key="t-off">
+                            ปิด
+                            <i class="fas fa-angle-right fa-lg m-l-5"></i>
+                        </div>
+                    </a>
+                    <!-- end widget-list-item -->
+                    <!-- begin widget-list-item -->
+                    <a href="#" class="widget-list-item">
+                        <div class="widget-list-media">
+                            <i class="fas fa-link" style="background-color: var(--vz-warning); color: var(--vz-white);"></i>
+                        </div>
+                        <div class="widget-list-content">
+                            <h4 class="widget-list-title" data-key="t-hold-application">2. ใบสมัคร hold ยอด</h4>
+                        </div>
+                        <div class="widget-list-action text-nowrap text-right text-muted" data-key="t-hold-application-description">
+                            ใบสมัครขอสิทธิ์ซื้อสินค้าเพื่อแจงยอดภายหลัง
+                            <i class="fas fa-angle-right fa-lg m-l-5"></i>
+                        </div>
+                    </a>
+                    <!-- end widget-list-item -->
+                </div>
+                <!-- end widget-list -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

@@ -1,0 +1,347 @@
+﻿@{
+    ViewBag.Title = "Sign In";
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="ladylip" data-sidebar-size="lg">
+<head>
+    <!-- App favicon -->
+    <link rel="shortcut icon" href="~/assets/images/favicon.ico">
+    <link href="~/css/site.css" rel="stylesheet" />
+    @Html.Partial("~/Views/Shared/_title_meta.cshtml")
+    @Html.Partial("~/Views/Shared/_head_css.cshtml")
+    <!-- Sweet Alert css-->
+    <link href="/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+
+    <style>
+        .background-slider {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-size:  cover;
+            background-position: top;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
+            z-index: -1;
+        }
+
+        .overlay-content {
+            position: absolute;
+            z-index: 10;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 2rem;
+            text-shadow: 0 0 10px rgba(0,0,0,0.7);
+        }
+
+        .bg-overlay {
+            background-color: #061040 !important;
+            opacity: 1 !important;
+        }
+
+        .swalimg {
+            width: 100% !important
+        }
+        /* ปรับ popup login ให้มีมุมโค้งและจัดระยะห่าง */
+        .popup-login {
+            border-radius: 15px !important;
+            padding-bottom: unset !important;
+        }
+
+        /* HTML container ภายใน popup */
+        .popup-login-html {
+            margin: unset !important;
+            border-radius: 15px !important;
+        }
+
+        /* popup */
+        button.close {
+            padding: 0;
+            background-color: transparent;
+            border: 0;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+
+        .close {
+            float: right;
+            font-size: 1.5rem;
+            font-weight: 700;
+            line-height: 1;
+            color: #000;
+            text-shadow: 0 1px 0 #fff;
+            opacity: .5;
+        }
+
+            .close:not(:disabled):not(.disabled) {
+                cursor: pointer;
+            }
+
+        .modal-header .close {
+            margin-top: 2px;
+        }
+
+        .modal-content {
+            border: 0;
+            -webkit-box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        /**/
+        .auth-page-wrapper {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #signin_submit {
+            background-color: #061040 !important;
+            border-color: #061040 !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-page-wrapper">
+        <!-- auth page bg -->
+        <div class="auth-one-bg-position">
+            <div class="bg-overlay"></div>
+        </div>
+
+        <!-- auth page content -->
+        <div id="backgroundSlider" class="auth-page-content background-slider">
+            <div class="container">
+                <div class="row d-none">
+                    <div class="col-lg-12">
+                        <div class="text-center text-white-50">
+                            <div class="login-header">
+                                <img src="~/images/logo.png" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end row -->
+
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6 col-xl-5">
+                        <div class="card mt-4 card-bg-fill">
+                            <div class="card-body p-4">
+                                <div class="text-center mt-2">
+                                    <h5 class="text-primary" data-key="t-welcomeback">ยินดีต้อนรับ !</h5>
+                                    <p class="text-muted" data-key="t-signintocontinuto">ลงชื่อเข้าใช้งานเพื่อไปยัง Star Richy</p>
+                                </div>
+                                <div class="p-2 mt-4">
+                                    <form action="@Url.Action("Index", "Dashboard")">
+                                        <div class="mb-3">
+                                            <label for="login__username" class="form-label" data-key="t-membercode">รหัสผู้ใช้</label>
+                                            <input type="text" class="form-control" id="login__username" value="S00000029"><!--S00000029-->
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label" for="login__password" data-key="t-password">รหัสผ่าน</label>
+                                            <div class="position-relative auth-pass-inputgroup mb-3">
+                                                <input type="password" class="form-control pe-5 password-input" id="login__password" value=""><!--7689-->
+                                                <button class="btn btn-link position-absolute end-0 top-0 text-decoration-none text-muted password-addon material-shadow-none" type="button" id="password-addon"><i class="ri-eye-fill align-middle"></i></button>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="" id="remember_checkbox">
+                                            <label class="form-check-label" for="remember_checkbox" data-key="t-remembercheck">จำไว้</label>
+                                        </div>
+
+                                        <div class="mt-4">
+                                            <button class="btn btn-success w-100" type="button" id="signin_submit" data-key="t-signin">เข้าใช้งาน</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            <!-- end card body -->
+                        </div>
+                        <!-- end card -->
+                    </div>
+                </div>
+                <!-- end row -->
+                <!-- end container -->
+            </div>
+        </div>
+        <!-- end auth page content -->
+        <!-- footer -->
+        @Html.Partial("~/Views/Shared/_footer.cshtml")
+        <!-- end Footer -->
+    </div>
+    <!-- end auth-page-wrapper -->
+    <div class="modal fade show" id="countdownModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="true" aria-modal="true" style="padding-right: 15px; display: block;">
+        <div class="modal-dialog modal-lg py-5" role="document">
+            <div class="modal-content" style="background-color: #0000;-webkit-box-shadow: none;">
+                <div class="modal-header p-0 border-0">
+                    <h5 class="modal-title text-white mx-auto" id="exampleModalLabel">Close in <font id="cool_down">20</font> seconds</h5>
+                    <button type="button" class="close px-0 ml-0 mr-1" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="text-danger" aria-hidden="true" style="font-size: 2em;line-height: 5px;">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img id="popup_image" src="~/assets/images/popup/popup.jpg" alt="" class="img-fluid" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("~/Views/Shared/_vendor_scripts.cshtml")
+    <!-- Sweet Alerts js -->
+    <script src="/assets/libs/sweetalert2/sweetalert2.min.js"></script>
+    <!-- password-addon init -->
+    <script src="~/assets/js/pages/password-addon.init.js"></script>
+
+    <script>
+        let countdownInterval = null;
+        $(document).ready(function () {
+            $('#loginmodal').modal({ show: true, backdrop: 'static', keyboard: false });
+            $('#countdownModal').modal('show');
+
+
+            $('#signin_submit').click(function (e) {
+                Swal.fire({
+                    html: '<div><img src="/assets/images/login/loginlogo.png" class="swalimg" /></div>',
+                    showCancelButton: false,
+                    showConfirmButton: false,
+                    showCloseButton: false,
+                    buttonsStyling: false,
+                    customClass: {
+                        popup: 'popup-login', // ใช้คลาสเฉพาะสำหรับ popup นี้
+                        htmlContainer: 'popup-login-html'
+                    }
+                });
+
+                $.ajax({
+                    type: "Post",
+                    url: '/Auth/Login',
+                    data: { email: $('#login__username').val(), password: $('#login__password').val() },
+                    dataType: "json",
+                    success: function (data) {
+
+                        data.lang = (data.lang == null || data.lang == '') ? data.lang = 'th' : data.lang;
+                        localStorage.setItem("language", data.lang);
+                        setTimeout(() => {
+                            Swal.close();
+                            if (data.message != "limit" && data.message != "error") {
+                                location.href = data.redirectUrl;
+                                //SwalFunc.SuccessWithRedirect("Login Success", "success", data.message);
+                                //console.log(data);
+                            }
+                            else if (data.message == "limit") {
+                                //$('#messageerror').html('User Online is limit!');
+                                //Your company reach the limit of users and devices.
+                            }
+                        }, 2000); // รอ 2000 มิลลิวินาที = 2 วินาที
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.close();
+                        Swal.fire("เกิดข้อผิดพลาด", "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้", "error");
+                    }
+                });
+            });
+
+            $('#kt-login__username').keydown(function (event) {
+                if (event.which == 13) {
+                    $('#kt-login__password').focus();
+                }
+            });
+
+            $('#kt-login__password').keydown(function (event) {
+                if (event.which == 13) {
+                    $('#kt_login_signin_submit').click();
+                }
+            });
+
+            showModalWithCountdown();
+            
+            (async () => {
+                await imageslidebar();
+                await imagepopupslidebar();
+            })();
+        });
+
+        async function imageslidebar() {
+            const response = await fetch('/home/GetSlideImages', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const images = await response.json();
+            if (!images || images.length === 0) return;
+
+            let index = 0;
+            const basePath = "/assets/images/slidebar/";
+
+            function changeBackground() {
+                $('#backgroundSlider').css('background-image', 'url(' + basePath + images[index] + ')');
+                index = (index + 1) % images.length;
+            }
+
+            changeBackground();
+            setInterval(changeBackground, 5000);
+        }
+
+        async function imagepopupslidebar() {
+            const response = await fetch('/home/GetPopupSlideImages', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const images = await response.json();
+            if (!images || images.length === 0) return;
+
+            let index = 0;
+            const basePath = "/assets/images/popup/";
+
+            function changeBackground() {
+                $('#popup_image').attr('src', '' + basePath + images[index] + '');
+                index = (index + 1) % images.length;
+            }
+
+            changeBackground();
+            setInterval(changeBackground, 5000);
+        }
+
+        function showModalWithCountdown() {
+            let countdown = 20;
+            $('#cool_down').text(countdown);
+            $('#countdownModal').modal('show');
+
+            // เริ่มนับถอยหลัง
+            countdownInterval = setInterval(function () {
+                countdown--;
+                $('#cool_down').text(countdown);
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    $('#countdownModal').modal('hide');
+                }
+            }, 1000);
+        }
+
+        $('#countdownModal').on('hide.bs.modal', function () {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        });
+    </script>
+</body>
+</html>
+<!-- end row -->

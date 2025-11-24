@@ -1,0 +1,964 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<TheStarRichyProject.Localize.Resource> localizer
+@using TheStarRichyProject.Helper
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    ViewBag.Title = "Member";
+    ViewBag.pTitle = "Personal Information";
+    ViewBag.pageTitle = "Member";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    var permissionsKey = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.PermissionsKey);
+    var permissions = JsonConvert.DeserializeObject<dynamic>(JsonConvert.DeserializeObject<dynamic>(permissionsKey));
+}
+<div class="row">
+    <div class="col-xxl-3">
+        <div class="card">
+            <div class="card-body p-4">
+                <div class="text-center">
+                    <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
+                        <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow" alt="user-profile-image">
+                        <div class="avatar-xs p-0 rounded-circle profile-photo-edit d-none">
+                            <input id="profile-img-file-input" type="file" class="profile-img-file-input">
+                            <label for="profile-img-file-input" class="profile-photo-edit avatar-sm">
+                                <span class="avatar-title rounded-circle bg-light text-body material-shadow">
+                                    <i class="ri-camera-fill ri-2x"></i>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="card-title mb-3 text-info" data-key="t-personalinfomation">ข้อมูลส่วนตัว</h5>
+                <div class="table-responsive">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-positionname">ตำแหน่งแพ็คเกจ :</th>
+                                <td class="text-muted"><span id="positionName"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-membercode">รหัสผู้ใช้ :</th>
+                                <td class="text-muted"><span id="membercode"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-name">ชื่อ :</th>
+                                <td class="text-muted"><span id="idcardname"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-bussinessname">ชื่อทางธุรกิจ :</th>
+                                <td class="text-muted"><span id="bussinessname"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-email">อีเมล์ :</th>
+                                <td class="text-muted"><span id="email"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-registerdate">วันที่ลงทะเบียน :</th>
+                                <td class="text-muted"><span id="registerdate"></span></td>
+                            </tr>
+                            <tr>
+                                <th class="ps-0" scope="row" data-key="t-personalpv">คะแนนส่วนตัว</th>
+                                <td class="text-muted"> <span id="personalpv"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xxl-9">
+        <div class="card">
+            <div class="card-header">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link fw-semibold active" data-bs-toggle="tab" href="#tab-personalinformation" role="tab" aria-selected="true" data-key="t-personalinformation">
+                                    ข้อมูลส่วนบุคคล
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#tab-addressinformation" role="tab" aria-selected="false" tabindex="-1" data-key="t-addressinformation">
+                                    ข้อมูลที่อยู่
+                                </a>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#tab-bankinformation" role="tab" aria-selected="false" tabindex="-1" data-key="t-bankinformation">
+                                    ข้อมูลธนาคาร
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="tab-content">
+                    <div id="tab-personalinformation" class="tab-pane active show" role="tabpanel">
+                        <div class="row gy-4">
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-country" class="form-label" data-key="t-country">ประเทศ</label>
+                                    @*<input type="text" class="form-control" id="info-country" disabled>*@
+                                    <select id="info-country" class="form-select" aria-label=".form-select-sm" disabled></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-businesscountry" class="form-label" data-key="t-businesscountry">ประเทศที่ดำเนินธุรกิจ</label>
+                                    @*<input type="text" class="form-control" id="info-businesscountry" disabled>*@
+                                    <select id="info-businesscountry" class="form-select" aria-label=".form-select-sm" disabled></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-sponsername" class="form-label" data-key="t-sponsername">ชื่อผู้แนะนำ</label>
+                                    <input type="text" class="form-control" id="info-sponsername" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-typebusinessman" class="form-label" data-key="t-typebusinessman">ประเภทนักธุรกิจ</label>
+                                    <input type="text" class="form-control" id="info-typebusinessman" disabled>
+                                    @*<select id="info-typebusinessman" class="form-select" aria-label=".form-select-sm" disabled></select>*@
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-registerdate" class="form-label" data-key="t-registerdate">วันที่ลงทะเบียน</label>
+                                    <input type="text" class="form-control" id="info-registerdate" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4">
+                            <div class="col-sm-12 col-md-4" style="padding-top: var(--vz-gutter-y);">
+                                <div>
+                                    <label for="info-title" class="form-label" data-key="t-title">คำนำหน้า</label>
+                                    <select id="info-title" class="form-select" aria-label=".form-select-sm" disabled></select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-8" style="padding-top: var(--vz-gutter-y);">
+                                <div>
+                                    <label for="info-idcardname" class="form-label" data-key="t-idcardname">ชื่อบนบัตร</label>
+                                    <input type="text" class="form-control" id="info-idcardname" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div>
+                                    <label for="info-bussinessname" class="form-label" data-key="t-bussinessname">ชื่อทางธุรกิจ</label>
+                                    <input type="text" class="form-control" id="info-bussinessname">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-idcard" class="form-label" data-key="t-idcard">หมายเลขประชาชน/หมายเลขพาสปอร์ต</label>
+                                    <input type="text" class="form-control" id="info-idcard" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-dateofbirth" class="form-label" data-key="t-dateofbirth">วันเกิด</label>
+                                    <input type="text" class="form-control" id="info-dateofbirth" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-marital" class="form-label" data-key="t-marital">สถานภาพสมรส</label>
+                                    <select id="info-marital" class="form-select" aria-label=".form-select-sm" disabled>
+                                        <option value="Single" data-key="t-single">โสด</option>
+                                        <option value="Marital" data-key="t-marital">สถานภาพสมรส</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-gender" class="form-label" data-key="t-gender">เพศ</label>
+                                    <select id="info-gender" class="form-select" aria-label=".form-select-sm" disabled>
+                                        <option value="Male" data-key="t-male">เพศชาย</option>
+                                        <option value="Female" data-key="t-female">เพศหญิง</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-membershiptype" class="form-label" data-key="t-membershiptype">ประเภทสมาชิก</label>
+                                    <select id="info-membershiptype" class="form-select" aria-label=".form-select-sm" disabled>
+                                        <option value="บุคคล" data-key="t-individual">บุคคล</option>
+                                        <option value="เอกชน" data-key="t-legalentity">เอกชน</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-lang" class="form-label" data-key="t-lang">ภาษา</label>
+                                    <select id="info-lang" class="form-select" aria-label=".form-select-sm">
+                                        <option value="01" data-key="t-thai">ไทย</option>
+                                        <option value="02" data-key="t-english">อังกฤษ</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div>
+                                    <label for="info-smsnews" class="form-label" data-key="t-smsnews">รับข้อมูลข่าวสารผ่าน sms</label>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="info-smsnews" checked="" disabled>
+                                        <label class="form-check-label" for="info-smsnews">
+                                            ยอมรับ
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div>
+                                    <label class="form-label" data-key="t-flagsend">การตรวจสอบเอกสาร</label>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="info-flagsendidcard" disabled>
+                                        <label class="form-check-label" for="flagsendidcard">
+                                            สำเนาบัตรประชาชน
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="info-flagsendbookbank" disabled>
+                                        <label class="form-check-label" for="flagsendbookbank">
+                                            สำเนาสมุดบัญชีธนาคาร
+                                        </label>
+                                    </div>
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="info-registerfrombranch" disabled>
+                                        <label class="form-check-label" for="registerfrombranch">
+                                            แบบฟอร์มการสมัครได้รับการส่งแล้ว
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 justify-content-end">
+                            <div class="col-sm-auto">
+                                <div>
+                                    <button class="btn btn-success h4" id="btn-personalupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-addressinformation" class="tab-pane" role="tabpanel">
+                        <div class="row gy-4">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14" data-key="t-idcardaddress">ที่อยู่ตามบัตรประชาชน</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div>
+                                            <label for="info-idcardaddress" class="form-label" data-key="t-address">ที่อยู่</label>
+                                            <textarea type="text" class="form-control" id="info-idcardaddress" rows="5" disabled></textarea>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-idcardprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                            <select id="info-idcardprovince" class="form-select" aria-label=".form-select-sm" disabled>
+                                                <option value="54" data-key="t-thai">แพร่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-idcarddistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                            <select id="info-idcarddistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-idcardsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                            <select id="info-idcardsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-idcardpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                            <input type="text" class="form-control" id="info-idcardpostcode" disabled>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14" data-key="t-presentaddress">ที่อยู่ปัจจุบัน</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="info-sameidcardaddress">
+                                            <label class="form-check-label" for="info-sameidcardaddress" data-key="t-sameidcardaddress">
+                                                เหมือนที่อยู่ตามบัตร
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-12">
+                                        <label for="info-presentaddress" class="form-label" data-key="t-address">ที่อยู่</label>
+                                        <textarea type="text" class="form-control" id="info-presentaddress" rows="5"></textarea>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                            <select id="info-presentprovince" class="form-select" aria-label=".form-select-sm">
+                                                <option value="54" data-key="t-thai">แพร่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentdistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                            <select id="info-presentdistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                            <select id="info-presentsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                            <input type="text" class="form-control" id="info-presentpostcode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-12 col-md-6">
+                                <div>
+                                    <label for="info-mobilephone" class="form-label" data-key="t-mobilephone">โทรศัพท์มือถือ</label>
+                                    <input type="text" class="form-control" id="info-mobilephone" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div>
+                                    <label for="info-homephone" class="form-label" data-key="t-homephone">โทรศัพท์บ้าน</label>
+                                    <input type="text" class="form-control" id="info-homephone">
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div>
+                                    <label for="info-email" class="form-label" data-key="t-email">อีเมล</label>
+                                    <input type="text" class="form-control" id="info-email" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-6">
+                                <div>
+                                    <label for="info-lineid" class="form-label" data-key="t-lineid">ไอดีไลน์</label>
+                                    <input type="text" class="form-control" id="info-lineid" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row gy-4">
+                            
+                            
+                            <div class="col-sm-12 col-md-6">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14">ที่อยู่ออกใบกำกับภาษี</h4>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="info-sameidcardaddress">
+                                            <label class="form-check-label" for="info-sameidcardaddress" data-key="t-sameidcardaddress">
+                                                เหมือนที่อยู่ตามบัตร
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">ในนามบริษัท</label>
+                                            <input type="text" class="form-control" id="info-presentpostcode">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">เลขทะเบียนการค้าของบริษัท</label>
+                                            <input type="text" class="form-control" id="info-presentpostcode">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <label for="info-presentaddress" class="form-label" data-key="t-presentaddress">ที่อยู่ออกใบกำกับภาษี</label>
+                                        <textarea type="text" class="form-control" id="info-presentaddress" rows="5"></textarea>
+                                    </div>
+
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-invprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                            <select id="info-invprovince" class="form-select" aria-label=".form-select-sm">
+                                                <option value="54" data-key="t-thai">แพร่</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-invdistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                            <select id="info-invdistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-invsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                            <select id="info-invsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 col-md-6">
+                                        <div>
+                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                            <input type="text" class="form-control" id="info-presentpostcode">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 justify-content-end" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-auto">
+                                <div>
+                                    <button class="btn btn-success h4" id="btn-addressupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="tab-bankinformation" class="tab-pane" role="tabpanel">
+                        <div class="row gy-4">
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-bankname" class="form-label" data-key="t-bankname">ธนาคาร</label>
+                                    <select id="info-bankname" class="form-select" aria-label=".form-select-sm" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-accountnumber" class="form-label" data-key="t-accountnumber">หมายเลขบัญชี</label>
+                                    <input type="text" class="form-control" id="info-accountnumber" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-bookbankname" class="form-label" data-key="t-bookbankname">ชื่อบัญชี</label>
+                                    <input type="text" class="form-control" id="info-bookbankname" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <div>
+                                        <label for="info-branchname" class="form-label" data-key="t-branchname">สาขา</label>
+                                        <input type="text" class="form-control" id="info-branchname" disabled>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-beneficiary" class="form-label" data-key="t-beneficiary">ผู้รับประโยชน์</label>
+                                    <input type="text" class="form-control" id="info-beneficiary" disabled>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-beneficiaryidcard" class="form-label" data-key="t-beneficiaryidcard">หมายเลขบัตรผู้รับประโยชน์</label>
+                                    <input type="text" class="form-control" id="info-beneficiaryidcard" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4 d-none" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-autotransfer" class="form-label" data-key="t-autotransfer">การโอนอัตโนมัติ</label>
+                                    <select id="info-autotransfer" class="form-select" aria-label=".form-select-sm">
+                                        <option value="Y" data-key="t-yes">ใช่</option>
+                                        <option value="N" data-key="t-no">ไม่มี</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-autoship" class="form-label" data-key="t-autoship">การสั่งซื้ออัตโนมัติ</label>
+                                    <select id="info-autoship" class="form-select" aria-label=".form-select-sm">
+                                        <option value="Deduct" data-key="t-deducted">หัก</option>
+                                        <option value="Not Deducted" data-key="t-notdeducted">ไม่หัก</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4 d-none" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-styling" class="form-label" data-key="t-styling">ตำแหน่ง</label>
+                                    <select id="info-styling" class="form-select" aria-label=".form-select-sm">
+                                        <option value="DIAMOND" data-key="t-DIAMOND">DIAMOND</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-12 col-md-4">
+                                <div>
+                                    <label for="info-centerid" class="form-label" data-key="t-centerid">สมัครผ่านศูนย์</label>
+                                    <input type="text" class="form-control" id="info-centerid" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row gy-4" style="padding-top: var(--vz-gutter-y);">
+                            <div class="col-sm-4">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <label for="info-copyidcard" class="form-label" data-key="t-copyidcard">สำเนาบัตรประชาชน</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="file" id="info-uploadcopyidcard" class="form-control" />
+                                        <img id="info-copyidcard" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/d9a142f8-a869-474e-a505-45274b7521ff/Mockup+Thai+card-01.jpg" alt="" style="max-height: 210px;max-width: auto;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <label for="info-copybankaccountbook" class="form-label" data-key="t-copybankaccountbook">สำเนาสมุดบัญชีธนาคาร</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="file" id="info-uploadcopybankaccountbook" class="form-control" />
+                                        <img id="info-copybankaccountbook" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/6f022280-7881-4495-8dd4-bd864dcff7aa/Mockup+Thai+card-12.jpg" alt="" style="max-height: 410px; max-width: auto;">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="row gy-4">
+                                    <div class="col-sm-12">
+                                        <label for="info-applicationsubmitte" class="form-label" data-key="t-applicationformhasbeensubmitted">แบบฟอร์มใบสมัครได้รับการส่งแล้ว</label>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <input type="file" id="info-uploadapplicationsubmitte" class="form-control" />
+                                        <img id="info-applicationsubmitte" src="" alt="" style="max-height: 510px; max-width: auto;">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (permissions.M2.ToString() != "Y")
+                        {
+                            <div class="row g-4 justify-content-end" style="padding-top: var(--vz-gutter-y);">
+                                <div class="col-sm-auto">
+                                    <div>
+                                        <button class="btn btn-success h4" id="btn-docupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div><!-- end card-body -->
+        </div><!-- end card -->
+    </div>
+    <!-- end col -->
+</div>
+
+<script>
+    const language = localStorage.getItem("language");
+    // Load member info from API
+    async function loadMemberInfo() {
+        try {
+            const response = await fetch('/home/GetMemberInfo', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            //const data = await response.json();
+            const member = await response.json();
+            if (member) {
+                memberinfo = member;
+                //console.info(member);
+                //console.log('JWT Token:', member);
+                // Update UI with member data
+                //info
+                $('#positionName').text(member.positionName || '');
+                $('#membercode').text(member.membercode || '');
+                $('#idcardname').text(member.idcardname || '');
+                $('#email').text(member.email || '');
+                $('#personalpv').text(member.personalPV || '');
+                $('#registerdate').text(member.registerDate || '');
+                $('#bussinessname').text(member.bussinessName || '');
+
+                $('#info-country').val(member.countryCode || '');
+                $('#info-businesscountry').val(member.locationCode || '');
+                $('#info-sponsername').val(member.sponsername || '');
+                $('#info-typebusinessman').val(member.memberType || '');
+                $('#info-registerdate').val(member.registerDate || '');
+                //$('#info-title').text(member.title || '');
+                $('#info-idcardname').val(member.idcardname || '');
+                $('#info-bussinessname').val(member.bussinessName || '');
+                $('#info-idcard').val(member.idcard || '');
+                $('#info-dateofbirth').val(member.dateofBirth || '');
+                $('#info-marital').val(member.marryStatus || '');
+                $('#info-membershiptype').val(member.typeofperson || '');
+                $('#info-lang').val(member.lang || '');
+                $('#info-smsType').text(member.smsType || '');//smsType
+
+                //address
+                $('#info-idcardaddress').val(member.idcardAddress || '');
+                $('#info-idcardprovince').val(member.iDcardDustrictCode || '');
+                $('#info-idcardpostcode').val(member.iDcardPostcode || '');
+                $('#info-presentaddress').val(member.presentAddress || '');
+                $('#info-presentprovince').val(member.presentDistrictCode || '');
+                $('#info-presentpostcode').val(member.presentPostcode || '');
+                $('#info-mobilephone').val(member.mobilePhone || '');
+                $('#info-homephone').val(member.homephone || '');
+                $('#info-email').val(member.email || '');
+                $('#info-lineid').val(member.lineid || '');
+
+                //bank
+                //$('#info-bankname').text(member.bankname || '');
+               
+                $('#info-accountnumber').val(member.accountnumber || '');
+                $('#info-bookbankname').val(member.bookbankname || '');
+                $('#info-branchname').val(member.branchname || '');
+                $('#info-beneficiary').val(member.beneficiary || '');
+                $('#info-beneficiaryidcard').val(member.beneficiaryIDCard || '');
+                $('#info-autotransfer').val(member.autotransfer || 'N');
+                $('#info-autoship').val(member.autoship || 'N');
+                $('#info-styling').val(member.position1 || '');
+                $('#info-centerid').val(member.centerName || '');
+
+                $('#sponsername').text(member.sponsername || 'N/A');//sponsername
+                $('#bwdLeftPV').text(Number(member.bwdLeftPV || '0').toLocaleString("en-US"));
+                $('#bwdRightPV').text(Number(member.bwdRightPV || '0').toLocaleString("en-US"));
+                $('#presentLeftPV').text(Number(member.presentLeftPV || '0').toLocaleString("en-US"));
+                $('#presentRightPV').text(Number(member.presentRightPV || '0').toLocaleString("en-US"));
+                $('#newLeftPV').text(Number(member.newLeftPV || '0').toLocaleString("en-US"));
+                $('#newRightPV').text(Number(member.newRightPV || '0').toLocaleString("en-US"));
+                $('#totalLeftBalanceTeam').text(Number(member.totalLeftBalanceTeam || '0').toLocaleString("en-US"));
+                $('#totalRightBalanceTeam').text(Number(member.totalRightBalanceTeam || '0').toLocaleString("en-US"));
+                $('#totalBonus').text(Number(member.totalBonus || '0').toLocaleString("en-US"));
+                $('#totalBalance').text(Number(member.totalBalance || '0').toLocaleString("en-US"));
+                $('#leftCountActive').text(Number(member.leftCountActive || '0').toLocaleString("en-US"));
+                $('#rigthCountActive').text(Number(member.rigthCountActive || '0').toLocaleString("en-US"));
+                $('#nextPosition').text(member.nextPosition || 'N/A');
+                $('#esTweakleg').text(Number(member.esTweakleg || '0').toLocaleString("en-US"));
+                $('#weakleg').text(Number(member.weakleg || '0').toLocaleString("en-US"));
+                $('#ewallet').text(Number(member.ewallet || '0').toLocaleString("en-US"));
+                $('#holdPV').text(Number(member.holdPV || '0').toLocaleString("en-US"));
+                $('#qualifyDate').text(member.qualifyDate || 'N/A');
+                $('#firstQdate').text(member.firstQdate || 'N/A');
+                $('#currentMonth').text(member.currentMonth || 'N/A');
+                $('#nextCMonth').text(member.nextCMonth || 'N/A');
+                $('#currentMonthQualifyPV').text(Number(member.currentMonthQualifyPV || '0').toLocaleString("en-US"));
+                $('#currentMonth1').text(member.currentMonth1 || 'N/A');
+                $('#lastmonthQualifyPV').text(Number(member.lastmonthQualifyPV || '0').toLocaleString("en-US"));
+                $('#lastCMonth').text(member.lastCMonth || 'N/A');
+                $('#leftURL').html(member.leftURL || 'N/A');
+                $('#leftURL').attr('href', member.leftURL || 'N/A');
+                $('#rightURL').html(member.rightURL || 'N/A');
+                $('#rightURL').attr('href', member.rightURL || 'N/A');
+
+                $('#user-profile-image').attr('src', '/' + member.memberPositionPicture || 'N/A');
+                $('#info-copyidcard').attr('src', '/' + member.memberIDPicture || 'N/A');
+                $('#info-copybankaccountbook').attr('src', '/' + member.memberBookPicture || 'N/A');
+                $('#info-applicationsubmitte').attr('src', '');
+
+                if (member.memberIDPicture != '') $('#info-uploadcopyidcard').addClass('d-none');
+                if (member.memberBookPicture != '') $('#info-uploadcopybankaccountbook').addClass('d-none');
+                //if (member.memberPositionPicture != '') $('#info-uploadapplicationsubmitte').addClass('d-none');
+                //
+
+                $('#info-flagsendidcard').attr('checked', (member.memberPositionPicture ? true : false));
+                $('#info-flagsendbookbank').attr('checked', (member.memberIDPicture ? true : false));
+                $('#info-registerfrombranch').attr('checked', false);
+
+
+                await loadBanks(member.bankname || '');
+                await loadTitleNames(member.title || '');
+            } else {
+                console.error('No token found');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching token:', error);
+            return null;
+        }
+    }
+
+    async function loadBanks(selectedBankText) {
+        try {
+            const response = await fetch('/Member/GetBanks', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+
+            const data = await response.json();
+            if (data) {
+                const $bankselect = $('#info-bankname');
+                $bankselect.empty(); // เคลียร์ option เดิมก่อน
+
+                let optionsHtml = ``;
+                $.each(data, function (index, item) {
+                    let id = item.M17_PX1;
+                    let dlname = language === 'th' ? item.Thainame : item.Engname;
+                    optionsHtml += `<option value="${id}">${dlname}</option>`;
+                });
+
+                $bankselect.append(optionsHtml);
+
+                // 🔽 เลือก option ตามข้อความ (text)
+                if (selectedBankText) {
+                    $bankselect.find('option').each(function () {
+                        if ($(this).text().trim() === selectedBankText.trim()) {
+                            $(this).prop('selected', true);
+                            return false; // ออกจาก each เมื่อเจอแล้ว
+                        }
+                    });
+                }
+
+                $bankselect.trigger('change'); // trigger change ถ้าต้องการ
+            } else {
+                console.error('No data found');
+            }
+        } catch (error) {
+            console.error('Error fetching banks:', error);
+        }
+    }
+
+    async function loadCountries() {
+        try {
+            const response = await fetch('/Member/GetCountries', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const data = await response.json();
+            if (data) {
+                //console.info(data);
+                const $select = $('#info-country');
+                let tableHtml = ``;
+                $.each(data, function (index, item) {
+                    let id = item.M35_PX1;
+                    let dlname = item.Thainame;
+                    if (language === 'th') dlname = item.Thainame;
+                    else dlname = item.EngName;
+                    tableHtml += `<option value="${id}">${dlname}</option>`;
+                });
+                // เพิ่มตารางเข้าใน container
+                $select.append(tableHtml);
+            } else {
+                console.error('No token found');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching token:', error);
+            return null;
+        }
+    } 
+
+    async function loadCountryBusinesses() {
+        try {
+            const response = await fetch('/Member/GetCountryBusinesses', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const data = await response.json();
+            if (data) {
+               //console.info(data);
+                const $select = $('#info-businesscountry');
+                let tableHtml = ``;
+                $.each(data, function (index, item) {
+                    let id = item.M35_PX1;
+                    let dlname = item.Thainame;
+                    if (language === 'th') dlname = item.Thainame;
+                    else dlname = item.EngName;
+                    tableHtml += `<option value="${id}">${dlname}</option>`;
+                });
+                // เพิ่มตารางเข้าใน container
+                $select.append(tableHtml);
+            } else {
+                console.error('No token found');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching token:', error);
+            return null;
+        }
+    } 
+
+    async function loadDistricts() {
+        try {
+            const response = await fetch('/Member/GetDistricts', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const data = await response.json();
+            if (data) {
+                //console.info(data);
+                const $idcardselect = $('#info-idcardprovince');
+                const $presentselect = $('#info-presentprovince');
+                let tableHtml = ``;
+                $.each(data, function (index, item) {
+                    let id = item.M32_PX1;
+                    let dlname = item.Thainame;
+                    if (language === 'th') dlname = item.Thainame;
+                    else dlname = item.EngName;
+                    tableHtml += `<option value="${id}">${dlname}</option>`;
+                });
+                // เพิ่มตารางเข้าใน container
+                $idcardselect.append(tableHtml);
+                $presentselect.append(tableHtml);
+            } else {
+                console.error('No token found');
+                return null;
+            }
+        } catch (error) {
+            console.error('Error fetching token:', error);
+            return null;
+        }
+    } 
+
+    async function loadTitleNames(selectedTitleText) {
+        try {
+            const response = await fetch('/Member/GetTitleNames', {
+                method: 'GET',
+                credentials: 'include' // ส่ง Cookie ไปด้วย
+            });
+            const data = await response.json();
+            if (data) {
+                const $select = $('#info-title');
+                $select.empty(); // ล้าง options เดิมก่อน
+
+                let optionsHtml = ``;
+                $.each(data, function (index, item) {
+                    let id = item.M15_PX1;
+                    let dlname = language === 'th' ? item.Thainame : item.EngName;
+                    optionsHtml += `<option value="${id}">${dlname}</option>`;
+                });
+
+                $select.append(optionsHtml);
+
+                // ✅ เลือก option ตาม text
+                if (selectedTitleText) {
+                    $select.find('option').each(function () {
+                        if ($(this).text().trim() === selectedTitleText.trim()) {
+                            $(this).prop('selected', true);
+                            return false; // หยุดการวนลูปเมื่อเจอแล้ว
+                        }
+                    });
+                }
+
+                $select.trigger('change'); // ถ้ามี event listener
+            } else {
+                console.error('No data found');
+            }
+        } catch (error) {
+            console.error('Error fetching title names:', error);
+        }
+    }
+
+    document.getElementById("btn-personalupdate").addEventListener("click", function () {
+        Swal.fire({
+            title: "ยืนยัน",
+            text: "ยืนยันอัพเดทข้อมูล",
+            icon: "warning",
+            showCancelButton: !0,
+            customClass: {
+                confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                cancelButton: "btn btn-danger w-xs mt-2"
+            },
+            confirmButtonText: "ยืนยัน",
+            buttonsStyling: !1,
+            showCloseButton: !0
+        }).then(function (t) {
+            /*t.value && Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success",
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs mt-2"
+                },
+                buttonsStyling: !1
+            })*/
+        })
+    })
+
+    document.getElementById("btn-addressupdate").addEventListener("click", function () {
+        Swal.fire({
+            title: "ยืนยัน",
+            text: "ยืนยันอัพเดทข้อมูล",
+            icon: "warning",
+            showCancelButton: !0,
+            customClass: {
+                confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                cancelButton: "btn btn-danger w-xs mt-2"
+            },
+            confirmButtonText: "ยืนยัน",
+            buttonsStyling: !1,
+            showCloseButton: !0
+        }).then(function (t) {
+            /*t.value && Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success",
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs mt-2"
+                },
+                buttonsStyling: !1
+            })*/
+        })
+    })
+
+    document.getElementById("btn-docupdate").addEventListener("click", function () {
+        Swal.fire({
+            title: "ยืนยัน",
+            text: "ยืนยันอัพเดทข้อมูล",
+            icon: "warning",
+            showCancelButton: !0,
+            customClass: {
+                confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                cancelButton: "btn btn-danger w-xs mt-2"
+            },
+            confirmButtonText: "ยืนยัน",
+            buttonsStyling: !1,
+            showCloseButton: !0
+        }).then(function (t) {
+            /*t.value && Swal.fire({
+                title: "Deleted!",
+                text: "Your file has been deleted.",
+                icon: "success",
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs mt-2"
+                },
+                buttonsStyling: !1
+            })*/
+        })
+    })
+
+    // Load member info when page loads using jQuery
+    $(document).ready(function () {
+        (async () => {
+            await loadCountries();
+            await loadCountryBusinesses();
+            await loadDistricts();
+            await loadMemberInfo();
+        })();
+    });
+</script>
+@section scripts{
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}

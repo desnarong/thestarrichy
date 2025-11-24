@@ -1,0 +1,731 @@
+/*
+Template Name: Velzon - Admin & Dashboard Template
+Custom CSS for Team Management Pages
+Author: Claude AI
+File: team-pages-velzon.css
+Version: 1.0
+*/
+
+/* ============================================
+   BINARY TREE STYLES
+   ============================================ */
+
+.binary-tree-container {
+    padding: 2rem;
+    min-height: 500px;
+    background: var(--vz-body-bg);
+}
+
+.binary-tree {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 1rem;
+}
+
+.tree-level {
+    display: flex;
+    justify-content: center;
+    gap: 4rem;
+    margin: 2rem 0;
+    width: 100%;
+}
+
+.tree-level:first-child {
+    margin-top: 0;
+}
+
+/* Node Cards */
+.node-card {
+    background: var(--vz-card-bg);
+    border: 2px solid var(--vz-border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    min-width: 200px;
+    max-width: 220px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    position: relative;
+}
+
+.node-card:hover:not(.empty) {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    border-color: var(--vz-primary);
+}
+
+/* Node Colors */
+.node-card.center {
+    border-color: var(--vz-info);
+    background: linear-gradient(135deg, var(--vz-card-bg) 0%, rgba(var(--vz-info-rgb), 0.05) 100%);
+}
+
+.node-card.left {
+    border-color: var(--vz-success);
+    background: linear-gradient(135deg, var(--vz-card-bg) 0%, rgba(var(--vz-success-rgb), 0.05) 100%);
+}
+
+.node-card.right {
+    border-color: var(--vz-warning);
+    background: linear-gradient(135deg, var(--vz-card-bg) 0%, rgba(var(--vz-warning-rgb), 0.05) 100%);
+}
+
+.node-card.empty {
+    border-style: dashed;
+    border-color: var(--vz-border-color);
+    opacity: 0.5;
+    background: var(--vz-light);
+    cursor: default;
+}
+
+.node-card.empty:hover {
+    transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Position Badge */
+.position-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+/* Node Avatar */
+.node-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin: 0 auto 1rem;
+    object-fit: cover;
+    border: 4px solid var(--vz-white);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.node-card.left .node-avatar {
+    border-color: var(--vz-success);
+}
+
+.node-card.right .node-avatar {
+    border-color: var(--vz-warning);
+}
+
+.node-card.center .node-avatar {
+    border-color: var(--vz-info);
+}
+
+/* Node Info */
+.node-info h6 {
+    font-weight: 600;
+    color: var(--vz-heading-color);
+    margin-bottom: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.node-info p {
+    margin-bottom: 0.25rem;
+    font-size: 0.85rem;
+}
+
+.node-info .text-muted {
+    color: var(--vz-secondary-color) !important;
+}
+
+/* Empty Node */
+.empty-node {
+    color: var(--vz-secondary-color);
+    padding: 2rem;
+}
+
+.empty-node i {
+    font-size: 3rem;
+    opacity: 0.3;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+/* Tree Connections (Optional Lines) */
+.tree-level::before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: var(--vz-border-color);
+    display: none; /* Enable if you want connecting lines */
+}
+
+/* ============================================
+   SEARCH & FILTER CONTROLS
+   ============================================ */
+
+.team-controls {
+    background: var(--vz-card-bg);
+    border: 1px solid var(--vz-border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.search-box {
+    position: relative;
+}
+
+.search-box input {
+    padding-left: 2.5rem;
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--vz-secondary-color);
+}
+
+/* ============================================
+   TEAM TABLE STYLES
+   ============================================ */
+
+.team-table {
+    background: var(--vz-card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.team-table .table {
+    margin-bottom: 0;
+}
+
+.team-table thead {
+    background: var(--vz-light);
+    border-bottom: 2px solid var(--vz-border-color);
+}
+
+.team-table thead th {
+    font-weight: 600;
+    color: var(--vz-heading-color);
+    padding: 1rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.team-table tbody tr {
+    transition: all 0.2s ease;
+}
+
+.team-table tbody tr:hover {
+    background: rgba(var(--vz-primary-rgb), 0.05);
+}
+
+.team-table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    font-size: 0.875rem;
+}
+
+/* Member Code */
+.member-code {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--vz-primary);
+    font-size: 0.9rem;
+}
+
+/* Status Badges */
+.status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-active {
+    background: rgba(var(--vz-success-rgb), 0.1);
+    color: var(--vz-success);
+}
+
+.status-inactive {
+    background: rgba(var(--vz-secondary-rgb), 0.1);
+    color: var(--vz-secondary);
+}
+
+.status-pending {
+    background: rgba(var(--vz-warning-rgb), 0.1);
+    color: var(--vz-warning);
+}
+
+/* PV Badge */
+.pv-badge {
+    background: linear-gradient(135deg, var(--vz-info), var(--vz-primary));
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* ============================================
+   SUMMARY CARDS
+   ============================================ */
+
+.summary-card {
+    border: 1px solid var(--vz-border-color);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: var(--vz-card-bg);
+}
+
+.summary-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card.success {
+    border-left: 4px solid var(--vz-success);
+}
+
+.summary-card.info {
+    border-left: 4px solid var(--vz-info);
+}
+
+.summary-card.warning {
+    border-left: 4px solid var(--vz-warning);
+}
+
+.summary-card.primary {
+    border-left: 4px solid var(--vz-primary);
+}
+
+.summary-card .card-body {
+    padding: 1.5rem;
+}
+
+.summary-card h6 {
+    color: var(--vz-secondary-color);
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-card h3 {
+    color: var(--vz-heading-color);
+    font-weight: 700;
+    font-size: 2rem;
+    margin-bottom: 0;
+}
+
+.summary-card .trend {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+.trend.up {
+    color: var(--vz-success);
+}
+
+.trend.down {
+    color: var(--vz-danger);
+}
+
+/* ============================================
+   TEAM STATS WIDGET
+   ============================================ */
+
+.team-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-item {
+    background: var(--vz-card-bg);
+    border: 1px solid var(--vz-border-color);
+    border-radius: 8px;
+    padding: 1.25rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stat-item:hover {
+    border-color: var(--vz-primary);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-item i {
+    font-size: 2rem;
+    margin-bottom: 0.75rem;
+    opacity: 0.7;
+}
+
+.stat-item.success i {
+    color: var(--vz-success);
+}
+
+.stat-item.info i {
+    color: var(--vz-info);
+}
+
+.stat-item.warning i {
+    color: var(--vz-warning);
+}
+
+.stat-item.primary i {
+    color: var(--vz-primary);
+}
+
+.stat-item .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--vz-heading-color);
+    margin-bottom: 0.25rem;
+}
+
+.stat-item .stat-label {
+    font-size: 0.8rem;
+    color: var(--vz-secondary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================
+   LOADING STATES
+   ============================================ */
+
+.loading-indicator {
+    padding: 4rem;
+    text-align: center;
+}
+
+.loading-indicator .spinner-border {
+    width: 3rem;
+    height: 3rem;
+    border-width: 0.3rem;
+}
+
+.loading-indicator p {
+    margin-top: 1rem;
+    color: var(--vz-secondary-color);
+    font-size: 0.9rem;
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, 
+        var(--vz-light) 0%, 
+        var(--vz-border-color) 50%, 
+        var(--vz-light) 100%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+.skeleton-text {
+    height: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+}
+
+.skeleton-card {
+    height: 200px;
+}
+
+/* ============================================
+   EMPTY STATES
+   ============================================ */
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--vz-secondary-color);
+    opacity: 0.3;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state h5 {
+    color: var(--vz-heading-color);
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state p {
+    color: var(--vz-secondary-color);
+    font-size: 0.9rem;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* ============================================
+   ALERTS & NOTIFICATIONS
+   ============================================ */
+
+.cart-expiry-alert {
+    border-left: 4px solid var(--vz-warning);
+    background: rgba(var(--vz-warning-rgb), 0.1);
+}
+
+.cart-expired-alert {
+    border-left: 4px solid var(--vz-danger);
+    background: rgba(var(--vz-danger-rgb), 0.1);
+}
+
+/* ============================================
+   PAGINATION
+   ============================================ */
+
+.team-pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 2rem;
+}
+
+.team-pagination .pagination {
+    gap: 0.5rem;
+}
+
+.team-pagination .page-item {
+    margin: 0 0.25rem;
+}
+
+.team-pagination .page-link {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* ============================================
+   ACTION BUTTONS
+   ============================================ */
+
+.btn-team-action {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.btn-team-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-group-team {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* ============================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================ */
+
+/* Tablets */
+@media (max-width: 991.98px) {
+    .tree-level {
+        gap: 2rem;
+    }
+    
+    .node-card {
+        min-width: 160px;
+        max-width: 180px;
+        padding: 1rem;
+    }
+    
+    .node-avatar {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .team-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 767.98px) {
+    .binary-tree {
+        padding: 1rem 0.5rem;
+    }
+    
+    .tree-level {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+    }
+    
+    .node-card {
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    .team-controls {
+        padding: 1rem;
+    }
+    
+    .team-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .summary-card h3 {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 575.98px) {
+    .node-avatar {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .node-info h6 {
+        font-size: 0.8rem;
+    }
+    
+    .team-table tbody td {
+        font-size: 0.75rem;
+        padding: 0.75rem;
+    }
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+
+@media print {
+    .binary-tree,
+    .team-table {
+        break-inside: avoid;
+    }
+    
+    .node-card {
+        box-shadow: none;
+        border: 1px solid #000;
+    }
+    
+    .btn-team-action,
+    .team-controls {
+        display: none;
+    }
+}
+
+/* ============================================
+   DARK MODE ADJUSTMENTS
+   ============================================ */
+
+[data-layout-mode="dark"] .node-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-layout-mode="dark"] .node-card:hover:not(.empty) {
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+[data-layout-mode="dark"] .node-avatar {
+    border-color: var(--vz-dark);
+}
+
+[data-layout-mode="dark"] .empty-state i {
+    opacity: 0.2;
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================ */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.node-card {
+    animation: fadeInUp 0.4s ease-out;
+}
+
+.node-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.node-card:nth-child(3) {
+    animation-delay: 0.2s;
+}
+
+/* Pulse animation for active nodes */
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(var(--vz-primary-rgb), 0.3);
+    }
+}
+
+.node-card.active {
+    animation: pulse 2s infinite;
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+
+.text-truncate-2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.text-truncate-3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.cursor-default {
+    cursor: default;
+}
+
+/* ============================================
+   END OF FILE
+   ============================================ */

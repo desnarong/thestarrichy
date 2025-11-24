@@ -1,0 +1,789 @@
+@{
+    ViewData["Title"] = "ข้อมูลการจัดส่งและชำระเงิน - Step 2/3";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cart = ViewBag.Cart as TheStarRichyProject.Models.CartData;
+    var branches = ViewBag.Branches as List<TheStarRichyProject.Models.BranchData>;
+}
+
+<!-- Custom CSS -->
+<style>
+    .step-indicator {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+        .step-indicator::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+    .step {
+        flex: 1;
+        text-align: center;
+        position: relative;
+        z-index: 1;
+    }
+
+    .step-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: #e0e0e0;
+        margin: 0 auto 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        color: #999;
+    }
+
+    .step.active .step-circle {
+        background: #405189;
+        color: white;
+    }
+
+    .step.completed .step-circle {
+        background: #198754;
+        color: white;
+    }
+
+    .form-section {
+        background: white;
+        padding: 25px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .form-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #405189;
+        color: #405189;
+    }
+
+    .payment-option, .delivery-option, .address-option {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 10px;
+    }
+
+        .payment-option:hover, .delivery-option:hover, .address-option:hover {
+            border-color: #405189;
+            background: #f8f9fa;
+        }
+
+        .payment-option.selected, .delivery-option.selected, .address-option.selected {
+            border-color: #405189;
+            background: #e7f1ff;
+        }
+
+        .payment-option input, .delivery-option input, .address-option input {
+            margin-right: 10px;
+        }
+
+    .address-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+        .address-card:hover {
+            border-color: #405189;
+            box-shadow: 0 2px 8px rgba(64, 81, 137, 0.1);
+        }
+
+        .address-card.selected {
+            border-color: #405189;
+            background: #e7f1ff;
+        }
+
+    .order-summary-box {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        position: sticky;
+        top: 20px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .btn-proceed {
+        width: 100%;
+        padding: 12px;
+        font-size: 16px;
+        font-weight: 600;
+    }
+
+    .badge-primary-address {
+        background-color: #198754;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+                <div class="step completed">
+                    <div class="step-circle">1</div>
+                    <div>เลือกสินค้า</div>
+                </div>
+                <div class="step active">
+                    <div class="step-circle">2</div>
+                    <div>ข้อมูลการจัดส่ง</div>
+                </div>
+                <div class="step">
+                    <div class="step-circle">3</div>
+                    <div>ชำระเงิน</div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="row">
+                <!-- Left Column: Form -->
+                <div class="col-lg-8">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <!-- 1. Payment Method -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <i class="fas fa-credit-card"></i> วิธีชำระเงิน
+                                </div>
+                                <div class="payment-option" data-method="PromptPay">
+                                    <input type="radio" name="paymentMethod" value="PromptPay" id="paymentPromptPay" checked>
+                                    <label for="paymentPromptPay" style="cursor: pointer; margin: 0;">
+                                        <strong>พร้อมเพย์ (QR Code)</strong><br>
+                                        <small class="text-muted">สแกน QR Code เพื่อชำระเงิน</small>
+                                    </label>
+                                </div>
+                                <div class="payment-option" data-method="CreditCard">
+                                    <input type="radio" name="paymentMethod" value="CreditCard" id="paymentCard">
+                                    <label for="paymentCard" style="cursor: pointer; margin: 0;">
+                                        <strong>บัตรเครดิต / เดบิต</strong><br>
+                                        <small class="text-muted">รองรับ Visa, MasterCard, JCB</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <!-- 2. Delivery Method -->
+                            <div class="form-section">
+                                <div class="form-section-title">
+                                    <i class="fas fa-shipping-fast"></i> การจัดส่งสินค้า
+                                </div>
+                                <div class="delivery-option" data-method="Delivery">
+                                    <input type="radio" name="deliveryMethod" value="Delivery" id="deliveryShip" checked>
+                                    <label for="deliveryShip" style="cursor: pointer; margin: 0;">
+                                        <strong>ให้จัดส่ง</strong><br>
+                                        <small class="text-muted">ค่าจัดส่ง: ฟรี (สั่งซื้อครบ ฿500) หรือ ฿50</small>
+                                    </label>
+                                </div>
+                                <div class="delivery-option" data-method="Pickup">
+                                    <input type="radio" name="deliveryMethod" value="Pickup" id="deliveryPickup">
+                                    <label for="deliveryPickup" style="cursor: pointer; margin: 0;">
+                                        <strong>รับเองที่ศูนย์กระจายสินค้า</strong><br>
+                                        <small class="text-muted">ฟรี ไม่มีค่าจัดส่ง</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <!-- 3. Shipping Address (แสดงเมื่อเลือก Delivery) -->
+                            <div class="form-section" id="shippingAddressSection">
+                                <div class="form-section-title">
+                                    <i class="fas fa-map-marker-alt"></i> ที่อยู่จัดส่ง
+                                </div>
+
+                                <!-- Address Type Selection -->
+                                <div class="mb-3">
+                                    <label class="form-label">เลือกประเภทที่อยู่</label>
+                                    <select class="form-select" id="addressTypeSelect">
+                                        <option value="">-- เลือกประเภทที่อยู่ --</option>
+                                        <option value="MemberAddress">ส่งตามที่อยู่สมาชิก</option>
+                                        <option value="FavoriteAddress">ที่อยู่ที่เคยจัดส่ง</option>
+                                        <option value="Other">ที่อยู่อื่นๆ (กรอกใหม่)</option>
+                                    </select>
+                                </div>
+
+                                <!-- Member Address Section (GetAddresses API) -->
+                                <div id="memberAddressesSection" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-home"></i> เลือกที่อยู่สมาชิก
+                                        </label>
+                                        <div id="memberAddressesList">
+                                            <!-- จะถูกเติมด้วย JavaScript -->
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <div class="mt-2">กำลังโหลดที่อยู่สมาชิก...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Favorite Addresses Section (GetFavoriteAddresses API) -->
+                                <div id="favoriteAddressesSection" style="display: none;">
+                                    <div class="mb-3">
+                                        <label class="form-label">
+                                            <i class="fas fa-star text-warning"></i> เลือกที่อยู่ที่เคยจัดส่ง
+                                        </label>
+                                        <div id="favoriteAddressesList">
+                                            <!-- จะถูกเติมด้วย JavaScript -->
+                                            <div class="text-center py-3">
+                                                <div class="spinner-border text-primary" role="status">
+                                                    <span class="visually-hidden">Loading...</span>
+                                                </div>
+                                                <div class="mt-2">กำลังโหลดที่อยู่ที่เคยจัดส่ง...</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Custom Address Form -->
+                                <div id="customAddressForm" style="display: none;">
+                                    <div class="row">
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">ที่อยู่ *</label>
+                                            <textarea class="form-control" id="addressLine" rows="2" required></textarea>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">จังหวัด *</label>
+                                            <input type="text" class="form-control" id="province" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">เขต/อำเภอ *</label>
+                                            <input type="text" class="form-control" id="district" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">แขวง/ตำบล *</label>
+                                            <input type="text" class="form-control" id="subDistrict" required>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label class="form-label">รหัสไปรษณีย์ *</label>
+                                            <input type="text" class="form-control" id="postalCode" maxlength="5" required>
+                                        </div>
+                                        <div class="col-md-12 mb-3">
+                                            <label class="form-label">เบอร์โทรศัพท์ *</label>
+                                            <input type="tel" class="form-control" id="phone" required>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 4. Branch Selection (แสดงเมื่อเลือก Pickup) -->
+                            <div class="form-section" id="branchSection" style="display: none;">
+                                <div class="form-section-title">
+                                    <i class="fas fa-store"></i> เลือกสาขาที่รับสินค้า
+                                </div>
+                                <select class="form-select" id="branchSelect">
+                                    <option value="">-- เลือกสาขา --</option>
+                                    @if (branches != null && branches.Any())
+                                    {
+                                        foreach (var branch in branches)
+                                        {
+                                            <option value="@branch.BranchCode">@branch.BranchName</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Order Summary -->
+                <div class="col-lg-4">
+                    <div class="order-summary-box">
+                        <h5 class="mb-3">สรุปคำสั่งซื้อ</h5>
+
+                        @if (cart != null && cart.Items != null)
+                        {
+                            <div class="mb-3">
+                                <small class="text-muted">จำนวนสินค้า</small>
+                                <div class="fw-bold">@cart.Items.Sum(x=>x.Quantity) รายการ</div>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ยอดรวมสินค้า</span>
+                                <span class="fw-bold">฿@cart.TotalAmount.ToString("N2")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>PV</span>
+                                <span class="fw-bold">@cart.TotalPV.ToString("N0")</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>ค่าจัดส่ง</span>
+                                <span class="fw-bold" id="shippingFeeDisplay">
+                                    <span>฿@cart.Deliveryfee</span>
+                                </span>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <span class="h5">ยอดรวมทั้งหมด</span>
+                                <span class="h5 text-primary" id="grandTotalDisplay">
+                                    ฿@cart.TotalAmount.ToString("N2")
+                                </span>
+                            </div>
+                        }
+
+                        <button type="button" class="btn btn-primary btn-proceed" id="btnProceedPayment">
+                            <i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-proceed mt-2" onclick="window.location.href='/orders/buypersonalorder'">
+                            <i class="fas fa-arrow-left"></i> กลับไปแก้ไขสินค้า
+                        </button>
+                    </div>
+                    <!-- 5. Invoice Option -->
+                    <div class="form-section mt-2">
+                        <div class="form-section-title">
+                            <i class="fas fa-file-invoice"></i> เงื่อนไขการส่งบิล
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="sendInvoice" value="1" id="sendInvoiceYes" checked>
+                            <label class="form-check-label" for="sendInvoiceYes">
+                                รับใบเสร็จตามที่อยู่จัดส่ง
+                            </label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="sendInvoice" value="0" id="sendInvoiceNo">
+                            <label class="form-check-label" for="sendInvoiceNo">
+                                รับ e-Invoice ทาง email เท่านั้น
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            let memberAddresses = [];        // ที่อยู่สมาชิก (จาก GetAddresses)
+            let favoriteAddresses = [];      // ที่อยู่ที่เคยจัดส่ง (จาก GetFavoriteAddresses)
+            let selectedMemberAddress = null;
+            let selectedFavoriteAddress = null;
+
+            // Payment Method Selection
+            $('.payment-option').click(function () {
+                $('.payment-option').removeClass('selected');
+                $(this).addClass('selected');
+                $(this).find('input[type="radio"]').prop('checked', true);
+            });
+
+            // Delivery Method Selection
+            $('.delivery-option').click(function () {
+                $('.delivery-option').removeClass('selected');
+                $(this).addClass('selected');
+                $(this).find('input[type="radio"]').prop('checked', true);
+
+                const method = $(this).data('method');
+                if (method === 'Delivery') {
+                    $('#shippingAddressSection').slideDown();
+                    $('#branchSection').slideUp();
+                    updateShippingFee(false);
+                } else {
+                    $('#shippingAddressSection').slideUp();
+                    $('#branchSection').slideDown();
+                    updateShippingFee(true);
+                }
+            });
+
+            // Address Type Selection
+            $('#addressTypeSelect').change(function () {
+                const type = $(this).val();
+
+                // ซ่อนทุก section ก่อน
+                $('#memberAddressesSection').hide();
+                $('#favoriteAddressesSection').hide();
+                $('#customAddressForm').hide();
+
+                if (type === 'MemberAddress') {
+                    // โหลดที่อยู่สมาชิก (GetAddresses)
+                    loadMemberAddresses();
+                    $('#memberAddressesSection').slideDown();
+                } else if (type === 'FavoriteAddress') {
+                    // โหลดที่อยู่ที่เคยจัดส่ง (GetFavoriteAddresses)
+                    loadFavoriteAddresses();
+                    $('#favoriteAddressesSection').slideDown();
+                } else if (type === 'Other') {
+                    $('#customAddressForm').slideDown();
+                }
+                // CardAddress ไม่ต้องทำอะไร (ใช้ default)
+            });
+
+            // ============================================
+            // Load Member Addresses (GetAddresses API)
+            // ============================================
+            function loadMemberAddresses() {
+                $.ajax({
+                    url: '/orders/GetAddresses',
+                    type: 'GET',
+                    success: function (response) {
+                        console.log('Member Addresses:', response);
+
+                        if (response.success && response.data && response.data.length > 0) {
+                            memberAddresses = response.data;
+                            renderMemberAddresses();
+                        } else {
+                            $('#memberAddressesList').html(`
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> ยังไม่มีที่อยู่สมาชิกที่บันทึกไว้
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error loading member addresses:', xhr);
+                        $('#memberAddressesList').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i> ไม่สามารถโหลดที่อยู่สมาชิกได้
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            function renderMemberAddresses() {
+                let html = '';
+
+                memberAddresses.forEach((addr, index) => {
+                    const isDefault = addr.isDefault === true;
+
+                    html += `
+                        <div class="address-card member-address-card" data-member-index="${index}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="memberAddress" value="${index}" id="member_${index}">
+                                <label class="form-check-label" for="member_${index}" style="cursor: pointer;">
+                                    <strong>
+                                        <i class="fas fa-home text-primary"></i>
+                                        ${addr.addressTypeDisplay || 'ที่อยู่สมาชิก'}
+                                    </strong>
+                                    ${isDefault ? '<span class="badge bg-primary">ค่าเริ่มต้น</span>' : ''}
+                                    <br>
+                                    <small>${addr.fullAddress || '-'}</small><br>
+                                    <small class="text-muted">โทร: ${addr.phone || '-'}</small>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#memberAddressesList').html(html);
+
+                // Bind click event
+                $('.member-address-card').click(function () {
+                    $('.member-address-card').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(this).find('input[type="radio"]').prop('checked', true);
+
+                    const index = parseInt($(this).data('member-index'));
+                    selectedMemberAddress = memberAddresses[index];
+                });
+            }
+
+            // ============================================
+            // Load Favorite Addresses (GetFavoriteAddresses API)
+            // ============================================
+            function loadFavoriteAddresses() {
+                $.ajax({
+                    url: '/orders/GetFavoriteAddresses',
+                    type: 'GET',
+                    success: function (response) {
+                        console.log('Favorite Addresses:', response);
+
+                        if (response.success && response.data && response.data.length > 0) {
+                            favoriteAddresses = response.data;
+                            renderFavoriteAddresses();
+                        } else {
+                            $('#favoriteAddressesList').html(`
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i> ยังไม่มีที่อยู่ที่เคยจัดส่งที่บันทึกไว้
+                                </div>
+                            `);
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('Error loading favorite addresses:', xhr);
+                        $('#favoriteAddressesList').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-circle"></i> ไม่สามารถโหลดที่อยู่ที่เคยจัดส่งได้
+                            </div>
+                        `);
+                    }
+                });
+            }
+
+            function renderFavoriteAddresses() {
+                let html = '';
+
+                favoriteAddresses.forEach((addr, index) => {
+                    const fullAddress = buildFullAddress(addr);
+                    const isPrimary = addr.contact_Primary === '1' || addr.contact_Primary === 'Y';
+
+                    html += `
+                        <div class="address-card favorite-address-card" data-fav-index="${index}">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="favoriteAddress" value="${index}" id="fav_${index}">
+                                <label class="form-check-label" for="fav_${index}" style="cursor: pointer;">
+                                    <strong>
+                                        <i class="fas fa-star text-warning"></i>
+                                        ${addr.contacNickname || 'ที่อยู่ที่เคยจัดส่ง'}
+                                    </strong>
+                                    ${isPrimary ? '<span class="badge-primary-address">หลัก</span>' : ''}
+                                    <br>
+                                    <small>${addr.contactperson || '-'}</small><br>
+                                    <small>${fullAddress}</small><br>
+                                    <small class="text-muted">โทร: ${addr.contact_Phone || '-'}</small>
+                                </label>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                $('#favoriteAddressesList').html(html);
+
+                // Bind click event
+                $('.favorite-address-card').click(function () {
+                    $('.favorite-address-card').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(this).find('input[type="radio"]').prop('checked', true);
+
+                    const index = parseInt($(this).data('fav-index'));
+                    selectedFavoriteAddress = favoriteAddresses[index];
+                });
+            }
+
+            function buildFullAddress(addr) {
+                const parts = [];
+
+                if (addr.contact_HouseNumber) parts.push(`เลขที่ ${addr.contact_HouseNumber}`);
+                if (addr.contact_Building) parts.push(`อาคาร ${addr.contact_Building}`);
+                if (addr.contact_Floor) parts.push(`ชั้น ${addr.contact_Floor}`);
+                if (addr.contact_Alley) parts.push(`ซอย ${addr.contact_Alley}`);
+                if (addr.contact_Road) parts.push(`ถนน ${addr.contact_Road}`);
+                if (addr.contact_Other) parts.push(addr.contact_Other);
+                if (addr.provincename) parts.push(addr.provincename);
+                if (addr.contact_Zipcode) parts.push(addr.contact_Zipcode);
+
+                return parts.join(' ') || 'ไม่มีที่อยู่';
+            }
+
+            // Update Shipping Fee
+            function updateShippingFee(isPickup) {
+                const totalAmount = @(cart?.TotalAmount ?? 0);
+                let shippingFee = 0;
+
+                if (!isPickup && totalAmount < 500) {
+                    shippingFee = 50;
+                }
+
+                const grandTotal = totalAmount + shippingFee;
+
+                $('#shippingFeeDisplay').html(
+                    shippingFee === 0 ?
+                        '<span class="text-success">ฟรี</span>' :
+                        '฿' + shippingFee.toFixed(2)
+                );
+                $('#grandTotalDisplay').text('฿' + grandTotal.toFixed(2));
+            }
+
+            // Proceed to Payment
+            $('#btnProceedPayment').click(function () {
+                const btn = $(this);
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังดำเนินการ...');
+
+                // Validate
+                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+                const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
+                const sendInvoice = $('input[name="sendInvoice"]:checked').val() === '1';
+
+                if (!paymentMethod || !deliveryMethod) {
+                    showNotification('error', 'กรุณาเลือกวิธีชำระเงินและการจัดส่ง');
+                    btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                    return;
+                }
+
+                // Build request
+                const request = {
+                    paymentMethod: paymentMethod,
+                    deliveryMethod: deliveryMethod,
+                    sendInvoice: sendInvoice
+                };
+
+                // Address handling
+                if (deliveryMethod === 'Delivery') {
+                    const addressType = $('#addressTypeSelect').val();
+
+                    if (!addressType) {
+                        showNotification('error', 'กรุณาเลือกประเภทที่อยู่');
+                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                        return;
+                    }
+
+                    request.deliveryAddressType = addressType;
+
+                    // ส่งตามที่อยู่สมาชิก (GetAddresses)
+                    if (addressType === 'MemberAddress') {
+                        if (!selectedMemberAddress) {
+                            showNotification('error', 'กรุณาเลือกที่อยู่สมาชิก');
+                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                            return;
+                        }
+
+                        request.memberAddress = {
+                            addressID: selectedMemberAddress.addressID,
+                            addressType: selectedMemberAddress.addressType,
+                            addressTypeDisplay: selectedMemberAddress.addressTypeDisplay,
+                            addressLine: selectedMemberAddress.addressLine,
+                            province: selectedMemberAddress.province,
+                            district: selectedMemberAddress.district,
+                            subDistrict: selectedMemberAddress.subDistrict,
+                            postalCode: selectedMemberAddress.postalCode,
+                            phone: selectedMemberAddress.phone,
+                            fullAddress: selectedMemberAddress.fullAddress,
+                            isDefault: selectedMemberAddress.isDefault
+                        };
+                    }
+                    // ที่อยู่ที่เคยจัดส่ง (GetFavoriteAddresses)
+                    else if (addressType === 'FavoriteAddress') {
+                        if (!selectedFavoriteAddress) {
+                            showNotification('error', 'กรุณาเลือกที่อยู่ที่เคยจัดส่ง');
+                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                            return;
+                        }
+
+                        request.favoriteAddress = {
+                            membercode: selectedFavoriteAddress.membercode,
+                            contacNickname: selectedFavoriteAddress.contacNickname,
+                            contactperson: selectedFavoriteAddress.contactperson,
+                            contact_HouseNumber: selectedFavoriteAddress.contact_HouseNumber,
+                            contact_Alley: selectedFavoriteAddress.contact_Alley,
+                            contact_Road: selectedFavoriteAddress.contact_Road,
+                            contact_Building: selectedFavoriteAddress.contact_Building,
+                            contact_Floor: selectedFavoriteAddress.contact_Floor,
+                            contact_Other: selectedFavoriteAddress.contact_Other,
+                            contact_Zipcode: selectedFavoriteAddress.contact_Zipcode,
+                            contact_TAMBON_ID: selectedFavoriteAddress.contact_TAMBON_ID,
+                            contact_Phone: selectedFavoriteAddress.contact_Phone,
+                            contact_Province: selectedFavoriteAddress.contact_Province,
+                            provincename: selectedFavoriteAddress.provincename,
+                            contact_Primary: selectedFavoriteAddress.contact_Primary
+                        };
+                    }
+                    // ที่อยู่อื่นๆ (กรอกใหม่)
+                    else if (addressType === 'Other') {
+                        const addressLine = $('#addressLine').val();
+                        const province = $('#province').val();
+                        const district = $('#district').val();
+                        const subDistrict = $('#subDistrict').val();
+                        const postalCode = $('#postalCode').val();
+                        const phone = $('#phone').val();
+
+                        if (!addressLine || !province || !district || !subDistrict || !postalCode || !phone) {
+                            showNotification('error', 'กรุณากรอกที่อยู่ให้ครบถ้วน');
+                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                            return;
+                        }
+
+                        request.customAddress = {
+                            addressLine: addressLine,
+                            province: province,
+                            district: district,
+                            subDistrict: subDistrict,
+                            postalCode: postalCode,
+                            phone: phone
+                        };
+                    }
+                    // CardAddress - ไม่ต้องส่งอะไร ใช้ default
+                } else {
+                    const branchCode = $('#branchSelect').val();
+                    if (!branchCode) {
+                        showNotification('error', 'กรุณาเลือกสาขา');
+                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                        return;
+                    }
+                    request.branchCode = branchCode;
+                    request.deliveryAddressType = "Branch";
+                }
+
+                // Submit
+                $.ajax({
+                    url: '/orders/SaveCheckoutInfo',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(request),
+                    success: function (response) {
+                        //console.log('SaveCheckoutInfo response:', response);
+                        // ⭐ ล้าง DL/Center
+                        sessionStorage.removeItem('selectedDL');
+                        sessionStorage.removeItem('selectedCenter');
+
+                        if (response.success) {
+                            window.location.href = '/orders/payment?orderID=' + response.orderID;
+                        } else {
+                            showNotification('error', response.message || 'เกิดข้อผิดพลาด');
+                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                        }
+                    },
+                    error: function (xhr) {
+                        console.error('SaveCheckoutInfo error:', xhr);
+                        showNotification('error', 'เกิดข้อผิดพลาด: ' + (xhr.responseJSON?.message || 'Unknown error'));
+                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                    }
+                });
+            });
+
+            function showNotification(type, message) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+                const notification = $(`
+                    <div class="alert ${alertClass} alert-dismissible fade show"
+                         role="alert"
+                         style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                        <i class="fas ${icon}"></i> ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+
+                $('body').append(notification);
+
+                setTimeout(function () {
+                    notification.fadeOut(function () {
+                        $(this).remove();
+                    });
+                }, 5000);
+            }
+        });
+    </script>
+}

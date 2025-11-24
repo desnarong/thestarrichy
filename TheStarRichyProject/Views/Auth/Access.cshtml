@@ -1,0 +1,17 @@
+﻿@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<TheStarRichyProject.Localize.Resource> localizer
+@{
+    ViewBag.Title = "Permission Access";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="kt-grid__item kt-grid__item--fluid kt-grid  kt-error-v6" style="background-image: url(~/lib/media/error/bg6.jpg);">
+    <div class="kt-error_container">
+        <div class="kt-error_subtitle kt-font-light">
+            <h1 data-localize="erroraccess">@localizer["auth-access-subtitle-access"]</h1>
+        </div>
+        <p class="kt-error_description kt-font-light">
+            <h3 class="text-center">@localizer["auth-access-h3-description"]</h3><br>
+            <h4 class="text-center">@localizer["auth-access-h4-description"] <a href="@Url.Action("Logout", "Auth")">@localizer["auth-access-click"]</a></h4>
+        </p>
+    </div>
+</div>

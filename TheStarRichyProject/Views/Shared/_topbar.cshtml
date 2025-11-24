@@ -1,0 +1,573 @@
+﻿@using TheStarRichyProject.Helper
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
+@{
+    var cookieValue = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.UserInfoKey);
+    var memberinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue);
+    var userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
+    var runmessage = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.MessageInfoKey);
+    var systemname = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.SystemInfoKey);
+    var positionpicture = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.MemberPositionPictureKey);
+}
+<style>
+    .left-group {
+        display: flex;
+        gap: 8px;
+    }
+
+    .text-start {
+        align-items: center;
+    }
+
+    .navbar-header-marquee {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-pack: justify;
+        -webkit-box-pack: justify;
+        justify-content: space-between;
+        -webkit-box-align: center;
+        -ms-flex-align: center;
+        align-items: center;
+        margin: 0 auto;
+        height: 20px;
+        padding: 0 1.5rem 0 calc(1.5rem * .5);
+        color: white !important;
+    }
+</style>
+<header id="page-topbar">
+    <div class="layout-width">
+        <div class="navbar-header">
+            <div class="left-group">
+                <div class="d-flex">
+                    <button type="button" class="btn btn-sm fs-16 header-item vertical-menu-btn topnav-hamburger"
+                            id="topnav-hamburger-icon">
+                        <span class="hamburger-icon">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                    </button>
+                </div>
+                <div class="d-flex" style="align-items: center;">
+                    <div class="text-start">
+                        <span class="d-none d-xl-inline-block fs-20 fw-medium user-name-text" id="systemname">@systemname</span>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <div class="dropdown d-md-none topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            id="page-header-search-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <i class="bx bx-search fs-22"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                         aria-labelledby="page-header-search-dropdown">
+                        <form class="p-3">
+                            <div class="form-group m-0">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Search ..."
+                                           aria-label="Recipient's username">
+                                    <button class="btn btn-primary" type="submit">
+                                        <i class="mdi mdi-magnify"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="dropdown ms-1 topbar-head-dropdown header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <img id="header-lang-img" src="~/assets/images/flags/th.svg" alt="Header Language" height="20"
+                             class="rounded">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end">
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language" data-lang="th"
+                           title="Thai">
+                            <img src="~/assets/images/flags/th.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle" data-key="t-thai">ไทย</span>
+                        </a>
+                        <a href="javascript:void(0);" class="dropdown-item notify-item language py-2" data-lang="en"
+                           title="English">
+                            <img src="~/assets/images/flags/us.svg" alt="user-image" class="me-2 rounded" height="18">
+                            <span class="align-middle" data-key="t-english">English</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="dropdown topbar-head-dropdown ms-1 header-item">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            id="page-header-cart-dropdown" data-bs-toggle="dropdown" data-bs-auto-close="outside"
+                            aria-haspopup="true" aria-expanded="false">
+                        <i class='bx bx-shopping-bag fs-22'></i>
+                        <span class="position-absolute topbar-badge cartitem-badge fs-10 translate-middle badge rounded-pill bg-info" id="headerCartBadge">0</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-xl dropdown-menu-end p-0 dropdown-menu-cart"
+                         aria-labelledby="page-header-cart-dropdown">
+                        <div class="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
+                            <div class="row align-items-center">
+                                <div class="col">
+                                    <h6 class="m-0 fs-16 fw-semibold">ตะกร้าสินค้า</h6>
+                                </div>
+                                <div class="col-auto">
+                                    <span class="badge bg-warning-subtle text-warning fs-13">
+                                        <span id="headerCartItemCount">0</span> รายการ
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div data-simplebar style="max-height: 300px;">
+                            <div class="p-2" id="headerCartItemsContainer">
+                                <!-- Cart items จะถูกโหลดที่นี่ -->
+                                <div class="text-center empty-cart">
+                                    <div class="avatar-md mx-auto my-3">
+                                        <div class="avatar-title bg-info-subtle text-info fs-36 rounded-circle">
+                                            <i class='bx bx-cart'></i>
+                                        </div>
+                                    </div>
+                                    <h5 class="mb-3">ตะกร้าว่างเปล่า!</h5>
+                                    <a href="/Orders/BuyPersonalOrder" class="btn btn-success w-md mb-3">ซื้อสินค้า</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3 border-bottom-0 border-start-0 border-end-0 border-dashed border" id="headerCartCheckout" style="display: none;">
+                            <div class="d-flex justify-content-between align-items-center pb-3">
+                                <h5 class="m-0 text-muted">ยอดรวม:</h5>
+                                <div class="px-2">
+                                    <h5 class="m-0 text-success" id="headerCartTotal">฿ 0.00</h5>
+                                </div>
+                            </div>
+                            <a href="/Orders/BuyPersonalOrder" class="btn btn-success text-center w-100">
+                                <i class="bx bx-cart"></i> ไปที่ตะกร้า
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            data-toggle="fullscreen">
+                        <i class='bx bx-fullscreen fs-22'></i>
+                    </button>
+                </div>
+
+                <div class="ms-1 header-item d-none d-sm-flex">
+                    <button type="button"
+                            class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle light-dark-mode">
+                        <i class='bx bx-moon fs-22'></i>
+                    </button>
+                </div>
+
+                <div class="dropdown topbar-head-dropdown ms-1 header-item" id="notificationDropdown">
+                    <button type="button" class="btn btn-icon btn-topbar btn-ghost-secondary rounded-circle"
+                            id="page-header-notifications-dropdown" data-bs-toggle="dropdown" aria-haspopup="true"
+                            aria-expanded="false">
+                        <i class='bx bx-bell fs-22'></i>
+                        <span class="position-absolute topbar-badge fs-10 translate-middle badge rounded-pill bg-danger">
+                            <span class="notificationscount"></span><span class="visually-hidden">unread messages</span>
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"
+                         aria-labelledby="page-header-notifications-dropdown">
+                        <div class="dropdown-head bg-primary bg-pattern rounded-top">
+                            <div class="p-3">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <h6 class="m-0 fs-16 fw-semibold text-white" data-key="t-notifications"> แจ้งเตือน </h6>
+                                    </div>
+                                    <div class="col-auto dropdown-tabs">
+                                        <span class="badge bg-light-subtle text-body fs-13"> <span class="notificationscount">  </span> <span data-key="t-new">ใหม่</span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-content position-relative" id="notificationItemsTabContent">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dropdown ms-sm-3 header-item topbar-user">
+                    <button type="button" class="btn" id="page-header-user-dropdown" data-bs-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                        <span class="d-flex align-items-center">
+                            <img class="rounded-circle header-profile-user" src="/@positionpicture"
+                                 alt="Header Avatar">
+                            <span class="text-start ms-xl-2">
+                                <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">@userinfo.idcardname</span>
+                            </span>
+                        </span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" style="width: 250px;">
+                        <h6 class="dropdown-header"><span data-key="t-welcome">Welcome</span> @userinfo.idcardname!</h6>
+                        <a class="dropdown-item" href="@Url.Action("index", "member")">
+                            <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-profile">ข้อมูลส่วนตัว</span>
+                        </a>
+                        <a class="dropdown-item" href="@Url.Action("Chat", "Apps")">
+                            <i class="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-message-noti">ข้อความแจ้งเตือน</span>
+                        </a>
+                        <a class="dropdown-item" href="@Url.Action("KanbanBoard", "Tasks")">
+                            <i class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-document-download">ดาวห์โหลดเอกสาร</span>
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="@Url.Action("ProfileSimple", "Pages")">
+                            <div class="row">
+                                <div class="col-6">
+                                    <i class="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-totalpv">รายได้รวม</span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="alert bg-success border-success h6 text-white material-shadow text-center mb-1" role="alert">
+                                        <strong>@(double.Parse(memberinfo.TotalBonus.ToString()).ToString("#,0.00"))</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        <a class="dropdown-item" href="@Url.Action("LockScreenBasic", "Authentication")">
+                            <i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-change-password">เปลี่ยนรหัสผ่าน</span>
+                        </a>
+                        <a class="dropdown-item" href="@Url.Action("Logout", "Auth")">
+                            <i class="mdi mdi-logout text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-logout">ออก</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="navbar-header-marquee">
+            <div class="marquee-container d-none d-xl-block ms-1 fs-12 user-name-sub-text">
+                <div class="marquee-text" id="runmessage">@runmessage</div>
+            </div>
+        </div>
+    </div>
+</header>
+
+<div id="removeNotificationModal" class="modal fade zoomIn" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="NotificationModalbtn-close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mt-2 text-center">
+                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop" colors="primary:#f7b84b,secondary:#f06548" style="width:100px;height:100px"></lord-icon>
+                    <div class="mt-4 pt-2 fs-15 mx-4 mx-sm-5">
+                        <h4>Are you sure ?</h4>
+                        <p class="text-muted mx-4 mb-0">Are you sure you want to remove this Notification ?</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-2 justify-content-center mt-4 mb-2">
+                    <button type="button" class="btn w-sm btn-light" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn w-sm btn-danger" id="delete-notification">Yes, Delete It!</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        let textmaxlength = 65;
+
+        // ⭐ โหลด Cart ใน Header
+        function loadHeaderCart() {
+            $.ajax({
+                url: '/Orders/GetCart',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        updateHeaderCart(response);
+                    }
+                },
+                error: function () {
+                    console.log('Failed to load header cart');
+                }
+            });
+        }
+
+        // ⭐ Update Header Cart Display
+        function updateHeaderCart(data) {
+            const items = data.items || [];
+            const itemCount = data.itemCount || 0;
+            const totalPrice = data.totalPrice || 0;
+
+            // Update badge
+            $('#headerCartBadge').text(itemCount);
+            $('#headerCartItemCount').text(itemCount);
+            $('#headerCartTotal').text('฿ ' + totalPrice.toFixed(2));
+
+            // Render items
+            const $container = $('#headerCartItemsContainer');
+
+            if (items.length === 0) {
+                $container.html(`
+                    <div class="text-center empty-cart">
+                        <div class="avatar-md mx-auto my-3">
+                            <div class="avatar-title bg-info-subtle text-info fs-36 rounded-circle">
+                                <i class='bx bx-cart'></i>
+                            </div>
+                        </div>
+                        <h5 class="mb-3">ตะกร้าว่างเปล่า!</h5>
+                        <a href="/Orders/BuyPersonalOrder" class="btn btn-success w-md mb-3">ซื้อสินค้า</a>
+                    </div>
+                `);
+                $('#headerCartCheckout').hide();
+            } else {
+                let html = '';
+                items.forEach(item => {
+                    const imageUrl = item.productImage ? '/' + item.productImage : '/assets/images/products/no-image.png';
+                    html += `
+                        <div class="d-block dropdown-item dropdown-item-cart text-wrap px-3 py-2">
+                            <div class="d-flex align-items-center">
+                                <img src="${imageUrl}"
+                                     class="me-3 rounded-circle avatar-sm p-2 bg-light"
+                                     alt="${item.productName}"
+                                     onerror="this.src='/assets/images/products/no-image.png'">
+                                <div class="flex-grow-1">
+                                    <h6 class="mt-0 mb-1 fs-14">
+                                        <a href="#" class="text-body">${item.productName}</a>
+                                    </h6>
+                                    <p class="mb-0 fs-12 text-muted">
+                                        ${item.quantity} x ฿${item.price.toFixed(2)}
+                                    </p>
+                                </div>
+                                <div class="px-2">
+                                    <h5 class="m-0 fw-normal">฿${item.subTotal.toFixed(2)}</h5>
+                                </div>
+                                <div class="ps-2">
+                                    <button type="button"
+                                            class="btn btn-icon btn-sm btn-ghost-secondary header-remove-item-btn"
+                                            data-product-id="${item.productID}">
+                                        <i class="ri-close-fill fs-16"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                $container.html(html);
+                $('#headerCartCheckout').show();
+
+                // Bind remove button
+                $('.header-remove-item-btn').click(function () {
+                    const productId = $(this).data('product-id');
+                    removeHeaderCartItem(productId);
+                });
+            }
+        }
+
+        // ⭐ ลบสินค้าจาก Header Cart
+        function removeHeaderCartItem(productId) {
+            if (confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?')) {
+                $.ajax({
+                    url: '/Orders/RemoveFromCart',
+                    type: 'POST',
+                    data: { productId: productId },
+                    success: function (response) {
+                        if (response.success) {
+                            loadHeaderCart(); // Reload cart
+
+                            // Show notification
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'สำเร็จ',
+                                text: 'ลบสินค้าออกจากตะกร้าแล้ว',
+                                timer: 1500,
+                                showConfirmButton: false
+                            });
+                        }
+                    }
+                });
+            }
+        }
+
+        // ⭐ เมื่อเปิด Cart Dropdown
+        $('#page-header-cart-dropdown').on('click', function () {
+            loadHeaderCart();
+        });
+
+        // ⭐ โหลด Cart ครั้งแรกเมื่อเปิดหน้า
+        loadHeaderCart();
+
+        // ⭐ Global function สำหรับ update จากหน้าอื่น
+        window.updateHeaderCartBadge = function() {
+            loadHeaderCart();
+        };
+
+        // ฟังก์ชันตัดข้อความไม่เกิน maxLength ตัวอักษร
+        function truncateText(text, maxLength) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+
+        async function loadMemberMessages() {
+            try {
+                const response = await fetch('/home/GetMemberMessages', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+                const data = await response.json();
+                if (data) {
+                    const $positionContainer = $('#notificationItemsTabContent');
+
+                    let tableHtml = `<div class="tab-pane fade show active py-2 ps-2" id="all-noti-tab" role="tabpanel">
+                        <div id="notification-item" style="max-height: 300px;" class="pe-2">`;
+                    let noticount = 0;
+                    $.each(data.slice(0, 10), function (index, item) {
+                        if (item.LastMonthStatusMessage != '') {
+                            let message = truncateText(item.LastMonthStatusMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.LastMonthStatusMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                        if (item.CurrentMonthStatusMessage != '') {
+                            let message = truncateText(item.CurrentMonthStatusMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.CurrentMonthStatusMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                        if (item.SendIDcardMessage != '') {
+                            let message = truncateText(item.SendIDcardMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.SendIDcardMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                        if (item.SendBankMessage != '') {
+                            let message = truncateText(item.SendBankMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.SendBankMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                        if (item.SendKYCMessage != '') {
+                            let message = truncateText(item.SendKYCMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.SendKYCMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                        if (item.SendHoldExpireMessage != '') {
+                            let message = truncateText(item.SendHoldExpireMessage, textmaxlength);
+                            tableHtml += `
+                                <div class="text-reset notification-item d-block dropdown-item position-relative">
+                                    <div class="d-flex">
+                                        <div class="avatar-xs me-3 flex-shrink-0">
+                                            <span class="avatar-title bg-info-subtle text-info rounded-circle fs-16">
+                                                <i class="bx bx-badge-check"></i>
+                                            </span>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <a href="#!" class="stretched-link notification-item-content" onclick="notificationitem('${item.SendHoldExpireMessage}')">
+                                                <h6 class="mt-0 mb-2 lh-base">${message}</h6>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            noticount++;
+                        }
+                    });
+                    tableHtml += `
+                        </div>
+                    </div>`;
+                    $('.notificationscount').html(noticount);
+                    $positionContainer.append(tableHtml);
+                } else {
+                    console.error('No token found');
+                    return null;
+                }
+            } catch (error) {
+                console.error('Error fetching token:', error);
+                return null;
+            }
+        }
+
+        (async () => {
+            await loadMemberMessages();
+        })();
+
+        window.testSwal = function () {
+            Swal.fire({
+                title: 'Test',
+                text: 'This is a test alert!',
+                icon: 'info',
+                confirmButtonText: 'OK'
+            });
+        };
+    });
+
+    function notificationitem(msg) {
+        Swal.fire({
+            title: 'Notification Message',
+            icon: 'info',
+            html: msg || 'No message provided',
+            showCloseButton: true,
+            showCancelButton: false,
+            buttonsStyling: true,
+            confirmButtonText: 'ปิดหน้าต่าง'
+        });
+    }
+</script>

@@ -1,0 +1,107 @@
+﻿@using TheStarRichyProject.Helper
+@inject Microsoft.AspNetCore.Mvc.Localization.IHtmlLocalizer<TheStarRichyProject.Localize.Resource> localizer
+
+@{
+}
+
+<!-- begin sidebar nav -->
+<ul class="nav">
+    <!-- <li class="nav-header">Navigation</li> -->
+    <li class="active">
+        <a href="@Url.Action("Index", "Home")">
+            <i class="fa fa-home"></i>
+            <span>@localizer["menu-home"]</span>
+        </a>
+    </li>
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-folder-open"></i>
+            <span>@localizer["menu-member"]</span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("member","index")"><a href="@Url.Action("index", "member")">@localizer["submenu-personalinformation"]</a></li>
+            <li class="@Html.IsActive("member","register")"><a href="@Url.Action("register", "member")"><span>@localizer["submenu-register"] </span></a></li>
+        </ul>
+    </li>
+
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-user-friends"></i>
+            <span>@localizer["menu-teaminfomation"]  </span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("teaminfomation","teambinary")"><a href="@Url.Action("teambinary", "teaminfomation")">@localizer["submenu-teambinary"] </a></li>
+            <li class="@Html.IsActive("teaminfomation","sponsorteam")"><a href="@Url.Action("sponsorteam", "teaminfomation")">@localizer["submenu-sponsorteam"] </a></li>
+            <li class="@Html.IsActive("teaminfomation","leftteam")"><a href="@Url.Action("leftteam", "teaminfomation")">@localizer["submenu-leftteam"] </a></li>
+            <li class="@Html.IsActive("teaminfomation","rightteam")"><a href="@Url.Action("rightteam", "teaminfomation")">@localizer["submenu-rightteam"] </a></li>
+        </ul>
+    </li>
+
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-cart-plus"></i>
+            <span>@localizer["menu-orders"] </span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("orders","buypersonalorder")"><a href="@Url.Action("buypersonalorder", "orders")">@localizer["submenu-buypersonalorder"] </a></li>
+            <li class="@Html.IsActive("orders","buyholdorder")"><a href="@Url.Action("buyholdorder", "orders")">@localizer["submenu-buyholdorder"] </a></li>
+            <li class="@Html.IsActive("orders","requestewalletonline")"><a href="@Url.Action("requestewalletonline", "orders")">@localizer["submenu-requestewalletonline"] </a></li>
+        </ul>
+    </li>
+
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-cart-plus"></i>
+            <span>@localizer["menu-buyorders"] </span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("buyorders","buyorderbyewallet")"><a href="@Url.Action("buyorderbyewallet", "buyorders")">@localizer["submenu-buyorderbyewallet"] </a></li>
+            <li class="@Html.IsActive("buyorders","saleorderfromhold")"><a href="@Url.Action("saleorderfromhold", "buyorders")">@localizer["submenu-saleorderfromhold"] </a></li>
+            <li class="@Html.IsActive("buyorders","ewallettransfer")"><a href="@Url.Action("ewallettransfer", "buyorders")">@localizer["submenu-ewallettransfer"] </a></li>
+        </ul>
+    </li>
+
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-print"></i>
+            <span>@localizer["menu-reports"] </span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("reports","income")"><a href="@Url.Action("income", "reports")">@localizer["submenu-income"] </a></li>
+            <li class="@Html.IsActive("reports","pointhistory")"><a href="@Url.Action("pointhistory", "reports")">@localizer["submenu-pointhistory"] </a></li>
+            <li class="@Html.IsActive("reports","orderhistory")"><a href="@Url.Action("orderhistory", "reports")">@localizer["submenu-orderhistory"] </a></li>
+            <li class="@Html.IsActive("reports","salereport")"><a href="@Url.Action("salereport", "reports")">@localizer["submenu-salereport"] </a></li>
+            <li class="@Html.IsActive("reports","registerapplication")"><a href="@Url.Action("registerapplication", "reports")">@localizer["submenu-registerapplication"] </a></li>
+            <li class="@Html.IsActive("reports","historyofpromotion")"><a href="@Url.Action("historyofpromotion", "reports")">@localizer["submenu-historyofpromotion"] </a></li>
+            <li class="@Html.IsActive("reports","travelpoints")"><a href="@Url.Action("travelpoints", "reports")">@localizer["submenu-travelpoints"] </a></li>
+        </ul>
+    </li>
+
+    <li class="has-sub expand">
+        <a href="javascript:;">
+            <b class="caret"></b>
+            <i class="fa fa-beer"></i>
+            <span>@localizer["menu-other"] </span>
+        </a>
+        <ul class="sub-menu" style="display: block;">
+            <li class="@Html.IsActive("other","changepassword")"><a href="@Url.Action("changepassword", "other")">@localizer["submenu-changepassword"] </a></li>
+            <li class="@Html.IsActive("other","taxdownload")"><a href="@Url.Action("taxdownload", "other")">@localizer["submenu-taxdownload"] </a></li>
+            <li class="@Html.IsActive("other","documents")"><a href="@Url.Action("documents", "other")">@localizer["submenu-documents"] </a></li>
+            <li><a href="/Auth/Logout">@localizer["submenu-quit"] </a></li>
+            <li><a href="javascript:;">@localizer["submenu-returntomainwebsite"] </a></li>
+        </ul>
+    </li>
+
+    <!--i class="fa fa-key calendar"></i>
+
+    <i class="fa fa-cubes"></i-->
+    <!-- begin sidebar minify button -->
+    <li><a href="javascript:;" class="sidebar-minify-btn" data-click="sidebar-minify"><i class="fa fa-angle-double-left"></i></a></li>
+    <!-- end sidebar minify button -->
+</ul>
+<!-- end sidebar nav -->
