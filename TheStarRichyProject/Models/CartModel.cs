@@ -11,8 +11,10 @@ namespace TheStarRichyProject.Models
         public string ProductImage { get; set; }
         public decimal Price { get; set; }
         public decimal PV { get; set; }
+        public decimal ShippingFee { get; set; }
         public int Quantity { get; set; }
         public string Makerby { get; set; }
+
 
         // ⭐ เพิ่ม DL และ Center Information
         public string DLCode { get; set; }              // รหัสผู้แนะนำ
@@ -26,6 +28,7 @@ namespace TheStarRichyProject.Models
     {
         public string ProductID { get; set; }
         public int Quantity { get; set; }
+        public decimal ShippingFee { get; set; }
     }
 
     // Response Models
@@ -60,7 +63,8 @@ namespace TheStarRichyProject.Models
         // Alias properties สำหรับ JavaScript
         public int TotalItems => ItemCount;
         public decimal TotalPrice => TotalAmount;
-        public decimal Deliveryfee { get; set; }
+        public decimal ShippingFee { get; set; }
+
     }
 
     public class CartItem

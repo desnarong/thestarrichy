@@ -220,51 +220,49 @@ namespace TheStarRichyApi.Services
         public async Task<bool> UpdateCartAsync(string memberCode, UpdateCartRequest request)
         {
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
-
             try
             {
                 using (var con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
 
-                    // อัพเดทจำนวนสินค้า
-                    string query = @"
-                        UPDATE ci
-                        SET ci.Quantity = @Quantity,
-                            ci.SubTotal = ci.Price * @Quantity
-                        FROM ShoppingCartItems ci
-                        INNER JOIN ShoppingCarts c ON ci.CartID = c.CartID
-                        WHERE c.MemberCode = @MemberCode
-                            AND c.Status = 'Active'
-                            AND c.ExpiryDate > GETDATE()
-                            AND ci.ProductID = @ProductID";
-
-                    using (var cmd = new SqlCommand(query, con))
+                    using (var cmd = new SqlCommand("SP_UpdateCart", con))
                     {
+                        cmd.CommandType = CommandType.StoredProcedure;
+
+                        // เพิ่ม Parameters
                         cmd.Parameters.AddWithValue("@MemberCode", memberCode);
                         cmd.Parameters.AddWithValue("@ProductID", request.ProductID);
                         cmd.Parameters.AddWithValue("@Quantity", request.Quantity);
 
-                        int rowsAffected = await cmd.ExecuteNonQueryAsync();
-
-                        if (rowsAffected > 0)
+                        // Execute และรับผลลัพธ์
+                        using (var reader = await cmd.ExecuteReaderAsync())
                         {
-                            // อัพเดทยอดรวมในตะกร้า
-                            string updateTotalQuery = @"
-                                UPDATE c
-                                SET c.TotalAmount = ISNULL((SELECT SUM(SubTotal) FROM ShoppingCartItems WHERE CartID = c.CartID), 0),
-                                    c.TotalPV = ISNULL((SELECT SUM(PV * Quantity) FROM ShoppingCartItems WHERE CartID = c.CartID), 0)
-                                FROM ShoppingCarts c
-                                WHERE c.MemberCode = @MemberCode
-                                    AND c.Status = 'Active'";
-
-                            using (var updateCmd = new SqlCommand(updateTotalQuery, con))
+                            if (await reader.ReadAsync())
                             {
-                                updateCmd.Parameters.AddWithValue("@MemberCode", memberCode);
-                                await updateCmd.ExecuteNonQueryAsync();
-                            }
+                                int success = reader.GetInt32(reader.GetOrdinal("Success"));
+                                string message = reader.GetString(reader.GetOrdinal("Message"));
 
-                            return true;
+                                if (success == 1)
+                                {
+                                    // สามารถดึงข้อมูลเพิ่มเติมได้ถ้าต้องการ
+                                    var cartId = reader.GetInt32(reader.GetOrdinal("CartID"));
+                                    var totalAmount = reader.GetDecimal(reader.GetOrdinal("TotalAmount"));
+                                    var totalPV = reader.GetDecimal(reader.GetOrdinal("TotalPV"));
+                                    var shippingFee = reader.GetDecimal(reader.GetOrdinal("ShippingFee"));
+
+                                    _logger.LogInformation(
+                                        "Cart updated: CartID={CartID}, Total={Total}, PV={PV}, Shipping={Shipping}",
+                                        cartId, totalAmount, totalPV, shippingFee);
+
+                                    return true;
+                                }
+                                else
+                                {
+                                    _logger.LogWarning("Cart update failed: {Message}", message);
+                                    return false;
+                                }
+                            }
                         }
                     }
                 }

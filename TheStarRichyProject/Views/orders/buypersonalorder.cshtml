@@ -257,7 +257,7 @@
                     <!-- Search Box -->
                     <div class="row g-2 align-items-end">
                         <!-- ช่องค้นหา -->
-                        <div class="col-md-4">
+                        <div class="col-md-4 col-sm-12">
                             <label class="form-label fw-bold mb-1" data-key="t-search-product">ค้นหาสินค้า</label>
                             <input type="text"
                                    class="form-control"
@@ -268,7 +268,7 @@
                         </div>
 
                         <!-- ประเภทสินค้า -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 col-sm-12">
                             <label class="form-label fw-bold mb-1" data-key="t-product-type">ประเภทสินค้า</label>
                             <select name="producttype" class="form-select">
                                 <option value="0" data-key="t-all">ทั้งหมด</option>
@@ -279,7 +279,7 @@
                         </div>
 
                         <!-- จัดเรียงตาม -->
-                        <div class="col-md-3">
+                        <div class="col-md-3 col-sm-12">
                             <label class="form-label fw-bold mb-1" data-key="t-sort-by">จัดเรียงตาม</label>
                             <select name="sortorder" class="form-select">
                                 <option value="0" data-key="t-latest">ล่าสุด</option>
@@ -292,7 +292,7 @@
                         </div>
 
                         <!-- ปุ่มค้นหาและรีเฟรช -->
-                        <div class="col-md-2">
+                        <div class="col-md-2 col-sm-12">
                             <div class="d-flex gap-1">
                                 <button type="submit" class="btn btn-primary flex-fill">
                                     <i class="bx bx-search"></i> <span data-key="t-search">ค้นหา</span>
@@ -794,7 +794,7 @@
                             $('#summaryTotal').text('฿ ' + (response.totalPrice || 0).toFixed(2));
                             $('#summaryPV').text((response.totalPV || 0).toFixed(0));
                             $('#summaryBV').text((response.totalBV || 0).toFixed(0));
-                            $('#shippingFee').text((response.deliveryfee || 0).toFixed(2));
+                            $('#shippingFee').text((response.shippingFee || 0).toFixed(2));
                             // //member
                             // if(response.memberCode)
                             // {

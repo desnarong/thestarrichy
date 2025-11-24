@@ -20,20 +20,22 @@ namespace TheStarRichyProject.Models
         public string DeliveryMethod { get; set; } // "Delivery", "Pickup"
 
         public string DeliveryAddressType { get; set; } // "Member", "Card", "Other", "Branch"
-        
+
         public int? AddressID { get; set; }
-        
+
         public CustomAddressInfo? CustomAddress { get; set; }
         public MemberAddressData? MemberAddress { get; set; }
         public MemberFavoriteAddressData? MemberFavorite { get; set; }
-        
+
         public bool SendInvoice { get; set; }
-        
+
         public string BranchCode { get; set; } // ถ้าเลือก Pickup
 
         public string BranchName { get; set; } = string.Empty;
         public string OrderID { get; set; }
-        
+
+        public decimal ShippingFee { get; set; }
+
     }
 
     /// <summary>

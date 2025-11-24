@@ -775,7 +775,7 @@ namespace TheStarRichyProject.Controllers
                         totalPrice = result.Data.TotalAmount,
                         totalPV = result.Data.TotalPV,
                         totalBV = result.Data.TotalBV,
-                        deliveryfee = result.Data.Deliveryfee,
+                        shippingFee = result.Data.ShippingFee,
                         memberCode = result.Data.MemberCode,
                         centerCode = result.Data.CenterCode,
                     });

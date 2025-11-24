@@ -196,7 +196,7 @@
                                     <input type="radio" name="deliveryMethod" value="Delivery" id="deliveryShip" checked>
                                     <label for="deliveryShip" style="cursor: pointer; margin: 0;">
                                         <strong>ให้จัดส่ง</strong><br>
-                                        <small class="text-muted">ค่าจัดส่ง: ฟรี (สั่งซื้อครบ ฿500) หรือ ฿50</small>
+                                        <small class="text-muted">ค่าจัดส่ง: @(cart?.ShippingFee ?? 0)</small>
                                     </label>
                                 </div>
                                 <div class="delivery-option" data-method="Pickup">
@@ -341,7 +341,7 @@
                             <div class="d-flex justify-content-between mb-2">
                                 <span>ค่าจัดส่ง</span>
                                 <span class="fw-bold" id="shippingFeeDisplay">
-                                    <span>฿@cart.Deliveryfee</span>
+                                    <span>฿@cart.ShippingFee</span>
                                 </span>
                             </div>
 
@@ -602,11 +602,9 @@
             // Update Shipping Fee
             function updateShippingFee(isPickup) {
                 const totalAmount = @(cart?.TotalAmount ?? 0);
-                let shippingFee = 0;
+                let shippingFee = @(cart?.ShippingFee ?? 0);
 
-                if (!isPickup && totalAmount < 500) {
-                    shippingFee = 50;
-                }
+                if(isPickup) shippingFee = 0;
 
                 const grandTotal = totalAmount + shippingFee;
 
