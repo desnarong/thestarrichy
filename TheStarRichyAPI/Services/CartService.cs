@@ -181,7 +181,6 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@ProductImage", request.ProductImage ?? "");
                         command.Parameters.AddWithValue("@Price", request.Price);
                         command.Parameters.AddWithValue("@PV", request.PV); 
-                        command.Parameters.AddWithValue("@ShippingFee", request.ShippingFee);
                         command.Parameters.AddWithValue("@Quantity", request.Quantity);
                         command.Parameters.AddWithValue("@MakerBy", request.Makerby);
 

@@ -142,17 +142,17 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT  aa.Membercode, aa.DLcode,aa.Dlname,M06_X4 as RegisterDate";
+                    string query = "SELECT  top 1 aa.Membercode, aa.DLcode,aa.DlName,M06_X4 as RegisterDate";
                     query += " FROM [000_Member_Binary_LeftRight_Search] aa (nolock) join M06 on aa.DLcode=M06_PX1";
 
-                    if (Memberpermission != "Y")
-                    {
-                        query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.DLCode  ";
-                    }
-                     
+                    //if (Memberpermission != "Y")
+                    //{
+                    //    query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.MemberLeftCode  ";
+                    //}
+
                     query += " where aa.Membercode = @Membercode and aa.DLcode=@SearchDLcode";
 
-                    
+
 
                     using (var command = new SqlCommand(query, con))
                     {

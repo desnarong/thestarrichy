@@ -379,6 +379,12 @@
                                 รับ e-Invoice ทาง email เท่านั้น
                             </label>
                         </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="sendInvoice" value="2" id="sendInvoiceNo2">
+                            <label class="form-check-label" for="sendInvoiceNo2">
+                                ไม่รับใบเสร็จ
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -624,7 +630,7 @@
                 // Validate
                 const paymentMethod = $('input[name="paymentMethod"]:checked').val();
                 const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-                const sendInvoice = $('input[name="sendInvoice"]:checked').val() === '1';
+                const sendInvoice = $('input[name="sendInvoice"]:checked').val();
 
                 if (!paymentMethod || !deliveryMethod) {
                     showNotification('error', 'กรุณาเลือกวิธีชำระเงินและการจัดส่ง');

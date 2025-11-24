@@ -255,7 +255,7 @@ namespace TheStarRichyApi.Services
                                     PaymentMethod = reader["PaymentMethod"]?.ToString(),
                                     DeliveryMethod = reader["DeliveryMethod"]?.ToString(),
                                     Status = reader["Status"]?.ToString(),
-                                    SendInvoice = Convert.ToBoolean(reader["SendBill"]),
+                                    SendInvoice = Convert.ToInt16(reader["SendBill"]),
                                     Items = new List<OrderItem>(),
                                     DeliveryInfo = new DeliveryInfo
                                     {
@@ -571,7 +571,7 @@ namespace TheStarRichyApi.Services
         public MemberAddressData? MemberAddress { get; set; }
         public MemberFavoriteAddressData? MemberFavorite { get; set; }
 
-        public bool SendInvoice { get; set; }
+        public int SendInvoice { get; set; }
 
         public string? BranchCode { get; set; } // ถ้าเลือก Pickup
 
@@ -646,7 +646,7 @@ namespace TheStarRichyApi.Services
         public string? DeliveryMethod { get; set; }
         public DeliveryInfo? DeliveryInfo { get; set; }
         public string Status { get; set; }
-        public bool SendInvoice { get; set; }
+        public int SendInvoice { get; set; }
     }
 
     public class OrderItem

@@ -27,7 +27,7 @@ namespace TheStarRichyProject.Models
         public MemberAddressData? MemberAddress { get; set; }
         public MemberFavoriteAddressData? MemberFavorite { get; set; }
 
-        public bool SendInvoice { get; set; }
+        public int SendInvoice { get; set; }
 
         public string BranchCode { get; set; } // ถ้าเลือก Pickup
 
@@ -155,7 +155,7 @@ namespace TheStarRichyProject.Models
         public string DeliveryMethod { get; set; }
         public DeliveryInfoData DeliveryInfo { get; set; }
         public string Status { get; set; }
-        public bool SendInvoice { get; set; }
+        public int SendInvoice { get; set; }
     }
 
     public class OrderItemInfo
@@ -428,7 +428,7 @@ namespace TheStarRichyProject.Models
         public string? ShippingPhone { get; set; }
         
         // Invoice
-        public bool SendInvoice { get; set; }
+        public int SendInvoice { get; set; }
         
         // Status
         public string OrderStatus { get; set; }
