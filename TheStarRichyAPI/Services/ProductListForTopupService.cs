@@ -166,7 +166,8 @@ namespace TheStarRichyApi.Services
                     ",[LimitPerMembercode],[LimitPertobuy],[scheduledforsale],[scheduledforposition],[scheduledforpositionrule] " +
                     ",[scheduledfornewmember],[scheduledfornewmemberstardate],[scheduledfornewmemberenddate] " +
                     ",[M01_X58],[M01_X41],[M01_X39],[M01_X37],[M01_X40],[M01_X21],M01_X52,M01_X53,M01_X59,M01_X60,[Totalproduct] " +
-                    ",M01_X46,M01_X50,d.T03_X5 as Membercode,COALESCE((d.TotalbuyPerson),0) as TotalbuyPerson" +
+                    ",M01_X46,M01_X50,M01_X68,M01_X69" +   //
+                    ",d.T03_X5 as Membercode,COALESCE((d.TotalbuyPerson),0) as TotalbuyPerson" +
                     ",COALESCE((e.TotalbuyALL),0)  as TotalbuyALL" +
                     ",S02_X109  as TypeofFee" +  //เงื่อนไขค่าส่งเป็น 0-บาท หรือ 1- พีวี
                     ",S02_X111  as CondFee" +   // ยอดขั้นต่ำที่ส่งฟรี
@@ -260,8 +261,8 @@ namespace TheStarRichyApi.Services
                 using var command = new SqlCommand(query, con);
                 command.Parameters.AddWithValue("@Membercode", memberCode);
                 command.Parameters.AddWithValue("@Registerdate", Registerdate);
-                
-                
+
+
 
                 if (!string.IsNullOrEmpty(groupCode))
                 {

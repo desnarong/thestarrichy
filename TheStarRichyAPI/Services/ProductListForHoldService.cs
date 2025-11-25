@@ -8,7 +8,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IProductListForHoldService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string? Registerdate, string? groupCode, string? sortOrder, string? productid, string? proDucttype);
     }
     public class ProductListForHoldService : IProductListForHoldService
     {
@@ -95,7 +95,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string? Registerdate, string? groupCode, string? sortOrder, string? productid, string? proDucttype)
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -115,13 +115,6 @@ namespace TheStarRichyApi.Services
 
             // Get Membercode from JWT
             string? memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? Registerdate = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? groupCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? sortOrder = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? productid = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string? proDucttype = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            _ = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            _ = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             // deleveryType M01_X46='0' - ส่ง   M01_X46='1' -ไม่ส่งรับเอง
             // shippingFee M01_X50='0'- ค่าส่งไม่ฟรี  M01_X50='1'-ค่าส่งฟรี
@@ -154,7 +147,8 @@ namespace TheStarRichyApi.Services
                     ",[LimitPerMembercode],[LimitPertobuy],[scheduledforsale],[scheduledforposition],[scheduledforpositionrule] " +
                     ",[scheduledfornewmember],[scheduledfornewmemberstardate],[scheduledfornewmemberenddate] " +
                     ",[M01_X58],[M01_X41],[M01_X39],[M01_X37],[M01_X40],[M01_X21],M01_X52,M01_X53,M01_X59,M01_X60,[Totalproduct] " +
-                    ",M01_X46,M01_X50,d.T03_X5 as Membercode,COALESCE((d.TotalbuyPerson),0) as TotalbuyPerson" +
+                    ",M01_X46,M01_X50,M01_X68,M01_X69" +   //
+                    ",d.T03_X5 as Membercode,COALESCE((d.TotalbuyPerson),0) as TotalbuyPerson" +
                     ",COALESCE((e.TotalbuyALL),0)  as TotalbuyALL" +
                     ",S02_X109  as TypeofFee" +  //เงื่อนไขค่าส่งเป็น บาท หรือพีวี
                     ",S02_X111  as CondFee" +   // ยอดขั้นต่ำที่ส่งฟรี
