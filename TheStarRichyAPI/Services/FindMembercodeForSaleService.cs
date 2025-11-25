@@ -142,7 +142,7 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT  top 1 aa.Membercode, aa.DLcode,aa.DlName,M06_X4 as RegisterDate";
+                    string query = "SELECT  top 1 aa.Membercode, aa.DLcode,aa.DlName,M06_X4 as RegisterDate,M06_X59 as Position ";
                     query += " FROM [000_Member_Binary_LeftRight_Search] aa (nolock) join M06 on aa.DLcode=M06_PX1";
 
                     //if (Memberpermission != "Y")
