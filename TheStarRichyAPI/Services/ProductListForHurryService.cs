@@ -8,17 +8,18 @@ namespace TheStarRichyApi.Services
 {
     public interface IProductListForHurryService
     {
-        Task<List<dynamic>> GetDisplayAsync(string? Registerdate, string? groupCode, string? sortOrder, string? productid, string? proDucttype);
+        Task<List<dynamic>> GetDisplayAsync(string? baseUrl, string? groupCode, string? sortOrder, string? productid, string? proDucttype);
     }
     public class ProductListForHurryService : IProductListForHurryService
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-
-        public ProductListForHurryService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        private readonly IMemberService _memberService;
+        public ProductListForHurryService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IMemberService memberService)
         {
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _memberService = memberService;
         }
         public async Task<string> GetPermissionAsync(string column, string memberCode)
         {
@@ -95,7 +96,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync(string? Registerdate, string? groupCode, string? sortOrder, string? productid, string? proDucttype)
+        public async Task<List<dynamic>> GetDisplayAsync(string? baseUrl, string? groupCode, string? sortOrder, string? productid, string? proDucttype)
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -117,6 +118,10 @@ namespace TheStarRichyApi.Services
             string? memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             // deleveryType M01_X46='0' - ส่ง   M01_X46='1' -ไม่ส่งรับเอง
             // shippingFee M01_X50='0'- ค่าส่งไม่ฟรี  M01_X50='1'-ค่าส่งฟรี
+            // Get Membercode from JWT
+            var memberInfos = await _memberService.GetMember2DisplayAsync(baseUrl);
+            var memberInfo = memberInfos.FirstOrDefault(m => m.Membercode == memberCode);
+            string? Registerdate = memberInfo?.RegisterDate; //วันสมัคร
 
 
             if (string.IsNullOrEmpty(memberCode))

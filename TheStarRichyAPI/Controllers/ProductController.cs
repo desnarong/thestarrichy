@@ -231,8 +231,9 @@ namespace TheStarRichyApi.Controllers
         {
             try
             {
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 // เรียกใช้ ProductListForHoldService
-                var result = await _productListForHoldService.GetDisplayAsync();
+                var result = await _productListForHoldService.GetDisplayAsync(baseUrl, groupcode, producttype, sortorder, productid);
 
                 // ตรวจสอบผลลัพธ์
                 if (result == null || !result.Any())
@@ -321,8 +322,9 @@ namespace TheStarRichyApi.Controllers
         {
             try
             {
+                var baseUrl = $"{Request.Scheme}://{Request.Host}";
                 // เรียกใช้ ProductListForHurryService
-                var result = await _productListForHurryService.GetDisplayAsync();
+                var result = await _productListForHurryService.GetDisplayAsync(baseUrl, groupcode, producttype, sortorder, productid);
 
                 // ตรวจสอบผลลัพธ์
                 if (result == null || !result.Any())
