@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using Microsoft.VisualBasic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Security.Claims;
 using TheStarRichyApi.Models;
@@ -124,6 +125,7 @@ namespace TheStarRichyApi.Services
                                 cartData.DLName = reader.IsDBNull(12) ? null : reader.GetString(12);         // DLName (NEW)
                                 cartData.RegisterDate = reader.IsDBNull(13) ? null : reader.GetDateTime(13); // RegisterDate (NEW)
                                 cartData.ShippingFee = reader.GetDecimal(14);           // ShippingFee
+                                cartData.BillType = reader.GetString(15);
                             }
 
                             // Result Set 2: รายการสินค้า
@@ -183,6 +185,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@PV", request.PV); 
                         command.Parameters.AddWithValue("@Quantity", request.Quantity);
                         command.Parameters.AddWithValue("@MakerBy", request.Makerby);
+                        command.Parameters.AddWithValue("@BillType", request.BillType);
 
                         // ⭐ พารามิเตอร์ใหม่ (ใช้ CenterCode แทน CenterID)
                         command.Parameters.AddWithValue("@DLCode", (object)request.DLCode ?? DBNull.Value);

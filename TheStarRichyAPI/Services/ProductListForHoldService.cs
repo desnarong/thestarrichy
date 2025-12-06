@@ -142,7 +142,6 @@ namespace TheStarRichyApi.Services
                 using var con = new SqlConnection(connectionString);
                 await con.OpenAsync();
 
-
                 string query = "SELECT A1.ProductID,[ProductThaiName],[ProductEngName],[ProductDescription]" +
                     ",[ProductDescription1],[ProductGroupcode],[ProductGroupThaiName],[ProductGroupEngName]" +
                     ",[TypeOfProductCode],[TypeOfProduct],[UnitOfProduct_th],[UnitOfProduct_en] " +
@@ -154,9 +153,9 @@ namespace TheStarRichyApi.Services
                     ",M01_X46,M01_X50,M01_X68,M01_X69" +   //
                     ",d.T03_X5 as Membercode,COALESCE((d.TotalbuyPerson),0) as TotalbuyPerson" +
                     ",COALESCE((e.TotalbuyALL),0)  as TotalbuyALL" +
-                    ",S02_X109  as TypeofFee" +  //เงื่อนไขค่าส่งเป็น บาท หรือพีวี
+                    ",S02_X109  as TypeofFee" +  //เงื่อนไขค่าส่งเป็น 0-บาท หรือ 1- พีวี
                     ",S02_X111  as CondFee" +   // ยอดขั้นต่ำที่ส่งฟรี
-                    ",S02_X110  as DeleveryFee1" +   // ค่าส่ง 1
+                    ",S02_X110  as DeleveryFe1" +   // ค่าส่ง 1
                     ",S02_X123  as DeleveryFee2" +   // ค่าส่ง 2
                     " from[000_Product] A1 (nolock) " +
 
@@ -166,48 +165,27 @@ namespace TheStarRichyApi.Services
                     " group by T03_2X1,T03_X5) as d on A1.ProductID = d.T03_2X1  and d.T03_X5 = @Membercode" +
                     " left outer join" +
                     " (select T03_2X1, COALESCE(Sum(BuyLimit), 0) as TotalbuyALL " +
-                    " from Sum_ProductSet group by T03_2X1) as e on A1.ProductID = e.T03_2X1" +
+                    " from Sum_ProductSet  group by T03_2X1) as e on A1.ProductID = e.T03_2X1" +
                     " join S02 on S02_X1<>A1.ProductID";
 
                 if (proDucttype == "2")  //ขายดี
-                { query += " left outer join [000_Bestseller] Best on Best.ProductID=A1.ProductID "; }
-
-                //" where  M01_X41='1' and M01_X39='0'   and (M01_X40='1' or M01_X40='2' )   and M01_X21 <>'1'       order by M01_X48,M01_PX1  ";
-
-
-                query += " where(  (M01_X40 = '1' or M01_X40 = '2')  " +
-                "       and TypeOfProductCode<>'005' and  M01_X58 = '0')  " +
-                " or " +
-
-                " (  ( (M01_X40 = '1' or M01_X40 = '2')   " +
-                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
-                " and(d.T03_X5 is null or d.T03_X5 = @Membercode) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) " +
-                "   and " +
-                "    (M01_X40 = '1' or M01_X40 = '2')  " +
-                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006') " +
-                "   and M01_X53 > 0 and M01_X53 > COALESCE(TotalbuyALL, 0)) " +
-                //" ) " +
-                "   or " +
-                "   ( (M01_X40 = '1' or M01_X40 = '2')  " +
-                "   and  M01_X58 = '1' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
-                " and(d.T03_X5 = @Membercode and @Registerdate between M01_X59 and M01_X60) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) ";
-
-                if (string.IsNullOrEmpty(groupCode))
-                { }
-                else
                 {
-                    query += " and  ProductGroupcode=@groupCode ";
+                    query += " inner join [000_Bestseller] Best on Best.ProductID=A1.ProductID ";
                 }
-                if (string.IsNullOrEmpty(productid))
-                { }
-                else
+               
+                query += " where  (  (M01_X40 = '1' or M01_X40 = '2')  " +
+                "       and TypeOfProductCode<>'005' and  M01_X58 = '0'  ";
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
+                }
+                if (!string.IsNullOrEmpty(productid))
                 {
                     query += " and  A1.ProductID=@productid ";
                 }
-
-
                 //Search by group
                 if (string.IsNullOrEmpty(proDucttype))
                 {
@@ -218,7 +196,7 @@ namespace TheStarRichyApi.Services
                     //if (proDucttype == "0")  //ทั้งหมด
                     //{ query += " order by ProductID desc "; }
                     if (proDucttype == "1")  //โปรโมชั่น
-                    { query += " and TypeOfProductCode='005' or TypeOfProductCode='006' "; }
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
                     if (proDucttype == "2")  //ขายดี
                     { query += " and  Best.ProductID=A1.ProductID "; }
                     if (proDucttype == "3")  //มาใหม่
@@ -226,35 +204,158 @@ namespace TheStarRichyApi.Services
 
 
                 }
+                query += ") or " +
+
+                " ( " +  //1
+                " (( (M01_X40 = '1' or M01_X40 = '2')   " +
+                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
+                " and (d.T03_X5 is null or d.T03_X5 = @Membercode) " +
+                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) " +
+                "   and " +
+                "    (M01_X40 = '1' or M01_X40 = '2')  " +
+                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006') " +
+                "   and M01_X53 > 0 and M01_X53 > COALESCE(TotalbuyALL, 0) ";
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
+                }
+                if (!string.IsNullOrEmpty(productid))
+                {
+                    query += " and  A1.ProductID=@productid ";
+                }
+                //Search by group
+                if (string.IsNullOrEmpty(proDucttype))
+                {
+
+                }
+                else
+                {
+                    //if (proDucttype == "0")  //ทั้งหมด
+                    //{ query += " order by ProductID desc "; }
+                    if (proDucttype == "1")  //โปรโมชั่น
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
+                    if (proDucttype == "2")  //ขายดี
+                    { query += " and  Best.ProductID=A1.ProductID "; }
+                    if (proDucttype == "3")  //มาใหม่
+                    { query += " and TypeOfProductCode<>'005' and TypeOfProductCode<>'006' and FORMAT( up_date, 'yyyy-MM') = FORMAT( GETDATE(), 'yyyy-MM') "; }
+
+
+                }
+                query += " )  or " +
+                "   ( (M01_X40 = '1' or M01_X40 = '2')  " +
+                "   and  M01_X58 = '1' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
+                " and(d.T03_X5 = @Membercode and @Registerdate between M01_X59 and M01_X60) " +
+                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0) ";
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
+                }
+                if (!string.IsNullOrEmpty(productid))
+                {
+                    query += " and  A1.ProductID=@productid ";
+                }
+                //Search by group
+                if (string.IsNullOrEmpty(proDucttype))
+                {
+
+                }
+                else
+                {
+                    //if (proDucttype == "0")  //ทั้งหมด
+                    //{ query += " order by ProductID desc "; }
+                    if (proDucttype == "1")  //โปรโมชั่น
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
+                    if (proDucttype == "2")  //ขายดี
+                    { query += " and  Best.ProductID=A1.ProductID "; }
+                    if (proDucttype == "3")  //มาใหม่
+                    { query += " and TypeOfProductCode<>'005' and TypeOfProductCode<>'006' and FORMAT( up_date, 'yyyy-MM') = FORMAT( GETDATE(), 'yyyy-MM') "; }
+
+
+                }
+                query += " )) ";  //1
 
                 //Sort
                 if (string.IsNullOrEmpty(sortOrder))
                 {
-                    query += " order by A1.ProductID desc ";
+                    query += " order by A1.ProductDate desc,A1.ProductID desc ";
                 }
                 else
                 {
-                    if (sortOrder == "0")
-                    { query += " order by A1.ProductID desc "; }
-                    if (sortOrder == "1")
-                    { query += " order by A1.ProductID asc "; }
-                    if (sortOrder == "2")
-                    { query += " order by MemberPrice asc "; }
-                    if (sortOrder == "3")
-                    { query += " order by MemberPrice desc "; }
-                    if (sortOrder == "4")
-                    { query += " order by PV asc "; }
-                    if (sortOrder == "5")
-                    { query += " order by PV desc "; }
-                    if (proDucttype == "3")  //มาใหม่
-                    { query += " order by A1.ProductID desc "; }
+                    if (string.IsNullOrEmpty(proDucttype))
+                    {
+                        if (sortOrder == "0")
+                        { query += " order by A1.ProductDate desc,A1.ProductID desc "; }
+                        if (sortOrder == "1")
+                        { query += " order by A1.ProductDate asc,A1.ProductID asc "; }
+                        if (sortOrder == "2")
+                        { query += " order by MemberPrice asc "; }
+                        if (sortOrder == "3")
+                        { query += " order by MemberPrice desc "; }
+                        if (sortOrder == "4")
+                        { query += " order by PV asc "; }
+                        if (sortOrder == "5")
+                        { query += " order by PV desc "; }
+                    }
+                    else
+                    {
+                        if (proDucttype == "1" || proDucttype == "0")  //โปรโมชั่น
+                        {
+                            if (sortOrder == "0")
+                            { query += " order by A1.ProductDate desc,A1.ProductID desc "; }
+                            if (sortOrder == "1")
+                            { query += " order by A1.ProductDate asc,A1.ProductID asc "; }
+                            if (sortOrder == "2")
+                            { query += " order by MemberPrice asc "; }
+                            if (sortOrder == "3")
+                            { query += " order by MemberPrice desc "; }
+                            if (sortOrder == "4")
+                            { query += " order by PV asc "; }
+                            if (sortOrder == "5")
+                            { query += " order by PV desc "; }
+                        }
+                        if (proDucttype == "2")  //ขายดี 
+                        {
+
+                            query += " order by Best.ProductQuantity desc  ";
+                        }
+                        if (proDucttype == "3")  //มาใหม่
+                        {
+
+                            query += " order by A1.ProductDate desc,A1.ProductID desc ";
+
+                        }
+
+
+                    }
+
                 }
                 // End Sort
                 using var command = new SqlCommand(query, con);
                 command.Parameters.AddWithValue("@Membercode", memberCode);
                 command.Parameters.AddWithValue("@Registerdate", Registerdate);
-                command.Parameters.AddWithValue("@groupCode", groupCode);
-                command.Parameters.AddWithValue("@productid", productid);
+
+
+
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    command.Parameters.AddWithValue("@groupCode", groupCode);
+                }
+
+                if (!string.IsNullOrEmpty(productid))
+                {
+                    command.Parameters.AddWithValue("@productid", productid);
+                }
+
+
+
+
+                     
 
 
                 using var reader = await command.ExecuteReaderAsync();

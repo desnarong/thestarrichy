@@ -14,6 +14,8 @@ namespace TheStarRichyProject.Models
         public decimal ShippingFee { get; set; }
         public int Quantity { get; set; }
         public string Makerby { get; set; }
+        public int BillType { get; set; }
+        
 
 
         // ⭐ เพิ่ม DL และ Center Information

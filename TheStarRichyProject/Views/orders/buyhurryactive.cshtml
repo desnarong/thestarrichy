@@ -1,6 +1,6 @@
 ﻿@model TheStarRichyProject.Models.BuyPersonalOrderViewModel
 @{
-    ViewData["Title"] = " ซื้อสินค้าแบบ Topup/รักษายอด ";
+    ViewData["Title"] = " ซื้อสินค้าแบบ Hurry active ";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
@@ -161,7 +161,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-header">
-                <h4 data-key="t-personal-order">ซื้อสินค้าแบบ Topup/รักษายอด</h4>
+                <h4 data-key="t-personal-order">ซื้อสินค้าแบบ Hurry active</h4>
             </div>
             <div class="card-block p-3">
                 <div class="row">
@@ -610,7 +610,7 @@
                         registerDate: selectedDL.registerDate,
                         centerCode: selectedCenter ? selectedCenter.centerCode : '',
                         centerName: selectedCenter ? selectedCenter.centerName : '',
-                        billType: 1
+                        billType: 11
                     },
                     success: function(response) {
                         if (response.success) {
@@ -802,7 +802,7 @@
                             //     $('#memberCodeInput').val(response.memberCode);
                             //     $('#btnSearchMember').click();
                             // }
-                            
+
                             // if(response.centerCode){
                             //     $('#centerCodeInput').val(response.centerCode);
                             //     $('#btnSearchCenter').click();

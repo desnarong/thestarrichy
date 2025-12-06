@@ -165,6 +165,147 @@ namespace TheStarRichyProject.Controllers
             }
         }
 
+        /// <summary>
+        /// หน้าสำหรับซื้อสินค้า Personal Order (Step 1)
+        /// GET: /Orders/BuyPersonalOrder
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> BuyHholdOrder(
+            string? groupcode = null,
+            string? producttype = null,
+            string? sortorder = null,
+            string? search = null)
+        {
+            try
+            {
+                var model = new BuyPersonalOrderViewModel
+                {
+                    SelectedGroupCode = !string.IsNullOrEmpty(groupcode) ? groupcode : null,
+                    SearchKeyword = search
+                };
+
+                // 1. ดึงกลุ่มสินค้า
+                var groups = await GetProductGroupsFromApi();
+                if (groups != null)
+                {
+                    model.ProductGroups = groups;
+                }
+
+                // 2. ดึงสินค้า
+                var products = await GetProductListForHoldFromApi(groupcode, producttype, sortorder);
+                if (products != null)
+                {
+                    HttpContext.Session.SetString("ProductList", JsonSerializer.Serialize(products));
+                    model.Products = products;
+
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        model.Products = model.Products
+                            .Where(p => p.ProductName?.Contains(search, StringComparison.OrdinalIgnoreCase) == true ||
+                                       p.ProductId?.Contains(search, StringComparison.OrdinalIgnoreCase) == true)
+                            .ToList();
+                    }
+                }
+
+                // 3. ดึง Cart
+                var token = GetToken();
+                var passkey = GetPasskey();
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    var cartResult = await _cartService.GetCartAsync(token, passkey);
+                    if (cartResult.Success && cartResult.Data != null)
+                    {
+                        model.CartItems = cartResult.Data.Items;
+                    }
+                }
+
+                // 4. ดึงข้อมูล Member
+                var memberCode = CookieHelper.GetCookie(_httpContextAccessor, CookieHelper.MemberCodeKey);
+                if (!string.IsNullOrEmpty(memberCode))
+                {
+                    model.CurrentMember = await FindMemberForSaleFromApi(memberCode);
+                }
+                model.Membercode = memberCode;
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading BuyPersonalOrder page");
+                TempData["Error"] = "เกิดข้อผิดพลาดในการโหลดหน้าสินค้า";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+        [HttpGet]
+        public async Task<IActionResult> BuyHurryActive(
+            string? groupcode = null,
+            string? producttype = null,
+            string? sortorder = null,
+            string? search = null)
+        {
+            try
+            {
+                var model = new BuyPersonalOrderViewModel
+                {
+                    SelectedGroupCode = !string.IsNullOrEmpty(groupcode) ? groupcode : null,
+                    SearchKeyword = search
+                };
+
+                // 1. ดึงกลุ่มสินค้า
+                var groups = await GetProductGroupsFromApi();
+                if (groups != null)
+                {
+                    model.ProductGroups = groups;
+                }
+
+                // 2. ดึงสินค้า
+                var products = await GetProductListForHurryFromApi(groupcode, producttype, sortorder);
+                if (products != null)
+                {
+                    HttpContext.Session.SetString("ProductList", JsonSerializer.Serialize(products));
+                    model.Products = products;
+
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        model.Products = model.Products
+                            .Where(p => p.ProductName?.Contains(search, StringComparison.OrdinalIgnoreCase) == true ||
+                                       p.ProductId?.Contains(search, StringComparison.OrdinalIgnoreCase) == true)
+                            .ToList();
+                    }
+                }
+
+                // 3. ดึง Cart
+                var token = GetToken();
+                var passkey = GetPasskey();
+
+                if (!string.IsNullOrEmpty(token))
+                {
+                    var cartResult = await _cartService.GetCartAsync(token, passkey);
+                    if (cartResult.Success && cartResult.Data != null)
+                    {
+                        model.CartItems = cartResult.Data.Items;
+                    }
+                }
+
+                // 4. ดึงข้อมูล Member
+                var memberCode = CookieHelper.GetCookie(_httpContextAccessor, CookieHelper.MemberCodeKey);
+                if (!string.IsNullOrEmpty(memberCode))
+                {
+                    model.CurrentMember = await FindMemberForSaleFromApi(memberCode);
+                }
+                model.Membercode = memberCode;
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading BuyPersonalOrder page");
+                TempData["Error"] = "เกิดข้อผิดพลาดในการโหลดหน้าสินค้า";
+                return RedirectToAction("Error", "Home");
+            }
+        }
+
         #endregion
 
         #region Step 2: Checkout Info (กรอกข้อมูลการจัดส่ง)
@@ -582,6 +723,88 @@ namespace TheStarRichyProject.Controllers
             {
                 var client = CreateRestClient();
                 var request = new RestRequest("/Product/productlistfortopup", Method.Get);
+                AddHeaders(request);
+
+                if (!string.IsNullOrEmpty(groupcode))
+                    request.AddQueryParameter("groupcode", groupcode);
+
+                if (!string.IsNullOrEmpty(producttype))
+                    request.AddQueryParameter("producttype", producttype);
+
+                if (!string.IsNullOrEmpty(sortorder))
+                    request.AddQueryParameter("sortorder", sortorder);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(
+                        response.Content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    return apiResponse?.Data;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting products from API");
+                return null;
+            }
+        }
+
+        private async Task<List<Product>?> GetProductListForHoldFromApi(
+            string? groupcode = null,
+            string? producttype = null,
+            string? sortorder = null)
+        {
+            try
+            {
+                var client = CreateRestClient();
+                var request = new RestRequest("/Product/productlistforhold", Method.Get);
+                AddHeaders(request);
+
+                if (!string.IsNullOrEmpty(groupcode))
+                    request.AddQueryParameter("groupcode", groupcode);
+
+                if (!string.IsNullOrEmpty(producttype))
+                    request.AddQueryParameter("producttype", producttype);
+
+                if (!string.IsNullOrEmpty(sortorder))
+                    request.AddQueryParameter("sortorder", sortorder);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<Product>>>(
+                        response.Content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    return apiResponse?.Data;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting products from API");
+                return null;
+            }
+        }
+
+        private async Task<List<Product>?> GetProductListForHurryFromApi(
+            string? groupcode = null,
+            string? producttype = null,
+            string? sortorder = null)
+        {
+            try
+            {
+                var client = CreateRestClient();
+                var request = new RestRequest("/Product/productlistforhurry", Method.Get);
                 AddHeaders(request);
 
                 if (!string.IsNullOrEmpty(groupcode))

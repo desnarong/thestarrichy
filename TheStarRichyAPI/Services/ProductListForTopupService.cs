@@ -185,37 +185,22 @@ namespace TheStarRichyApi.Services
                     " join S02 on S02_X1<>A1.ProductID";
 
                 if (proDucttype == "2")  //ขายดี
-                { query += " left outer join [000_Bestseller] Best on Best.ProductID=A1.ProductID "; }
+                {
+                    query += " inner join [000_Bestseller] Best on Best.ProductID=A1.ProductID "; }
 
-                query += " where( (M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
-                "       and TypeOfProductCode<>'005' and  M01_X58 = '0')  " +
-                " or " +
-
-                " (  ((M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')   " +
-                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
-                " and(d.T03_X5 is null or d.T03_X5 = @Membercode) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) " +
-                "   and " +
-                "   (M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
-                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006') " +
-                "   and M01_X53 > 0 and M01_X53 > COALESCE(TotalbuyALL, 0)) " +
-                //" ) " +
-                "   or " +
-                "   ((M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
-                "   and  M01_X58 = '1' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
-                " and(d.T03_X5 = @Membercode and @Registerdate between M01_X59 and M01_X60) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) ";
-
+                query += " where  ( (M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
+                "       and TypeOfProductCode<>'005' and  M01_X58 = '0'  ";
                 if (!string.IsNullOrEmpty(groupCode))
                 {
-                    query += " and  ProductGroupcode=@groupCode ";
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
                 }
                 if (!string.IsNullOrEmpty(productid))
                 {
                     query += " and  A1.ProductID=@productid ";
                 }
-
-
                 //Search by group
                 if (string.IsNullOrEmpty(proDucttype))
                 {
@@ -226,7 +211,7 @@ namespace TheStarRichyApi.Services
                     //if (proDucttype == "0")  //ทั้งหมด
                     //{ query += " order by ProductID desc "; }
                     if (proDucttype == "1")  //โปรโมชั่น
-                    { query += " and TypeOfProductCode='005' or TypeOfProductCode='006' "; }
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
                     if (proDucttype == "2")  //ขายดี
                     { query += " and  Best.ProductID=A1.ProductID "; }
                     if (proDucttype == "3")  //มาใหม่
@@ -234,28 +219,139 @@ namespace TheStarRichyApi.Services
 
 
                 }
+                query += ") or " +
+
+                " ( " +  //1
+                " (((M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')   " +
+                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
+                " and (d.T03_X5 is null or d.T03_X5 = @Membercode) " +
+                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) " +
+                "   and " +
+                "   (M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
+                "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006') " +
+                "   and M01_X53 > 0 and M01_X53 > COALESCE(TotalbuyALL, 0) ";
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
+                }
+                if (!string.IsNullOrEmpty(productid))
+                {
+                    query += " and  A1.ProductID=@productid ";
+                }
+                //Search by group
+                if (string.IsNullOrEmpty(proDucttype))
+                {
+
+                }
+                else
+                {
+                    //if (proDucttype == "0")  //ทั้งหมด
+                    //{ query += " order by ProductID desc "; }
+                    if (proDucttype == "1")  //โปรโมชั่น
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
+                    if (proDucttype == "2")  //ขายดี
+                    { query += " and  Best.ProductID=A1.ProductID "; }
+                    if (proDucttype == "3")  //มาใหม่
+                    { query += " and TypeOfProductCode<>'005' and TypeOfProductCode<>'006' and FORMAT( up_date, 'yyyy-MM') = FORMAT( GETDATE(), 'yyyy-MM') "; }
+
+
+                }
+                query += " )  or " +
+                "   ((M01_X37 = '0' or M01_X37 = '2' or M01_X37 = '1') and(M01_X40 = '0' or M01_X40 = '2')  " +
+                "   and  M01_X58 = '1' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
+                " and(d.T03_X5 = @Membercode and @Registerdate between M01_X59 and M01_X60) " +
+                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0) ";
+                if (!string.IsNullOrEmpty(groupCode))
+                {
+                    if (groupCode != "ALL")
+                    {
+                        query += " and  ProductGroupcode=@groupCode ";
+                    }
+                }
+                if (!string.IsNullOrEmpty(productid))
+                {
+                    query += " and  A1.ProductID=@productid ";
+                }
+                //Search by group
+                if (string.IsNullOrEmpty(proDucttype))
+                {
+
+                }
+                else
+                {
+                    //if (proDucttype == "0")  //ทั้งหมด
+                    //{ query += " order by ProductID desc "; }
+                    if (proDucttype == "1")  //โปรโมชั่น
+                    { query += " and (TypeOfProductCode='005' or TypeOfProductCode='006') "; }
+                    if (proDucttype == "2")  //ขายดี
+                    { query += " and  Best.ProductID=A1.ProductID "; }
+                    if (proDucttype == "3")  //มาใหม่
+                    { query += " and TypeOfProductCode<>'005' and TypeOfProductCode<>'006' and FORMAT( up_date, 'yyyy-MM') = FORMAT( GETDATE(), 'yyyy-MM') "; }
+
+
+                }
+                query += " )) ";  //1
+
+
+
+
 
                 //Sort
                 if (string.IsNullOrEmpty(sortOrder))
                 {
-                    query += " order by A1.ProductID desc ";
+                    query += " order by A1.ProductDate desc,A1.ProductID desc ";
                 }
                 else
                 {
-                    if (sortOrder == "0")
-                    { query += " order by A1.ProductID desc "; }
-                    if (sortOrder == "1")
-                    { query += " order by A1.ProductID asc "; }
-                    if (sortOrder == "2")
-                    { query += " order by MemberPrice asc "; }
-                    if (sortOrder == "3")
-                    { query += " order by MemberPrice desc "; }
-                    if (sortOrder == "4")
-                    { query += " order by PV asc "; }
-                    if (sortOrder == "5")
-                    { query += " order by PV desc "; }
-                    if (proDucttype == "3")  //มาใหม่
-                    { query += " order by A1.ProductID desc "; }
+                    if (string.IsNullOrEmpty(proDucttype))
+                    {
+                        if (sortOrder == "0")
+                        { query += " order by A1.ProductDate desc,A1.ProductID desc "; }
+                        if (sortOrder == "1")
+                        { query += " order by A1.ProductDate asc,A1.ProductID asc "; }
+                        if (sortOrder == "2")
+                        { query += " order by MemberPrice asc "; }
+                        if (sortOrder == "3")
+                        { query += " order by MemberPrice desc "; }
+                        if (sortOrder == "4")
+                        { query += " order by PV asc "; }
+                        if (sortOrder == "5")
+                        { query += " order by PV desc "; }
+                    } else
+                    {
+                        if (proDucttype == "1" || proDucttype == "0")  //โปรโมชั่น
+                        {
+                            if (sortOrder == "0")
+                            { query += " order by A1.ProductDate desc,A1.ProductID desc "; }
+                            if (sortOrder == "1")
+                            { query += " order by A1.ProductDate asc,A1.ProductID asc "; }
+                            if (sortOrder == "2")
+                            { query += " order by MemberPrice asc "; }
+                            if (sortOrder == "3")
+                            { query += " order by MemberPrice desc "; }
+                            if (sortOrder == "4")
+                            { query += " order by PV asc "; }
+                            if (sortOrder == "5")
+                            { query += " order by PV desc "; }
+                        }
+                        if (proDucttype == "2")  //ขายดี 
+                        {
+ 
+                             query += " order by Best.ProductQuantity desc  ";  
+                        }
+                        if (proDucttype == "3")  //มาใหม่
+                        {
+                         
+                             query += " order by A1.ProductDate desc,A1.ProductID desc ";  
+   
+                        }
+ 
+ 
+                    }
+                    
                 }
                 // End Sort
                 using var command = new SqlCommand(query, con);

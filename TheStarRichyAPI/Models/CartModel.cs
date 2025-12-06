@@ -12,6 +12,7 @@
         public decimal ShippingFee { get; set; }
         public int Quantity { get; set; }
         public string Makerby { get; set; }
+        public int BillType { get; set; }
 
         // ⭐ DL และ Center Information
         public string? DLCode { get; set; }                 // รหัสผู้แนะนำ
@@ -62,6 +63,7 @@
         public string? CenterCode { get; set; }             // มีอยู่แล้วในตาราง
         public string? CenterName { get; set; }             // ⭐ NEW
         public string? Makerby { get; set; }                // มีอยู่แล้วในตาราง (DL เดิม)
+        public string? BillType { get; set; }
         public string? DLCode { get; set; }                 // ⭐ NEW (DL ใหม่)
         public string? DLName { get; set; }                 // ⭐ NEW
         public DateTime? RegisterDate { get; set; }         // ⭐ NEW
