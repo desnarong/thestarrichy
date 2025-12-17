@@ -107,6 +107,7 @@ namespace TheStarRichyApi.Services
 
             string passwordEncode1 = await GetPasskeyAsync("Passkey1");
             string passwordEncode2 = await GetPasskeyAsync("Passkey2");
+            string checkPaymentgateway = await GetPasskeyAsync("S02_X118");  //0 - เปิดใช้งาน payment gateway 1 ปิดการใช้งาน
 
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
@@ -134,6 +135,8 @@ namespace TheStarRichyApi.Services
             }
 
             var result = new List<dynamic>();
+            result.Add(new { CheckPaymentGateway = checkPaymentgateway });
+
             string? connectionString = _configuration.GetConnectionString("MLMConnectionString");
             Registerdate = FormatDate(Registerdate);
 
