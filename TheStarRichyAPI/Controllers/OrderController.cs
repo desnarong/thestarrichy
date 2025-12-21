@@ -278,6 +278,62 @@ namespace TheStarRichyApi.Controllers
                 });
             }
         }
+        /// <summary>
+        /// อัพโหลดรูปหลักฐานการชำระเงิน
+        /// POST: /api/Order/update/{orderID}
+        /// </summary>
+        [HttpPost("update/{orderID}")]
+        public async Task<IActionResult> UpdateOrder(string orderID, string remark)
+        {
+            try
+            {
+                if (!await _orderService.ValidatePasskeyAsync())
+                {
+                    return Unauthorized(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Invalid Passkey"
+                    });
+                }
+
+                string memberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(memberCode))
+                {
+                    return Unauthorized(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Member not found"
+                    });
+                }
+
+                var result = await _orderService.BankSlipOrderAsync(memberCode, orderID, remark);
+
+                if (result)
+                {
+                    return Ok(new ApiResponse<object>
+                    {
+                        Success = true,
+                        Message = "ยืนยันคำสั่งซื้อสำเร็จ"
+                    });
+                }
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "ไม่สามารถยืนยันคำสั่งซื้อได้"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming order");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "เกิดข้อผิดพลาด"
+                });
+            }
+        }
     }
 
     #region Response Models

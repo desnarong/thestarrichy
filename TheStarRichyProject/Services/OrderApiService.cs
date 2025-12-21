@@ -21,6 +21,7 @@ namespace TheStarRichyProject.Services
         Task<BranchesResponse> GetBranchesAsync(string token, string passkey, string provinceCode = null);
         Task<OrderResponse> ConfirmOrderAsync(string token, string passkey, string orderID);
         Task<CenterResponse> FindCenterFromApi(string token, string passkey, string centercode);
+        Task<OrderResponse> UpdateOrderAsync(string token, string passkey, string orderID, string remark);
     }
 
     public class OrderApiService : IOrderApiService
@@ -399,6 +400,38 @@ namespace TheStarRichyProject.Services
             if (!string.IsNullOrWhiteSpace(a.ZipCode)) parts.Add(a.ZipCode);
 
             return string.Join(" ", parts);
+        }
+
+        public async Task<OrderResponse> UpdateOrderAsync(string token, string passkey, string orderID, string remark)
+        {
+            try
+            {
+                var client = CreateClient();
+                var request = new RestRequest($"/Order/update/{orderID}?remark={remark}", Method.Post);
+                request.AddHeader("Authorization", $"Bearer {token}");
+                request.AddHeader("X-Passkey", passkey);
+
+                var response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful)
+                {
+                    return JsonConvert.DeserializeObject<OrderResponse>(response.Content);
+                }
+
+                return new OrderResponse
+                {
+                    Success = false,
+                    Message = $"ไม่สามารถยืนยันคำสั่งซื้อได้: {response.StatusCode}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new OrderResponse
+                {
+                    Success = false,
+                    Message = $"เกิดข้อผิดพลาด: {ex.Message}"
+                };
+            }
         }
     }
 }

@@ -15,6 +15,7 @@ namespace TheStarRichyApi.Services
         Task<PaymentResponse> CreatePaymentAsync(string memberCode, PaymentRequest request);
         Task<PaymentStatusResponse> GetPaymentStatusAsync(string paymentID);
         Task<bool> ConfirmOrderAsync(string memberCode, string orderID);
+        Task<bool> BankSlipOrderAsync(string memberCode, string orderID, string slips);
     }
 
     public class OrderService : IOrderService
@@ -532,6 +533,41 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@OrderID", orderID);
                         command.Parameters.AddWithValue("@PaymentStatus", "Paid");
                         command.Parameters.AddWithValue("@PaymentReferenceNo", DBNull.Value);
+                        command.Parameters.AddWithValue("@UpdatedBy", memberCode);
+
+                        // Return value
+                        var returnParam = command.Parameters.Add("@ReturnValue", SqlDbType.Int);
+                        returnParam.Direction = ParameterDirection.ReturnValue;
+
+                        await command.ExecuteNonQueryAsync();
+
+                        int returnValue = (int)returnParam.Value;
+                        return returnValue == 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error confirming order");
+                return false;
+            }
+        }
+
+        public async Task<bool> BankSlipOrderAsync(string memberCode, string orderID, string slips)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    // ใช้ SP_UpdatePaymentStatus ที่มีอยู่แล้ว
+                    using (var command = new SqlCommand("SP_UpdateOrderStatus", connection))
+                    {
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@OrderID", orderID);
+                        command.Parameters.AddWithValue("@Status", "WaitVerify");
+                        command.Parameters.AddWithValue("@Remarks", slips);
                         command.Parameters.AddWithValue("@UpdatedBy", memberCode);
 
                         // Return value

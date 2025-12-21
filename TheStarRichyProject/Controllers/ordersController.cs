@@ -572,6 +572,14 @@ namespace TheStarRichyProject.Controllers
         [HttpPost]
         public async Task<IActionResult> SubmitBankSlip([FromBody] BankSlipRequest request)
         {
+            var token = GetToken();
+            var passkey = GetPasskey();
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return Json(new { success = false, message = "กรุณา Login ก่อน" });
+            }
+
             if (request == null || string.IsNullOrEmpty(request.OrderID) || request.Slips == null || request.Slips.Count == 0)
             {
                 return Json(new { success = false, message = "ข้อมูลไม่ครบถ้วน" });
@@ -611,6 +619,9 @@ namespace TheStarRichyProject.Controllers
                 // order.Status = "WaitVerify"; 
                 // order.SlipPath = string.Join(";", savedFilePaths); // เก็บหลายรูปคั่นด้วยเครื่องหมาย ;
                 // await _context.SaveChangesAsync();
+
+                // ✅ ยืนยันคำสั่งซื้อ (เรียกแค่ตรงนี้!)
+                await _orderService.UpdateOrderAsync(token, passkey, request.OrderID, Newtonsoft.Json.JsonConvert.SerializeObject(savedFilePaths));
 
                 return Json(new { success = true, message = "อัปโหลดสลิปเรียบร้อยแล้ว" });
             }
