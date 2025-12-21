@@ -64,6 +64,7 @@ builder.Services.AddScoped<IKbankApiClient, KbankApiClient>();
 builder.Services.AddScoped<IProductApiClient, ProductApiClient>();
 builder.Services.AddScoped<ICartApiService, CartApiService>();
 builder.Services.AddScoped<IOrderApiService, OrderApiService>();
+builder.Services.AddScoped<IApiService, ApiService>();
 
 var app = builder.Build();
 

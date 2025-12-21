@@ -131,7 +131,7 @@ namespace TheStarRichyApi.Services
 
                     
                     string query = "SELECT top 1 M17_PX1,M17_X2 as BankName,M17_X3 as BankEngname ,M17_PX11 as AccountNumber     ";
-                    query += " ,M17_X4 as Bankcode,S02_X1 as AccountName ";
+                    query += " ,M17_X4 as Bankcode,S02_X1 as AccountName, S02_X118 as CheckPaymentGateway ";
                     query += " FROM M17   (nolock) join S02 on M17_PX1<>S02_X1 ";
                     query += " where MainAccount='1'       ";
 

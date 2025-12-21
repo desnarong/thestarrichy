@@ -10,9 +10,24 @@ namespace TheStarRichyApi.Controllers
     public class StaticController : ControllerBase
     {
         private readonly IStaticService _staticService;
-        public StaticController(IStaticService staticService)
+        private readonly IBankService _bankService;
+        public StaticController(IStaticService staticService, IBankService bankService)
         {
             _staticService = staticService;
+            _bankService = bankService;
+        }
+        [HttpGet("paymentbank")]
+        public async Task<IActionResult> GetPaymentBanks()
+        {
+            try
+            {
+                var result = await _bankService.GetDisplayAsync();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
         }
         [HttpGet("banks")]
         public async Task<IActionResult> GetBanks()

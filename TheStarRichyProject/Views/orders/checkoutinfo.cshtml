@@ -3,10 +3,11 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var cart = ViewBag.Cart as TheStarRichyProject.Models.CartData;
     var branches = ViewBag.Branches as List<TheStarRichyProject.Models.BranchData>;
+    var paymentbank = ViewBag.PaymentBank as dynamic;
 }
 
-<!-- Custom CSS -->
 <style>
+    /* Step Indicator */
     .step-indicator {
         display: flex;
         justify-content: space-between;
@@ -43,6 +44,7 @@
         justify-content: center;
         font-weight: bold;
         color: #999;
+        box-shadow: 0 0 0 4px #fff;
     }
 
     .step.active .step-circle {
@@ -55,12 +57,13 @@
         color: white;
     }
 
+    /* Form Section */
     .form-section {
         background: white;
         padding: 25px;
-        border-radius: 8px;
+        border-radius: 12px;
         margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .form-section-title {
@@ -72,317 +75,377 @@
         color: #405189;
     }
 
-    .payment-option, .delivery-option, .address-option {
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 15px;
+    /* Universal Card Style for Options */
+    .payment-card, .delivery-card {
+        border: 2px solid #eff2f7;
+        border-radius: 12px;
+        transition: all 0.2s ease-in-out;
         cursor: pointer;
-        transition: all 0.3s ease;
-        margin-bottom: 10px;
+        background: #fff;
     }
 
-        .payment-option:hover, .delivery-option:hover, .address-option:hover {
+        .payment-card:hover, .delivery-card:hover {
             border-color: #405189;
-            background: #f8f9fa;
+            background-color: #f9f9f9;
         }
 
-        .payment-option.selected, .delivery-option.selected, .address-option.selected {
+        .payment-card:has(input:checked), .delivery-card:has(input:checked) {
             border-color: #405189;
-            background: #e7f1ff;
+            background-color: #f6f8ff;
+            box-shadow: 0 4px 12px rgba(64, 81, 137, 0.08);
         }
 
-        .payment-option input, .delivery-option input, .address-option input {
-            margin-right: 10px;
-        }
-
+    /* Address Card */
     .address-card {
         border: 1px solid #e0e0e0;
         border-radius: 8px;
         padding: 15px;
         margin-bottom: 10px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
     }
 
         .address-card:hover {
             border-color: #405189;
-            box-shadow: 0 2px 8px rgba(64, 81, 137, 0.1);
         }
 
         .address-card.selected {
             border-color: #405189;
-            background: #e7f1ff;
+            background: #f6f8ff;
+            box-shadow: 0 2px 8px rgba(64, 81, 137, 0.1);
         }
 
+    /* Invoice Card Styles */
+    .invoice-card {
+        border: 2px solid #eff2f7;
+        border-radius: 10px;
+        padding: 15px 10px;
+        text-align: center;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        background: #fff;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .invoice-card:hover {
+            border-color: #405189;
+        }
+
+        .invoice-card:has(input:checked) {
+            border-color: #405189;
+            background-color: #f6f8ff;
+            color: #405189;
+        }
+
+    .invoice-label {
+        cursor: pointer;
+        margin-bottom: 0;
+        font-weight: 500;
+        font-size: 0.85rem;
+    }
+
+        .invoice-label i {
+            color: #878a99;
+            transition: color 0.2s;
+        }
+
+    .invoice-card:has(input:checked) i {
+        color: #405189;
+    }
+
+    /* Order Summary Sticky Box */
     .order-summary-box {
         background: white;
-        padding: 20px;
-        border-radius: 8px;
+        border-radius: 12px;
         position: sticky;
-        top: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        top: 90px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
     }
 
-    .btn-proceed {
-        width: 100%;
-        padding: 12px;
-        font-size: 16px;
-        font-weight: 600;
+    /* Utilities */
+    .bg-soft-primary {
+        background-color: rgba(64, 81, 137, 0.1) !important;
     }
 
-    .badge-primary-address {
-        background-color: #198754;
-        color: white;
-        padding: 2px 8px;
-        border-radius: 4px;
-        font-size: 11px;
+    .bg-soft-success {
+        background-color: rgba(10, 179, 156, 0.1) !important;
+    }
+
+    .bg-soft-info {
+        background-color: rgba(41, 156, 219, 0.1) !important;
+    }
+
+    .bank-info-box {
+        background-color: #ffffff !important;
+        border: 1px dashed #ced4da !important;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
     }
 </style>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <!-- Step Indicator -->
+<div class="container-fluid py-4">
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
             <div class="step-indicator">
                 <div class="step completed">
-                    <div class="step-circle">1</div>
-                    <div>เลือกสินค้า</div>
+                    <div class="step-circle"><i class="fas fa-check"></i></div>
+                    <div class="fw-medium">เลือกสินค้า</div>
                 </div>
                 <div class="step active">
                     <div class="step-circle">2</div>
-                    <div>ข้อมูลการจัดส่ง</div>
+                    <div class="fw-medium">ข้อมูลการจัดส่ง</div>
                 </div>
                 <div class="step">
                     <div class="step-circle">3</div>
-                    <div>ชำระเงิน</div>
+                    <div class="fw-medium">ชำระเงิน</div>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <!-- Main Content -->
+    <div class="row">
+        <div class="col-lg-8">
             <div class="row">
-                <!-- Left Column: Form -->
-                <div class="col-lg-8">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <!-- 1. Payment Method -->
-                            <div class="form-section">
-                                <div class="form-section-title">
-                                    <i class="fas fa-credit-card"></i> วิธีชำระเงิน
-                                </div>
-                                <div class="payment-option" data-method="PromptPay">
-                                    <input type="radio" name="paymentMethod" value="PromptPay" id="paymentPromptPay" checked>
-                                    <label for="paymentPromptPay" style="cursor: pointer; margin: 0;">
-                                        <strong>พร้อมเพย์ (QR Code)</strong><br>
-                                        <small class="text-muted">สแกน QR Code เพื่อชำระเงิน</small>
-                                    </label>
-                                </div>
-                                <div class="payment-option" data-method="CreditCard">
-                                    <input type="radio" name="paymentMethod" value="CreditCard" id="paymentCard">
-                                    <label for="paymentCard" style="cursor: pointer; margin: 0;">
-                                        <strong>บัตรเครดิต / เดบิต</strong><br>
-                                        <small class="text-muted">รองรับ Visa, MasterCard, JCB</small>
-                                    </label>
-                                </div>
-                            </div>
+                <div class="col-md-6">
+                    <div class="form-section h-100">
+                        <div class="form-section-title">
+                            <i class="fas fa-credit-card me-2"></i>วิธีชำระเงิน
                         </div>
-                        
-                        <div class="col-md-6">
-                            <!-- 2. Delivery Method -->
-                            <div class="form-section">
-                                <div class="form-section-title">
-                                    <i class="fas fa-shipping-fast"></i> การจัดส่งสินค้า
-                                </div>
-                                <div class="delivery-option" data-method="Delivery">
-                                    <input type="radio" name="deliveryMethod" value="Delivery" id="deliveryShip" checked>
-                                    <label for="deliveryShip" style="cursor: pointer; margin: 0;">
-                                        <strong>ให้จัดส่ง</strong><br>
-                                        <small class="text-muted">ค่าจัดส่ง: @(cart?.ShippingFee ?? 0)</small>
-                                    </label>
-                                </div>
-                                <div class="delivery-option" data-method="Pickup">
-                                    <input type="radio" name="deliveryMethod" value="Pickup" id="deliveryPickup">
-                                    <label for="deliveryPickup" style="cursor: pointer; margin: 0;">
-                                        <strong>รับเองที่ศูนย์กระจายสินค้า</strong><br>
-                                        <small class="text-muted">ฟรี ไม่มีค่าจัดส่ง</small>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-12">
-                            <!-- 3. Shipping Address (แสดงเมื่อเลือก Delivery) -->
-                            <div class="form-section" id="shippingAddressSection">
-                                <div class="form-section-title">
-                                    <i class="fas fa-map-marker-alt"></i> ที่อยู่จัดส่ง
-                                </div>
-
-                                <!-- Address Type Selection -->
-                                <div class="mb-3">
-                                    <label class="form-label">เลือกประเภทที่อยู่</label>
-                                    <select class="form-select" id="addressTypeSelect">
-                                        <option value="">-- เลือกประเภทที่อยู่ --</option>
-                                        <option value="MemberAddress">ส่งตามที่อยู่สมาชิก</option>
-                                        <option value="FavoriteAddress">ที่อยู่ที่เคยจัดส่ง</option>
-                                        <option value="Other">ที่อยู่อื่นๆ (กรอกใหม่)</option>
-                                    </select>
-                                </div>
-
-                                <!-- Member Address Section (GetAddresses API) -->
-                                <div id="memberAddressesSection" style="display: none;">
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="fas fa-home"></i> เลือกที่อยู่สมาชิก
-                                        </label>
-                                        <div id="memberAddressesList">
-                                            <!-- จะถูกเติมด้วย JavaScript -->
-                                            <div class="text-center py-3">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <div class="mt-2">กำลังโหลดที่อยู่สมาชิก...</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Favorite Addresses Section (GetFavoriteAddresses API) -->
-                                <div id="favoriteAddressesSection" style="display: none;">
-                                    <div class="mb-3">
-                                        <label class="form-label">
-                                            <i class="fas fa-star text-warning"></i> เลือกที่อยู่ที่เคยจัดส่ง
-                                        </label>
-                                        <div id="favoriteAddressesList">
-                                            <!-- จะถูกเติมด้วย JavaScript -->
-                                            <div class="text-center py-3">
-                                                <div class="spinner-border text-primary" role="status">
-                                                    <span class="visually-hidden">Loading...</span>
-                                                </div>
-                                                <div class="mt-2">กำลังโหลดที่อยู่ที่เคยจัดส่ง...</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Custom Address Form -->
-                                <div id="customAddressForm" style="display: none;">
-                                    <div class="row">
-                                        <div class="col-md-12 mb-3">
-                                            <label class="form-label">ที่อยู่ *</label>
-                                            <textarea class="form-control" id="addressLine" rows="2" required></textarea>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">จังหวัด *</label>
-                                            <input type="text" class="form-control" id="province" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">เขต/อำเภอ *</label>
-                                            <input type="text" class="form-control" id="district" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">แขวง/ตำบล *</label>
-                                            <input type="text" class="form-control" id="subDistrict" required>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">รหัสไปรษณีย์ *</label>
-                                            <input type="text" class="form-control" id="postalCode" maxlength="5" required>
-                                        </div>
-                                        <div class="col-md-12 mb-3">
-                                            <label class="form-label">เบอร์โทรศัพท์ *</label>
-                                            <input type="tel" class="form-control" id="phone" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- 4. Branch Selection (แสดงเมื่อเลือก Pickup) -->
-                            <div class="form-section" id="branchSection" style="display: none;">
-                                <div class="form-section-title">
-                                    <i class="fas fa-store"></i> เลือกสาขาที่รับสินค้า
-                                </div>
-                                <select class="form-select" id="branchSelect">
-                                    <option value="">-- เลือกสาขา --</option>
-                                    @if (branches != null && branches.Any())
-                                    {
-                                        foreach (var branch in branches)
-                                        {
-                                            <option value="@branch.BranchCode">@branch.BranchName</option>
-                                        }
-                                    }
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Order Summary -->
-                <div class="col-lg-4">
-                    <div class="order-summary-box">
-                        <h5 class="mb-3">สรุปคำสั่งซื้อ</h5>
-
-                        @if (cart != null && cart.Items != null)
+                        @if (paymentbank.CheckPaymentGateway == "0")
                         {
-                            <div class="mb-3">
-                                <small class="text-muted">จำนวนสินค้า</small>
-                                <div class="fw-bold">@cart.Items.Sum(x=>x.Quantity) รายการ</div>
+                            <div class="payment-card mb-3" onclick="document.getElementById('paymentPromptPay').click()">
+                                <div class="d-flex align-items-center p-3">
+                                    <div class="form-check custom-radio me-2">
+                                        <input type="radio" name="paymentMethod" value="PromptPay" id="paymentPromptPay" class="form-check-input" checked>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label for="paymentPromptPay" class="d-block mb-0 cursor-pointer">
+                                            <strong class="d-block">พร้อมเพย์ (QR Code)</strong>
+                                            <small class="text-muted">สแกนจ่ายได้ทุกแอปธนาคาร</small>
+                                        </label>
+                                    </div>
+                                    <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/PromptPay-logo.png" height="20">
+                                </div>
                             </div>
 
-                            <hr>
-
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>ยอดรวมสินค้า</span>
-                                <span class="fw-bold">฿@cart.TotalAmount.ToString("N2")</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>PV</span>
-                                <span class="fw-bold">@cart.TotalPV.ToString("N0")</span>
-                            </div>
-                            <div class="d-flex justify-content-between mb-2">
-                                <span>ค่าจัดส่ง</span>
-                                <span class="fw-bold" id="shippingFeeDisplay">
-                                    <span>฿@cart.ShippingFee</span>
-                                </span>
-                            </div>
-
-                            <hr>
-
-                            <div class="d-flex justify-content-between mb-3">
-                                <span class="h5">ยอดรวมทั้งหมด</span>
-                                <span class="h5 text-primary" id="grandTotalDisplay">
-                                    ฿@cart.TotalAmount.ToString("N2")
-                                </span>
+                            <div class="payment-card mb-3" onclick="document.getElementById('paymentCard').click()">
+                                <div class="d-flex align-items-center p-3">
+                                    <div class="form-check custom-radio me-2">
+                                        <input type="radio" name="paymentMethod" value="CreditCard" id="paymentCard" class="form-check-input">
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <label for="paymentCard" class="d-block mb-0 cursor-pointer">
+                                            <strong class="d-block">บัตรเครดิต / เดบิต</strong>
+                                            <small class="text-muted">Visa, MasterCard, JCB</small>
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <i class="ri-visa-fill fs-20 text-primary"></i>
+                                        <i class="ri-mastercard-fill fs-20 text-danger"></i>
+                                    </div>
+                                </div>
                             </div>
                         }
 
-                        <button type="button" class="btn btn-primary btn-proceed" id="btnProceedPayment">
-                            <i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-proceed mt-2" onclick="window.location.href='/orders/buypersonalorder'">
-                            <i class="fas fa-arrow-left"></i> กลับไปแก้ไขสินค้า
-                        </button>
+                        <div class="payment-card mb-3" onclick="document.getElementById('paymentBankTransfer').click()">
+                            <div class="d-flex align-items-start p-3">
+                                <div class="form-check custom-radio me-2 mt-1">
+                                    <input type="radio" name="paymentMethod" value="BankTransfer" id="paymentBankTransfer" class="form-check-input">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <label for="paymentBankTransfer" class="d-block mb-0 cursor-pointer">
+                                        <div class="d-flex align-items-center mb-1">
+                                            <span class="badge bg-primary-subtle text-primary me-2">แนะนำ</span>
+                                            <strong class="text-dark">เงินโอน (Bank Transfer)</strong>
+                                        </div>
+                                        <small class="text-muted d-block mb-2">ตรวจสอบยอดภายใน 5-15 นาทีในขั้นตอนถัดไป</small>
+
+                                        <div class="bank-info-box p-2 rounded bg-light">
+                                            <div class="d-flex align-items-center justify-content-between mb-1">
+                                                <small class="fw-bold text-uppercase">@paymentbank.BankName</small>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 fs-11" onclick="copyAccNumber()">คัดลอก</button>
+                                            </div>
+                                            <div class="h6 mb-0 text-primary fw-bold">@($"เลขที่บัญชี {paymentbank.AccountNumber}")</div>
+                                            <small class="text-muted fs-11">@($"ชื่อบัญชี {paymentbank.AccountName}")</small>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <!-- 5. Invoice Option -->
-                    <div class="form-section mt-2">
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-section h-100">
                         <div class="form-section-title">
-                            <i class="fas fa-file-invoice"></i> เงื่อนไขการส่งบิล
+                            <i class="fas fa-shipping-fast me-2"></i>การจัดส่งสินค้า
                         </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="sendInvoice" value="1" id="sendInvoiceYes" checked>
-                            <label class="form-check-label" for="sendInvoiceYes">
-                                รับใบเสร็จตามที่อยู่จัดส่ง
+
+                        <div class="delivery-card mb-3" onclick="document.getElementById('deliveryShip').click()">
+                            <div class="d-flex align-items-center p-3">
+                                <div class="form-check custom-radio me-2">
+                                    <input type="radio" name="deliveryMethod" value="Delivery" id="deliveryShip" class="form-check-input" checked>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <label for="deliveryShip" class="d-flex justify-content-between align-items-center mb-0 cursor-pointer">
+                                        <div>
+                                            <strong class="d-block">ให้จัดส่งตามที่อยู่</strong>
+                                            <small class="text-muted">ส่งด่วนถึงบ้าน 1-3 วัน</small>
+                                        </div>
+                                        <span class="badge bg-soft-primary text-primary">฿ @(cart?.ShippingFee ?? 0)</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="delivery-card mb-3" onclick="document.getElementById('deliveryPickup').click()">
+                            <div class="d-flex align-items-center p-3">
+                                <div class="form-check custom-radio me-2">
+                                    <input type="radio" name="deliveryMethod" value="Pickup" id="deliveryPickup" class="form-check-input">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <label for="deliveryPickup" class="d-flex justify-content-between align-items-center mb-0 cursor-pointer">
+                                        <div>
+                                            <strong class="d-block">รับเองที่ศูนย์กระจายสินค้า</strong>
+                                            <small class="text-muted">รับได้ทันที ไม่มีค่าใช้จ่าย</small>
+                                        </div>
+                                        <span class="badge bg-soft-success text-success">ฟรี</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-12">
+                    <div class="form-section" id="shippingAddressSection">
+                        <div class="form-section-title">
+                            <i class="fas fa-map-marker-alt me-2"></i>ที่อยู่จัดส่งสินค้า
+                        </div>
+
+                        <div class="mb-4">
+                            <select class="form-select form-select-lg border-primary-subtle" id="addressTypeSelect">
+                                <option value="">-- กรุณาเลือกประเภทที่อยู่จัดส่ง --</option>
+                                <option value="MemberAddress">ส่งตามที่อยู่สมาชิก</option>
+                                <option value="FavoriteAddress">เลือกจากที่อยู่ที่เคยจัดส่ง</option>
+                                <option value="Other">เพิ่มที่อยู่ใหม่</option>
+                            </select>
+                        </div>
+
+                        <div id="memberAddressesSection" style="display: none;">
+                            <div id="memberAddressesList" class="row"></div>
+                        </div>
+
+                        <div id="favoriteAddressesSection" style="display: none;">
+                            <div id="favoriteAddressesList" class="row"></div>
+                        </div>
+
+                        <div id="customAddressForm" style="display: none;" class="bg-light p-3 rounded-3">
+                            <div class="row">
+                                <div class="col-md-12 mb-3">
+                                    <label class="form-label fw-bold">ระบุที่อยู่โดยละเอียด *</label>
+                                    <textarea class="form-control" id="addressLine" rows="2" placeholder="บ้านเลขที่, อาคาร, ถนน..."></textarea>
+                                </div>
+                                <div class="col-md-6 mb-3"><label class="form-label">จังหวัด *</label><input type="text" class="form-control" id="province"></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">เขต/อำเภอ *</label><input type="text" class="form-control" id="district"></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">แขวง/ตำบล *</label><input type="text" class="form-control" id="subDistrict"></div>
+                                <div class="col-md-6 mb-3"><label class="form-label">รหัสไปรษณีย์ *</label><input type="text" class="form-control" id="postalCode" maxlength="5"></div>
+                                <div class="col-md-12"><label class="form-label">เบอร์โทรศัพท์ผู้รับ *</label><input type="tel" class="form-control" id="phone"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section" id="branchSection" style="display: none;">
+                        <div class="form-section-title"><i class="fas fa-store me-2"></i>สาขาที่ต้องการรับสินค้า</div>
+                        <select class="form-select form-select-lg" id="branchSelect">
+                            <option value="">-- เลือกสาขาที่ใกล้บ้านคุณ --</option>
+                            @if (branches != null)
+                            {
+                                foreach (var branch in branches)
+                                {
+                                    <option value="@branch.BranchCode">@branch.BranchName</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="order-summary-box shadow-sm border-0">
+                <div class="form-section-title p-3 border-bottom mb-0">
+                    <div class="fw-bold mb-0">สรุปคำสั่งซื้อ</div>
+                </div>
+                <div class="p-3">
+                    @if (cart != null)
+                    {
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">จำนวนสินค้า</span>
+                            <span class="fw-bold">@cart.Items.Sum(x => x.Quantity) รายการ</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">ยอดรวมสินค้า</span>
+                            <span class="fw-bold">฿@cart.TotalAmount.ToString("N2")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-muted">คะแนน PV ทั้งหมด</span>
+                            <span class="badge bg-soft-info text-info fw-bold">@cart.TotalPV.ToString("N0") PV</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-3">
+                            <span class="text-muted">ค่าจัดส่ง</span>
+                            <span class="fw-bold" id="shippingFeeDisplay">฿@cart.ShippingFee.ToString("N2")</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="h6 fw-bold mb-0">ยอดรวมสุทธิ</span>
+                            <span class="h4 fw-bold text-primary mb-0" id="grandTotalDisplay">฿@((cart.TotalAmount + cart.ShippingFee).ToString("N2"))</span>
+                        </div>
+                    }
+
+                    <button type="button" class="btn btn-primary btn-lg w-100 fw-bold mb-2 shadow" id="btnProceedPayment">
+                        ดำเนินการชำระเงิน <i class="ri-arrow-right-line ms-1"></i>
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary w-100 btn-md" onclick="window.location.href='/orders/buypersonalorder'">
+                        <i class="ri-arrow-left-line me-1"></i> กลับไปแก้ไขสินค้า
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-section mt-4">
+                <div class="form-section-title mb-3">
+                    <div class="text-primary mb-0"><i class="fas fa-file-invoice me-2"></i>การรับใบเสร็จ</div>
+                </div>
+                <div class="row g-2">
+                    <div class="col-4">
+                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceYes').click()">
+                            <input class="d-none" type="radio" name="sendInvoice" value="1" id="sendInvoiceYes" checked>
+                            <label class="invoice-label" for="sendInvoiceYes">
+                                <i class="ri-mail-send-line fs-20 d-block"></i><span>ตามที่อยู่</span>
                             </label>
                         </div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="radio" name="sendInvoice" value="0" id="sendInvoiceNo">
-                            <label class="form-check-label" for="sendInvoiceNo">
-                                รับ e-Invoice ทาง email เท่านั้น
+                    </div>
+                    <div class="col-4">
+                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo').click()">
+                            <input class="d-none" type="radio" name="sendInvoice" value="0" id="sendInvoiceNo">
+                            <label class="invoice-label" for="sendInvoiceNo">
+                                <i class="ri-mail-line fs-20 d-block"></i><span>Email</span>
                             </label>
                         </div>
-                        <div class="form-check mt-2">
-                            <input class="form-check-input" type="radio" name="sendInvoice" value="2" id="sendInvoiceNo2">
-                            <label class="form-check-label" for="sendInvoiceNo2">
-                                ไม่รับใบเสร็จ
+                    </div>
+                    <div class="col-4">
+                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo2').click()">
+                            <input class="d-none" type="radio" name="sendInvoice" value="2" id="sendInvoiceNo2">
+                            <label class="invoice-label" for="sendInvoiceNo2">
+                                <i class="ri-close-circle-line fs-20 d-block"></i><span>ไม่รับ</span>
                             </label>
                         </div>
                     </div>
@@ -395,399 +458,172 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            let memberAddresses = [];        // ที่อยู่สมาชิก (จาก GetAddresses)
-            let favoriteAddresses = [];      // ที่อยู่ที่เคยจัดส่ง (จาก GetFavoriteAddresses)
+            let memberAddresses = [];
+            let favoriteAddresses = [];
             let selectedMemberAddress = null;
             let selectedFavoriteAddress = null;
 
-            // Payment Method Selection
-            $('.payment-option').click(function () {
-                $('.payment-option').removeClass('selected');
-                $(this).addClass('selected');
-                $(this).find('input[type="radio"]').prop('checked', true);
-            });
-
-            // Delivery Method Selection
-            $('.delivery-option').click(function () {
-                $('.delivery-option').removeClass('selected');
-                $(this).addClass('selected');
-                $(this).find('input[type="radio"]').prop('checked', true);
-
-                const method = $(this).data('method');
+            // Delivery Method Logic
+            $('.delivery-card').click(function () {
+                const method = $(this).find('input').val();
                 if (method === 'Delivery') {
                     $('#shippingAddressSection').slideDown();
                     $('#branchSection').slideUp();
-                    updateShippingFee(false);
+                    updateSummary(false);
                 } else {
                     $('#shippingAddressSection').slideUp();
                     $('#branchSection').slideDown();
-                    updateShippingFee(true);
+                    updateSummary(true);
                 }
             });
 
             // Address Type Selection
             $('#addressTypeSelect').change(function () {
                 const type = $(this).val();
-
-                // ซ่อนทุก section ก่อน
-                $('#memberAddressesSection').hide();
-                $('#favoriteAddressesSection').hide();
-                $('#customAddressForm').hide();
+                $('#memberAddressesSection, #favoriteAddressesSection, #customAddressForm').hide();
 
                 if (type === 'MemberAddress') {
-                    // โหลดที่อยู่สมาชิก (GetAddresses)
                     loadMemberAddresses();
-                    $('#memberAddressesSection').slideDown();
+                    $('#memberAddressesSection').fadeIn();
                 } else if (type === 'FavoriteAddress') {
-                    // โหลดที่อยู่ที่เคยจัดส่ง (GetFavoriteAddresses)
                     loadFavoriteAddresses();
-                    $('#favoriteAddressesSection').slideDown();
+                    $('#favoriteAddressesSection').fadeIn();
                 } else if (type === 'Other') {
-                    $('#customAddressForm').slideDown();
+                    $('#customAddressForm').fadeIn();
                 }
-                // CardAddress ไม่ต้องทำอะไร (ใช้ default)
             });
 
-            // ============================================
-            // Load Member Addresses (GetAddresses API)
-            // ============================================
             function loadMemberAddresses() {
-                $.ajax({
-                    url: '/orders/GetAddresses',
-                    type: 'GET',
-                    success: function (response) {
-                        console.log('Member Addresses:', response);
-
-                        if (response.success && response.data && response.data.length > 0) {
-                            memberAddresses = response.data;
-                            renderMemberAddresses();
-                        } else {
-                            $('#memberAddressesList').html(`
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> ยังไม่มีที่อยู่สมาชิกที่บันทึกไว้
-                                </div>
-                            `);
-                        }
-                    },
-                    error: function (xhr) {
-                        console.error('Error loading member addresses:', xhr);
-                        $('#memberAddressesList').html(`
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle"></i> ไม่สามารถโหลดที่อยู่สมาชิกได้
-                            </div>
-                        `);
+                $.get('/orders/GetAddresses', function(res) {
+                    if(res.success) {
+                        memberAddresses = res.data;
+                        let html = '';
+                        res.data.forEach((addr, i) => {
+                            html += `
+                                <div class="col-md-6 mb-2">
+                                    <div class="address-card member-address-card" data-index="${i}">
+                                        <div class="fw-bold text-primary fs-13"><i class="fas fa-home me-1"></i> ${addr.addressTypeDisplay}</div>
+                                        <small class="d-block text-muted mt-1 text-truncate-2">${addr.fullAddress}</small>
+                                        <small class="text-muted">โทร: ${addr.phone}</small>
+                                    </div>
+                                </div>`;
+                        });
+                        $('#memberAddressesList').html(html);
+                        $('.member-address-card').click(function() {
+                            $('.member-address-card').removeClass('selected');
+                            $(this).addClass('selected');
+                            selectedMemberAddress = memberAddresses[$(this).data('index')];
+                        });
                     }
                 });
             }
 
-            function renderMemberAddresses() {
-                let html = '';
-
-                memberAddresses.forEach((addr, index) => {
-                    const isDefault = addr.isDefault === true;
-
-                    html += `
-                        <div class="address-card member-address-card" data-member-index="${index}">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="memberAddress" value="${index}" id="member_${index}">
-                                <label class="form-check-label" for="member_${index}" style="cursor: pointer;">
-                                    <strong>
-                                        <i class="fas fa-home text-primary"></i>
-                                        ${addr.addressTypeDisplay || 'ที่อยู่สมาชิก'}
-                                    </strong>
-                                    ${isDefault ? '<span class="badge bg-primary">ค่าเริ่มต้น</span>' : ''}
-                                    <br>
-                                    <small>${addr.fullAddress || '-'}</small><br>
-                                    <small class="text-muted">โทร: ${addr.phone || '-'}</small>
-                                </label>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                $('#memberAddressesList').html(html);
-
-                // Bind click event
-                $('.member-address-card').click(function () {
-                    $('.member-address-card').removeClass('selected');
-                    $(this).addClass('selected');
-                    $(this).find('input[type="radio"]').prop('checked', true);
-
-                    const index = parseInt($(this).data('member-index'));
-                    selectedMemberAddress = memberAddresses[index];
-                });
-            }
-
-            // ============================================
-            // Load Favorite Addresses (GetFavoriteAddresses API)
-            // ============================================
             function loadFavoriteAddresses() {
-                $.ajax({
-                    url: '/orders/GetFavoriteAddresses',
-                    type: 'GET',
-                    success: function (response) {
-                        console.log('Favorite Addresses:', response);
-
-                        if (response.success && response.data && response.data.length > 0) {
-                            favoriteAddresses = response.data;
-                            renderFavoriteAddresses();
-                        } else {
-                            $('#favoriteAddressesList').html(`
-                                <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> ยังไม่มีที่อยู่ที่เคยจัดส่งที่บันทึกไว้
-                                </div>
-                            `);
-                        }
-                    },
-                    error: function (xhr) {
-                        console.error('Error loading favorite addresses:', xhr);
-                        $('#favoriteAddressesList').html(`
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-circle"></i> ไม่สามารถโหลดที่อยู่ที่เคยจัดส่งได้
-                            </div>
-                        `);
+                $.get('/orders/GetFavoriteAddresses', function(res) {
+                    if(res.success) {
+                        favoriteAddresses = res.data;
+                        let html = '';
+                        res.data.forEach((addr, i) => {
+                            html += `
+                                <div class="col-md-6 mb-2">
+                                    <div class="address-card favorite-address-card" data-index="${i}">
+                                        <div class="fw-bold text-warning fs-13"><i class="fas fa-star me-1"></i> ${addr.contacNickname || 'ที่อยู่เดิม'}</div>
+                                        <small class="d-block text-muted mt-1 text-truncate-2">${addr.contactperson}</small>
+                                        <small class="text-muted">โทร: ${addr.contact_Phone}</small>
+                                    </div>
+                                </div>`;
+                        });
+                        $('#favoriteAddressesList').html(html);
+                        $('.favorite-address-card').click(function() {
+                            $('.favorite-address-card').removeClass('selected');
+                            $(this).addClass('selected');
+                            selectedFavoriteAddress = favoriteAddresses[$(this).data('index')];
+                        });
                     }
                 });
             }
 
-            function renderFavoriteAddresses() {
-                let html = '';
-
-                favoriteAddresses.forEach((addr, index) => {
-                    const fullAddress = buildFullAddress(addr);
-                    const isPrimary = addr.contact_Primary === '1' || addr.contact_Primary === 'Y';
-
-                    html += `
-                        <div class="address-card favorite-address-card" data-fav-index="${index}">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="favoriteAddress" value="${index}" id="fav_${index}">
-                                <label class="form-check-label" for="fav_${index}" style="cursor: pointer;">
-                                    <strong>
-                                        <i class="fas fa-star text-warning"></i>
-                                        ${addr.contacNickname || 'ที่อยู่ที่เคยจัดส่ง'}
-                                    </strong>
-                                    ${isPrimary ? '<span class="badge-primary-address">หลัก</span>' : ''}
-                                    <br>
-                                    <small>${addr.contactperson || '-'}</small><br>
-                                    <small>${fullAddress}</small><br>
-                                    <small class="text-muted">โทร: ${addr.contact_Phone || '-'}</small>
-                                </label>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                $('#favoriteAddressesList').html(html);
-
-                // Bind click event
-                $('.favorite-address-card').click(function () {
-                    $('.favorite-address-card').removeClass('selected');
-                    $(this).addClass('selected');
-                    $(this).find('input[type="radio"]').prop('checked', true);
-
-                    const index = parseInt($(this).data('fav-index'));
-                    selectedFavoriteAddress = favoriteAddresses[index];
-                });
+            function updateSummary(isPickup) {
+                const total = @(cart?.TotalAmount ?? 0);
+                const fee = isPickup ? 0 : @(cart?.ShippingFee ?? 0);
+                const grand = total + fee;
+                $('#shippingFeeDisplay').html(isPickup ? '<span class="text-success fw-bold">ฟรี</span>' : '฿' + fee.toLocaleString(undefined, {minimumFractionDigits: 2}));
+                $('#grandTotalDisplay').text('฿' + grand.toLocaleString(undefined, {minimumFractionDigits: 2}));
             }
 
-            function buildFullAddress(addr) {
-                const parts = [];
-
-                if (addr.contact_HouseNumber) parts.push(`เลขที่ ${addr.contact_HouseNumber}`);
-                if (addr.contact_Building) parts.push(`อาคาร ${addr.contact_Building}`);
-                if (addr.contact_Floor) parts.push(`ชั้น ${addr.contact_Floor}`);
-                if (addr.contact_Alley) parts.push(`ซอย ${addr.contact_Alley}`);
-                if (addr.contact_Road) parts.push(`ถนน ${addr.contact_Road}`);
-                if (addr.contact_Other) parts.push(addr.contact_Other);
-                if (addr.provincename) parts.push(addr.provincename);
-                if (addr.contact_Zipcode) parts.push(addr.contact_Zipcode);
-
-                return parts.join(' ') || 'ไม่มีที่อยู่';
-            }
-
-            // Update Shipping Fee
-            function updateShippingFee(isPickup) {
-                const totalAmount = @(cart?.TotalAmount ?? 0);
-                let shippingFee = @(cart?.ShippingFee ?? 0);
-
-                if(isPickup) shippingFee = 0;
-
-                const grandTotal = totalAmount + shippingFee;
-
-                $('#shippingFeeDisplay').html(
-                    shippingFee === 0 ?
-                        '<span class="text-success">ฟรี</span>' :
-                        '฿' + shippingFee.toFixed(2)
-                );
-                $('#grandTotalDisplay').text('฿' + grandTotal.toFixed(2));
-            }
-
-            // Proceed to Payment
             $('#btnProceedPayment').click(function () {
                 const btn = $(this);
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังดำเนินการ...');
-
-                // Validate
                 const paymentMethod = $('input[name="paymentMethod"]:checked').val();
                 const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
                 const sendInvoice = $('input[name="sendInvoice"]:checked').val();
 
                 if (!paymentMethod || !deliveryMethod) {
-                    showNotification('error', 'กรุณาเลือกวิธีชำระเงินและการจัดส่ง');
-                    btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                    Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิธีชำระเงินและวิธีจัดส่ง', 'warning');
                     return;
                 }
 
-                // Build request
+                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...');
+
                 const request = {
                     paymentMethod: paymentMethod,
                     deliveryMethod: deliveryMethod,
                     sendInvoice: sendInvoice
                 };
 
-                // Address handling
                 if (deliveryMethod === 'Delivery') {
                     const addressType = $('#addressTypeSelect').val();
-
                     if (!addressType) {
-                        showNotification('error', 'กรุณาเลือกประเภทที่อยู่');
-                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                        Swal.fire('แจ้งเตือน', 'กรุณาเลือกที่อยู่จัดส่ง', 'warning');
+                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
                         return;
                     }
-
                     request.deliveryAddressType = addressType;
 
-                    // ส่งตามที่อยู่สมาชิก (GetAddresses)
-                    if (addressType === 'MemberAddress') {
-                        if (!selectedMemberAddress) {
-                            showNotification('error', 'กรุณาเลือกที่อยู่สมาชิก');
-                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
-                            return;
-                        }
-
-                        request.memberAddress = {
-                            addressID: selectedMemberAddress.addressID,
-                            addressType: selectedMemberAddress.addressType,
-                            addressTypeDisplay: selectedMemberAddress.addressTypeDisplay,
-                            addressLine: selectedMemberAddress.addressLine,
-                            province: selectedMemberAddress.province,
-                            district: selectedMemberAddress.district,
-                            subDistrict: selectedMemberAddress.subDistrict,
-                            postalCode: selectedMemberAddress.postalCode,
-                            phone: selectedMemberAddress.phone,
-                            fullAddress: selectedMemberAddress.fullAddress,
-                            isDefault: selectedMemberAddress.isDefault
-                        };
-                    }
-                    // ที่อยู่ที่เคยจัดส่ง (GetFavoriteAddresses)
-                    else if (addressType === 'FavoriteAddress') {
-                        if (!selectedFavoriteAddress) {
-                            showNotification('error', 'กรุณาเลือกที่อยู่ที่เคยจัดส่ง');
-                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
-                            return;
-                        }
-
-                        request.favoriteAddress = {
-                            membercode: selectedFavoriteAddress.membercode,
-                            contacNickname: selectedFavoriteAddress.contacNickname,
-                            contactperson: selectedFavoriteAddress.contactperson,
-                            contact_HouseNumber: selectedFavoriteAddress.contact_HouseNumber,
-                            contact_Alley: selectedFavoriteAddress.contact_Alley,
-                            contact_Road: selectedFavoriteAddress.contact_Road,
-                            contact_Building: selectedFavoriteAddress.contact_Building,
-                            contact_Floor: selectedFavoriteAddress.contact_Floor,
-                            contact_Other: selectedFavoriteAddress.contact_Other,
-                            contact_Zipcode: selectedFavoriteAddress.contact_Zipcode,
-                            contact_TAMBON_ID: selectedFavoriteAddress.contact_TAMBON_ID,
-                            contact_Phone: selectedFavoriteAddress.contact_Phone,
-                            contact_Province: selectedFavoriteAddress.contact_Province,
-                            provincename: selectedFavoriteAddress.provincename,
-                            contact_Primary: selectedFavoriteAddress.contact_Primary
-                        };
-                    }
-                    // ที่อยู่อื่นๆ (กรอกใหม่)
-                    else if (addressType === 'Other') {
-                        const addressLine = $('#addressLine').val();
-                        const province = $('#province').val();
-                        const district = $('#district').val();
-                        const subDistrict = $('#subDistrict').val();
-                        const postalCode = $('#postalCode').val();
-                        const phone = $('#phone').val();
-
-                        if (!addressLine || !province || !district || !subDistrict || !postalCode || !phone) {
-                            showNotification('error', 'กรุณากรอกที่อยู่ให้ครบถ้วน');
-                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
-                            return;
-                        }
-
+                    if (addressType === 'MemberAddress' && selectedMemberAddress) {
+                        request.memberAddress = selectedMemberAddress;
+                    } else if (addressType === 'FavoriteAddress' && selectedFavoriteAddress) {
+                        request.favoriteAddress = selectedFavoriteAddress;
+                    } else if (addressType === 'Other') {
                         request.customAddress = {
-                            addressLine: addressLine,
-                            province: province,
-                            district: district,
-                            subDistrict: subDistrict,
-                            postalCode: postalCode,
-                            phone: phone
+                            addressLine: $('#addressLine').val(),
+                            province: $('#province').val(),
+                            district: $('#district').val(),
+                            subDistrict: $('#subDistrict').val(),
+                            postalCode: $('#postalCode').val(),
+                            phone: $('#phone').val()
                         };
                     }
-                    // CardAddress - ไม่ต้องส่งอะไร ใช้ default
                 } else {
-                    const branchCode = $('#branchSelect').val();
-                    if (!branchCode) {
-                        showNotification('error', 'กรุณาเลือกสาขา');
-                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
-                        return;
-                    }
-                    request.branchCode = branchCode;
+                    request.branchCode = $('#branchSelect').val();
                     request.deliveryAddressType = "Branch";
                 }
 
-                // Submit
                 $.ajax({
                     url: '/orders/SaveCheckoutInfo',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(request),
                     success: function (response) {
-                        //console.log('SaveCheckoutInfo response:', response);
-                        // ⭐ ล้าง DL/Center
-                        sessionStorage.removeItem('selectedDL');
-                        sessionStorage.removeItem('selectedCenter');
-
                         if (response.success) {
                             window.location.href = '/orders/payment?orderID=' + response.orderID;
                         } else {
-                            showNotification('error', response.message || 'เกิดข้อผิดพลาด');
-                            btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                            Swal.fire('ผิดพลาด', response.message, 'error');
+                            btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
                         }
                     },
-                    error: function (xhr) {
-                        console.error('SaveCheckoutInfo error:', xhr);
-                        showNotification('error', 'เกิดข้อผิดพลาด: ' + (xhr.responseJSON?.message || 'Unknown error'));
-                        btn.prop('disabled', false).html('<i class="fas fa-arrow-right"></i> ดำเนินการชำระเงิน');
+                    error: function () {
+                        Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
                     }
                 });
             });
-
-            function showNotification(type, message) {
-                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
-                const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
-                const notification = $(`
-                    <div class="alert ${alertClass} alert-dismissible fade show"
-                         role="alert"
-                         style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
-                        <i class="fas ${icon}"></i> ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                `);
-
-                $('body').append(notification);
-
-                setTimeout(function () {
-                    notification.fadeOut(function () {
-                        $(this).remove();
-                    });
-                }, 5000);
-            }
         });
+
+        function copyAccNumber() {
+            var accNo = "@paymentbank.AccountNumber";
+            navigator.clipboard.writeText(accNo).then(() => {
+                Swal.fire({ title: 'คัดลอกแล้ว', icon: 'success', timer: 1000, showConfirmButton: false });
+            });
+        }
     </script>
 }

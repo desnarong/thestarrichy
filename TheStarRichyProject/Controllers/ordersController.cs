@@ -26,19 +26,22 @@ namespace TheStarRichyProject.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICartApiService _cartService;
         private readonly IOrderApiService _orderService;
+        private readonly IApiService _apiService;
 
         public ordersController(
             ILogger<ordersController> logger,
             IConfiguration config,
             IHttpContextAccessor httpContextAccessor,
             ICartApiService cartService,
-            IOrderApiService orderService)
+            IOrderApiService orderService,
+            IApiService apiService)
         {
             _logger = logger;
             _config = config;
             _httpContextAccessor = httpContextAccessor;
             _cartService = cartService;
             _orderService = orderService;
+            _apiService = apiService;
         }
 
         #region Helper Methods
@@ -347,6 +350,10 @@ namespace TheStarRichyProject.Controllers
                 var branches = await _orderService.GetBranchesAsync(token, passkey);
                 ViewBag.Branches = branches.Data ?? new List<BranchData>();
 
+                // payment bank
+                var paymentbank = await _apiService.GetAsync<List<dynamic>>("/Static/paymentbank");
+                ViewBag.PaymentBank  = paymentbank[0];
+
                 return View();
             }
             catch (Exception ex)
@@ -454,6 +461,10 @@ namespace TheStarRichyProject.Controllers
                 ViewBag.OrderSummary = summary.Data;
                 ViewBag.OrderID = orderID;
 
+                // payment bank
+                var paymentbank = await _apiService.GetAsync<List<dynamic>>("/Static/paymentbank");
+                ViewBag.PaymentBank = paymentbank[0];
+
                 return View();
             }
             catch (Exception ex)
@@ -555,6 +566,58 @@ namespace TheStarRichyProject.Controllers
                     success = false,
                     message = "เกิดข้อผิดพลาด: " + ex.Message
                 });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitBankSlip([FromBody] BankSlipRequest request)
+        {
+            if (request == null || string.IsNullOrEmpty(request.OrderID) || request.Slips == null || request.Slips.Count == 0)
+            {
+                return Json(new { success = false, message = "ข้อมูลไม่ครบถ้วน" });
+            }
+
+            try
+            {
+                // 1. กำหนดโฟลเดอร์ที่จะเก็บรูป (เช่น /wwwroot/uploads/slips/ORDER_ID/)
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "slips", request.OrderID);
+
+                if (!Directory.Exists(folderPath))
+                {
+                    Directory.CreateDirectory(folderPath);
+                }
+
+                List<string> savedFilePaths = new List<string>();
+
+                foreach (var base64String in request.Slips)
+                {
+                    // แยกส่วนหัว "data:image/jpeg;base64,..." ออกถ้ามี
+                    var base64Data = base64String.Contains(",") ? base64String.Split(',')[1] : base64String;
+                    byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+                    // ตั้งชื่อไฟล์ (ใช้ GUID เพื่อไม่ให้ซ้ำ)
+                    string fileName = $"slip_{Guid.NewGuid()}.jpg";
+                    string filePath = Path.Combine(folderPath, fileName);
+
+                    // บันทึกไฟล์ลง Disk
+                    await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                    // เก็บ Path สั้นๆ ไว้บันทึกลง Database (ถ้าต้องการ)
+                    savedFilePaths.Add($"/uploads/slips/{request.OrderID}/{fileName}");
+                }
+
+                // 2. อัปเดตสถานะใน Database (ตัวอย่าง)
+                // var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == request.OrderID);
+                // order.Status = "WaitVerify"; 
+                // order.SlipPath = string.Join(";", savedFilePaths); // เก็บหลายรูปคั่นด้วยเครื่องหมาย ;
+                // await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "อัปโหลดสลิปเรียบร้อยแล้ว" });
+            }
+            catch (Exception ex)
+            {
+                // บันทึก Log ข้อผิดพลาด
+                return Json(new { success = false, message = "เกิดข้อผิดพลาดในการบันทึกรูปภาพ: " + ex.Message });
             }
         }
 
@@ -684,7 +747,34 @@ namespace TheStarRichyProject.Controllers
         #endregion
 
         #region Private API Helper Methods
+        private async Task<List<dynamic>> GetPaymentBankFromApi()
+        {
+            try
+            {
+                var client = CreateRestClient();
+                var request = new RestRequest("/Static/paymentbank", Method.Get);
+                AddHeaders(request);
 
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    var apiResponse = JsonSerializer.Deserialize<ApiResponse<List<dynamic>>>(
+                        response.Content,
+                        new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
+                    );
+
+                    return apiResponse?.Data;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting product groups from API");
+                return null;
+            }
+        }
         private async Task<List<ProductGroup>?> GetProductGroupsFromApi()
         {
             try
@@ -1257,7 +1347,11 @@ namespace TheStarRichyProject.Controllers
             [JsonPropertyName("data")]
             public T? Data { get; set; }
         }
-
+        public class BankSlipRequest
+        {
+            public string OrderID { get; set; }
+            public List<string> Slips { get; set; } // รายการของ Base64 strings
+        }
         #endregion
     }
 }

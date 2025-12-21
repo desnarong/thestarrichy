@@ -85,9 +85,11 @@ builder.Services.AddHttpClient<IKbankAuthService, KbankAuthService>();
 builder.Services.AddHttpClient<IKbankQrPaymentService, KbankQrPaymentService>();
 builder.Services.Configure<KbankSettings>(builder.Configuration.GetSection("Kbank"));
 
+
 // System
 builder.Services.AddScoped<ICheckwebStatusService, CheckwebStatusService>();
 builder.Services.AddScoped<IStaticService, StaticService>();
+builder.Services.AddScoped<IBankService, BankService>();
 
 // ================================================================
 
