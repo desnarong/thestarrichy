@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
 using RestSharp;
+using System.Diagnostics.Metrics;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Models;
 using TheStarRichyProject.Services;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TheStarRichyProject.Controllers
 {
@@ -173,7 +172,7 @@ namespace TheStarRichyProject.Controllers
         /// GET: /Orders/BuyPersonalOrder
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> BuyHholdOrder(
+        public async Task<IActionResult> BuyHoldOrder(
             string? groupcode = null,
             string? producttype = null,
             string? sortorder = null,
@@ -587,8 +586,8 @@ namespace TheStarRichyProject.Controllers
 
             try
             {
-                // 1. กำหนดโฟลเดอร์ที่จะเก็บรูป (เช่น /wwwroot/uploads/slips/ORDER_ID/)
-                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads", "slips", request.OrderID);
+                // 1. กำหนดโฟลเดอร์ที่จะเก็บรูป (เช่น /wwwroot/Images/Slip/)
+                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "Slip");//, request.OrderID
 
                 if (!Directory.Exists(folderPath))
                 {
@@ -596,7 +595,7 @@ namespace TheStarRichyProject.Controllers
                 }
 
                 List<string> savedFilePaths = new List<string>();
-
+                var index = 1;
                 foreach (var base64String in request.Slips)
                 {
                     // แยกส่วนหัว "data:image/jpeg;base64,..." ออกถ้ามี
@@ -604,25 +603,20 @@ namespace TheStarRichyProject.Controllers
                     byte[] imageBytes = Convert.FromBase64String(base64Data);
 
                     // ตั้งชื่อไฟล์ (ใช้ GUID เพื่อไม่ให้ซ้ำ)
-                    string fileName = $"slip_{Guid.NewGuid()}.jpg";
+                    string fileName = $"{request.OrderID}-{index++}.jpg";
                     string filePath = Path.Combine(folderPath, fileName);
 
                     // บันทึกไฟล์ลง Disk
                     await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
 
                     // เก็บ Path สั้นๆ ไว้บันทึกลง Database (ถ้าต้องการ)
-                    savedFilePaths.Add($"/uploads/slips/{request.OrderID}/{fileName}");
+                    savedFilePaths.Add($"/Images/Slip/{fileName}");
                 }
 
-                // 2. อัปเดตสถานะใน Database (ตัวอย่าง)
-                // var order = await _context.Orders.FirstOrDefaultAsync(x => x.OrderID == request.OrderID);
-                // order.Status = "WaitVerify"; 
-                // order.SlipPath = string.Join(";", savedFilePaths); // เก็บหลายรูปคั่นด้วยเครื่องหมาย ;
-                // await _context.SaveChangesAsync();
-
+                // 2. อัปเดตสถานะใน Database
                 // ✅ ยืนยันคำสั่งซื้อ (เรียกแค่ตรงนี้!)
-                await _orderService.UpdateOrderAsync(token, passkey, request.OrderID, Newtonsoft.Json.JsonConvert.SerializeObject(savedFilePaths));
-
+                var result = await _orderService.UpdateOrderAsync(token, passkey, request.OrderID, Newtonsoft.Json.JsonConvert.SerializeObject(savedFilePaths));
+                //ViewBag.BillNo = result.Data.billNo;
                 return Json(new { success = true, message = "อัปโหลดสลิปเรียบร้อยแล้ว" });
             }
             catch (Exception ex)
@@ -666,12 +660,13 @@ namespace TheStarRichyProject.Controllers
                 }
 
                 // ✅ ยืนยันคำสั่งซื้อ (เรียกแค่ตรงนี้!)
-                await _orderService.ConfirmOrderAsync(token, passkey, orderID);
+                var result = await _orderService.ConfirmOrderAsync(token, passkey, orderID);
 
                 // ดึงข้อมูลสรุป
                 var summary = await _orderService.GetOrderSummaryAsync(token, passkey, orderID);
                 ViewBag.OrderSummary = summary.Data;
                 ViewBag.OrderID = orderID;
+                ViewBag.BillNo = summary.Data.BillNo;
 
                 // Clear session
                 HttpContext.Session.Remove("CurrentOrderID");
@@ -755,6 +750,50 @@ namespace TheStarRichyProject.Controllers
             }
         }
 
+        /// <summary>
+        /// ดึง address master (API)
+        /// GET: /Orders/GetMasterAddress
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetMasterAddress()
+        {
+            try
+            {
+                var result = await GetMasterAddressFromApi();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetMasterAddress");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
+        #endregion
+
+        #region address master
+        private async Task<dynamic> GetMasterAddressFromApi()
+        {
+            try
+            {
+                var client = CreateRestClient();
+                var request = new RestRequest("/Static/addressmaster", Method.Get);
+                AddHeaders(request);
+
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    return response.Content;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting address master from API");
+                return null;
+            }
+        }
         #endregion
 
         #region Private API Helper Methods
@@ -844,7 +883,9 @@ namespace TheStarRichyProject.Controllers
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
-                    return apiResponse?.Data;
+                    var validProducts = apiResponse?.Data.Where(p => p.ProductId != null).ToList();
+
+                    return validProducts;
                 }
 
                 return null;
@@ -885,7 +926,9 @@ namespace TheStarRichyProject.Controllers
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
-                    return apiResponse?.Data;
+                    var validProducts = apiResponse?.Data.Where(p => p.ProductId != null).ToList();
+
+                    return validProducts;
                 }
 
                 return null;
@@ -926,7 +969,9 @@ namespace TheStarRichyProject.Controllers
                         new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
                     );
 
-                    return apiResponse?.Data;
+                    var validProducts = apiResponse?.Data.Where(p => p.ProductId != null).ToList();
+
+                    return validProducts;
                 }
 
                 return null;
@@ -985,6 +1030,9 @@ namespace TheStarRichyProject.Controllers
                     });
                 }
 
+                var cookieValue = CookieHelper.GetCookie(_httpContextAccessor, CookieHelper.UserInfoKey);
+                var userinfo = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
+
                 var memberInfo = await FindMemberForSaleFromApi(dlcode);
 
                 if (memberInfo != null)
@@ -996,7 +1044,7 @@ namespace TheStarRichyProject.Controllers
                             data = new
                             {
                                 dlCode = memberInfo.DLcode,
-                                dlName = memberInfo.DlName,
+                                dlName = memberInfo.DLcode ==  (string)userinfo.membercode ? (string)userinfo.idcardname : memberInfo.DlName,
                                 registerDate = memberInfo.RegisterDate?.ToString("dd/MM/yyyy")
                             }
                         });
@@ -1095,13 +1143,13 @@ namespace TheStarRichyProject.Controllers
                     {
                         success = true,
                         items = result.Data.Items,
-                        itemCount = result.Data.Items.Sum(x=>x.Quantity),
+                        itemCount = result.Data.Items.Sum(x => x.Quantity),
                         totalPrice = result.Data.TotalAmount,
                         totalPV = result.Data.TotalPV,
                         totalBV = result.Data.TotalBV,
                         shippingFee = result.Data.ShippingFee,
                         memberCode = result.Data.MemberCode,
-                        centerCode = result.Data.CenterCode,
+                        centerCode = result.Data.CenterCode
                     });
                 }
 
@@ -1118,6 +1166,8 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> AddToCart(
             [FromForm] string productId,
             [FromForm] int quantity,
+            [FromForm] int limit,
+            [FromForm] int billType,
             [FromForm] string dlCode = null,           // ⭐ NEW
             [FromForm] string dlName = null,           // ⭐ NEW
             [FromForm] string registerDate = null,     // ⭐ NEW
@@ -1187,7 +1237,9 @@ namespace TheStarRichyProject.Controllers
                     DLName = dlName,
                     RegisterDate = string.IsNullOrEmpty(registerDate) ? null : DateTime.TryParse(registerDate, out var dt) ? dt : (DateTime?)null,
                     CenterCode = centerCode,
-                    CenterName = centerName
+                    CenterName = centerName,
+                    BillType = billType,
+                    Limit = limit
                 };
 
                 // 5. เรียก API เพิ่มลง Cart

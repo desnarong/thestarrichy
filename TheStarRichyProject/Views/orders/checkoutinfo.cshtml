@@ -1,3 +1,6 @@
+@using TheStarRichyProject.Helper
+@using Newtonsoft.Json
+@inject IHttpContextAccessor HttpContextAccessor
 @{
     ViewData["Title"] = "ข้อมูลการจัดส่งและชำระเงิน - Step 2/3";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -261,7 +264,6 @@
                                 <div class="flex-grow-1">
                                     <label for="paymentBankTransfer" class="d-block mb-0 cursor-pointer">
                                         <div class="d-flex align-items-center mb-1">
-                                            <span class="badge bg-primary-subtle text-primary me-2">แนะนำ</span>
                                             <strong class="text-dark">เงินโอน (Bank Transfer)</strong>
                                         </div>
                                         <small class="text-muted d-block mb-2">ตรวจสอบยอดภายใน 5-15 นาทีในขั้นตอนถัดไป</small>
@@ -348,17 +350,52 @@
                             <div id="favoriteAddressesList" class="row"></div>
                         </div>
 
-                        <div id="customAddressForm" style="display: none;" class="bg-light p-3 rounded-3">
+                        <div id="customAddressForm" class="bg-light p-3 rounded-3" style="display: none;">
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label class="form-label fw-bold">ระบุที่อยู่โดยละเอียด *</label>
                                     <textarea class="form-control" id="addressLine" rows="2" placeholder="บ้านเลขที่, อาคาร, ถนน..."></textarea>
                                 </div>
-                                <div class="col-md-6 mb-3"><label class="form-label">จังหวัด *</label><input type="text" class="form-control" id="province"></div>
-                                <div class="col-md-6 mb-3"><label class="form-label">เขต/อำเภอ *</label><input type="text" class="form-control" id="district"></div>
-                                <div class="col-md-6 mb-3"><label class="form-label">แขวง/ตำบล *</label><input type="text" class="form-control" id="subDistrict"></div>
-                                <div class="col-md-6 mb-3"><label class="form-label">รหัสไปรษณีย์ *</label><input type="text" class="form-control" id="postalCode" maxlength="5"></div>
-                                <div class="col-md-12"><label class="form-label">เบอร์โทรศัพท์ผู้รับ *</label><input type="tel" class="form-control" id="phone"></div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">รหัสไปรษณีย์ *</label>
+                                    <input type="text" class="form-control" id="zipcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" autocomplete="off">
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">จังหวัด *</label>
+                                    <select class="form-select" id="province" disabled>
+                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">เขต/อำเภอ *</label>
+                                    <select class="form-select" id="amphoe" disabled>
+                                        <option value="">-- เลือกอำเภอ --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">แขวง/ตำบล *</label>
+                                    <select class="form-select" id="tambon" disabled>
+                                        <option value="">-- เลือกตำบล --</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-12 mb-3"><label class="form-label">เบอร์โทรศัพท์ผู้รับ *</label><input type="tel" class="form-control" id="phone"></div>
+                                <div class="col-md-12 mb-3"><label class="form-label">ชื่อผู้รับ *</label><input type="text" class="form-control" id="recipientName"></div>
+                                <div class="col-md-12 mb-3"><label class="form-label">ชื่อย่อ *</label><input type="text" class="form-control" id="initials"></div>
+                                <div class="col-sm-12 mb-3">
+                                    <div>
+                                        <div class="form-check mb-3">
+                                            <input class="form-check-input" type="checkbox" id="favoriteaddress">
+                                            <label class="form-check-label" for="favoriteaddress">
+                                                เพิ่มลงในที่อยู่ที่ใช้งานบ่อย
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -418,35 +455,34 @@
                         <i class="ri-arrow-left-line me-1"></i> กลับไปแก้ไขสินค้า
                     </button>
                 </div>
-            </div>
-
-            <div class="form-section mt-4">
-                <div class="form-section-title mb-3">
-                    <div class="text-primary mb-0"><i class="fas fa-file-invoice me-2"></i>การรับใบเสร็จ</div>
-                </div>
-                <div class="row g-2">
-                    <div class="col-4">
-                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceYes').click()">
-                            <input class="d-none" type="radio" name="sendInvoice" value="1" id="sendInvoiceYes" checked>
-                            <label class="invoice-label" for="sendInvoiceYes">
-                                <i class="ri-mail-send-line fs-20 d-block"></i><span>ตามที่อยู่</span>
-                            </label>
-                        </div>
+                <div class="form-section mt-4" style="box-shadow: unset !important;">
+                    <div class="form-section-title mb-3">
+                        <div class="text-primary mb-0"><i class="fas fa-file-invoice me-2"></i>การรับใบเสร็จ</div>
                     </div>
-                    <div class="col-4">
-                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo').click()">
-                            <input class="d-none" type="radio" name="sendInvoice" value="0" id="sendInvoiceNo">
-                            <label class="invoice-label" for="sendInvoiceNo">
-                                <i class="ri-mail-line fs-20 d-block"></i><span>Email</span>
-                            </label>
+                    <div class="row g-2">
+                        <div class="col-4">
+                            <div class="invoice-card" onclick="document.getElementById('sendInvoiceYes').click()">
+                                <input class="d-none" type="radio" name="sendInvoice" value="1" id="sendInvoiceYes" checked>
+                                <label class="invoice-label" for="sendInvoiceYes">
+                                    <i class="ri-mail-send-line fs-20 d-block"></i><span>ตามที่อยู่</span>
+                                </label>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-4">
-                        <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo2').click()">
-                            <input class="d-none" type="radio" name="sendInvoice" value="2" id="sendInvoiceNo2">
-                            <label class="invoice-label" for="sendInvoiceNo2">
-                                <i class="ri-close-circle-line fs-20 d-block"></i><span>ไม่รับ</span>
-                            </label>
+                        <div class="col-4">
+                            <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo').click()">
+                                <input class="d-none" type="radio" name="sendInvoice" value="0" id="sendInvoiceNo">
+                                <label class="invoice-label" for="sendInvoiceNo">
+                                    <i class="ri-mail-line fs-20 d-block"></i><span>Email</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="invoice-card" onclick="document.getElementById('sendInvoiceNo2').click()">
+                                <input class="d-none" type="radio" name="sendInvoice" value="2" id="sendInvoiceNo2">
+                                <label class="invoice-label" for="sendInvoiceNo2">
+                                    <i class="ri-close-circle-line fs-20 d-block"></i><span>ไม่รับ</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -462,6 +498,9 @@
             let favoriteAddresses = [];
             let selectedMemberAddress = null;
             let selectedFavoriteAddress = null;
+            var masterData = [];
+
+            loadMasterAddresses();
 
             // Delivery Method Logic
             $('.delivery-card').click(function () {
@@ -499,12 +538,13 @@
                         memberAddresses = res.data;
                         let html = '';
                         res.data.forEach((addr, i) => {
+                            let phone = addr.phone == null ? '' : addr.phone;
                             html += `
                                 <div class="col-md-6 mb-2">
                                     <div class="address-card member-address-card" data-index="${i}">
-                                        <div class="fw-bold text-primary fs-13"><i class="fas fa-home me-1"></i> ${addr.addressTypeDisplay}</div>
+                                        <div class="fw-bold text-primary fs-13"><i class="fas fa-home me-1"></i>@cart.DLName</div>
                                         <small class="d-block text-muted mt-1 text-truncate-2">${addr.fullAddress}</small>
-                                        <small class="text-muted">โทร: ${addr.phone}</small>
+                                        <div class="col-md-12"><label class="form-label">โทร <span style="color: red;">*</span> : ${phone}</label><input type="text" class="form-control" id="memberphone" value="${phone}"></div>
                                     </div>
                                 </div>`;
                         });
@@ -515,6 +555,26 @@
                             selectedMemberAddress = memberAddresses[$(this).data('index')];
                         });
                     }
+                });
+            }
+
+            function loadMasterAddresses() {
+                $.get('/orders/GetMasterAddress', function(res) {
+                    // --- ส่วนแก้ปัญหา filter is not a function ---
+                    if (typeof res === 'string') {
+                        try { res = JSON.parse(res); } catch (e) { console.error("JSON Error", e); return; }
+                    }
+                    if (!Array.isArray(res)) {
+                        // ถ้าข้อมูลซ้อนอยู่ใน .data หรือ .result ให้แก้ตรงนี้
+                        if (res.data && Array.isArray(res.data)) masterData = res.data;
+                        else masterData = [];
+                    } else {
+                        masterData = res;
+                    }
+                    // ----------------------------------------
+
+                    console.log("Loaded " + masterData.length + " rows");
+                    $('#zipcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
                 });
             }
 
@@ -580,17 +640,52 @@
                     request.deliveryAddressType = addressType;
 
                     if (addressType === 'MemberAddress' && selectedMemberAddress) {
+
+                        if(!$('#memberphone').val()){
+                            Swal.fire({
+                                title: 'แจ้งเตือน',
+                                text: 'กรุณาระบุเบอร์โทรศัพท์',
+                                icon: 'warning',
+                                confirmButtonText: 'ตกลง'
+                            }).then((result) => {
+                                // เมื่อผู้ใช้กดปุ่ม "ตกลง" หรือปิดหน้าต่างแจ้งเตือน
+                                setTimeout(function() {
+                                    $('#memberphone').focus();
+                                }, 300); // หน่วงเวลาเล็กน้อยเพื่อให้ SweetAlert ปิดสนิทก่อน (บางเคสอาจไม่ต้องใช้)
+                            });
+                            return; // หยุดการทำงานส่วนอื่นต่อ
+                        }
+
                         request.memberAddress = selectedMemberAddress;
+                        request.memberAddress.phone = $('#memberphone').val();
                     } else if (addressType === 'FavoriteAddress' && selectedFavoriteAddress) {
                         request.favoriteAddress = selectedFavoriteAddress;
                     } else if (addressType === 'Other') {
+                        var favoriteaddress = +$('#favoriteaddress').prop('checked');
                         request.customAddress = {
                             addressLine: $('#addressLine').val(),
+
+                            // 1. รหัสไปรษณีย์ (เปลี่ยน ID เป็น #zipcode)
+                            postalCode: $('#zipcode').val(),
+
+                            // 2. จังหวัด (ดึง Text เพราะ Value เป็นรหัส 81)
                             province: $('#province').val(),
-                            district: $('#district').val(),
-                            subDistrict: $('#subDistrict').val(),
-                            postalCode: $('#postalCode').val(),
-                            phone: $('#phone').val()
+
+                            // 3. อำเภอ (เปลี่ยน ID เป็น #amphoe และดึง Text)
+                            district: $('#amphoe').val(),
+
+                            // 4. ตำบล (เปลี่ยน ID เป็น #tambon และดึง Text)
+                            subDistrict: $('#tambon').val(),
+
+                            // ถ้าต้องการส่ง "รหัส" ไปด้วย ให้เพิ่ม field แบบนี้ครับ (ถ้าหลังบ้านไม่ได้ใช้ ลบออกได้)
+                            // provinceCode: $('#province').val(),
+                            // districtCode: $('#amphoe').val(),
+                            // subDistrictCode: $('#tambon').val(),
+
+                            phone: $('#phone').val(),
+                            favoriteAddress: favoriteaddress, // เช็คค่า checkbox ว่าติ๊กหรือไม่
+                            recipientName: $('#recipientName').val(),
+                            initials: $('#initials').val()
                         };
                     }
                 } else {
@@ -617,6 +712,103 @@
                     }
                 });
             });
+
+            // 1. เมื่อพิมพ์ Zipcode
+            $('#zipcode').on('input', function() {
+                var selectedZip = $(this).val();
+
+                resetDropdown('#province', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetDropdown('#amphoe', '-- เลือกอำเภอ --');
+                resetDropdown('#tambon', '-- เลือกตำบล --');
+
+                if (selectedZip.length === 5) {
+                    // กรองข้อมูลตาม Zipcode
+                    var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+
+                    if (filteredData.length > 0) {
+                        // หาจังหวัดที่ไม่ซ้ำ (เช็คจาก province_code)
+                        var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+
+                        // สร้าง Option (Value = Code, Text = Name)
+                        $('#province').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                        $.each(uniqueProvinces, function(index, item) {
+                            $('#province').append('<option value="' + item.province_code + '">' + item.province + '</option>');
+                        });
+                        $('#province').prop('disabled', false);
+
+                        // Auto Select ถ้ามีจังหวัดเดียว
+                        if (uniqueProvinces.length === 1) {
+                            $('#province').val(uniqueProvinces[0].province_code).trigger('change');
+                        }
+                    }
+                }
+            });
+
+            // 2. เมื่อเลือก Province (Value คือ province_code แล้ว)
+            $('#province').change(function() {
+                var selectedZip = $('#zipcode').val();
+                var selectedProvCode = $(this).val(); // ได้ค่าเป็น code เช่น 81
+
+                resetDropdown('#amphoe', '-- เลือกอำเภอ --');
+                resetDropdown('#tambon', '-- เลือกตำบล --');
+
+                if (selectedProvCode) {
+                    // กรอง: Zipcode ตรงกัน AND province_code ตรงกัน
+                    var filteredData = masterData.filter(item =>
+                        item.zipcode === selectedZip &&
+                        item.province_code == selectedProvCode
+                    );
+
+                    // หาอำเภอที่ไม่ซ้ำ (เช็คจาก amphoe_code)
+                    var uniqueAmphoes = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
+
+                    $.each(uniqueAmphoes, function(index, item) {
+                        $('#amphoe').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                    });
+                    $('#amphoe').prop('disabled', false);
+
+                    if (uniqueAmphoes.length === 1) {
+                        $('#amphoe').val(uniqueAmphoes[0].amphoe_code).trigger('change');
+                    }
+                }
+            });
+
+            // 3. เมื่อเลือก Amphoe (Value คือ amphoe_code แล้ว)
+            $('#amphoe').change(function() {
+                var selectedZip = $('#zipcode').val();
+                var selectedProvCode = $('#province').val();
+                var selectedAmpCode = $(this).val(); // ได้ค่าเป็น code เช่น 8104
+
+                resetDropdown('#tambon', '-- เลือกตำบล --');
+
+                if (selectedAmpCode) {
+                    // กรอง: Zipcode + ProvCode + AmpCode
+                    var filteredData = masterData.filter(item =>
+                        item.zipcode === selectedZip &&
+                        item.province_code == selectedProvCode &&
+                        item.amphoe_code == selectedAmpCode
+                    );
+
+                    // ตำบล แสดงทั้งหมดที่เจอได้เลย (Value = tambon_code)
+                    $.each(filteredData, function(index, item) {
+                        $('#tambon').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
+                    });
+                    $('#tambon').prop('disabled', false);
+                }
+            });
+
+            // --- Helper Function ช่วยตัดตัวซ้ำโดยอิงจาก Code ---
+            function getUniqueList(data, codeKey, nameKey) {
+                var seen = new Set();
+                return data.filter(item => {
+                    var k = item[codeKey];
+                    return seen.has(k) ? false : seen.add(k);
+                }).sort((a, b) => a[nameKey].localeCompare(b[nameKey])); // เรียงตามชื่อ ก-ฮ
+            }
+
+            function resetDropdown(selector, defaultText) {
+                $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+            }
         });
 
         function copyAccNumber() {

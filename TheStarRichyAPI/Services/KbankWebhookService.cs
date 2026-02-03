@@ -161,6 +161,7 @@ namespace TheStarRichyApi.Services
                             {
                                 bool success = reader.GetInt32(reader.GetOrdinal("Success")) == 1;
                                 string message = reader.GetString(reader.GetOrdinal("Message"));
+                                string billNo = reader.GetString(reader.GetOrdinal("BillNo"));
 
                                 var result = new WebhookProcessResult
                                 {
@@ -169,7 +170,8 @@ namespace TheStarRichyApi.Services
                                     OrderID = orderID,
                                     PaymentStatus = paymentStatus,
                                     TransactionStatus = transactionStatus,
-                                    Amount = amount
+                                    Amount = amount,
+                                    BillNo = billNo,
                                 };
 
                                 return result;

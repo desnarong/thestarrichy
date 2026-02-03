@@ -3,6 +3,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var summary = ViewBag.OrderSummary as TheStarRichyProject.Models.OrderSummaryData;
     var orderID = ViewBag.OrderID as string;
+    var billNo = ViewBag.BillNo as string;
 }
 
 <!-- Custom CSS -->
@@ -198,6 +199,10 @@
         <div class="order-id-box">
             <h5>เลขที่คำสั่งซื้อ</h5>
             <div class="order-number">@orderID</div>
+            <hr />
+            <h5>เลขที่บิล</h5>
+            <div class="order-number">@billNo</div>
+            
             <small class="text-muted">กรุณาเก็บเลขที่คำสั่งซื้อนี้ไว้สำหรับการติดตาม</small>
         </div>
 

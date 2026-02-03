@@ -102,6 +102,7 @@ namespace TheStarRichyApi.Models.Kbank
         public bool Success { get; set; }
         public string Message { get; set; } = string.Empty;
         public string OrderID { get; set; } = string.Empty;
+        public string BillNo { get; set; } = string.Empty;
         public string PaymentStatus { get; set; } = string.Empty;
         public string? TransactionStatus { get; set; }
         public decimal Amount { get; set; }

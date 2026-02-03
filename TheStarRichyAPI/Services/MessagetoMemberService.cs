@@ -102,7 +102,7 @@ namespace TheStarRichyApi.Services
                 using (var con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-                    string query = "SELECT LastMonthStatusMessage,CurrentMonthStatusMessage,SendIDcardMessage,SendBankMessage,SendKYCMessage,SendHoldExpireMessage,SendPendingBillReceive FROM [000_CustomerMessage] where M06_PX1=@Membercode ";
+                    string query = "SELECT LastMonthStatusMessage,CurrentMonthStatusMessage,SendIDcardMessage,SendBankMessage,SendKYCMessage,SendHoldExpireMessage,SendPendingBillReceive,SendPendingBillConfirm FROM [000_CustomerMessage] where M06_PX1=@Membercode ";
 
                     using (var command = new SqlCommand(query, con))
                     {

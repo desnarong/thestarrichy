@@ -246,36 +246,36 @@ namespace TheStarRichyApi.Controllers
                     });
                 }
 
-                // ตรวจสอบว่ามี Membercode หรือไม่ (แสดงว่าไม่มี permission)
-                var firstItem = result.FirstOrDefault();
-                if (firstItem != null)
-                {
-                    var dict = firstItem as IDictionary<string, object>;
-                    if (dict != null && dict.ContainsKey("Membercode"))
-                    {
-                        var membercode = dict["Membercode"]?.ToString();
-                        if (string.IsNullOrEmpty(membercode))
-                        {
-                            return Unauthorized(new
-                            {
-                                success = false,
-                                message = "ไม่มีสิทธิ์เข้าถึงข้อมูล",
-                                data = new List<object>()
-                            });
-                        }
-                    }
+                //// ตรวจสอบว่ามี Membercode หรือไม่ (แสดงว่าไม่มี permission)
+                //var firstItem = result.FirstOrDefault();
+                //if (firstItem != null)
+                //{
+                //    var dict = firstItem as IDictionary<string, object>;
+                //    if (dict != null && dict.ContainsKey("Membercode"))
+                //    {
+                //        var membercode = dict["Membercode"]?.ToString();
+                //        if (string.IsNullOrEmpty(membercode))
+                //        {
+                //            return Unauthorized(new
+                //            {
+                //                success = false,
+                //                message = "ไม่มีสิทธิ์เข้าถึงข้อมูล",
+                //                data = new List<object>()
+                //            });
+                //        }
+                //    }
 
-                    // ตรวจสอบว่ามี Error หรือไม่
-                    if (dict != null && dict.ContainsKey("Error"))
-                    {
-                        return StatusCode(500, new
-                        {
-                            success = false,
-                            message = dict["Error"]?.ToString(),
-                            data = new List<object>()
-                        });
-                    }
-                }
+                //    // ตรวจสอบว่ามี Error หรือไม่
+                //    if (dict != null && dict.ContainsKey("Error"))
+                //    {
+                //        return StatusCode(500, new
+                //        {
+                //            success = false,
+                //            message = dict["Error"]?.ToString(),
+                //            data = new List<object>()
+                //        });
+                //    }
+                //}
 
                 return Ok(new
                 {
@@ -337,36 +337,36 @@ namespace TheStarRichyApi.Controllers
                     });
                 }
 
-                // ตรวจสอบว่ามี Membercode หรือไม่ (แสดงว่าไม่มี permission)
-                var firstItem = result.FirstOrDefault();
-                if (firstItem != null)
-                {
-                    var dict = firstItem as IDictionary<string, object>;
-                    if (dict != null && dict.ContainsKey("Membercode"))
-                    {
-                        var membercode = dict["Membercode"]?.ToString();
-                        if (string.IsNullOrEmpty(membercode))
-                        {
-                            return Unauthorized(new
-                            {
-                                success = false,
-                                message = "ไม่มีสิทธิ์เข้าถึงข้อมูล",
-                                data = new List<object>()
-                            });
-                        }
-                    }
+                //// ตรวจสอบว่ามี Membercode หรือไม่ (แสดงว่าไม่มี permission)
+                //var firstItem = result.FirstOrDefault();
+                //if (firstItem != null)
+                //{
+                //    var dict = firstItem as IDictionary<string, object>;
+                //    if (dict != null && dict.ContainsKey("Membercode"))
+                //    {
+                //        var membercode = dict["Membercode"]?.ToString();
+                //        if (string.IsNullOrEmpty(membercode))
+                //        {
+                //            return Unauthorized(new
+                //            {
+                //                success = false,
+                //                message = "ไม่มีสิทธิ์เข้าถึงข้อมูล",
+                //                data = new List<object>()
+                //            });
+                //        }
+                //    }
 
-                    // ตรวจสอบว่ามี Error หรือไม่
-                    if (dict != null && dict.ContainsKey("Error"))
-                    {
-                        return StatusCode(500, new
-                        {
-                            success = false,
-                            message = dict["Error"]?.ToString(),
-                            data = new List<object>()
-                        });
-                    }
-                }
+                //    // ตรวจสอบว่ามี Error หรือไม่
+                //    if (dict != null && dict.ContainsKey("Error"))
+                //    {
+                //        return StatusCode(500, new
+                //        {
+                //            success = false,
+                //            message = dict["Error"]?.ToString(),
+                //            data = new List<object>()
+                //        });
+                //    }
+                //}
 
                 return Ok(new
                 {

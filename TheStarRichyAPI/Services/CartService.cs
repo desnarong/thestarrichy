@@ -143,7 +143,8 @@ namespace TheStarRichyApi.Services
                                         Price = reader.GetDecimal(6),
                                         PV = reader.GetDecimal(7),
                                         Quantity = reader.GetInt32(8),
-                                        SubTotal = reader.GetDecimal(9)
+                                        SubTotal = reader.GetDecimal(9),
+                                        Limit = reader.GetInt32(11)
                                     });
                                 }
                             }
@@ -186,6 +187,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Quantity", request.Quantity);
                         command.Parameters.AddWithValue("@MakerBy", request.Makerby);
                         command.Parameters.AddWithValue("@BillType", request.BillType);
+                        command.Parameters.AddWithValue("@Limit", request.Limit);
 
                         // ⭐ พารามิเตอร์ใหม่ (ใช้ CenterCode แทน CenterID)
                         command.Parameters.AddWithValue("@DLCode", (object)request.DLCode ?? DBNull.Value);

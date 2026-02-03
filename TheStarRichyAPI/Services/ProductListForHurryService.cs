@@ -135,8 +135,6 @@ namespace TheStarRichyApi.Services
             }
 
             var result = new List<dynamic>();
-            result.Add(new { CheckPaymentGateway = checkPaymentgateway });
-
             string? connectionString = _configuration.GetConnectionString("MLMConnectionString");
             Registerdate = FormatDate(Registerdate);
 
@@ -348,8 +346,6 @@ namespace TheStarRichyApi.Services
                 command.Parameters.AddWithValue("@Membercode", memberCode);
                 command.Parameters.AddWithValue("@Registerdate", Registerdate);
 
-
-
                 if (!string.IsNullOrEmpty(groupCode))
                 {
                     command.Parameters.AddWithValue("@groupCode", groupCode);
@@ -359,10 +355,6 @@ namespace TheStarRichyApi.Services
                 {
                     command.Parameters.AddWithValue("@productid", productid);
                 }
-
-                 
- 
-
 
                 using var reader = await command.ExecuteReaderAsync();
                 while (await reader.ReadAsync())

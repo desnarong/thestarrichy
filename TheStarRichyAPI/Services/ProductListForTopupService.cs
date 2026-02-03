@@ -151,7 +151,6 @@ namespace TheStarRichyApi.Services
             }
 
             var result = new List<dynamic>();
-            result.Add(new { CheckPaymentGateway = checkPaymentgateway });
             string? connectionString = _configuration.GetConnectionString("MLMConnectionString");
             Registerdate = FormatDate(Registerdate);
 
@@ -297,10 +296,6 @@ namespace TheStarRichyApi.Services
 
                 }
                 query += " )) ";  //1
-
-
-
-
 
                 //Sort
                 if (string.IsNullOrEmpty(sortOrder))

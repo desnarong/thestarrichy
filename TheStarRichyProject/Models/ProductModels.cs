@@ -171,15 +171,18 @@ namespace TheStarRichyProject.Models
             if (cartitem != null)
             {
                 var product = Products.FirstOrDefault(x => x.ProductId == cartitem.ProductID);
-                if (product.TypeofFee == "1")
+                if (product != null)
                 {
-                    if (CartItems.Sum(x => x.PV) > product.CondFee) return 0;
-                    else return product.DeliveryFee1 ?? 0;
-                }
-                else
-                {
-                    if (CartItems.Sum(x => x.SubTotal) > product.CondFee) return 0;
-                    else return product.DeliveryFee1 ?? 0;
+                    if (product.TypeofFee == "1")
+                    {
+                        if (CartItems.Sum(x => x.PV) > product.CondFee) return 0;
+                        else return product.DeliveryFee1 ?? 0;
+                    }
+                    else
+                    {
+                        if (CartItems.Sum(x => x.SubTotal) > product.CondFee) return 0;
+                        else return product.DeliveryFee1 ?? 0;
+                    }
                 }
             }
             return 0;

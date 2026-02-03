@@ -13,6 +13,7 @@
         public int Quantity { get; set; }
         public string Makerby { get; set; }
         public int BillType { get; set; }
+        public int Limit { get; set; }
 
         // ⭐ DL และ Center Information
         public string? DLCode { get; set; }                 // รหัสผู้แนะนำ
@@ -64,6 +65,7 @@
         public string? CenterName { get; set; }             // ⭐ NEW
         public string? Makerby { get; set; }                // มีอยู่แล้วในตาราง (DL เดิม)
         public string? BillType { get; set; }
+        public string? Limit { get; set; }
         public string? DLCode { get; set; }                 // ⭐ NEW (DL ใหม่)
         public string? DLName { get; set; }                 // ⭐ NEW
         public DateTime? RegisterDate { get; set; }         // ⭐ NEW
@@ -83,6 +85,8 @@
         public decimal PV { get; set; }
         public int Quantity { get; set; }
         public decimal SubTotal { get; set; }
+        public int Limit { get; set; }
+        
     }
 
     public class CheckoutResponse

@@ -94,5 +94,18 @@ namespace TheStarRichyApi.Controllers
                 return StatusCode(500, new { message = "Internal server error" });
             }
         }
+        [HttpGet("addressmaster")]
+        public async Task<IActionResult> GetAddressMaster()
+        {
+            try
+            {
+                var result = await _staticService.GetAddressMasterAsync();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
     }
 }

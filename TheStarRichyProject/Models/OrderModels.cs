@@ -67,6 +67,10 @@ namespace TheStarRichyProject.Models
         [Phone(ErrorMessage = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง")]
         [MaxLength(20)]
         public string Phone { get; set; }
+
+        public string? RecipientName { get; set; }
+        public string? Initials { get; set; }
+        public int? FavoriteAddress { get; set; }
     }
 
     /// <summary>
@@ -156,6 +160,7 @@ namespace TheStarRichyProject.Models
         public DeliveryInfoData DeliveryInfo { get; set; }
         public string Status { get; set; }
         public int SendInvoice { get; set; }
+        public string BillNo { get; set; }
     }
 
     public class OrderItemInfo
@@ -376,7 +381,7 @@ namespace TheStarRichyProject.Models
     {
         public bool Success { get; set; }
         public string Message { get; set; }
-        public object Data { get; set; }
+        public dynamic Data { get; set; }
     }
 
     #endregion

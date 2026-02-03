@@ -15,8 +15,7 @@ namespace TheStarRichyProject.Models
         public int Quantity { get; set; }
         public string Makerby { get; set; }
         public int BillType { get; set; }
-        
-
+        public int Limit { get; set; }
 
         // ⭐ เพิ่ม DL และ Center Information
         public string DLCode { get; set; }              // รหัสผู้แนะนำ
@@ -66,7 +65,8 @@ namespace TheStarRichyProject.Models
         public int TotalItems => ItemCount;
         public decimal TotalPrice => TotalAmount;
         public decimal ShippingFee { get; set; }
-
+        public string? DLCode { get; set; }              // รหัสผู้แนะนำ
+        public string? DLName { get; set; }              // ชื่อผู้แนะนำ
     }
 
     public class CartItem
@@ -83,6 +83,7 @@ namespace TheStarRichyProject.Models
         public decimal SubTotal => Price * Quantity;
         public decimal TotalPV => PV * Quantity;
         public decimal TotalBV => BV * Quantity;
+        public int Limit { get; set; }
     }
 
     public class CheckoutResponse

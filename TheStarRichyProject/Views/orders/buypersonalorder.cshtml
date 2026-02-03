@@ -392,7 +392,7 @@
                                                value="1"
                                                min="1"
                                                data-product-id="@product.ProductId"
-                                               data-limit="0">
+                                               data-limit="0" disabled>
                                         <button type="button"
                                                 class="qty-btn btn-increase"
                                                 data-product-id="@product.ProductId"
@@ -420,7 +420,8 @@
                                                min="1"
                                                max="@int.Parse(product.LimitPerMembercode ?? "0")"
                                                data-product-id="@product.ProductId"
-                                               data-limit="@product.LimitPerMembercode">
+                                               data-limit="@product.LimitPerMembercode"
+                                               disabled>
                                         <button type="button"
                                                 class="qty-btn btn-increase"
                                                 data-product-id="@product.ProductId"
@@ -610,7 +611,7 @@
                         registerDate: selectedDL.registerDate,
                         centerCode: selectedCenter ? selectedCenter.centerCode : '',
                         centerName: selectedCenter ? selectedCenter.centerName : '',
-                        billType: 1
+                        billType: 2
                     },
                     success: function(response) {
                         if (response.success) {
@@ -701,12 +702,27 @@
                                 </td>
                                 <td>฿${item.price.toFixed(2)}</td>
                                 <td>
-                                    <input type="number"
-                                           class="form-control form-control-sm cart-item-quantity"
-                                           value="${item.quantity}"
-                                           min="1"
-                                           data-product-id="${item.productID || item.productId}"
-                                           style="width: 80px;">
+                                    <div class="quantity-controls">
+                                        <button type="button"
+                                                class="qty-btn btn-cartdecrease"
+                                                data-product-id="${item.productID || item.productId}">
+                                            <i class="bx bx-minus"></i>
+                                        </button>
+                                        <input type="number"
+                                               name="cartitemquantity[]"
+                                               class="form-control form-control-sm qty-input cart-item-quantity"
+                                               value="${item.quantity}"
+                                               min="1"
+                                               max="${item.limit || 0}"
+                                               data-product-id="${item.productID || item.productId}"
+                                               style="width: 80px;" disabled>
+                                         <button type="button"
+                                                class="qty-btn btn-cartincrease"
+                                                data-product-id="${item.productID || item.productId}"
+                                                data-max="${item.limit || 0}">
+                                            <i class="bx bx-plus"></i>
+                                        </button>
+                                    </div>
                                 </td>
                                 <td><strong>฿${(item.price * item.quantity).toFixed(2)}</strong></td>
                                 <td>
@@ -796,17 +812,6 @@
                             $('#summaryPV').text((response.totalPV || 0).toFixed(0));
                             $('#summaryBV').text((response.totalBV || 0).toFixed(0));
                             $('#shippingFee').text((response.shippingFee || 0).toFixed(2));
-                            // //member
-                            // if(response.memberCode)
-                            // {
-                            //     $('#memberCodeInput').val(response.memberCode);
-                            //     $('#btnSearchMember').click();
-                            // }
-                            
-                            // if(response.centerCode){
-                            //     $('#centerCodeInput').val(response.centerCode);
-                            //     $('#btnSearchCenter').click();
-                            // }
                         }
                     }
                 });
@@ -825,16 +830,6 @@
                         <i class="fa ${icon}"></i> ${message}
                     </div>
                 `);
-                // const notification = $(`
-                //     <div class="alert ${alertClass} alert-dismissible fade show"
-                //          role="alert"
-                //          style="position: fixed; top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-                //         <i class="fa ${icon}"></i> ${message}
-                //         <button type="button" class="close" data-dismiss="alert">
-                //             <span>&times;</span>
-                //         </button>
-                //     </div>
-                // `);
 
                 $('body').append(notification);
 
@@ -976,11 +971,40 @@
                     }
                 });
             }
+        });
 
-            // $('#centerCodeInput').on('input', function() {
-            //     // $('#memberSearchResult').hide();
-            //     // $('#memberSearchError').hide();
-            // });
+        // ===================================
+        // CART QUANTITY BUTTONS (Event Delegation)
+        // ===================================
+
+        // ลดจำนวนในตะกร้า
+        $(document).on('click', '.btn-cartdecrease', function() {
+            const productId = $(this).data('product-id');
+            const input = $(`.cart-item-quantity[data-product-id="${productId}"]`);
+            let currentVal = parseInt(input.val()) || 0;
+
+            if (currentVal > 1) {
+                input.val(currentVal - 1);
+                // สำคัญ! ต้องสั่ง trigger change เพื่อให้ไปเรียก updateCartQuantity
+                input.trigger('change');
+            }
+        });
+
+        // เพิ่มจำนวนในตะกร้า
+        $(document).on('click', '.btn-cartincrease', function() {
+            const productId = $(this).data('product-id');
+            const maxQty = parseInt($(this).data('max')) || 0;
+            const input = $(`.cart-item-quantity[data-product-id="${productId}"]`);
+            let currentVal = parseInt(input.val()) || 0;
+
+            // เช็คว่า maxQty เป็น 0 (ไม่จำกัด) หรือ ยังไม่เกินลิมิต
+            if (maxQty === 0 || currentVal < maxQty) {
+                input.val(currentVal + 1);
+                // สำคัญ! ต้องสั่ง trigger change เพื่อให้ไปเรียก updateCartQuantity
+                input.trigger('change');
+            } else {
+                showNotification('warning', `ไม่สามารถเพิ่มได้เกิน ${maxQty} ชิ้น`);
+            }
         });
     </script>
 

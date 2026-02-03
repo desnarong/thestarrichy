@@ -325,7 +325,12 @@
                     Swal.fire('กรุณาแนบสลิป', 'ต้องมีหลักฐานการโอนอย่างน้อย 1 รูป', 'warning');
                     return;
                 }
-                $(this).prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...');
+                $('#confirmSubmitModal').modal('show');
+            });
+
+            $('#btnConfirmSubmit').click(function() {
+                $('#confirmSubmitModal').modal('hide');
+                $('#btnSubmitSlip').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...');
 
                 $.ajax({
                     url: '/orders/SubmitBankSlip', // ต้องมี Action นี้ใน Controller
@@ -378,4 +383,25 @@
             });
         }
     </script>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmSubmitModalLabel">ยืนยันการส่งสลิป</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    คุณต้องการส่งสลิปการโอนเงินนี้หรือไม่? หลังจากส่งแล้วจะไม่สามารถแก้ไขได้
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                    <button type="button" class="btn btn-primary" id="btnConfirmSubmit">
+                        <i class="ri-checkbox-circle-line me-1"></i> ยืนยัน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 }

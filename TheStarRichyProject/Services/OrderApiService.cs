@@ -301,7 +301,7 @@ namespace TheStarRichyProject.Services
                 return new OrderResponse
                 {
                     Success = false,
-                    Message = $"ไม่สามารถยืนยันคำสั่งซื้อได้: {response.StatusCode}"
+                    Message = $"ไม่สามารถยืนยันคำสั่งซื้อได้: {response.StatusCode}",
                 };
             }
             catch (Exception ex)

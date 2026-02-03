@@ -253,12 +253,13 @@ namespace TheStarRichyApi.Controllers
 
                 var result = await _orderService.ConfirmOrderAsync(memberCode, orderID);
 
-                if (result)
+                if (result != null)
                 {
                     return Ok(new ApiResponse<object>
                     {
                         Success = true,
-                        Message = "ยืนยันคำสั่งซื้อสำเร็จ"
+                        Message = "ยืนยันคำสั่งซื้อสำเร็จ",
+                        Data = result
                     });
                 }
 
@@ -314,7 +315,8 @@ namespace TheStarRichyApi.Controllers
                     return Ok(new ApiResponse<object>
                     {
                         Success = true,
-                        Message = "ยืนยันคำสั่งซื้อสำเร็จ"
+                        Message = "ยืนยันคำสั่งซื้อสำเร็จ",
+                        Data = result
                     });
                 }
 
@@ -343,6 +345,11 @@ namespace TheStarRichyApi.Controllers
         public bool Success { get; set; }
         public string Message { get; set; }
         public T Data { get; set; }
+    }
+
+    public class OrderResult
+    {
+        public string BillNo { get; set; }
     }
 
     #endregion

@@ -2,7 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Data;
 using System.Data.SqlClient;
+using System.Reflection.PortableExecutable;
 using System.Text.Json;
+using TheStarRichyApi.Controllers;
 using TheStarRichyApi.Models;
 
 namespace TheStarRichyApi.Services
@@ -14,7 +16,7 @@ namespace TheStarRichyApi.Services
         Task<OrderSummary> GetOrderSummaryAsync(string memberCode, string orderID);
         Task<PaymentResponse> CreatePaymentAsync(string memberCode, PaymentRequest request);
         Task<PaymentStatusResponse> GetPaymentStatusAsync(string paymentID);
-        Task<bool> ConfirmOrderAsync(string memberCode, string orderID);
+        Task<OrderResult> ConfirmOrderAsync(string memberCode, string orderID);
         Task<bool> BankSlipOrderAsync(string memberCode, string orderID, string slips);
     }
 
@@ -115,96 +117,105 @@ namespace TheStarRichyApi.Services
                 {
                     await connection.OpenAsync();
 
-                    // อัพเดทข้อมูล ShoppingOrder
-                    string updateQuery = @"
-                        UPDATE ShoppingOrder
-                        SET PaymentMethod = @PaymentMethod,
-                            DeliveryMethod = @DeliveryMethod,
-                            DeliveryAddress = @DeliveryAddress,
-                            DeliveryProvince = @DeliveryProvince,
-                            DeliveryDistrict = @DeliveryDistrict,
-                            DeliverySubDistrict = @DeliverySubDistrict,
-                            DeliveryPostalCode = @DeliveryPostalCode,
-                            DeliveryPhone = @DeliveryPhone,
-                            BranchCode = @BranchCode,
-                            SendBill = @SendBill,
-                            Remark = @Remark,
-                            ModifiedDate = GETDATE(),
-                            ModifiedBy = @MemberCode
-                        WHERE OrderID = @OrderID AND MemberCode = @MemberCode;
-
-                        SELECT @OrderID AS OrderID;
-                    ";
-
-                    using (var command = new SqlCommand(updateQuery, connection))
+                    // ตรวจสอบชื่อ Stored Procedure ให้ตรงกับใน Database
+                    using (var command = new SqlCommand("SP_UpdateShoppingOrder", connection))
                     {
+                        command.CommandType = CommandType.StoredProcedure;
+
+                        // 1. Parameter พื้นฐาน
                         command.Parameters.AddWithValue("@OrderID", request.OrderID);
                         command.Parameters.AddWithValue("@MemberCode", memberCode);
-                        command.Parameters.AddWithValue("@PaymentMethod", request.PaymentMethod ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@DeliveryMethod", request.DeliveryMethod ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@PaymentMethod", (object)request.PaymentMethod ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliveryMethod", (object)request.DeliveryMethod ?? DBNull.Value);
 
-                        // Parse Address
+                        // แปลง Bool เป็น Int (1/0)
+                        command.Parameters.AddWithValue("@SendBill", request.SendInvoice);
+                        command.Parameters.AddWithValue("@BranchCode", (object)request.BranchCode?.ToString() ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Remark", ""); // หรือรับค่า Remark จาก request
+
+                        // ตัวแปรสำหรับเก็บค่าที่จะส่งเข้า SP
+                        object deliveryAddr = DBNull.Value;
+                        object province = DBNull.Value;
+                        object district = DBNull.Value;
+                        object subDistrict = DBNull.Value;
+                        object postalCode = DBNull.Value;
+                        object phone = DBNull.Value;
+                        object recipient = DBNull.Value;
+                        object initials = DBNull.Value;
+                        int freqAddr = 0; // Default 0
+
+                        // 2. Logic การเลือกที่อยู่ (ยุบรวม Logic เพื่อความสะอาดของโค้ด)
                         if (request.CustomAddress != null)
                         {
-                            command.Parameters.AddWithValue("@DeliveryAddress", request.CustomAddress.AddressLine ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryProvince", request.CustomAddress.Province ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryDistrict", request.CustomAddress.District ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliverySubDistrict", request.CustomAddress.SubDistrict ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPostalCode", request.CustomAddress.PostalCode ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPhone", request.CustomAddress.Phone ?? (object)DBNull.Value);
+                            deliveryAddr = request.CustomAddress.AddressLine;
+                            province = request.CustomAddress.Province;       // ส่งเป็น Code หรือ Name ตามที่ SP รองรับ
+                            district = request.CustomAddress.District;
+                            subDistrict = request.CustomAddress.SubDistrict;
+                            postalCode = request.CustomAddress.PostalCode;
+                            phone = request.CustomAddress.Phone;
+                            recipient = request.CustomAddress.RecipientName;
+                            initials = request.CustomAddress.Initials;
+
+                            // แปลง Bool เป็น Int
+                            freqAddr = request.CustomAddress.FavoriteAddress ?? 0;
                         }
                         else if (request.MemberAddress != null)
                         {
-                            command.Parameters.AddWithValue("@DeliveryAddress", request.MemberAddress.AddressLine ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryProvince", request.MemberAddress.Province ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryDistrict", request.MemberAddress.District ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliverySubDistrict", request.MemberAddress.SubDistrict ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPostalCode", request.MemberAddress.PostalCode ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPhone", request.MemberAddress.Phone ?? (object)DBNull.Value);
+                            deliveryAddr = request.MemberAddress.AddressLine;
+                            province = request.MemberAddress.Province;
+                            district = request.MemberAddress.District;
+                            subDistrict = request.MemberAddress.SubDistrict;
+                            postalCode = request.MemberAddress.PostalCode;
+                            phone = request.MemberAddress.Phone;
+                            // กรณีใช้ที่อยู่เดิม ไม่ต้องใส่ชื่อผู้รับใหม่ (หรือจะใส่ก็ได้แล้วแต่ Requirement)
                         }
                         else if (request.MemberFavorite != null)
                         {
-                            command.Parameters.AddWithValue("@DeliveryAddress", request.MemberFavorite.Contact_HouseNumber ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryProvince", request.MemberFavorite.Contact_Province ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryDistrict", request.MemberFavorite.Contact_Alley ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliverySubDistrict", request.MemberFavorite.Contact_TAMBON_ID ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPostalCode", request.MemberFavorite.Contact_Zipcode ?? (object)DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPhone", request.MemberFavorite.Contact_Phone ?? (object)DBNull.Value);
-                        }
-                        else
-                        {
-                            command.Parameters.AddWithValue("@DeliveryAddress", DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryProvince", DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryDistrict", DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliverySubDistrict", DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPostalCode", DBNull.Value);
-                            command.Parameters.AddWithValue("@DeliveryPhone", DBNull.Value);
+                            // ** ระวัง Mapping ตรงนี้ **
+                            deliveryAddr = request.MemberFavorite.Contact_HouseNumber; // หรือ Contact_Other
+
+                            // ต้องมั่นใจว่าส่ง "Code" หรือ "ID" ตามที่ SP คาดหวัง
+                            province = request.MemberFavorite.Contact_Province;
+
+                            // Contact_Alley ไม่น่าใช่ District (Amphoe) เช็ค Field นี้ดีๆ
+                            // ปกติ District คือ Contact_District (ถ้ามี) หรือต้อง Lookup เอา
+                            district = request.MemberFavorite.Contact_Alley;
+
+                            subDistrict = request.MemberFavorite.Contact_TAMBON_ID; // อันนี้มักเป็น INT
+                            postalCode = request.MemberFavorite.Contact_Zipcode;
+                            phone = request.MemberFavorite.Contact_Phone;
                         }
 
-                        command.Parameters.AddWithValue("@BranchCode", request.BranchCode?.ToString() ?? (object)DBNull.Value);
-                        command.Parameters.AddWithValue("@SendBill", request.SendInvoice);
-                        command.Parameters.AddWithValue("@Remark", "");
+                        // 3. Add Parameters ที่อยู่
+                        command.Parameters.AddWithValue("@DeliveryAddress", deliveryAddr ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliveryProvince", province ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliveryDistrict", district ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliverySubDistrict", subDistrict ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliveryPostalCode", postalCode ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@DeliveryPhone", phone ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@RecipientName", recipient ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Initials", initials ?? DBNull.Value);
 
-                        using (var reader = await command.ExecuteReaderAsync())
+                        // ** สำคัญ: ชื่อต้องตรง SQL (@Frequentlyaddress) **
+                        command.Parameters.AddWithValue("@FavoriteAddress", freqAddr);
+
+                        // Parameter ModifiedBy
+                        command.Parameters.AddWithValue("@ModifiedBy", memberCode);
+
+                        // 4. Execute และรับค่า Return (แก้ไขจาก ReturnValue เป็น ExecuteScalar)
+                        // เพราะ SQL จบด้วย SELECT @OrderID 
+
+                        var resultObj = await command.ExecuteScalarAsync();
+                        string resultOrderID = resultObj != null ? resultObj.ToString() : "";
+
+                        return new CheckoutInfoResponse
                         {
-                            if (await reader.ReadAsync())
-                            {
-                                return new CheckoutInfoResponse
-                                {
-                                    Success = true,
-                                    Message = "บันทึกข้อมูลสำเร็จ",
-                                    OrderID = reader.GetString(0)
-                                };
-                            }
-                        }
+                            Success = !string.IsNullOrEmpty(resultOrderID),
+                            Message = "บันทึกข้อมูลสำเร็จ",
+                            OrderID = resultOrderID
+                        };
                     }
                 }
-
-                return new CheckoutInfoResponse
-                {
-                    Success = false,
-                    Message = "ไม่สามารถบันทึกข้อมูลได้"
-                };
             }
             catch (Exception ex)
             {
@@ -257,6 +268,7 @@ namespace TheStarRichyApi.Services
                                     DeliveryMethod = reader["DeliveryMethod"]?.ToString(),
                                     Status = reader["Status"]?.ToString(),
                                     SendInvoice = Convert.ToInt16(reader["SendBill"]),
+                                    BillNo = reader["BillNo"]?.ToString(),
                                     Items = new List<OrderItem>(),
                                     DeliveryInfo = new DeliveryInfo
                                     {
@@ -518,7 +530,7 @@ namespace TheStarRichyApi.Services
         /// <summary>
         /// ยืนยันคำสั่งซื้อ - ใช้ SP_UpdatePaymentStatus
         /// </summary>
-        public async Task<bool> ConfirmOrderAsync(string memberCode, string orderID)
+        public async Task<OrderResult> ConfirmOrderAsync(string memberCode, string orderID)
         {
             try
             {
@@ -526,30 +538,37 @@ namespace TheStarRichyApi.Services
                 {
                     await connection.OpenAsync();
 
-                    // ใช้ SP_UpdatePaymentStatus ที่มีอยู่แล้ว
                     using (var command = new SqlCommand("SP_UpdatePaymentStatus", connection))
                     {
                         command.CommandType = CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@OrderID", orderID);
                         command.Parameters.AddWithValue("@PaymentStatus", "Paid");
-                        command.Parameters.AddWithValue("@PaymentReferenceNo", DBNull.Value);
+                        command.Parameters.AddWithValue("@PaymentReferenceNo", (object)DBNull.Value);
                         command.Parameters.AddWithValue("@UpdatedBy", memberCode);
 
-                        // Return value
-                        var returnParam = command.Parameters.Add("@ReturnValue", SqlDbType.Int);
-                        returnParam.Direction = ParameterDirection.ReturnValue;
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                int success = reader["Success"] != DBNull.Value ? Convert.ToInt32(reader["Success"]) : 0;
 
-                        await command.ExecuteNonQueryAsync();
-
-                        int returnValue = (int)returnParam.Value;
-                        return returnValue == 1;
+                                if (success == 1)
+                                {
+                                    return new OrderResult
+                                    {
+                                        BillNo = reader["BillNo"] != DBNull.Value ? reader["BillNo"].ToString() : null
+                                    };
+                                }
+                            }
+                        }
                     }
                 }
+                return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error confirming order");
-                return false;
+                return null;
             }
         }
 
@@ -587,7 +606,6 @@ namespace TheStarRichyApi.Services
                 return false;
             }
         }
-
         #endregion
     }
 
@@ -658,6 +676,9 @@ namespace TheStarRichyApi.Services
         public string? SubDistrict { get; set; }
         public string? PostalCode { get; set; }
         public string? Phone { get; set; }
+        public string? RecipientName { get; set; }
+        public string? Initials { get; set; }
+        public int? FavoriteAddress { get; set; }
     }
 
     public class CheckoutInfoResponse
@@ -683,6 +704,7 @@ namespace TheStarRichyApi.Services
         public DeliveryInfo? DeliveryInfo { get; set; }
         public string Status { get; set; }
         public int SendInvoice { get; set; }
+        public string BillNo { get; set; }
     }
 
     public class OrderItem
