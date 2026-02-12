@@ -17,6 +17,7 @@ namespace TheStarRichyApi.Controllers
             _bankService = bankService;
         }
         [HttpGet("paymentbank")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetPaymentBanks()
         {
             try
@@ -30,6 +31,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("banks")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetBanks()
         {
             try
@@ -43,6 +45,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("countries")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCountries()
         {
             try
@@ -56,6 +59,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("countrybusinesses")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetCountryBusinesses()
         {
             try
@@ -69,6 +73,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("districts")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetDistricts()
         {
             try
@@ -82,6 +87,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("titlenames")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTitlenames()
         {
             try
@@ -95,6 +101,7 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("addressmaster")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAddressMaster()
         {
             try

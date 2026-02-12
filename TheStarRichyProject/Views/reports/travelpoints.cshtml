@@ -1,0 +1,290 @@
+@{
+    ViewData["Title"] = "คะแนนท่องเที่ยว";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-travelpoints">คะแนนท่องเที่ยว</h4>
+            </div>
+            <div class="card-block p-3">
+                <!-- Summary Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h6 data-key="t-total-travel-points">คะแนนท่องเที่ยวทั้งหมด</h6>
+                                <h3 id="totalTravelPoints">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h6 data-key="t-available-points">คะแนนที่ใช้ได้</h6>
+                                <h3 id="availablePoints">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h6 data-key="t-used-points">คะแนนที่ใช้แล้ว</h6>
+                                <h3 id="usedPoints">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h6 data-key="t-expired-points">คะแนนที่หมดอายุ</h6>
+                                <h3 id="expiredPoints">0</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label data-key="t-from-date">จากวันที่:</label>
+                            <input type="date" class="form-control" id="fromDate">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label data-key="t-to-date">ถึงวันที่:</label>
+                            <input type="date" class="form-control" id="toDate">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label data-key="t-transaction-type">ประเภทธุรกรรม:</label>
+                            <select class="form-control" id="transactionType">
+                                <option value="">ทั้งหมด</option>
+                                <option value="earned">ได้รับคะแนน</option>
+                                <option value="used">ใช้คะแนน</option>
+                                <option value="expired">คะแนนหมดอายุ</option>
+                                <option value="adjusted">ปรับปรุงคะแนน</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <button class="btn btn-primary btn-block" id="btnSearch" data-key="t-search">ค้นหา</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Points History Table -->
+                <div class="table-responsive">
+                    <table id="travelPointsTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="15%">วันที่</th>
+                                <th width="20%">รายการ</th>
+                                <th width="15%">ประเภท</th>
+                                <th width="15%">คะแนน</th>
+                                <th width="15%">ยอดคงเหลือ</th>
+                                <th width="15%">หมายเหตุ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Data will be loaded via AJAX -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Points Redemption Section -->
+                <div class="row mt-4">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 data-key="t-points-redemption">แลกคะแนนท่องเที่ยว</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label data-key="t-select-travel-package">เลือกแพ็คเกจท่องเที่ยว:</label>
+                                            <select class="form-control" id="travelPackage">
+                                                <option value="">-- เลือกแพ็คเกจ --</option>
+                                                <option value="package1">แพ็คเกจท่องเที่ยวภูเก็ต (5,000 คะแนน)</option>
+                                                <option value="package2">แพ็คเกจท่องเที่ยวเชียงใหม่ (8,000 คะแนน)</option>
+                                                <option value="package3">แพ็คเกจท่องเที่ยวพัทยา (3,000 คะแนน)</option>
+                                                <option value="package4">แพ็คเกจท่องเที่ยวฮ่องกง (15,000 คะแนน)</option>
+                                                <option value="package5">แพ็คเกจท่องเที่ยวญี่ปุ่น (25,000 คะแนน)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label>&nbsp;</label>
+                                            <button class="btn btn-success btn-block" id="btnRedeem" data-key="t-redeem-points">แลกคะแนน</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="alert alert-info mt-3">
+                                    <i class="fas fa-info-circle"></i> <strong data-key="t-note">หมายเหตุ:</strong> 
+                                    <span data-key="t-travel-points-note">คะแนนท่องเที่ยวมีอายุ 1 ปีนับจากวันที่ได้รับ และสามารถใช้แลกแพ็คเกจท่องเที่ยวได้ตามเงื่อนไขที่กำหนด</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        var table = $('#travelPointsTable').DataTable({
+            "pageLength": 25,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
+            },
+            "ajax": {
+                "url": "/api/reports/travelpoints",
+                "type": "GET",
+                "data": function (d) {
+                    d.fromDate = $('#fromDate').val();
+                    d.toDate = $('#toDate').val();
+                    d.transactionType = $('#transactionType').val();
+                }
+            },
+            "columns": [
+                { "data": "index" },
+                { "data": "date" },
+                { "data": "description" },
+                { 
+                    "data": "type",
+                    "render": function(data) {
+                        var badgeClass = 'secondary';
+                        var typeText = data;
+                        
+                        if (data === 'earned') {
+                            badgeClass = 'success';
+                            typeText = 'ได้รับคะแนน';
+                        } else if (data === 'used') {
+                            badgeClass = 'warning';
+                            typeText = 'ใช้คะแนน';
+                        } else if (data === 'expired') {
+                            badgeClass = 'danger';
+                            typeText = 'คะแนนหมดอายุ';
+                        } else if (data === 'adjusted') {
+                            badgeClass = 'info';
+                            typeText = 'ปรับปรุงคะแนน';
+                        }
+                        
+                        return '<span class="badge bg-' + badgeClass + '">' + typeText + '</span>';
+                    }
+                },
+                { 
+                    "data": "points",
+                    "render": function(data, type, row) {
+                        var sign = '';
+                        if (row.type === 'earned' || row.type === 'adjusted' && data > 0) {
+                            sign = '+';
+                        } else if (row.type === 'used' || row.type === 'expired' || (row.type === 'adjusted' && data < 0)) {
+                            sign = '-';
+                        }
+                        
+                        var colorClass = 'text-success';
+                        if (sign === '-') {
+                            colorClass = 'text-danger';
+                        }
+                        
+                        return '<span class="' + colorClass + '">' + sign + Math.abs(data) + ' คะแนน</span>';
+                    }
+                },
+                { 
+                    "data": "balance",
+                    "render": function(data) {
+                        return data + ' คะแนน';
+                    }
+                },
+                { "data": "remark" }
+            ],
+            "drawCallback": function(settings) {
+                // Update summary after data loads
+                updateSummary(settings.json);
+            }
+        });
+
+        // Search button click
+        $('#btnSearch').click(function() {
+            table.ajax.reload();
+        });
+
+        // Update summary function
+        function updateSummary(data) {
+            if (!data || !data.summary) return;
+            
+            $('#totalTravelPoints').text(data.summary.totalPoints);
+            $('#availablePoints').text(data.summary.availablePoints);
+            $('#usedPoints').text(data.summary.usedPoints);
+            $('#expiredPoints').text(data.summary.expiredPoints);
+        }
+
+        // Redeem button click
+        $('#btnRedeem').click(function() {
+            var selectedPackage = $('#travelPackage').val();
+            if (!selectedPackage) {
+                toastr.warning('กรุณาเลือกแพ็คเกจท่องเที่ยว');
+                return;
+            }
+            
+            // Confirm redemption
+            if (confirm('คุณต้องการแลกคะแนนสำหรับแพ็คเกจนี้ใช่หรือไม่?')) {
+                // Call API to redeem points
+                $.ajax({
+                    url: '/api/reports/redeemtravelpoints',
+                    type: 'POST',
+                    data: {
+                        packageId: selectedPackage
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            toastr.success('แลกคะแนนสำเร็จ: ' + response.message);
+                            table.ajax.reload(); // Refresh table
+                        } else {
+                            toastr.error('แลกคะแนนไม่สำเร็จ: ' + response.message);
+                        }
+                    },
+                    error: function() {
+                        toastr.error('เกิดข้อผิดพลาดในการแลกคะแนน');
+                    }
+                });
+            }
+        });
+
+        // Set default dates (last 90 days)
+        var today = new Date();
+        var threeMonthsAgo = new Date();
+        threeMonthsAgo.setDate(today.getDate() - 90);
+        
+        $('#fromDate').val(threeMonthsAgo.toISOString().split('T')[0]);
+        $('#toDate').val(today.toISOString().split('T')[0]);
+
+        // Load initial data
+        table.ajax.reload();
+    });
+</script>
+
+@section scripts{
+    <!-- DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Toastr for notifications -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+}

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using RestSharp;
@@ -755,6 +756,7 @@ namespace TheStarRichyProject.Controllers
         /// GET: /Orders/GetMasterAddress
         /// </summary>
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetMasterAddress()
         {
             try
@@ -768,8 +770,47 @@ namespace TheStarRichyProject.Controllers
                 return StatusCode(500, new { success = false, message = ex.Message });
             }
         }
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTitlename()
+        {
+            try
+            {
+                var result = await GetTitlenameAsyncFromApi();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetTitlename");
+                return StatusCode(500, new { success = false, message = ex.Message });
+            }
+        }
         #endregion
+        #region address master
+        private async Task<dynamic> GetTitlenameAsyncFromApi()
+        {
+            try
+            {
+                var client = CreateRestClient();
+                var request = new RestRequest("/Static/titlenames", Method.Get);
+                AddHeaders(request);
 
+                RestResponse response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful && !string.IsNullOrEmpty(response.Content))
+                {
+                    return response.Content;
+                }
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting address master from API");
+                return null;
+            }
+        }
+        #endregion
         #region address master
         private async Task<dynamic> GetMasterAddressFromApi()
         {

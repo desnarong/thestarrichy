@@ -12,6 +12,9 @@ builder.Services.AddMemoryCache();
 // Authentication & Login
 builder.Services.AddScoped<ILoginService, LoginService>();
 
+// Registration
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+
 // Member Management
 builder.Services.AddScoped<IMemberService, MemberService>();
 builder.Services.AddScoped<IMemberIncomeByPeriodService, MemberIncomeByPeriodService>();

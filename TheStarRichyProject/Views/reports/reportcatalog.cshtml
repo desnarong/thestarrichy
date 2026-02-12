@@ -1,0 +1,513 @@
+@{
+    ViewData["Title"] = "รายงานทั้งหมด (API Catalog)";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4 data-key="t-report-catalog">รายงานทั้งหมด - API Endpoints Catalog</h4>
+                <p class="text-muted mb-0">แสดงรายการ API endpoints ทั้งหมดพร้อมฟิลด์ข้อมูลที่สามารถเรียกใช้งานได้</p>
+            </div>
+            <div class="card-block p-3">
+                <!-- Filter Section -->
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label data-key="t-search-report">ค้นหารายงาน:</label>
+                            <input type="text" id="searchReport" class="form-control" placeholder="พิมพ์ชื่อรายงานหรือฟิลด์ที่ต้องการค้นหา...">
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label data-key="t-filter-controller">ตัวกรองตาม Controller:</label>
+                            <select id="filterController" class="form-control">
+                                <option value="">ทั้งหมด</option>
+                                <option value="Member">MemberController</option>
+                                <option value="Product">ProductController</option>
+                                <option value="Static">StaticController</option>
+                                <option value="Cart">CartController</option>
+                                <option value="KbankPayment">KbankPaymentController</option>
+                                <option value="Login">LoginController</option>
+                                <option value="Master">MasterController</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label data-key="t-filter-auth">ตัวกรองตาม Authentication:</label>
+                            <select id="filterAuth" class="form-control">
+                                <option value="">ทั้งหมด</option>
+                                <option value="true">ต้องมี Authentication</option>
+                                <option value="false">ไม่ต้องมี Authentication</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Table -->
+                <div class="table-responsive">
+                    <table id="reportsTable" class="table table-striped table-bordered">
+                        <thead>
+                            <tr>
+                                <th width="5%">#</th>
+                                <th width="20%">ชื่อรายงาน</th>
+                                <th width="15%">Endpoint</th>
+                                <th width="10%">Method</th>
+                                <th width="10%">Auth</th>
+                                <th width="40%">ฟิลด์ข้อมูล</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- MemberController Reports -->
+                            <tr data-controller="Member" data-auth="true">
+                                <td>1</td>
+                                <td>ข้อมูลสมาชิก</td>
+                                <td><code>/Member/display</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Membername</span>
+                                    <span class="badge bg-secondary">MemberFlag</span>
+                                    <span class="badge bg-secondary">MemberRank</span>
+                                    <span class="badge bg-secondary">MemberRankName</span>
+                                    <span class="badge bg-secondary">MemberRankColor</span>
+                                    <span class="badge bg-secondary">MemberRankImage</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>2</td>
+                                <td>รายได้ตามช่วง</td>
+                                <td><code>/Member/incomebyperiod</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Startdate</span>
+                                    <span class="badge bg-secondary">Enddate</span>
+                                    <span class="badge bg-secondary">PaymentDate</span>
+                                    <span class="badge bg-secondary">TypeofBonus</span>
+                                    <span class="badge bg-secondary">SponserBonus</span>
+                                    <span class="badge bg-secondary">RebateBonus</span>
+                                    <span class="badge bg-secondary">WeakBonus</span>
+                                    <span class="badge bg-secondary">MatchingBonus</span>
+                                    <span class="badge bg-secondary">StrongBonus</span>
+                                    <span class="badge bg-secondary">AllSaleBonus</span>
+                                    <span class="badge bg-secondary">MobileBonus</span>
+                                    <span class="badge bg-secondary">UnilevelBonus</span>
+                                    <span class="badge bg-secondary">SpecialBonus</span>
+                                    <span class="badge bg-secondary">TotalBonus</span>
+                                    <span class="badge bg-secondary">WTHTax</span>
+                                    <span class="badge bg-secondary">OtherExpense</span>
+                                    <span class="badge bg-secondary">ServicePrice</span>
+                                    <span class="badge bg-secondary">Coupon</span>
+                                    <span class="badge bg-secondary">BonusatferTax</span>
+                                    <span class="badge bg-secondary">Remark</span>
+                                    <span class="badge bg-secondary">NetBonus</span>
+                                    <span class="badge bg-secondary">PeriodName</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>3</td>
+                                <td>รายงานทีมซ้าย</td>
+                                <td><code>/Member/reportmemberleftteam</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Membername</span>
+                                    <span class="badge bg-secondary">MemberRank</span>
+                                    <span class="badge bg-secondary">MemberRankName</span>
+                                    <span class="badge bg-secondary">MemberRankColor</span>
+                                    <span class="badge bg-secondary">MemberRankImage</span>
+                                    <span class="badge bg-secondary">TotalTeam</span>
+                                    <span class="badge bg-secondary">TotalPackage</span>
+                                    <span class="badge bg-secondary">TotalRanking</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>4</td>
+                                <td>รายงานทีมขวา</td>
+                                <td><code>/Member/reportmemberrightteam</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Membername</span>
+                                    <span class="badge bg-secondary">MemberRank</span>
+                                    <span class="badge bg-secondary">MemberRankName</span>
+                                    <span class="badge bg-secondary">MemberRankColor</span>
+                                    <span class="badge bg-secondary">MemberRankImage</span>
+                                    <span class="badge bg-secondary">TotalTeam</span>
+                                    <span class="badge bg-secondary">TotalPackage</span>
+                                    <span class="badge bg-secondary">TotalRanking</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>5</td>
+                                <td>รายงานทีม Sponsor</td>
+                                <td><code>/Member/reportmembersponserteam</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Membername</span>
+                                    <span class="badge bg-secondary">MemberRank</span>
+                                    <span class="badge bg-secondary">MemberRankName</span>
+                                    <span class="badge bg-secondary">MemberRankColor</span>
+                                    <span class="badge bg-secondary">MemberRankImage</span>
+                                    <span class="badge bg-secondary">TotalTeam</span>
+                                    <span class="badge bg-secondary">TotalPackage</span>
+                                    <span class="badge bg-secondary">TotalRanking</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>6</td>
+                                <td>รายงานโบนัสตามวันที่</td>
+                                <td><code>/Member/reportbonusbydate</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Startdate</span>
+                                    <span class="badge bg-secondary">Enddate</span>
+                                    <span class="badge bg-secondary">PaymentDate</span>
+                                    <span class="badge bg-secondary">TypeofBonus</span>
+                                    <span class="badge bg-secondary">SponserBonus</span>
+                                    <span class="badge bg-secondary">RebateBonus</span>
+                                    <span class="badge bg-secondary">WeakBonus</span>
+                                    <span class="badge bg-secondary">MatchingBonus</span>
+                                    <span class="badge bg-secondary">StrongBonus</span>
+                                    <span class="badge bg-secondary">AllSaleBonus</span>
+                                    <span class="badge bg-secondary">MobileBonus</span>
+                                    <span class="badge bg-secondary">UnilevelBonus</span>
+                                    <span class="badge bg-secondary">SpecialBonus</span>
+                                    <span class="badge bg-secondary">TotalBonus</span>
+                                    <span class="badge bg-secondary">WTHTax</span>
+                                    <span class="badge bg-secondary">OtherExpense</span>
+                                    <span class="badge bg-secondary">ServicePrice</span>
+                                    <span class="badge bg-secondary">Coupon</span>
+                                    <span class="badge bg-secondary">BonusatferTax</span>
+                                    <span class="badge bg-secondary">Remark</span>
+                                    <span class="badge bg-secondary">NetBonus</span>
+                                    <span class="badge bg-secondary">PeriodName</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>7</td>
+                                <td>รายงานประวัติตำแหน่ง</td>
+                                <td><code>/Member/reportpositionhistory</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">Membername</span>
+                                    <span class="badge bg-secondary">OldRank</span>
+                                    <span class="badge bg-secondary">NewRank</span>
+                                    <span class="badge bg-secondary">ChangeDate</span>
+                                    <span class="badge bg-secondary">Reason</span>
+                                    <span class="badge bg-secondary">ApprovedBy</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Member" data-auth="true">
+                                <td>8</td>
+                                <td>รายงาน Log</td>
+                                <td><code>/Member/reportlog</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">ActionType</span>
+                                    <span class="badge bg-secondary">ActionDate</span>
+                                    <span class="badge bg-secondary">IPAddress</span>
+                                    <span class="badge bg-secondary">Description</span>
+                                    <span class="badge bg-secondary">Module</span>
+                                </td>
+                            </tr>
+
+                            <!-- ProductController Reports -->
+                            <tr data-controller="Product" data-auth="false">
+                                <td>9</td>
+                                <td>รายการกลุ่มสินค้า</td>
+                                <td><code>/api/Product/productgroup</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-secondary">✗</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">GroupCode</span>
+                                    <span class="badge bg-secondary">GroupName</span>
+                                    <span class="badge bg-secondary">GroupDescription</span>
+                                    <span class="badge bg-secondary">GroupImage</span>
+                                    <span class="badge bg-secondary">GroupOrder</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Product" data-auth="true">
+                                <td>10</td>
+                                <td>สินค้าตามกลุ่ม</td>
+                                <td><code>/api/Product/groupofproducts</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">ProductCode</span>
+                                    <span class="badge bg-secondary">ProductName</span>
+                                    <span class="badge bg-secondary">ProductDescription</span>
+                                    <span class="badge bg-secondary">ProductPrice</span>
+                                    <span class="badge bg-secondary">ProductPV</span>
+                                    <span class="badge bg-secondary">ProductImage</span>
+                                    <span class="badge bg-secondary">ProductType</span>
+                                    <span class="badge bg-secondary">GroupCode</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Product" data-auth="true">
+                                <td>11</td>
+                                <td>สินค้า Topup</td>
+                                <td><code>/api/Product/productlistfortopup</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">ProductCode</span>
+                                    <span class="badge bg-secondary">ProductName</span>
+                                    <span class="badge bg-secondary">ProductDescription</span>
+                                    <span class="badge bg-secondary">ProductPrice</span>
+                                    <span class="badge bg-secondary">ProductPV</span>
+                                    <span class="badge bg-secondary">ProductImage</span>
+                                    <span class="badge bg-secondary">ProductType</span>
+                                    <span class="badge bg-secondary">GroupCode</span>
+                                </td>
+                            </tr>
+
+                            <!-- StaticController Reports -->
+                            <tr data-controller="Static" data-auth="true">
+                                <td>12</td>
+                                <td>รายการธนาคาร</td>
+                                <td><code>/Static/banks</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">BankCode</span>
+                                    <span class="badge bg-secondary">BankName</span>
+                                    <span class="badge bg-secondary">BankShortName</span>
+                                    <span class="badge bg-secondary">BankLogo</span>
+                                    <span class="badge bg-secondary">BankOrder</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Static" data-auth="true">
+                                <td>13</td>
+                                <td>รายการประเทศ</td>
+                                <td><code>/Static/countries</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">CountryCode</span>
+                                    <span class="badge bg-secondary">CountryName</span>
+                                    <span class="badge bg-secondary">CountryFlag</span>
+                                    <span class="badge bg-secondary">CountryOrder</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Static" data-auth="true">
+                                <td>14</td>
+                                <td>เขต/อำเภอ</td>
+                                <td><code>/Static/districts</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">DistrictCode</span>
+                                    <span class="badge bg-secondary">DistrictName</span>
+                                    <span class="badge bg-secondary">ProvinceCode</span>
+                                    <span class="badge bg-secondary">ProvinceName</span>
+                                    <span class="badge bg-secondary">RegionCode</span>
+                                </td>
+                            </tr>
+                            <tr data-controller="Static" data-auth="true">
+                                <td>15</td>
+                                <td>คำนำหน้าชื่อ</td>
+                                <td><code>/Static/titlenames</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">TitleCode</span>
+                                    <span class="badge bg-secondary">TitleName</span>
+                                    <span class="badge bg-secondary">TitleGender</span>
+                                    <span class="badge bg-secondary">TitleOrder</span>
+                                </td>
+                            </tr>
+
+                            <!-- CartController Reports -->
+                            <tr data-controller="Cart" data-auth="true">
+                                <td>16</td>
+                                <td>ดึงตะกร้า</td>
+                                <td><code>/api/Cart/get</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-warning">✓</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">CartId</span>
+                                    <span class="badge bg-secondary">Membercode</span>
+                                    <span class="badge bg-secondary">ProductCode</span>
+                                    <span class="badge bg-secondary">ProductName</span>
+                                    <span class="badge bg-secondary">Quantity</span>
+                                    <span class="badge bg-secondary">Price</span>
+                                    <span class="badge bg-secondary">PV</span>
+                                    <span class="badge bg-secondary">TotalPrice</span>
+                                    <span class="badge bg-secondary">TotalPV</span>
+                                    <span class="badge bg-secondary">AddedDate</span>
+                                </td>
+                            </tr>
+
+                            <!-- KbankPaymentController Reports -->
+                            <tr data-controller="KbankPayment" data-auth="false">
+                                <td>17</td>
+                                <td>สร้าง QR Payment</td>
+                                <td><code>/api/KbankPayment/qr/create</code></td>
+                                <td><span class="badge bg-primary">POST</span></td>
+                                <td><span class="badge bg-secondary">✗</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">amount</span>
+                                    <span class="badge bg-secondary">reference1</span>
+                                    <span class="badge bg-secondary">reference2</span>
+                                    <span class="badge bg-secondary">reference3</span>
+                                    <span class="badge bg-secondary">qrType</span>
+                                    <span class="badge bg-secondary">transactionId</span>
+                                    <span class="badge bg-secondary">qrImage</span>
+                                    <span class="badge bg-secondary">expiryDate</span>
+                                </td>
+                            </tr>
+
+                            <!-- LoginController Reports -->
+                            <tr data-controller="Login" data-auth="false">
+                                <td>18</td>
+                                <td>เข้าสู่ระบบ</td>
+                                <td><code>/Login/signin</code></td>
+                                <td><span class="badge bg-primary">POST</span></td>
+                                <td><span class="badge bg-secondary">✗</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">username</span>
+                                    <span class="badge bg-secondary">password</span>
+                                    <span class="badge bg-secondary">passkey</span>
+                                    <span class="badge bg-secondary">ipAddress</span>
+                                    <span class="badge bg-secondary">token</span>
+                                    <span class="badge bg-secondary">expires</span>
+                                    <span class="badge bg-secondary">membercode</span>
+                                    <span class="badge bg-secondary">membername</span>
+                                </td>
+                            </tr>
+
+                            <!-- MasterController Reports -->
+                            <tr data-controller="Master" data-auth="false">
+                                <td>19</td>
+                                <td>สถานะเว็บไซต์</td>
+                                <td><code>/Master/webstatus</code></td>
+                                <td><span class="badge bg-success">GET</span></td>
+                                <td><span class="badge bg-secondary">✗</span></td>
+                                <td>
+                                    <span class="badge bg-secondary">Status</span>
+                                    <span class="badge bg-secondary">Message</span>
+                                    <span class="badge bg-secondary">Timestamp</span>
+                                    <span class="badge bg-secondary">Version</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- API Usage Instructions -->
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 data-key="t-api-usage">วิธีการใช้งาน API</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>1. Authentication</h6>
+                        <p>สำหรับ endpoints ที่ต้องมี Authentication ต้องส่ง Header ดังนี้:</p>
+                        <pre><code>Authorization: Bearer <your-jwt-token>
+X-Passkey: <your-passkey></code></pre>
+
+                        <h6>2. ตัวอย่างการเรียกใช้งานด้วย cURL</h6>
+                        <pre><code># เรียกข้อมูลสมาชิก
+curl -X GET "http://localhost:5242/Member/display" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "X-Passkey: ibi1Nxvi2Kym0edyf2015zzz"
+
+# เรียกรายงานโบนัสตามวันที่
+curl -X GET "http://localhost:5242/Member/reportbonusbydate" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "X-Passkey: ibi1Nxvi2Kym0edyf2015zzz"
+
+# เรียกรายการธนาคาร
+curl -X GET "http://localhost:5242/Static/banks" \
+  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
+  -H "X-Passkey: ibi1Nxvi2Kym0edyf2015zzz"</code></pre>
+
+                        <h6>3. ตัวอย่างการเรียกใช้งานด้วย JavaScript (Fetch API)</h6>
+                        <pre><code>async function getMemberReport() {
+  const response = await fetch('http://localhost:5242/Member/display', {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Bearer ' + token,
+      'X-Passkey': 'ibi1Nxvi2Kym0edyf2015zzz'
+    }
+  });
+  const data = await response.json();
+  console.log(data);
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        // Initialize DataTable
+        var table = $('#reportsTable').DataTable({
+            "pageLength": 25,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
+            }
+        });
+
+        // Search filter
+        $('#searchReport').on('keyup', function () {
+            table.search(this.value).draw();
+        });
+
+        // Controller filter
+        $('#filterController').on('change', function () {
+            var controller = $(this).val();
+            if (controller) {
+                table.column(1).search(controller, true, false).draw();
+            } else {
+                table.column(1).search('').draw();
+            }
+        });
+
+        // Auth filter
+        $('#filterAuth').on('change', function () {
+            var auth = $(this).val();
+            if (auth) {
+                table.column(4).search(auth === 'true' ? '✓' : '✗', true, false).draw();
+            } else {
+                table.column(4).search('').draw();
+            }
+        });
+
+        // Add click event to copy endpoint
+        $('#reportsTable tbody').on('click', 'td:nth-child(3)', function () {
+            var endpoint = $(this).text().trim();
+            navigator.clipboard.writeText(endpoint).then(function() {
+                toastr.success('คัดลอก Endpoint เรียบร้อยแล้ว: ' + endpoint);
+            });
+        });
+    });
+</script>
+
+@section scripts{
+    <!-- DataTables -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Toastr for notifications -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+}

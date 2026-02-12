@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -29,6 +30,11 @@ namespace TheStarRichyProject.Controllers
             return View();
         }
         public IActionResult register()
+        {
+            return View();
+        }
+        [AllowAnonymous]
+        public IActionResult externalregistration()
         {
             return View();
         }

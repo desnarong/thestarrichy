@@ -76,13 +76,6 @@ namespace TheStarRichyApi.Services
                 return new List<dynamic>();
             }
 
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic>();
-            }
-
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -139,13 +132,6 @@ namespace TheStarRichyApi.Services
 
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
-            {
-                return new List<dynamic>();
-            }
-
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
             {
                 return new List<dynamic>();
             }
@@ -210,13 +196,6 @@ namespace TheStarRichyApi.Services
                 return new List<dynamic>();
             }
 
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic>();
-            }
-
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -273,13 +252,6 @@ namespace TheStarRichyApi.Services
 
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
-            {
-                return new List<dynamic>();
-            }
-
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
             {
                 return new List<dynamic>();
             }
@@ -344,13 +316,6 @@ namespace TheStarRichyApi.Services
                 return new List<dynamic>();
             }
 
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic>();
-            }
-
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -408,13 +373,6 @@ namespace TheStarRichyApi.Services
 
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
-            {
-                return new List<dynamic>();
-            }
-
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
             {
                 return new List<dynamic>();
             }

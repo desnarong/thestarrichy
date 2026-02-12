@@ -11,7 +11,7 @@ using TheStarRichyProject.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// âËÅ´¡ÒÃµÑé§¤èÒ
+// ï¿½ï¿½Å´ï¿½ï¿½Ãµï¿½é§¤ï¿½ï¿½
 builder.Configuration
 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
 .AddEnvironmentVariables();
@@ -21,7 +21,7 @@ builder.Services.AddLocalization(options => options.ResourcesPath = "Resources")
 builder.Services.AddControllersWithViews()
 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
 
-// µÑé§¤èÒÀÒÉÒ
+// ï¿½ï¿½é§¤ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 var supportedCultures = new[]
 {
 new CultureInfo("en-US"),

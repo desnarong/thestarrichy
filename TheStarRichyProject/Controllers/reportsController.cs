@@ -24,5 +24,17 @@ namespace TheStarRichyProject.Controllers
         {
             return View();
         }
+        public IActionResult reportcatalog()
+        {
+            return View();
+        }
+        public IActionResult historyofpromotion()
+        {
+            return View();
+        }
+        public IActionResult travelpoints()
+        {
+            return View();
+        }
     }
 }

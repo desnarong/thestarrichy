@@ -1,0 +1,535 @@
+@{
+    Layout = null;
+    ViewBag.Title = "External Registration";
+}
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>External Registration</title>
+    <script src="~/assets/js/layout.js"></script>
+    <!-- Bootstrap Css -->
+    <link href="~/assets/css/bootstrap.min.css" rel="stylesheet" type="text/css" />
+    <!-- Icons Css -->
+    <link href="~/assets/css/icons.min.css" rel="stylesheet" type="text/css" />
+    <!-- App Css-->
+    <link href="~/assets/css/app.min.css" rel="stylesheet" type="text/css" />
+    <!-- ⭐ เพิ่มบรรทัดนี้ -->
+    <link href="~/assets/css/team-pages-velzon.css" rel="stylesheet" />
+    <!-- custom Css-->
+    <link href="~/assets/css/custom.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" />
+    <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <style>
+        div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
+            background-color: rgba(var(--vz-link-color-rgb),var(--vz-link-opacity,1)) !important
+        }
+
+        .h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>ลงทะเบียนสมาชิก</h4>
+                        <p class="text-muted mb-0">กรอกข้อมูลพื้นฐานที่จำเป็น</p>
+                    </div>
+                    <div class="card-body">
+                        <form id="simpleRegistrationForm">
+                            <div class="row">
+                                <!-- Left Column - Basic Information -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>ข้อมูลพื้นฐาน</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    ประเทศ
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select name="simpleCountry" class="form-control" required>
+                                                        <option value="">-- เลือกประเทศ --</option>
+                                                        <option value="thailand" selected>ประเทศไทย</option>
+                                                        <option value="laos">สาธารณรัฐประชาธิปไตยประชาชนลาว</option>
+                                                        <option value="cambodia">ราชอาณาจักรกัมพูชา</option>
+                                                        <option value="myanmar">สาธารณรัฐแห่งสหภาพเมียนมา</option>
+                                                        <option value="vietnam">สาธารณรัฐสังคมนิยมเวียดนาม</option>
+                                                        <option value="other">อื่นๆ</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    ประเภทเอกสาร
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select name="simpleDocumentType" class="form-control" required id="simpleDocumentType">
+                                                        <option value="">-- เลือกประเภทเอกสาร --</option>
+                                                        <option value="citizen" selected>บัตรประชาชน</option>
+                                                        <option value="passport">พาสปอร์ต</option>
+                                                        <option value="alien">บัตรต่างด้าว</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    เลขที่เอกสาร
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="simpleDocumentNumber" placeholder="กรอกเลขที่เอกสาร" required />
+                                                    <small class="text-muted mt-1" id="documentValidationMessage"></small>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    รหัสผู้อ้างอิง
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <div class="input-group">
+                                                        <input type="text" class="form-control" id="simpleReferrerCode" placeholder="กรอกรหัสผู้อ้างอิง" required />
+                                                        <button type="button" class="btn btn-primary" id="btnSearchReferrer" data-key="t-search">ค้นหา</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">ชื่อผู้อ้างอิง</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="simpleReferrerName" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    คำนำหน้า
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <select name="simpleTitle" id="simpleTitle" class="form-control" required>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    ชื่อ-นามสกุล
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="simpleFullName" placeholder="กรอกชื่อ-นามสกุล" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">
+                                                    โทรศัพท์มือถือ
+                                                    <span class="text-danger">*</span>
+                                                </label>
+                                                <div class="col-md-8">
+                                                    <input type="tel" class="form-control" id="simpleMobile" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">อีเมล</label>
+                                                <div class="col-md-8">
+                                                    <input type="email" class="form-control" id="simpleEmail" placeholder="กรอกอีเมล" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">Line ID</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="simpleLineId" placeholder="กรอก Line ID" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label required">ยืนยันตัวตน</label>
+                                                <div class="col-md-8">
+                                                    <div class="form-check mb-2">
+                                                        <input type="radio" class="form-check-input" name="verificationMethod" id="verificationPhone" value="phone" checked />
+                                                        <label class="form-check-label" for="verificationPhone">ยืนยันด้วยเบอร์โทรศัพท์</label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input type="radio" class="form-check-input" name="verificationMethod" id="verificationEmail" value="email" />
+                                                        <label class="form-check-label" for="verificationEmail">ยืนยันด้วยอีเมล</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label"></label>
+                                                <div class="col-md-8">
+                                                    <button type="button" class="btn btn-outline-primary w-100" id="btnSendOTP">
+                                                        <i class="fas fa-paper-plane me-2"></i>ส่งรหัส OTP
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right Column - Address Information (Optional) -->
+                                <div class="col-12 col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h5>ข้อมูลที่อยู่ <small class="text-muted">(ไม่จำเป็นต้องกรอก)</small></h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="alert alert-warning mb-3">
+                                                <i class="fas fa-info-circle me-2"></i>
+                                                <small>หากกรอกข้อมูลที่อยู่ กรุณากรอกให้ครบถ้วน</small>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">ที่อยู่ตามบัตรประชาชน</label>
+                                                <div class="col-md-8">
+                                                    <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง"></textarea>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">รหัสไปรษณีย์</label>
+                                                <div class="col-md-8">
+                                                    <input type="text" class="form-control" id="simplePostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" />
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">จังหวัด</label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" id="simpleProvince" disabled>
+                                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">เขต/อำเภอ</label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" id="simpleDistrict" disabled>
+                                                        <option value="">-- เลือกอำเภอ --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-4 col-form-label">แขวง/ตำบล</label>
+                                                <div class="col-md-8">
+                                                    <select class="form-control" id="simpleSubdistrict" disabled>
+                                                        <option value="">-- เลือกตำบล --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Mobile-Friendly Action Buttons -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="d-flex flex-column flex-md-row justify-content-center justify-content-md-end align-items-center gap-3">
+                                        <a href="/" class="btn btn-outline-info w-100 w-md-auto">
+                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                        </a>
+                                        <button type="button" class="btn btn-outline-secondary w-100 w-md-auto" id="btnResetSimple">
+                                            <i class="fas fa-redo me-2"></i>ล้างข้อมูล
+                                        </button>
+                                        <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto" id="btnSubmitSimple">
+                                            <i class="fas fa-user-plus me-2"></i>ลงทะเบียนทันที
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+            let masterData = [];
+            let tlenameData = [];
+
+            // Load master address data
+            loadMasterAddresses();
+            loadMastertitlename();
+
+            // Reset simple form
+            $('#btnResetSimple').click(function () {
+                $('#simpleRegistrationForm')[0].reset();
+                $('#simpleReferrerName').val('');
+                resetAddressDropdowns();
+                $('#simpleCountry').val('thailand');
+                $('#simpleDocumentType').val('citizen');
+                $('#documentValidationMessage').text('');
+            });
+
+            // Search referrer
+            $('#btnSearchReferrer').click(function () {
+                const referrerCode = $('#simpleReferrerCode').val();
+                if (referrerCode) {
+                    // Call API to find referrer
+                    $.get('/Registration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+                        .done(function(response) {
+                            if (response.success) {
+                                $('#simpleReferrerName').val(response.memberName);
+                                alert('พบข้อมูลผู้อ้างอิงแล้ว');
+                            } else {
+                                $('#simpleReferrerName').val('');
+                                alert(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
+                            }
+                        })
+                        .fail(function() {
+                            $('#simpleReferrerName').val('');
+                            alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+                        });
+                } else {
+                    alert('กรุณากรอกรหัสผู้อ้างอิง');
+                }
+            });
+
+            // Document type change
+            $('#simpleDocumentType').change(function () {
+                const docType = $(this).val();
+                $('#documentValidationMessage').text('');
+
+                if (docType === 'citizen') {
+                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขบัตรประชาชน 13 หลัก');
+                } else if (docType === 'passport') {
+                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขพาสปอร์ต');
+                } else {
+                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขบัตรต่างด้าว');
+                }
+            });
+
+            // Zipcode input for address lookup
+            $('#simplePostcode').on('input', function() {
+                var selectedZip = $(this).val();
+                resetAddressDropdowns();
+
+                if (selectedZip.length === 5) {
+                    // Filter data by zipcode
+                    var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+
+                    if (filteredData.length > 0) {
+                        // Get unique provinces
+                        var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+
+                        // Create province options
+                        $('#simpleProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                        $.each(uniqueProvinces, function(index, item) {
+                            $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
+                        });
+                        $('#simpleProvince').prop('disabled', false);
+
+                        // Auto select if only one province
+                        if (uniqueProvinces.length === 1) {
+                            $('#simpleProvince').val(uniqueProvinces[0].province_code).trigger('change');
+                        }
+                    }
+                }
+            });
+
+            // Province change
+            $('#simpleProvince').change(function() {
+                var selectedZip = $('#simplePostcode').val();
+                var selectedProvCode = $(this).val();
+
+                resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+
+                if (selectedProvCode) {
+                    var filteredData = masterData.filter(item =>
+                        item.zipcode === selectedZip &&
+                        item.province_code == selectedProvCode
+                    );
+
+
+
+                    if (filteredData.length > 0) {
+                        var uniqueDistricts = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
+
+                        $('#simpleDistrict').empty().append('<option value="">-- เลือกอำเภอ --</option>');
+                        $.each(uniqueDistricts, function(index, item) {
+                            $('#simpleDistrict').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                        });
+                        $('#simpleDistrict').prop('disabled', false);
+
+                        if (uniqueDistricts.length === 1) {
+                            $('#simpleDistrict').val(uniqueDistricts[0].amphoe_code).trigger('change');
+                        }
+                    }
+                }
+            });
+
+            // District change
+            $('#simpleDistrict').change(function() {
+                var selectedZip = $('#simplePostcode').val();
+                var selectedProvCode = $('#simpleProvince').val();
+                var selectedDistCode = $(this).val();
+
+                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+                console.log(selectedDistCode);
+
+                if (selectedDistCode) {
+                    var filteredData = masterData.filter(item =>
+                        item.zipcode === selectedZip &&
+                        item.province_code == selectedProvCode &&
+                        item.amphoe_code == selectedDistCode
+                    );
+
+                    if (filteredData.length > 0) {
+                        var uniqueSubdistricts = getUniqueList(filteredData, 'tambon_code', 'tambon');
+
+                        $('#simpleSubdistrict').empty().append('<option value="">-- เลือกตำบล --</option>');
+                        $.each(uniqueSubdistricts, function(index, item) {
+                            $('#simpleSubdistrict').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
+                        });
+                        $('#simpleSubdistrict').prop('disabled', false);
+                    }
+                }
+            });
+
+            // Submit form
+            $('#simpleRegistrationForm').on('submit', function(e) {
+                e.preventDefault();
+                alert('Form submitted!');
+                // TODO: Implement form submission to API
+            });
+
+            // Helper functions
+            function loadMasterAddresses() {
+                $.get('/orders/GetMasterAddress', function(res) {
+                    if (!res) {
+                        console.error("No response data from GetMasterAddress");
+                        //alert('ไม่พบข้อมูลที่อยู่');
+                        return;
+                    }
+
+                    if (typeof res === 'string') {
+                        try { res = JSON.parse(res); } catch (e) {
+                            console.error("JSON Error", e);
+                            //alert('ไม่สามารถโหลดข้อมูลที่อยู่ได้');
+                            return;
+                        }
+                    }
+
+                    if (!Array.isArray(res)) {
+                        if (res.data && Array.isArray(res.data)) {
+                            masterData = res.data;
+                        } else if (res.result && Array.isArray(res.result)) {
+                            masterData = res.result;
+                        } else {
+                            masterData = [];
+                        }
+                    } else {
+                        masterData = res;
+                    }
+
+                    console.log("Loaded " + masterData.length + " rows of address data");
+                    $('#simplePostcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
+
+                    if (masterData.length === 0) {
+                        //alert('ไม่พบข้อมูลที่อยู่ในระบบ');
+                    }
+                }).fail(function() {
+                    //alert('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์เพื่อโหลดข้อมูลที่อยู่');
+                    console.error("Failed to load master address data");
+                });
+            }
+
+                            function loadMastertitlename() {
+            const $select = $('#simpleTitle');
+
+            // 1. ตรวจสอบก่อนว่ามี Element นี้อยู่ในหน้าเว็บไหม
+            if ($select.length === 0) {
+                console.error("หา Element #simpleTitle ไม่พบในหน้านี้");
+                return;
+            }
+
+            $.get('/orders/GetTitlename')
+                .done(function(res) {
+                    if (!res) {
+                        console.error("เซิร์ฟเวอร์ส่งค่าว่างกลับมา");
+                        return;
+                    }
+
+                    // 2. แปลงข้อมูลหากเป็น String และดึง Array ออกมา
+                    let rawData = (typeof res === 'string') ? JSON.parse(res) : res;
+                    let tlenameData = Array.isArray(rawData) ? rawData : (rawData.data || rawData.result || []);
+
+                    if (tlenameData.length === 0) {
+                        console.warn("ไม่มีข้อมูลใน Array");
+                        return;
+                    }
+
+                    // 3. เตรียม HTML String (ล้างค่าเก่าไปในตัว)
+                    let htmlOptions = '<option value="">-- เลือกคำนำหน้า --</option>';
+
+                    $.each(tlenameData, function(index, item) {
+                        // ดักเผื่อชื่อ Property เป็นตัวเล็กหรือตัวใหญ่
+                        let val = item.M15_PX1 ?? item.m15_px1 ?? "";
+                        let text = item.Thainame ?? item.thainame ?? item.THAINAME ?? "ไม่ระบุชื่อ";
+
+                        htmlOptions += `<option value="${val}">${text}</option>`;
+                    });
+
+                    // 4. แสดงผลลงใน Select
+                    $select.html(htmlOptions);
+
+                    // 5. บรรทัดสำคัญ! ถ้าคุณใช้ Select2 หรือ Plugin อื่นๆ ต้องสั่งให้มัน Refresh
+                    if ($select.data('select2')) {
+                        $select.trigger('change');
+                    } else if ($select.hasClass('selectpicker')) {
+                        $select.selectpicker('refresh');
+                    }
+
+                    console.log(`สำเร็จ! โหลดข้อมูลได้ ${tlenameData.length} แถว`);
+                })
+                .fail(function(xhr, status, error) {
+                    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+                });
+        }
+
+            function validateThaiID(id) {
+                if (id.length !== 13) return false;
+
+                let sum = 0;
+                for (let i = 0; i < 12; i++) {
+                    sum += parseInt(id.charAt(i)) * (13 - i);
+                }
+
+                let checkDigit = (11 - (sum % 11)) % 10;
+                return checkDigit === parseInt(id.charAt(12));
+            }
+
+            function getUniqueList(data, codeKey, nameKey) {
+                var seen = new Set();
+                return data.filter(item => {
+                    var k = item[codeKey];
+                    return seen.has(k) ? false : seen.add(k);
+                }).sort((a, b) => a[nameKey].localeCompare(b[nameKey]));
+            }
+
+            function resetDropdown(selector, defaultText) {
+                $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+            }
+
+            function resetAddressDropdowns() {
+                resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+            }
+        });
+    </script>
+</body>
+</html>
