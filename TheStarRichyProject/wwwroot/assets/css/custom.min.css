@@ -269,3 +269,22 @@
 .page-content {
     padding: calc(90px + 1.5rem) calc(1.5rem * .5) 60px calc(1.5rem * .5);
 }
+
+/* Override: make label + inputs use 1rem font-size app-wide */
+label,
+.col-form-label,
+.form-check-label,
+.form-control {
+    font-size: 0.90rem;
+    color: #4d4e54 !important;
+}
+
+/* Small adjustment to keep form-control line-height consistent */
+.form-control {
+    line-height: 1.5;
+}
+
+/* Slightly smaller button text for compact UI */
+.btn {
+    font-size: 0.90rem;
+}

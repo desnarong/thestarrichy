@@ -31,5 +31,27 @@ namespace TheStarRichyApi.Services
         /// ตรวจสอบว่าเลขบัตรประชาชน/เอกสารซ้ำหรือไม่
         /// </summary>
         Task<bool> IsDocumentNumberExistsAsync(string documentNumber);
+
+        // Validation methods for external registration
+        Task<ValidationResponse> CheckBlacklistAsync(string idCardNumber);
+        Task<ValidationResponse> CheckExpireAsync(string idCardNumber);
+        Task<ValidationResponse> CheckMemberResignAsync(string idCardNumber);
+        Task<ValidationResponse> CheckSponsorCodeAsync(string memberCode);
+        Task<ValidationResponse> CheckDuplicateIDCardAsync(string idCardNumber);
+        Task<ValidationResponse> CheckDuplicateIDCardNameAsync(string idCardName);
+        Task<ValidationResponse> CheckDuplicateBusinessNameAsync(string businessName);
+        Task<ValidationResponse> CheckDuplicateTelephoneAsync(string telephone);
+        Task<ValidationResponse> CheckDuplicateBankAccountAsync(string bankCode, string accountNumber);
+        Task<ValidationResponse> CheckDuplicateBankAccountNameAsync(string bankCode, string accountName);
+        Task<ValidationResponse> CheckDuplicateEmailAsync(string email);
+        Task<ValidationResponse> CheckDuplicateLineIdAsync(string lineId);
+        Task<ValidationResponse> CheckAgeAsync(string birthDate);
+
+        // OTP methods
+        Task<SendOTPResponse> SendOTPAsync(SendOTPRequest request);
+        Task<VerifyOTPResponse> VerifyOTPAsync(VerifyOTPRequest request);
+
+        // Final registration with OTP
+        Task<RegistrationResponse> FinalizeRegistrationAsync(FinalizeRegistrationRequest request);
     }
 }

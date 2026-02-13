@@ -7,30 +7,16 @@ namespace TheStarRichyApi.Models
     /// </summary>
     public class EasyRegistrationRequest
     {
-        [Required(ErrorMessage = "กรุณาเลือกประเทศ")]
         public string Country { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณาเลือกประเภทเอกสาร")]
-        public string DocumentType { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "กรุณากรอกเลขที่เอกสาร")]
         public string DocumentNumber { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณากรอกรหัสผู้อ้างอิง")]
         public string ReferrerCode { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณาเลือกคำนำหน้า")]
         public string Title { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณากรอกชื่อ-นามสกุล")]
-        public string FullName { get; set; } = string.Empty;
-
-        [Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์")]
-        [Phone(ErrorMessage = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง")]
         public string Mobile { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "กรุณากรอกอีเมล")]
-        [EmailAddress(ErrorMessage = "รูปแบบอีเมลไม่ถูกต้อง")]
         public string Email { get; set; } = string.Empty;
 
         public string? LineId { get; set; }
@@ -42,9 +28,19 @@ namespace TheStarRichyApi.Models
         public string? DistrictCode { get; set; }
         public string? SubdistrictCode { get; set; }
 
-        // OTP verification
-        [Required(ErrorMessage = "กรุณาเลือกวิธีการยืนยันตัวตน")]
-        public string VerificationMethod { get; set; } = "phone"; // phone or email
+        public string VerificationMethod { get; set; } = "phone";
+
+        // 💡 ฟิลด์เหล่านี้มีส่งมาใน JSON ทั้งหมด (รวมไว้ในคลาสแม่ที่เดียว)
+        public string? CountryBusiness { get; set; }
+        public string? Position { get; set; }
+        public string? RegistrationDate { get; set; }
+        public string? BirthDate { get; set; }
+        public string? IdCardName { get; set; }
+        public string? BusinessName { get; set; }
+        public string? HomePhone { get; set; }
+
+        // Uploaded member pictures (base64 strings). Maps from JSON property `memberpic`.
+        public List<string>? Memberpic { get; set; }
     }
 
     /// <summary>
@@ -52,50 +48,35 @@ namespace TheStarRichyApi.Models
     /// </summary>
     public class FullRegistrationRequest
     {
-        // General Information
-        [Required]
         public string Country { get; set; } = string.Empty;
 
-        [Required]
         public string BusinessCountry { get; set; } = string.Empty;
 
-        [Required]
         public string ReferrerCode { get; set; } = string.Empty;
 
-        [Required]
         public string ReferrerSide { get; set; } = "left"; // left or right
 
         public string? UplineCode { get; set; }
         public string? UplineSide { get; set; } = "left";
 
-        [Required]
         public string BusinessType { get; set; } = "businessman"; // businessman or user
 
-        [Required]
         public string Title { get; set; } = string.Empty;
 
-        [Required]
         public string NameOnCard { get; set; } = string.Empty;
 
         public string? BusinessName { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
 
-        [Required]
         public string CitizenNumber { get; set; } = string.Empty;
 
-        // Contact Information
-        [Required]
-        [Phone]
         public string Mobile { get; set; } = string.Empty;
 
-        [Phone]
         public string? HomePhone { get; set; }
 
         public string? Fax { get; set; }
 
-        [Required]
-        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
         public string? LineId { get; set; }
@@ -128,6 +109,9 @@ namespace TheStarRichyApi.Models
         public string? BankBookImage { get; set; }
         public string? ApplicationFormImage { get; set; }
         public string? ProfileImage { get; set; }
+
+        // If client sends `memberpic` (array of base64 strings) prefer that over individual image props
+        public List<string>? Memberpic { get; set; }
     }
 
     /// <summary>
@@ -136,10 +120,10 @@ namespace TheStarRichyApi.Models
     /// </summary>
     public class ExternalRegistrationRequest : EasyRegistrationRequest
     {
-        // Inherit all fields from EasyRegistrationRequest
-        // เพิ่มฟิลด์เฉพาะสำหรับ external registration ถ้าจำเป็น
-        public string? SourcePage { get; set; } // ระบุว่ามาจากหน้าไหน
-        public string? CampaignCode { get; set; } // รหัสแคมเปญ (ถ้ามี)
+        // 💡 ลบฟิลด์ที่ซ้ำซ้อนออกทั้งหมด เพราะสืบทอดมาจาก EasyRegistrationRequest แล้ว
+        // เหลือไว้เฉพาะฟิลด์ที่คลาสแม่ไม่มีจริงๆ
+        public string? SourcePage { get; set; }
+        public string? CampaignCode { get; set; }
     }
 
     /// <summary>
@@ -173,5 +157,86 @@ namespace TheStarRichyApi.Models
         public string? MemberCode { get; set; }
         public string? MemberName { get; set; }
         public string? Message { get; set; }
+    }
+
+    /// <summary>
+    /// Response model สำหรับ validation APIs
+    /// </summary>
+    public class ValidationResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+
+    /// <summary>
+    /// Request model สำหรับส่ง OTP
+    /// </summary>
+    public class SendOTPRequest
+    {
+        [Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์")]
+        [Phone(ErrorMessage = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "กรุณาเลือกวิธีการส่ง OTP")]
+        public string Method { get; set; } = "sms"; // sms or email
+    }
+
+    /// <summary>
+    /// Response model สำหรับส่ง SMS
+    /// </summary>
+    public class SendSMSResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string? ErrorCode { get; set; }
+    }
+
+    /// <summary>
+    /// Response model สำหรับส่ง OTP
+    /// </summary>
+    public class SendOTPResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string? ReferenceId { get; set; } // สำหรับ track OTP session
+    }
+
+    /// <summary>
+    /// Request model สำหรับ verify OTP
+    /// </summary>
+    public class VerifyOTPRequest
+    {
+        [Required(ErrorMessage = "กรุณากรอกเบอร์โทรศัพท์")]
+        [Phone(ErrorMessage = "รูปแบบเบอร์โทรศัพท์ไม่ถูกต้อง")]
+        public string Phone { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "กรุณากรอก OTP")]
+        public string OTP { get; set; } = string.Empty;
+
+        public string? ReferenceId { get; set; } // สำหรับ track OTP session
+    }
+
+    /// <summary>
+    /// Response model สำหรับ verify OTP
+    /// </summary>
+    public class VerifyOTPResponse
+    {
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public bool IsValid { get; set; }
+    }
+
+    /// <summary>
+    /// Request model สำหรับ final registration (external with OTP)
+    /// </summary>
+    public class FinalizeRegistrationRequest : ExternalRegistrationRequest
+    {
+        public string OTP { get; set; } = string.Empty;
+
+        public string? ReferenceId { get; set; } // มีใน JSON: "a5ea286d-1f3e-4fe4-81b2-5c1dc1df164d"
+
+        // TODO: Add file URLs when upload system is ready
+        // public string? IdCardImageUrl { get; set; }
+        // public string? ProfileImageUrl { get; set; }
     }
 }

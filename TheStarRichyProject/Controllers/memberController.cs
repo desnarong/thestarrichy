@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -9,6 +9,8 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Dynamic;
+using Newtonsoft.Json.Converters;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Models;
 
@@ -41,20 +43,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetMemberInfo()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Member/display", Method.Get);
@@ -72,20 +74,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetMemberEstimatePosition()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Member/estimateposition", Method.Get);
@@ -103,20 +105,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetBanks()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Static/banks", Method.Get);
@@ -134,20 +136,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetCountries()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Static/countries", Method.Get);
@@ -165,20 +167,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetCountryBusinesses()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Static/countrybusinesses", Method.Get);
@@ -196,20 +198,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetDistricts()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Static/districts", Method.Get);
@@ -227,20 +229,20 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetTitleNames()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-            var options = new RestClientOptions(_config["Api:Url"])
+            var options = new RestClientOptions(_config["Api:Url"]!)
             {
                 ThrowOnAnyError = true,
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
                 }
             };
-            var passkey = _config["Api:Passkey"];
+            var passkey = _config["Api:Passkey"]!;
             var token = Request.Cookies[CookieHelper.UserKey];
             var client = new RestClient(options);
             var request = new RestRequest("/Static/titlenames", Method.Get);

@@ -56,7 +56,7 @@ namespace TheStarRichyProject.Services
                 var restRequest = new RestRequest("/Order/checkout-info", Method.Post);
                 restRequest.AddHeader("Authorization", $"Bearer {token}");
                 restRequest.AddHeader("X-Passkey", passkey);
-                restRequest.AddJsonBody(request);
+                restRequest.AddStringBody(JsonConvert.SerializeObject(request), ContentType.Json);
 
                 var response = await client.ExecuteAsync(restRequest);
 
@@ -121,7 +121,7 @@ namespace TheStarRichyProject.Services
                 var restRequest = new RestRequest("/Order/create-payment", Method.Post);
                 restRequest.AddHeader("Authorization", $"Bearer {token}");
                 restRequest.AddHeader("X-Passkey", passkey);
-                restRequest.AddJsonBody(request);
+                restRequest.AddStringBody(JsonConvert.SerializeObject(request), ContentType.Json);
 
                 var response = await client.ExecuteAsync(restRequest);
 

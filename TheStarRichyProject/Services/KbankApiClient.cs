@@ -1,4 +1,5 @@
-﻿using RestSharp;
+﻿using Newtonsoft.Json;
+using RestSharp;
 using System.Net;
 using TheStarRichyProject.Helper;
 
@@ -96,7 +97,7 @@ namespace TheStarRichyProject.Services
                     reference1 = reference1,
                     reference2 = reference2
                 };
-                request.AddJsonBody(body);
+                request.AddStringBody(JsonConvert.SerializeObject(body), ContentType.Json);
 
                 RestResponse response = await client.ExecuteAsync(request);
 
@@ -138,7 +139,7 @@ namespace TheStarRichyProject.Services
                 {
                     origPartnerTxnUid = transactionId
                 };
-                request.AddJsonBody(body);
+                request.AddStringBody(JsonConvert.SerializeObject(body), ContentType.Json);
 
                 RestResponse response = await client.ExecuteAsync(request);
 
@@ -179,7 +180,7 @@ namespace TheStarRichyProject.Services
                 {
                     origPartnerTxnUid = transactionId
                 };
-                request.AddJsonBody(body);
+                request.AddStringBody(JsonConvert.SerializeObject(body), ContentType.Json);
 
                 RestResponse response = await client.ExecuteAsync(request);
 

@@ -83,7 +83,7 @@ File: Custom Bootstrap Css File
     --vz-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
     --vz-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
     --vz-body-font-family: var(--vz-font-sans-serif);
-    --vz-body-font-size: 0.8125rem;
+    --vz-body-font-size: 1rem;
     --vz-body-font-weight: 400;
     --vz-body-line-height: 1.5;
     --vz-body-color: #212529;

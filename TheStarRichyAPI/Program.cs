@@ -14,6 +14,7 @@ builder.Services.AddScoped<ILoginService, LoginService>();
 
 // Registration
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<ISMSService, SMSService>();
 
 // Member Management
 builder.Services.AddScoped<IMemberService, MemberService>();

@@ -269,5 +269,429 @@ namespace TheStarRichyApi.Controllers
                 return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการตรวจสอบข้อมูล" });
             }
         }
+
+        #region Validation Endpoints for External Registration
+
+        /// <summary>
+        /// ตรวจสอบบัญชีดำ (Blacklist Check)
+        /// GET /Registration/CheckBlacklist?idCardNumber={value}
+        /// </summary>
+        [HttpGet("CheckBlacklist")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckBlacklist([FromQuery] string idCardNumber)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCardNumber))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกเลขบัตรประชาชน" });
+
+                var result = await _registrationService.CheckBlacklistAsync(idCardNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckBlacklist endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบบัตรหมดอายุ (Expire Check)
+        /// GET /Registration/CheckExpire?idCardNumber={value}
+        /// </summary>
+        [HttpGet("CheckExpire")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckExpire([FromQuery] string idCardNumber)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCardNumber))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกเลขบัตรประชาชน" });
+
+                var result = await _registrationService.CheckExpireAsync(idCardNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckExpire endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบสมาชิกลาออก (Member Resign Check)
+        /// GET /Registration/CheckMemberResign?idCardNumber={value}
+        /// </summary>
+        [HttpGet("CheckMemberResign")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckMemberResign([FromQuery] string idCardNumber)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCardNumber))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกเลขบัตรประชาชน" });
+
+                var result = await _registrationService.CheckMemberResignAsync(idCardNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckMemberResign endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบรหัสผู้แนะนำ (Sponsor Code Check)
+        /// GET /Registration/CheckSponsorCode?memberCode={value}
+        /// </summary>
+        [HttpGet("CheckSponsorCode")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckSponsorCode([FromQuery] string memberCode)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(memberCode))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกรหัสผู้แนะนำ" });
+
+                var result = await _registrationService.CheckSponsorCodeAsync(memberCode);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckSponsorCode endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบเลขบัตรซ้ำ (Duplicate ID Card Check)
+        /// GET /Registration/CheckDupIDcard?idCardNumber={value}
+        /// </summary>
+        [HttpGet("CheckDupIDcard")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupIDcard([FromQuery] string idCardNumber)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCardNumber))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกเลขบัตรประชาชน" });
+
+                var result = await _registrationService.CheckDuplicateIDCardAsync(idCardNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupIDcard endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบชื่อตามบัตรซ้ำ (Duplicate ID Card Name Check)
+        /// GET /Registration/CheckDupIDcardname?idCardName={value}
+        /// </summary>
+        [HttpGet("CheckDupIDcardname")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupIDcardname([FromQuery] string idCardName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(idCardName))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกชื่อตามบัตรประชาชน" });
+
+                var result = await _registrationService.CheckDuplicateIDCardNameAsync(idCardName);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupIDcardname endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบชื่อธุรกิจซ้ำ (Duplicate Business Name Check)
+        /// GET /Registration/CheckDupBusinessname?businessName={value}
+        /// </summary>
+        [HttpGet("CheckDupBusinessname")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupBusinessname([FromQuery] string businessName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(businessName))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกชื่อธุรกิจ" });
+
+                var result = await _registrationService.CheckDuplicateBusinessNameAsync(businessName);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupBusinessname endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบเบอร์โทรซ้ำ (Duplicate Telephone Check)
+        /// GET /Registration/CheckDupTelephone?telephone={value}
+        /// </summary>
+        [HttpGet("CheckDupTelephone")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupTelephone([FromQuery] string telephone)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(telephone))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกเบอร์โทรศัพท์" });
+
+                var result = await _registrationService.CheckDuplicateTelephoneAsync(telephone);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupTelephone endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบเลขบัญชีธนาคารซ้ำ (Duplicate Bank Account Check)
+        /// GET /Registration/CheckDupBankAccountNumber?bankCode={value}&accountNumber={value}
+        /// </summary>
+        [HttpGet("CheckDupBankAccountNumber")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupBankAccountNumber([FromQuery] string bankCode, [FromQuery] string accountNumber)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(bankCode) || string.IsNullOrEmpty(accountNumber))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกข้อมูลบัญชีธนาคารให้ครบถ้วน" });
+
+                var result = await _registrationService.CheckDuplicateBankAccountAsync(bankCode, accountNumber);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupBankAccountNumber endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบชื่อบัญชีธนาคารซ้ำ (Duplicate Bank Account Name Check)
+        /// GET /Registration/CheckDupBankAccountName?bankCode={value}&accountName={value}
+        /// </summary>
+        [HttpGet("CheckDupBankAccountName")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupBankAccountName([FromQuery] string bankCode, [FromQuery] string accountName)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(bankCode) || string.IsNullOrEmpty(accountName))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกข้อมูลบัญชีธนาคารให้ครบถ้วน" });
+
+                var result = await _registrationService.CheckDuplicateBankAccountNameAsync(bankCode, accountName);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupBankAccountName endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบอีเมลซ้ำ (Duplicate Email Check)
+        /// GET /Registration/CheckDupEmail?email={value}
+        /// </summary>
+        [HttpGet("CheckDupEmail")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupEmail([FromQuery] string email)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(email))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกอีเมล" });
+
+                var result = await _registrationService.CheckDuplicateEmailAsync(email);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupEmail endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบ Line ID ซ้ำ (Duplicate Line ID Check)
+        /// GET /Registration/CheckDupLineid?lineId={value}
+        /// </summary>
+        [HttpGet("CheckDupLineid")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckDupLineid([FromQuery] string lineId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(lineId))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอก Line ID" });
+
+                var result = await _registrationService.CheckDuplicateLineIdAsync(lineId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckDupLineid endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบอายุ (Age Check)
+        /// GET /Registration/CheckAge?birthDate={value}
+        /// </summary>
+        [HttpGet("CheckAge")]
+        [AllowAnonymous]
+        public async Task<IActionResult> CheckAge([FromQuery] string birthDate)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(birthDate))
+                    return BadRequest(new ValidationResponse { Success = false, Message = "กรุณากรอกวันเกิด" });
+
+                var result = await _registrationService.CheckAgeAsync(birthDate);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CheckAge endpoint");
+                return StatusCode(500, new ValidationResponse { Success = false, Message = "เกิดข้อผิดพลาดภายในระบบ" });
+            }
+        }
+
+        #endregion
+
+        #region OTP Endpoints
+
+        /// <summary>
+        /// ส่ง OTP ไปยังเบอร์โทรศัพท์
+        /// POST /Registration/SendOTP
+        /// </summary>
+        [HttpPost("SendOTP")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendOTP([FromBody] SendOTPRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new SendOTPResponse
+                    {
+                        Success = false,
+                        Message = "ข้อมูลไม่ครบถ้วนหรือไม่ถูกต้อง"
+                    });
+                }
+
+                var result = await _registrationService.SendOTPAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in SendOTP endpoint");
+                return StatusCode(500, new SendOTPResponse
+                {
+                    Success = false,
+                    Message = "เกิดข้อผิดพลาดในการส่ง OTP"
+                });
+            }
+        }
+
+        /// <summary>
+        /// ตรวจสอบ OTP
+        /// POST /Registration/VerifyOTP
+        /// </summary>
+        [HttpPost("VerifyOTP")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyOTP([FromBody] VerifyOTPRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new VerifyOTPResponse
+                    {
+                        Success = false,
+                        Message = "ข้อมูลไม่ครบถ้วนหรือไม่ถูกต้อง"
+                    });
+                }
+
+                var result = await _registrationService.VerifyOTPAsync(request);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in VerifyOTP endpoint");
+                return StatusCode(500, new VerifyOTPResponse
+                {
+                    Success = false,
+                    Message = "เกิดข้อผิดพลาดในการตรวจสอบ OTP"
+                });
+            }
+        }
+
+        #endregion
+
+        #region Final Registration
+
+        /// <summary>
+        /// ลงทะเบียนสมาชิกพร้อม OTP verification (External Registration with OTP)
+        /// POST /Registration/Finalize
+        /// </summary>
+        [HttpPost("Finalize")]
+        [AllowAnonymous]
+        public async Task<IActionResult> FinalizeRegistration([FromBody] FinalizeRegistrationRequest request)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new RegistrationResponse
+                    {
+                        Success = false,
+                        Message = "ข้อมูลไม่ครบถ้วนหรือไม่ถูกต้อง",
+                        Errors = ModelState.ToDictionary(
+                            kvp => kvp.Key,
+                            kvp => kvp.Value?.Errors.FirstOrDefault()?.ErrorMessage ?? "Invalid"
+                        )
+                    });
+                }
+
+                var result = await _registrationService.FinalizeRegistrationAsync(request);
+
+                if (result.Success)
+                {
+                    _logger.LogInformation("Final registration successful for {DocumentNumber}", 
+                        request.DocumentNumber);
+                    return Ok(result);
+                }
+                else
+                {
+                    return BadRequest(result);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in FinalizeRegistration endpoint");
+                return StatusCode(500, new RegistrationResponse
+                {
+                    Success = false,
+                    Message = "เกิดข้อผิดพลาดภายในระบบ"
+                });
+            }
+        }
+
+        #endregion
     }
 }

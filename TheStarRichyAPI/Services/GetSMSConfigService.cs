@@ -75,13 +75,6 @@ namespace TheStarRichyApi.Services
                 return new List<dynamic> { new { Membercode = "" } };
             }
 
-            // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic> { new { Membercode = "" } };
-            }
-
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -142,8 +135,6 @@ namespace TheStarRichyApi.Services
 
                     using (var command = new SqlCommand(query, con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
-
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             while (await reader.ReadAsync())

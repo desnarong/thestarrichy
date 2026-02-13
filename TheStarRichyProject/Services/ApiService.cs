@@ -71,7 +71,7 @@ namespace TheStarRichyProject.Services
                 
                 if (data != null)
                 {
-                    request.AddJsonBody(data);
+                    request.AddStringBody(JsonConvert.SerializeObject(data), ContentType.Json);
                 }
 
                 var response = await client.ExecuteAsync(request);

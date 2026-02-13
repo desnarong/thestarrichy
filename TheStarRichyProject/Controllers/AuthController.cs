@@ -78,7 +78,7 @@ namespace TheStarRichyProject.Controllers
 
                 // Create RestSharp request
                 var request = new RestRequest("/Login/signin", Method.Post);
-                request.AddJsonBody(payload);
+                request.AddStringBody(JsonConvert.SerializeObject(payload), ContentType.Json);
 
                 try
                 {
