@@ -55,7 +55,6 @@
                 <p class="text-muted mb-0">เลือกประเภทการลงทะเบียนที่ต้องการ</p>
             </div>
             <div class="card-block p-3">
-                <!-- Registration Type Tabs -->
                 <ul class="nav nav-tabs mb-4" id="registrationTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="simple-tab" data-bs-toggle="tab" data-bs-target="#simple-tab-pane" type="button" role="tab" aria-controls="simple-tab-pane" aria-selected="true">
@@ -70,7 +69,6 @@
                 </ul>
 
                 <div class="tab-content" id="registrationTabsContent">
-                    <!-- Simple Registration Tab -->
                     <div class="tab-pane fade show active" id="simple-tab-pane" role="tabpanel" aria-labelledby="simple-tab" tabindex="0">
                         <div class="alert alert-info mb-4">
                             <i class="fas fa-info-circle me-2"></i>
@@ -86,8 +84,8 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">ประเทศ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">ประเทศ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select name="country" id="simpleCountry" class="form-control" required>
                                                         <option value="">-- เลือกประเทศ --</option>
                                                     </select>
@@ -95,8 +93,8 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select name="countryBusiness" id="simpleCountryBusiness" class="form-control" required>
                                                         <option value="">-- เลือกประเทศที่ดำเนินธุรกิจ --</option>
                                                     </select>
@@ -104,8 +102,8 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="input-group">
                                                         <input type="text" class="form-control" id="simpleReferrerCode" value="@userinfo.membercode" placeholder="กรอกรหัสผู้แนะนำ" required />
                                                         <button type="button" class="btn btn-primary" id="btnSearchReferrer">ค้นหา</button>
@@ -114,8 +112,8 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">ตำแหน่ง <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">ตำแหน่ง <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="position" id="positionLeft" value="left" checked />
                                                         <label class="form-check-label" for="positionLeft">ซ้ายสุด</label>
@@ -128,22 +126,22 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">ชื่อผู้แนะนำ</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">ชื่อผู้แนะนำ</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleReferrerName" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleRegistrationDate" readonly required disabled />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleBirthDate"
                                                            placeholder="dd-mm-yyyy"
                                                            maxlength="10"
@@ -154,8 +152,8 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">คำนำหน้า <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">คำนำหน้า <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select name="simpleTitle" id="simpleTitle" class="form-control" required>
                                                         <option value="">-- เลือกคำนำหน้า --</option>
                                                     </select>
@@ -163,55 +161,55 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">ชื่อบนบัตร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">ชื่อบนบัตร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleFullName" placeholder="กรอกชื่อบนบัตร" required />
                                                     <small class="text-muted mt-1" id="simpleIdCardNameValidation"></small>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">ชื่อธุรกิจ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">ชื่อธุรกิจ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleBusinessName" placeholder="กรอกชื่อธุรกิจ" required />
                                                     <small class="text-muted mt-1" id="simpleBusinessNameValidation"></small>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">เลขบัตรปชช./พาสปอร์ต <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">เลขบัตรปชช./พาสปอร์ต <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleDocumentNumber" placeholder="กรอกเลขที่เอกสาร" required />
                                                     <small class="text-muted mt-1" id="documentValidationMessage"></small>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label required">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label required">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="tel" class="form-control" id="simpleMobile" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
                                                     <small class="text-muted mt-1" id="mobileValidation"></small>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">โทรศัพท์บ้าน</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">โทรศัพท์บ้าน</label>
+                                                <div class="col-md-7">
                                                     <input type="tel" class="form-control" id="simpleHomePhone" placeholder="กรอกเบอร์โทรศัพท์บ้าน" />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">อีเมล</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">อีเมล</label>
+                                                <div class="col-md-7">
                                                     <input type="email" class="form-control" id="simpleEmail" placeholder="กรอกอีเมล" />
                                                     <small class="text-muted mt-1" id="emailValidation"></small>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">Line ID</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">Line ID</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleLineId" placeholder="กรอก Line ID" />
                                                     <small class="text-muted mt-1" id="lineIdValidation"></small>
                                                 </div>
@@ -256,36 +254,36 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">ที่อยู่ตามบัตรฯ</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">ที่อยู่ตามบัตรฯ</label>
+                                                <div class="col-md-7">
                                                     <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน"></textarea>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">รหัสไปรษณีย์</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">รหัสไปรษณีย์</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simplePostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">จังหวัด</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">จังหวัด</label>
+                                                <div class="col-md-7">
                                                     <select class="form-control" id="simpleProvince" disabled>
                                                         <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">เขต/อำเภอ</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">เขต/อำเภอ</label>
+                                                <div class="col-md-7">
                                                     <select class="form-control" id="simpleDistrict" disabled>
                                                         <option value="">-- เลือกอำเภอ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label">แขวง/ตำบล</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label">แขวง/ตำบล</label>
+                                                <div class="col-md-7">
                                                     <select class="form-control" id="simpleSubdistrict" disabled>
                                                         <option value="">-- เลือกตำบล --</option>
                                                     </select>
@@ -314,7 +312,6 @@
                         </form>
                     </div>
 
-                    <!-- Full Registration Tab -->
                     <div class="tab-pane fade" id="full-tab-pane" role="tabpanel" aria-labelledby="full-tab" tabindex="0">
                         <div class="alert alert-warning mb-4">
                             <i class="fas fa-exclamation-circle me-2"></i>
@@ -340,24 +337,24 @@
                                         </div>
                                         <div class="card-block p-3">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-country">ประเทศ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-country">ประเทศ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select id="fullCountry" name="country" class="form-control" required>
                                                         <option value="">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select id="fullCountryBusiness" name="business_country" class="form-control" required>
                                                         <option value="">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="input-group">
                                                         <input type="text" id="fullReferrerCode" class="form-control" placeholder="กรอกรหัสผู้แนะนำ" value="@userinfo.membercode" required />
                                                         <button type="button" class="btn btn-primary" data-key="t-search" id="btnFullSearchReferrer">
@@ -367,8 +364,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label"><span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label"><span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked required />
                                                         <label class="form-check-label" for="referrer_left" data-key="t-referrer-left">ด้านซ้าย</label>
@@ -380,14 +377,14 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-referrer-name">ชื่อผู้แนะนำ</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-referrer-name">ชื่อผู้แนะนำ</label>
+                                                <div class="col-md-7">
                                                     <input type="text" id="fullReferrerName" class="form-control" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="input-group">
                                                         <input type="text" class="form-control" placeholder="กรอกรหัสอัพไลน์" required />
                                                         <button type="button" class="btn btn-primary" data-key="t-search">
@@ -397,14 +394,14 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-upline-name">ชื่ออัพไลน์</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-upline-name">ชื่ออัพไลน์</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-upline-side">ด้านอัพไลน์ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-upline-side">ด้านอัพไลน์ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="upline_side" id="uplineside_left" checked required />
                                                         <label class="form-check-label" for="uplineside_left" data-key="t-referrer-left">ด้านซ้าย</label>
@@ -416,8 +413,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="business_type" id="businessman" checked required />
                                                         <label class="form-check-label" for="businessman" data-key="t-businessman">นักธุรกิจ</label>
@@ -429,40 +426,42 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-user-code">รหัสผู้ใช้</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-user-code">รหัสผู้ใช้</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" value="" readonly />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" id="fullRegistrationDate" class="form-control" readonly disabled required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-title">คำนำหน้า <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-title">คำนำหน้า <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select id="fullTitle" name="title" class="form-control" required>
                                                         <option value="">-- เลือกคำนำหน้า --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบนบัตร" required />
+                                                <label class="col-md-5 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullNameOnCard" class="form-control" placeholder="กรอกชื่อบนบัตร" required />
+                                                    <small class="text-muted mt-1" id="fullNameOnCardValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อธุรกิจ" />
+                                                <label class="col-md-5 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullBusinessName" class="form-control" placeholder="กรอกชื่อธุรกิจ" />
+                                                    <small class="text-muted mt-1" id="fullBusinessNameValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-date-of-birth">วันเกิด <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-date-of-birth">วันเกิด <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" id="fullBirthDate"
                                                            placeholder="dd-mm-yyyy"
                                                            maxlength="10"
@@ -472,14 +471,15 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-citizen-number">เลขบัตรประชาชน/พาสปอร์ต <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง" required />
+                                                <label class="col-md-5 col-form-label" data-key="t-citizen-number">เลขบัตรประชาชน/พาสปอร์ต <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullDocumentNumber" class="form-control" placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง" required />
+                                                    <small class="text-muted mt-1" id="fullDocumentValidationMessage"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-gender">เพศ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-gender">เพศ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="gender" id="male" checked required />
                                                         <label class="form-check-label" for="male" data-key="t-male">ชาย</label>
@@ -491,8 +491,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-language">ภาษา <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-language">ภาษา <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select id="fullLanguage" name="language" class="form-control" required>
                                                         <option value="th">ไทย</option>
                                                         <option value="en">English</option>
@@ -500,8 +500,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-yes" checked required />
                                                         <label class="form-check-label" for="sms_news_updates-yes" data-key="t-yes">ใช่</label>
@@ -513,8 +513,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-membership-type">ประเภทสมาชิก <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-membership-type">ประเภทสมาชิก <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="membership_type" id="individual" checked required />
                                                         <label class="form-check-label" for="individual" data-key="t-individual">บุคคล</label>
@@ -526,8 +526,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-marital-status">สถานะสมรส <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-marital-status">สถานะสมรส <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="marital_status" id="marital" checked required />
                                                         <label class="form-check-label" for="marital" data-key="t-marital">สมรส</label>
@@ -539,14 +539,14 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-spouses-name">ชื่อคู่สมรส</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-spouses-name">ชื่อคู่สมรส</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" value="" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-document-verification">การตรวจสอบเอกสาร</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-document-verification">การตรวจสอบเอกสาร</label>
+                                                <div class="col-md-7">
                                                 </div>
                                             </div>
                                         </div>
@@ -640,26 +640,28 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
+                                                <label class="col-md-5 col-form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullMobile" class="form-control" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
+                                                    <small class="text-muted mt-1" id="fullMobileValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-home-phone">โทรศัพท์บ้าน</label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเบอร์โทรศัพท์บ้าน" />
+                                                <label class="col-md-5 col-form-label" data-key="t-home-phone">โทรศัพท์บ้าน</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullHomePhone" class="form-control" placeholder="กรอกเบอร์โทรศัพท์บ้าน" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-email">อีเมล</label>
-                                                <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกอีเมล" />
+                                                <label class="col-md-5 col-form-label" data-key="t-email">อีเมล</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullEmail" class="form-control" placeholder="กรอกอีเมล" />
+                                                    <small class="text-muted mt-1" id="fullEmailValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-line-id">Line ID</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-line-id">Line ID</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอก Line ID" />
                                                 </div>
                                             </div>
@@ -674,46 +676,46 @@
                                         </div>
                                         <div class="card-block p-3">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <select id="fullBank" name="bank" class="form-control" required>
                                                         <option value="">-- เลือกธนาคาร --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกสาขา" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกชื่อผู้รับผลประโยชน์" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกเลขบัตรผู้รับผลประโยชน์" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-yes" checked required />
                                                         <label class="form-check-label" for="auto_transfer-yes" data-key="t-yes">ใช่</label>
@@ -725,8 +727,8 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-autoship">Autoship <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-autoship">Autoship <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="autoship" id="deduct" checked required />
                                                         <label class="form-check-label" for="deduct" data-key="t-deduct">หัก</label>
@@ -738,43 +740,43 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-position">ตำแหน่ง</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-position">ตำแหน่ง</label>
+                                                <div class="col-md-7">
                                                     <select id="fullPosition" name="position" class="form-control">
                                                         <option value="">-- (เว้นไว้) --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-apply-through-the-center">สมัครผ่านศูนย์</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-apply-through-the-center">สมัครผ่านศูนย์</label>
+                                                <div class="col-md-7">
                                                     <input type="text" class="form-control" placeholder="กรอกชื่อศูนย์" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" required />
                                                     <img id="fullIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
                                                     <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" required />
                                                     <img id="fullBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-application-form-submitted">ใบสมัครที่ส่งแล้ว (เพิ่มไฟล์)</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-application-form-submitted">ใบสมัครที่ส่งแล้ว (เพิ่มไฟล์)</label>
+                                                <div class="col-md-7">
                                                     <input type="file" class="form-control" id="fullApplicationForm" accept="image/*" />
                                                     <img id="fullApplicationFormPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview application form" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-picture">รูปภาพ</label>
-                                                <div class="col-md-8">
+                                                <label class="col-md-5 col-form-label" data-key="t-picture">รูปภาพ</label>
+                                                <div class="col-md-7">
                                                     <input type="file" class="form-control" id="fullBusinessPhoto" accept="image/*" />
                                                     <img id="fullBusinessPhotoPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview profile" />
                                                 </div>
@@ -847,6 +849,143 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
+    // ==========================================
+    // GLOBAL VALIDATION FUNCTIONS (Moved outside document.ready to fix ReferenceError)
+    // ==========================================
+    function validateSimpleFullName() {
+        const val = ($('#simpleFullName').val() || "").trim();
+        const errorTarget = $('#simpleIdCardNameValidation');
+        if (!val) {
+            errorTarget.text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
+            return false;
+        }
+        if (!/^[a-zA-Z\u0E00-\u0E7F\s.]+$/.test(val)) {
+            errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
+            return false;
+        }
+        if (val.length < 2 || val.length > 100) {
+            errorTarget.text('ชื่อต้องมีความยาว 2-100 ตัวอักษร').addClass('validation-error');
+            return false;
+        }
+        errorTarget.text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateSimpleBusinessName() {
+        const val = ($('#simpleBusinessName').val() || "").trim();
+        if (!val) {
+            $('#simpleBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
+            return false;
+        }
+        if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
+            $('#simpleBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
+            return false;
+        }
+        $('#simpleBusinessNameValidation').text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateSimpleMobile() {
+        const val = ($('#simpleMobile').val() || "").trim();
+        if (!val) {
+            $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
+            return false;
+        }
+        if (!/^0\d{9}$/.test(val)) {
+            $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
+            return false;
+        }
+        $('#mobileValidation').text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateFullNameOnCard() {
+        const val = ($('#fullNameOnCard').val() || "").trim();
+        if (!val) {
+            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
+            return false;
+        }
+        if (!/^[a-zA-Z\u0E00-\u0E7F\s.]+$/.test(val)) {
+            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
+            return false;
+        }
+        $('#fullNameOnCardValidation').text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateFullBusinessName() {
+        const val = ($('#fullBusinessName').val() || "").trim();
+        if (!val) {
+            $('#fullBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
+            return false;
+        }
+        if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
+            $('#fullBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
+            return false;
+        }
+        $('#fullBusinessNameValidation').text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateFullMobile() {
+        const val = ($('#fullMobile').val() || "").trim();
+        if (!val) {
+            $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
+            return false;
+        }
+        if (!/^0\d{9}$/.test(val)) {
+            $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
+            return false;
+        }
+        $('#fullMobileValidation').text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateSimpleEmail() {
+        const email = ($('#simpleEmail').val() || "").trim();
+        const validationEl = $('#emailValidation');
+        if (!email) {
+            validationEl.text(''); 
+            return true;
+        }
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+            validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
+            return false;
+        }
+        validationEl.text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateFullEmail() {
+        const email = ($('#fullEmail').val() || "").trim();
+        const validationEl = $('#fullEmailValidation');
+        if (!email) {
+            validationEl.text(''); 
+            return true;
+        }
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (!emailRegex.test(email)) {
+            validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
+            return false;
+        }
+        validationEl.text('').removeClass('validation-error');
+        return true;
+    }
+
+    function validateThaiID(id) {
+        if (!id || id.length !== 13) return false;
+        let sum = 0;
+        for (let i = 0; i < 12; i++) {
+            sum += parseInt(id.charAt(i)) * (13 - i);
+        }
+        let checkDigit = (11 - (sum % 11)) % 10;
+        return checkDigit === parseInt(id.charAt(12));
+    }
+
+    // ==========================================
+    // DOCUMENT READY
+    // ==========================================
     $(document).ready(function () {
         let masterData = [];
 
@@ -867,15 +1006,15 @@
         loadFullBanks();
 
         $('#simpleBirthDate').datepicker({
-                format: 'dd-mm-yyyy',
-                language: 'th-th', // 📌 คีย์เวิร์ดสำคัญ: ใช้ 'th-th' จะเป็น พ.ศ. ทันที!
-                autoclose: true
+            format: 'dd-mm-yyyy',
+            language: 'th-th', 
+            autoclose: true
         });
 
         $('#fullBirthDate').datepicker({
-                format: 'dd-mm-yyyy',
-                language: 'th-th', // 📌 คีย์เวิร์ดสำคัญ: ใช้ 'th-th' จะเป็น พ.ศ. ทันที!
-                autoclose: true
+            format: 'dd-mm-yyyy',
+            language: 'th-th', 
+            autoclose: true
         });
 
         // Switch to full registration tab
@@ -892,16 +1031,15 @@
 
                 // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
                 $('#simpleRegistrationForm .is-invalid').removeClass('is-invalid');
-                $('#documentValidationMessage').html(''); // ล้างข้อความแจ้งเตือนเลขบัตร ปชช.
+                $('#documentValidationMessage').html(''); 
 
                 // (เผื่อมีข้อความ Validation อื่นๆ ที่คุณดักไว้)
                 $('#simpleIdCardNameValidation, #simpleBusinessNameValidation, #mobileValidation, #emailValidation, #lineIdValidation').html('');
 
-                // 3. จัดการ Dropdown ที่อยู่ (เรียกใช้ฟังก์ชันเดิมของคุณ)
+                // 3. จัดการ Dropdown ที่อยู่ 
                 if (typeof resetAddressDropdowns === 'function') {
                     resetAddressDropdowns();
                 } else {
-                    // เผื่อฟังก์ชัน resetAddressDropdowns ไม่มี จะได้ใช้แบบแมนนวลแทน
                     $('#simpleProvince').html('<option value="">-- รอผลจากรหัสไปรษณีย์ --</option>');
                     $('#simpleDistrict').html('<option value="">-- เลือกอำเภอ --</option>');
                     $('#simpleSubdistrict').html('<option value="">-- เลือกตำบล --</option>');
@@ -1011,8 +1149,8 @@
         });
 
         $('#simpleDocumentNumber').on('blur', function() {
-            // 1. ดึงค่ามา ลบขีด (-) และช่องว่างออกให้เหลือแต่ตัวอักษร/ตัวเลขติดกัน
-            const docNumber = $(this).val().replace(/[- ]/g, '');
+            // แก้ไข: ใช้ || "" เพื่อป้องกัน error
+            const docNumber = ($(this).val() || "").replace(/[- ]/g, '');
 
             // 2. ล้างข้อความ Error เก่าออกก่อนเสมอเมื่อเริ่มเช็คใหม่
             $(this).removeClass('is-invalid');
@@ -1032,8 +1170,7 @@
                     toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
                 } else {
                     // ✅ UX เสริม: ถ้าบัตรถูกต้อง ให้เติมขีด (-) จัด Format อัตโนมัติ (x-xxxx-xxxxx-xx-x)
-                    const formattedID = docNumber.replace(/(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})/, '$1-$2-$3-$4-$5');
-                    $(this).val(formattedID);
+                    $(this).val(docNumber);
                 }
 
             } else {
@@ -1041,6 +1178,38 @@
                 // ถือว่าเป็นเอกสารประเภทอื่น และปล่อยผ่าน
             }
         });
+
+        // --- New input filters & validators (simple + full) ---
+        // Strip '-' and spaces while typing for document numbers
+        $('#simpleDocumentNumber, #fullDocumentNumber').on('input', function () {
+            this.value = this.value.replace(/[-\s]/g, '');
+        });
+
+        // Allow only digits for phone inputs (keeps leading 0)
+        $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone').on('input', function () {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        // Email input handlers (validate as user types)
+        $('#simpleEmail').on('input', validateSimpleEmail);
+        $('#fullEmail').on('input', validateFullEmail);
+
+        // Auto-copy name-on-card -> business name (only if user hasn't edited business name)
+        $('#simpleFullName').on('input', function() {
+            if (!$('#simpleBusinessName').data('userEdited')) {
+                $('#simpleBusinessName').val($(this).val());
+            }
+            validateSimpleFullName();
+        });
+        $('#simpleBusinessName').on('input', function(){ $(this).data('userEdited', true); validateSimpleBusinessName(); });
+
+        $('#fullNameOnCard').on('input', function() {
+            if (!$('#fullBusinessName').data('userEdited')) {
+                $('#fullBusinessName').val($(this).val());
+            }
+            validateFullNameOnCard();
+        });
+        $('#fullBusinessName').on('input', function(){ $(this).data('userEdited', true); validateFullBusinessName(); });
 
         // Zipcode input for address lookup
         $('#simplePostcode').on('input', function() {
@@ -1245,7 +1414,7 @@
             }
         });
 
-            // Simple form submission
+        // Simple form submission
         $('#simpleRegistrationForm').submit(async function (e) {
             e.preventDefault();
 
@@ -1254,25 +1423,20 @@
             // ==========================================
             // 1. Basic validation (ค้นหาตัวที่บังคับกรอก)
             // ==========================================
-            // ทริค: ค้นหาด้วย attribute [required] ไปเลย ชัวร์สุด!
             const requiredFields = $(this).find('input[required], select[required], textarea[required]');
 
             requiredFields.each(function () {
                 const field = $(this);
 
-                // ถ้าเป็น Radio หรือ Checkbox
                 if (field.is(':radio') || field.is(':checkbox')) {
                     const name = field.attr('name');
-                    // เช็คว่ากลุ่มชื่อนี้ มีการติ๊กเลือกหรือยัง
                     if ($('input[name="' + name + '"]:checked').length === 0) {
-                        // ถ้ายังไม่ติ๊ก ให้หาทุกตัวในกลุ่มแล้วใส่คลาสแดง
                         $('input[name="' + name + '"]').addClass('is-invalid');
                         isValid = false;
                     } else {
                         $('input[name="' + name + '"]').removeClass('is-invalid');
                     }
                 }
-                // ถ้าเป็น Text input หรือ Select
                 else {
                     const val = $.trim(field.val());
                     if (!val) {
@@ -1287,7 +1451,8 @@
             // ==========================================
             // 2. Validate Thai ID (บัตร ปชช.)
             // ==========================================
-            const docNumber = $('#simpleDocumentNumber').val().replace(/[- ]/g, '');
+            // แก้ไข: ใช้ || "" ป้องกัน error
+            const docNumber = ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, '');
             if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
                 $('#simpleDocumentNumber').addClass('is-invalid');
                 $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
@@ -1327,6 +1492,13 @@
             // ==========================================
             // 4. แสดงผลลัพธ์และส่งข้อมูล
             // ==========================================
+
+            // Additional content validation (name/business/mobile)
+            if (!validateSimpleFullName()) { isValid = false; }
+            if (!validateSimpleBusinessName()) { isValid = false; }
+            if (!validateSimpleEmail()) { isValid = false; }
+            if (!validateSimpleMobile()) { isValid = false; }
+
             console.log("ฟอร์มผ่านหรือไม่: ", isValid);
 
             if (isValid) {
@@ -1334,7 +1506,8 @@
 
                 const formData = {
                     country: $('#simpleCountry').val(),
-                    documentNumber: $('#simpleDocumentNumber').val().replace(/[- ]/g, ''), // คลีนก่อนส่งไปเช็คซ้ำ
+                    // แก้ไข: ใช้ || "" ป้องกัน error
+                    documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''), 
                     referrerCode: $('#simpleReferrerCode').val(),
                     title: $('select[name="simpleTitle"]').val(),
                     fullName: $('#simpleFullName').val(),
@@ -1346,7 +1519,7 @@
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
-                    businessName: $('#simpleBusinessName').val() // เพิ่มตัวนี้ให้ครบตามเช็คข้างล่าง
+                    businessName: $('#simpleBusinessName').val() 
                 };
 
                 try {
@@ -1367,7 +1540,6 @@
 
                     // ถ้าผ่านหมด -> ค่อยเรียกส่ง OTP
                     await sendOTPAndShowInput(formData);
-                    // Swal.close(); // ปิด Loading ชั่วคราว (ถ้าเปิดคอมเมนต์ sendOTP ให้ลบบรรทัดนี้)
 
                 } catch (err) {
                     console.error(err);
@@ -1387,26 +1559,36 @@
         // โบนัส: ซ่อนแจ้งเตือนตอน User เริ่มแก้ข้อผิดพลาด
         $('#simpleRegistrationForm').on('input change', 'input, select, textarea', function() {
             $(this).removeClass('is-invalid');
-            if ($(this).attr('id') === 'simpleDocumentNumber') {
+            const id = $(this).attr('id');
+            if (id === 'simpleDocumentNumber') {
                 $('#documentValidationMessage').html('');
+            }
+            if (id === 'simpleFullName') {
+                $('#simpleIdCardNameValidation').text('');
+            }
+            if (id === 'simpleBusinessName') {
+                $('#simpleBusinessNameValidation').text('');
+                $('#simpleBusinessName').data('userEdited', true);
+            }
+            if (id === 'simpleMobile') {
+                $('#mobileValidation').text('');
+            }
+            if (id === 'simpleEmail') {
+                $('#emailValidation').text('');
             }
         });
 
-            // Full form submission — run same duplicate checks + OTP flow as Simple/ExternalRegistration
+        // Full form submission — run same duplicate checks + OTP flow as Simple/ExternalRegistration
         $('#fullRegistrationForm').submit(async function (e) {
             e.preventDefault();
 
             let isValid = true;
 
-            // ==========================================
-            // 1. ตรวจสอบฟิลด์บังคับกรอก (อ่านจากแท็ก required อัตโนมัติ)
-            // ==========================================
             const requiredFields = $(this).find('input[required], select[required], textarea[required]');
 
             requiredFields.each(function () {
                 const field = $(this);
 
-                // ถ้าเป็น Radio หรือ Checkbox
                 if (field.is(':radio') || field.is(':checkbox')) {
                     const name = field.attr('name');
                     if ($('#fullRegistrationForm input[name="' + name + '"]:checked').length === 0) {
@@ -1416,7 +1598,6 @@
                         $('#fullRegistrationForm input[name="' + name + '"]').removeClass('is-invalid');
                     }
                 }
-                // ถ้าเป็น Input ปกติ
                 else {
                     const val = $.trim(field.val());
                     if (!val) {
@@ -1431,14 +1612,13 @@
             // ==========================================
             // 2. ตรวจสอบความถูกต้องของบัตรประชาชน
             // ==========================================
-            const citizenInput = $('#fullRegistrationForm input[placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง"]');
-            const docNumber = citizenInput.val().replace(/[- ]/g, '');
+            const citizenInput = $('#fullDocumentNumber');
+            // แก้ไข: ใช้ || "" ป้องกัน error
+            const docNumber = (citizenInput.val() || "").replace(/[- ]/g, '');
 
-            // ถ้าพิมพ์ 13 หลักแต่ผิดสูตร
             if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
                 citizenInput.addClass('is-invalid');
 
-                // สร้างข้อความเตือนสีแดงใต้ช่อง ถ้ายังไม่มี
                 if (citizenInput.next('.invalid-feedback-custom').length === 0) {
                     citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</small>');
                 }
@@ -1446,13 +1626,15 @@
                 isValid = false;
                 toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
             } else {
-                // ลบข้อความเตือนทิ้งถ้าถูกแล้ว
                 citizenInput.next('.invalid-feedback-custom').remove();
             }
 
-            // ==========================================
-            // 3. แจ้งเตือน Error และเลื่อนหน้าจอไปจุดที่ผิด
-            // ==========================================
+            // Additional content validation (name/business/mobile)
+            if (!validateFullNameOnCard()) { $('#fullNameOnCard').addClass('is-invalid'); isValid = false; }
+            if (!validateFullBusinessName()) { $('#fullBusinessName').addClass('is-invalid'); isValid = false; }
+            if (!validateFullEmail()) { $('#fullEmail').addClass('is-invalid'); isValid = false; }
+            if (!validateFullMobile()) { $('#fullMobile').addClass('is-invalid'); isValid = false; }
+
             if (!isValid) {
                 const firstError = $('#fullRegistrationForm .is-invalid').first();
                 if (firstError.length > 0) {
@@ -1460,16 +1642,13 @@
                     firstError.focus();
                 }
                 toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
-                return; // หยุดการทำงาน ไม่ให้ส่งฟอร์ม
+                return;
             }
 
-            // ==========================================
-            // 4. รวบรวมข้อมูลเพื่อส่งเช็ค (Duplicate Checks)
-            // ==========================================
             Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             const formData = {
-                _origin: 'full', // mark origin so finalRegistration reads full inputs
+                _origin: 'full', 
                 country: $('#fullCountry').val(),
                 businessCountry: $('#fullCountryBusiness').val(),
                 referrerCode: $('#fullReferrerCode').val(),
@@ -1479,11 +1658,11 @@
                 businessType: $('input[name="business_type"]:checked').attr('id') === 'businessman' ? 'businessman' : 'user',
                 title: $('#fullTitle').val(),
                 language: $('#fullLanguage').val(),
-                nameOnCard: $('#fullRegistrationForm input[placeholder="กรอกชื่อบนบัตร"]').val() || '',
-                businessName: $('#fullRegistrationForm input[placeholder="กรอกชื่อธุรกิจ"]').val() || '',
-                citizenNumber: docNumber, // ใช้ตัวแปรที่ดึงมาลบขีดแล้ว
-                mobile: $('#fullRegistrationForm input[placeholder="กรอกเบอร์โทรศัพท์มือถือ"]').val() || '',
-                email: $('#fullRegistrationForm input[placeholder="กรอกอีเมล"]').val() || '', // แก้คำที่พิมพ์ผิดจาก 'กรอกรอกรอกอีเมล' ให้แล้วนะครับ
+                nameOnCard: $('#fullNameOnCard').val() || '',
+                businessName: $('#fullBusinessName').val() || '',
+                citizenNumber: docNumber, 
+                mobile: $('#fullMobile').val() || '',
+                email: $('#fullEmail').val() || '', 
 
                 // Bank & position
                 bank: $('#fullBank').val(),
@@ -1521,10 +1700,8 @@
                     return;
                 }
 
-                // All checks passed -> send OTP and continue (finalRegistration will handle memberpic for full)
-                // await sendOTPAndShowInput(formData);
-
-                Swal.close(); // เอาออกได้ถ้าเปิดใช้งานโค้ดบรรทัดด้านบน
+                Swal.close(); 
+                // await sendOTPAndShowInput(formData); // หากเปิดใช้งาน OTP ให้เอาคอมเม้นต์บรรทัดนี้ออก
 
             } catch (err) {
                 console.error(err);
@@ -1535,8 +1712,23 @@
         // โบนัส UX: ทันทีที่ User เริ่มแก้ไขช่องที่ผิด ให้เอาสีแดงแจ้งเตือนออกอัตโนมัติ
         $('#fullRegistrationForm').on('input change', 'input, select, textarea', function() {
             $(this).removeClass('is-invalid');
-            if ($(this).attr('placeholder') === 'กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง') {
+
+            const id = $(this).attr('id');
+            if (id === 'fullDocumentNumber') {
                 $(this).next('.invalid-feedback-custom').remove();
+                $('#fullDocumentValidationMessage').text('');
+            }
+            if (id === 'fullNameOnCard') {
+                $('#fullNameOnCardValidation').text('').removeClass('validation-error');
+            }
+            if (id === 'fullBusinessName') {
+                $('#fullBusinessNameValidation').text('').removeClass('validation-error');
+            }
+            if (id === 'fullMobile') {
+                $('#fullMobileValidation').text('');
+            }
+            if (id === 'fullEmail') {
+                $('#fullEmailValidation').text('');
             }
         });
 
@@ -1544,22 +1736,16 @@
         $('#btnCancelFull, #btnCancelFullSticky').click(function () {
             if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
 
-                // 1. ล้างข้อมูลทุกช่องในฟอร์มกลับเป็นค่าเริ่มต้น
                 $('#fullRegistrationForm')[0].reset();
-
-                // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
                 $('#fullRegistrationForm .is-invalid').removeClass('is-invalid');
-                $('#fullRegistrationForm .invalid-feedback-custom').remove(); // ลบข้อความเตือนเลขบัตร ปชช.
+                $('#fullRegistrationForm .invalid-feedback-custom').remove(); 
 
-                // 3. ซ่อนและล้างรูปภาพ Preview ของไฟล์อัปโหลด
                 $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview')
                     .hide()
                     .attr('src', '');
 
-                // (ไฟล์ Input จะถูกล้างไปพร้อมกับคำสั่ง reset() ในข้อ 1 แล้ว แต่กันเหนียวไว้ก่อนได้)
                 $('#fullIdCardCopy, #fullBankCardCopy, #fullBusinessPhoto, #fullApplicationForm').val('');
 
-                // 4. ล้างค่า Dropdown ที่อยู่ และ "บังคับให้เป็น Disabled (ล็อคไว้)" จนกว่าจะพิมพ์รหัสไปรษณีย์ใหม่
                 resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
                 resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
                 resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
@@ -1567,21 +1753,16 @@
                 resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
                 resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
 
-                // 🔒 รักษาและบังคับสถานะ disabled ให้ Dropdown เหล่านี้
                 $('#fullProvinceIdCard, #fullDistrictIdCard, #fullSubdistrictIdCard, #fullCurrentProvince, #fullCurrentDistrict, #fullCurrentSubdistrict').prop('disabled', true);
 
-                // 5. ติ๊ก Checkbox ให้กลับไปใช้ "ที่อยู่ตามบัตร" พร้อมกับ Trigger ให้ระบบซ่อนกล่องฝั่งขวา
                 $('#fullUseIdCardAddress').prop('checked', true).trigger('change');
 
-                // แจ้งเตือน User
                 toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
-
-                // เลื่อนหน้าจอกลับไปบนสุดเพื่อเริ่มใหม่
                 $('html, body').animate({ scrollTop: 0 }, 500);
             }
         });
 
-        // Sticky-action buttons wiring (mirror existing behaviors)
+        // Sticky-action buttons wiring
         $('#btnSaveFullSticky').click(function () {
             $('#fullRegistrationForm').submit();
         });
@@ -1600,9 +1781,7 @@
 
         // Helper functions
         function loadMasterAddresses() {
-            // Use the same API as checkoutinfo.cshtml
             $.get('/orders/GetMasterAddress', function(res) {
-                // Handle the response format (same as checkoutinfo.cshtml)
                 if (typeof res === 'string') {
                     try { res = JSON.parse(res); } catch (e) {
                         console.error("JSON Error", e);
@@ -1612,7 +1791,6 @@
                 }
 
                 if (!Array.isArray(res)) {
-                    // Check if data is nested in .data or .result
                     if (res.data && Array.isArray(res.data)) {
                         masterData = res.data;
                     } else if (res.result && Array.isArray(res.result)) {
@@ -1636,7 +1814,6 @@
             });
         }
 
-        // --- Simple registration helpers (from ExternalRegistration example) ---
         function setSimpleRegistrationDate() {
             const d = new Date();
             const day = String(d.getDate()).padStart(2, '0');
@@ -1655,9 +1832,7 @@
                 data.forEach(item => {
                     $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
-            }).fail(() => {
-                // fallback: keep existing options
-            });
+            }).fail(() => {});
         }
 
         function loadSimpleCountryBusinesses() {
@@ -1684,7 +1859,6 @@
             });
         }
 
-        // --- Full registration helpers (mirror Simple) ---
         function setFullRegistrationDate() {
             const d = new Date();
             const day = String(d.getDate()).padStart(2, '0');
@@ -1703,7 +1877,7 @@
                 data.forEach(item => {
                     $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
-            }).fail(() => { /* fallback */ });
+            }).fail(() => {});
         }
 
         function loadFullCountryBusinesses() {
@@ -1714,7 +1888,7 @@
                 data.forEach(item => {
                     $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
-            }).fail(() => { /* fallback */ });
+            }).fail(() => {});
         }
 
         function loadFullTitles() {
@@ -1730,24 +1904,19 @@
             });
         }
 
-        // Load bank list for Full registration (calls Member/GetBanks)
         function loadFullBanks() {
             $.get('/Member/GetBanks').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
                 $('#fullBank').empty().append('<option value="">-- เลือกธนาคาร --</option>');
                 data.forEach(item => {
-                    // try common field names: code/name or BankCode/BankName
                     const code = item.M17_PX1;
                     const name = item.Thainame;
                     $('#fullBank').append(`<option value="${code}">${name}</option>`);
                 });
-            }).fail(() => {
-                // fallback: keep empty
-            });
+            }).fail(() => {});
         }
 
-        // Read selected file inputs and convert to base64 strings. Returns array of base64 strings (omit empty slots).
         function readFilesAsBase64(selectors) {
             return Promise.all(selectors.map(sel => {
                 return new Promise(resolve => {
@@ -1756,7 +1925,6 @@
                     const file = input.files[0];
                     const reader = new FileReader();
                     reader.onload = function (e) {
-                        // strip data:<mime>;base64, prefix
                         const s = (e.target.result || '').toString();
                         const parts = s.split(',');
                         resolve(parts.length > 1 ? parts[1] : parts[0]);
@@ -1765,18 +1933,6 @@
                     reader.readAsDataURL(file);
                 });
             })).then(results => results.filter(r => r));
-        }
-
-        function validateThaiID(id) {
-            if (id.length !== 13) return false;
-
-            let sum = 0;
-            for (let i = 0; i < 12; i++) {
-                sum += parseInt(id.charAt(i)) * (13 - i);
-            }
-
-            let checkDigit = (11 - (sum % 11)) % 10;
-            return checkDigit === parseInt(id.charAt(12));
         }
 
         function getUniqueList(data, codeKey, nameKey) {
@@ -1797,10 +1953,7 @@
             resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
         }
 
-        // Ensure Full current address follows checkbox initial state
-        $('#fullUseIdCardAddress').trigger('change');
-
-        // --- Duplicate checks (reuse ExternalRegistration endpoints) ---
+        // --- Duplicate checks ---
         async function checkDuplicateIDCard(id) {
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
@@ -1852,7 +2005,7 @@
             }
         }
 
-        // --- OTP logic (shared with ExternalRegistration) ---
+        // --- OTP logic ---
         let countdownInterval;
         window.currentFormData = null;
         window.currentReferenceId = null;
@@ -1882,7 +2035,6 @@
                     Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
                 }
             } catch (e) {
-                // Demo fallback: allow proceeding when SMS API fails in dev
                 console.warn('SendOTP API failed, using demo fallback', e);
                 window.currentFormData = formData;
                 window.currentReferenceId = 'REF-DEMO';
@@ -1935,7 +2087,6 @@
                     $(this).prop('disabled', false).html('ยืนยัน');
                 }
             } catch (e) {
-                // Demo bypass
                 bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
                 await finalRegistration(window.currentFormData, otp);
             }
@@ -1944,7 +2095,6 @@
         async function finalRegistration(formData, otp) {
             Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
 
-            // Choose which file inputs to read depending on origin (full vs simple)
             const selectors = (formData && formData._origin === 'full')
                 ? ['#fullIdCardCopy', '#fullBankCardCopy', '#fullApplicationForm', '#fullBusinessPhoto']
                 : ['#simpleIdCardCopy', '#simpleBankCardCopy', '#simpleBusinessPhoto'];
@@ -1983,6 +2133,5 @@
     });
 </script>
 @section scripts {
-<!-- App js -->
 <script src="~/assets/js/app.js"></script>
 }
