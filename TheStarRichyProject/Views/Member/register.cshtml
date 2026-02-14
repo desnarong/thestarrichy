@@ -10,8 +10,13 @@
 
 <style>
     /* Full registration — improved spacing and sticky action bar */
-    .full-card .card-body { padding: 1.25rem; }
-    .full-card .form-group .form-control { padding: .65rem .75rem; }
+    .full-card .card-body {
+        padding: 1.25rem;
+    }
+
+    .full-card .form-group .form-control {
+        padding: .65rem .75rem;
+    }
 
     .full-action-bar {
         position: sticky;
@@ -23,14 +28,24 @@
         z-index: 1050;
     }
 
-    .full-action-bar .btn { min-width: 140px; }
+        .full-action-bar .btn {
+            min-width: 140px;
+        }
 
     /* Make the action bar slightly transparent on small screens to avoid covering inputs */
     @@media (max-width: 576px) {
-        .full-action-bar { padding: .5rem; }
-        .full-action-bar .btn { min-width: 120px; }
+        .full-action-bar {
+            padding: .5rem;
+        }
+
+            .full-action-bar .btn {
+                min-width: 120px;
+            }
     }
 </style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
+<link href="~/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" />
+<script src="~/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 
 <div class="row">
     <div class="col-md-12 col-lg-12">
@@ -129,7 +144,12 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-4 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="date" class="form-control" id="simpleBirthDate" required />
+                                                    <input type="text" class="form-control" id="simpleBirthDate"
+                                                           placeholder="dd-mm-yyyy"
+                                                           maxlength="10"
+                                                           pattern="\d{2}-\d{2}-\d{4}"
+                                                           title="กรุณากรอกวันที่ในรูปแบบ dd-mm-yyyy เช่น 14-02-2569"
+                                                           required>
                                                 </div>
                                             </div>
 
@@ -279,7 +299,7 @@
                             <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex flex-column flex-md-row justify-content-end gap-3">
-                                        <a href="/" class="btn btn-outline-secondary w-100 w-md-auto"style="align-content: center;">
+                                        <a href="/" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
                                             <i class="fas fa-home me-2"></i>กลับหน้าแรก
                                         </a>
                                         <button type="button" class="btn btn-outline-secondary w-100 w-md-auto" id="btnResetSimple">
@@ -300,9 +320,8 @@
                             <i class="fas fa-exclamation-circle me-2"></i>
                             <strong>ลงทะเบียนแบบเต็ม:</strong> กรอกข้อมูลทั้งหมดครบถ้วนสำหรับสมาชิกที่ต้องการบันทึกข้อมูลทั้งหมดในครั้งเดียว
                         </div>
-                        
+
                         <form id="fullRegistrationForm" method="post" novalidate>
-                            <!-- Mobile-Friendly Action Buttons -->
                             <div class="row mb-2">
                                 <div class="col-12">
                                     <div class="text-center text-md-start">
@@ -312,9 +331,8 @@
                                     </div>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
-                                <!-- Left Column - General Information -->
                                 <div class="col-12 col-lg-6">
                                     <div class="card">
                                         <div class="card-header">
@@ -322,41 +340,41 @@
                                         </div>
                                         <div class="card-block p-3">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-country">ประเทศ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-country">ประเทศ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <select id="fullCountry" name="country" class="form-control">
+                                                    <select id="fullCountry" name="country" class="form-control" required>
                                                         <option value="">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <select id="fullCountryBusiness" name="business_country" class="form-control">
+                                                    <select id="fullCountryBusiness" name="business_country" class="form-control" required>
                                                         <option value="">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-referrer-code">รหัสผู้แนะนำ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" placeholder="กรอกรหัสผู้แนะนำ" value="@userinfo.membercode" />
-                                                        <button type="button" class="btn btn-primary" data-key="t-search">
+                                                        <input type="text" id="fullReferrerCode" class="form-control" placeholder="กรอกรหัสผู้แนะนำ" value="@userinfo.membercode" required />
+                                                        <button type="button" class="btn btn-primary" data-key="t-search" id="btnFullSearchReferrer">
                                                             <i class="fas fa-search"></i>
                                                         </button>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label"></label>
+                                                <label class="col-md-4 col-form-label"><span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked />
+                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked required />
                                                         <label class="form-check-label" for="referrer_left" data-key="t-referrer-left">ด้านซ้าย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" />
+                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" required />
                                                         <label class="form-check-label" for="referrer_right" data-key="t-referrer-right">ด้านขวา</label>
                                                     </div>
                                                 </div>
@@ -364,14 +382,14 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-4 col-form-label" data-key="t-referrer-name">ชื่อผู้แนะนำ</label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
+                                                    <input type="text" id="fullReferrerName" class="form-control" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-upline-code">รหัสอัพไลน์</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" placeholder="กรอกรหัสอัพไลน์" />
+                                                        <input type="text" class="form-control" placeholder="กรอกรหัสอัพไลน์" required />
                                                         <button type="button" class="btn btn-primary" data-key="t-search">
                                                             <i class="fas fa-search"></i>
                                                         </button>
@@ -385,27 +403,27 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-upline-side">ด้านอัพไลน์</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-upline-side">ด้านอัพไลน์ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_left" checked />
+                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_left" checked required />
                                                         <label class="form-check-label" for="uplineside_left" data-key="t-referrer-left">ด้านซ้าย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_right" />
+                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_right" required />
                                                         <label class="form-check-label" for="uplineside_right" data-key="t-referrer-right">ด้านขวา</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="business_type" id="businessman" checked />
+                                                        <input type="radio" class="form-check-input" name="business_type" id="businessman" checked required />
                                                         <label class="form-check-label" for="businessman" data-key="t-businessman">นักธุรกิจ</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="business_type" id="user" />
+                                                        <input type="radio" class="form-check-input" name="business_type" id="user" required />
                                                         <label class="form-check-label" for="user" data-key="t-user">ผู้ใช้</label>
                                                     </div>
                                                 </div>
@@ -417,23 +435,23 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-registration-date">วันที่สมัคร</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" id="fullRegistrationDate" class="form-control" readonly />
+                                                    <input type="text" id="fullRegistrationDate" class="form-control" readonly disabled required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-title">คำนำหน้า</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-title">คำนำหน้า <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <select id="fullTitle" name="title" class="form-control">
+                                                    <select id="fullTitle" name="title" class="form-control" required>
                                                         <option value="">-- เลือกคำนำหน้า --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบนบัตร" />
+                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบนบัตร" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -443,74 +461,79 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-date-of-birth">วันเกิด</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-date-of-birth">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="วว-ดด-ปปปป" />
+                                                    <input type="text" class="form-control" id="fullBirthDate"
+                                                           placeholder="dd-mm-yyyy"
+                                                           maxlength="10"
+                                                           pattern="\d{2}-\d{2}-\d{4}"
+                                                           title="กรุณากรอกวันที่ในรูปแบบ dd-mm-yyyy เช่น 14-02-2569"
+                                                           required>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-citizen-number">เลขบัตรประชาชน/เลขหนังสือเดินทาง</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-citizen-number">เลขบัตรประชาชน/พาสปอร์ต <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง" />
+                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-gender">เพศ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-gender">เพศ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="gender" id="male" checked />
+                                                        <input type="radio" class="form-check-input" name="gender" id="male" checked required />
                                                         <label class="form-check-label" for="male" data-key="t-male">ชาย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="gender" id="female" />
+                                                        <input type="radio" class="form-check-input" name="gender" id="female" required />
                                                         <label class="form-check-label" for="female" data-key="t-female">หญิง</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-language">ภาษา</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-language">ภาษา <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <select id="fullLanguage" name="language" class="form-control">
+                                                    <select id="fullLanguage" name="language" class="form-control" required>
                                                         <option value="th">ไทย</option>
                                                         <option value="en">English</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-yes" checked />
+                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-yes" checked required />
                                                         <label class="form-check-label" for="sms_news_updates-yes" data-key="t-yes">ใช่</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-no" />
+                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-no" required />
                                                         <label class="form-check-label" for="sms_news_updates-no" data-key="t-no">ไม่ใช่</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-membership-type">ประเภทสมาชิก</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-membership-type">ประเภทสมาชิก <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="membership_type" id="individual" checked />
+                                                        <input type="radio" class="form-check-input" name="membership_type" id="individual" checked required />
                                                         <label class="form-check-label" for="individual" data-key="t-individual">บุคคล</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="membership_type" id="legal_entity" />
+                                                        <input type="radio" class="form-check-input" name="membership_type" id="legal_entity" required />
                                                         <label class="form-check-label" for="legal_entity" data-key="t-legal-entity">นิติบุคคล</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-marital-status">สถานะสมรส</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-marital-status">สถานะสมรส <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="marital_status" id="marital" checked />
+                                                        <input type="radio" class="form-check-input" name="marital_status" id="marital" checked required />
                                                         <label class="form-check-label" for="marital" data-key="t-marital">สมรส</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="marital_status" id="single" />
+                                                        <input type="radio" class="form-check-input" name="marital_status" id="single" required />
                                                         <label class="form-check-label" for="single" data-key="t-single">โสด</label>
                                                     </div>
                                                 </div>
@@ -528,29 +551,29 @@
                                             </div>
                                         </div>
                                     </div>
+
                                     <div class="card mt-3">
                                         <div class="card-header">
                                             <h5 data-key="t-address-information">ข้อมูลที่อยู่</h5>
                                         </div>
                                         <div class="card-block p-3">
                                             <div class="row">
-                                                <!-- Left: Address on ID card -->
                                                 <div class="col-12 mb-3">
                                                     <h6 class="mb-3">ที่อยู่ตามบัตรประชาชน</h6>
 
                                                     <div class="form-group mb-3">
-                                                        <label class="form-label small">บ้านเลขที่/ถนน</label>
-                                                        <textarea id="fullAddressIdCard" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง"></textarea>
+                                                        <label class="form-label small">บ้านเลขที่/ถนน <span class="text-danger">*</span></label>
+                                                        <textarea id="fullAddressIdCard" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง" required></textarea>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">รหัสไปรษณีย์</label>
-                                                            <input id="fullPostcodeIdCard" type="text" class="form-control" placeholder="รหัสไปรษณีย์" />
+                                                            <label class="form-label small">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                                            <input id="fullPostcodeIdCard" type="text" class="form-control" placeholder="รหัสไปรษณีย์" required />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">จังหวัด</label>
-                                                            <select id="fullProvinceIdCard" name="province_id_card" class="form-control" disabled>
+                                                            <label class="form-label small">จังหวัด <span class="text-danger">*</span></label>
+                                                            <select id="fullProvinceIdCard" name="province_id_card" class="form-control" disabled required>
                                                                 <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                             </select>
                                                         </div>
@@ -558,21 +581,20 @@
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">เขต/อำเภอ</label>
-                                                            <select id="fullDistrictIdCard" class="form-control" disabled>
+                                                            <label class="form-label small">เขต/อำเภอ <span class="text-danger">*</span></label>
+                                                            <select id="fullDistrictIdCard" class="form-control" disabled required>
                                                                 <option value="">-- เลือกอำเภอ --</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">แขวง/ตำบล</label>
-                                                            <select id="fullSubdistrictIdCard" class="form-control" disabled>
+                                                            <label class="form-label small">แขวง/ตำบล <span class="text-danger">*</span></label>
+                                                            <select id="fullSubdistrictIdCard" class="form-control" disabled required>
                                                                 <option value="">-- เลือกตำบล --</option>
                                                             </select>
                                                         </div>
                                                     </div>
                                                 </div>
 
-                                                <!-- Right: Current / Contact Address -->
                                                 <div class="col-12 mb-3">
                                                     <h6 class="mb-3">ที่อยู่ปัจจุบัน (ที่ติดต่อได้)</h6>
 
@@ -584,18 +606,18 @@
                                                     </div>
 
                                                     <div class="form-group mb-3">
-                                                        <label class="form-label small">ที่อยู่</label>
-                                                        <textarea id="fullCurrentAddress" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง"></textarea>
+                                                        <label class="form-label small">ที่อยู่ <span class="text-danger">*</span></label>
+                                                        <textarea id="fullCurrentAddress" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง" required></textarea>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">รหัสไปรษณีย์</label>
-                                                            <input id="fullCurrentPostcode" type="text" class="form-control" placeholder="รหัสไปรษณีย์" />
+                                                            <label class="form-label small">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                                            <input id="fullCurrentPostcode" type="text" class="form-control" placeholder="รหัสไปรษณีย์" required />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">จังหวัด</label>
-                                                            <select id="fullCurrentProvince" name="province_current" class="form-control" disabled>
+                                                            <label class="form-label small">จังหวัด <span class="text-danger">*</span></label>
+                                                            <select id="fullCurrentProvince" name="province_current" class="form-control" disabled required>
                                                                 <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                             </select>
                                                         </div>
@@ -603,14 +625,14 @@
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">เขต/อำเภอ</label>
-                                                            <select id="fullCurrentDistrict" class="form-control" disabled>
+                                                            <label class="form-label small">เขต/อำเภอ <span class="text-danger">*</span></label>
+                                                            <select id="fullCurrentDistrict" class="form-control" disabled required>
                                                                 <option value="">-- เลือกอำเภอ --</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">แขวง/ตำบล</label>
-                                                            <select id="fullCurrentSubdistrict" class="form-control" disabled>
+                                                            <label class="form-label small">แขวง/ตำบล <span class="text-danger">*</span></label>
+                                                            <select id="fullCurrentSubdistrict" class="form-control" disabled required>
                                                                 <option value="">-- เลือกตำบล --</option>
                                                             </select>
                                                         </div>
@@ -618,9 +640,9 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเบอร์โทรศัพท์มือถือ" />
+                                                    <input type="text" class="form-control" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -645,7 +667,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Right Column - Bank Information -->
                                 <div class="col-lg-6">
                                     <div class="card">
                                         <div class="card-header">
@@ -653,29 +674,29 @@
                                         </div>
                                         <div class="card-block p-3">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-bank">ธนาคาร</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <select id="fullBank" name="bank" class="form-control">
+                                                    <select id="fullBank" name="bank" class="form-control" required>
                                                         <option value="">-- เลือกธนาคาร --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-account-number">เลขที่บัญชี</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" />
+                                                    <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-account-name">ชื่อบัญชี</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" />
+                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-branch">สาขา</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="text" class="form-control" placeholder="กรอกสาขา" />
+                                                    <input type="text" class="form-control" placeholder="กรอกสาขา" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -691,27 +712,27 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-yes" checked />
+                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-yes" checked required />
                                                         <label class="form-check-label" for="auto_transfer-yes" data-key="t-yes">ใช่</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-no" />
+                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-no" required />
                                                         <label class="form-check-label" for="auto_transfer-no" data-key="t-no">ไม่ใช่</label>
                                                     </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-autoship">Autoship</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-autoship">Autoship <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="autoship" id="deduct" checked />
+                                                        <input type="radio" class="form-check-input" name="autoship" id="deduct" checked required />
                                                         <label class="form-check-label" for="deduct" data-key="t-deduct">หัก</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="autoship" id="not_deducted" />
+                                                        <input type="radio" class="form-check-input" name="autoship" id="not_deducted" required />
                                                         <label class="form-check-label" for="not_deducted" data-key="t-not-deducted">ไม่หัก</label>
                                                     </div>
                                                 </div>
@@ -731,16 +752,16 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" />
+                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" required />
                                                     <img id="fullIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร</label>
+                                                <label class="col-md-4 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
                                                 <div class="col-md-8">
-                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" />
+                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" required />
                                                     <img id="fullBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
                                                 </div>
                                             </div>
@@ -762,21 +783,19 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- Sticky action bar for Full registration -->
-                    <div class="full-action-bar d-print-none">
-                        <div class="container-fluid d-flex justify-content-end align-items-center">
-                            <div class="d-flex gap-2">
-                                <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
-                                    <i class="fas fa-times me-2"></i>ยกเลิก
-                                </button>
-                                <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
-                                    <i class="fas fa-save me-2"></i>บันทึกข้อมูล
-                                </button>
+                            <div class="full-action-bar d-print-none">
+                                <div class="container-fluid d-flex justify-content-end align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
+                                            <i class="fas fa-times me-2"></i>ยกเลิก
+                                        </button>
+                                        <button type="submit" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-save me-2"></i>บันทึกข้อมูล
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <!-- end fullRegistrationForm -->
-                </form>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -784,567 +803,558 @@
     </div>
 </div>
 
-    <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="otpModalLabel">
-                        <i class="fas fa-mobile-alt me-2"></i>ยืนยันรหัส OTP
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="otpModalLabel">
+                    <i class="fas fa-mobile-alt me-2"></i>ยืนยันรหัส OTP
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <i class="fas fa-sms display-4 text-primary mb-3"></i>
+                    <p class="mb-2">เราได้ส่งรหัส OTP ไปยังเบอร์โทรศัพท์</p>
+                    <h5 class="text-primary fw-bold" id="otpPhoneNumber"></h5>
+                    <small class="text-muted">กรุณาใส่รหัส OTP 6 หลักที่ได้รับ</small>
                 </div>
-                <div class="modal-body">
-                    <div class="text-center mb-4">
-                        <i class="fas fa-sms display-4 text-primary mb-3"></i>
-                        <p class="mb-2">เราได้ส่งรหัส OTP ไปยังเบอร์โทรศัพท์</p>
-                        <h5 class="text-primary fw-bold" id="otpPhoneNumber"></h5>
-                        <small class="text-muted">กรุณาใส่รหัส OTP 6 หลักที่ได้รับ</small>
+
+                <form id="otpForm">
+                    <div class="mb-3">
+                        <input type="text" class="form-control form-control-lg text-center"
+                               id="otpInput" maxlength="6" placeholder="000000"
+                               style="font-size: 1.5rem; letter-spacing: 0.5rem;" autocomplete="off" required>
+                        <div class="invalid-feedback text-center" id="otpError"></div>
                     </div>
 
-                    <form id="otpForm">
-                        <div class="mb-3">
-                            <input type="text" class="form-control form-control-lg text-center"
-                                   id="otpInput" maxlength="6" placeholder="000000"
-                                   style="font-size: 1.5rem; letter-spacing: 0.5rem;" autocomplete="off" required>
-                            <div class="invalid-feedback text-center" id="otpError"></div>
-                        </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <small class="text-muted">รหัส OTP จะหมดอายุใน 5 นาที</small>
-                            <button type="button" class="btn btn-link btn-sm p-0" id="resendOTPBtn" disabled>
-                                <small>ส่งรหัสใหม่ (30)</small>
-                            </button>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
-                    <button type="button" class="btn btn-primary" id="verifyOTPBtn" disabled>
-                        <i class="fas fa-check me-2"></i>ยืนยัน
-                    </button>
-                </div>
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <small class="text-muted">รหัส OTP จะหมดอายุใน 5 นาที</small>
+                        <button type="button" class="btn btn-link btn-sm p-0" id="resendOTPBtn" disabled>
+                            <small>ส่งรหัสใหม่ (30)</small>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="verifyOTPBtn" disabled>
+                    <i class="fas fa-check me-2"></i>ยืนยัน
+                </button>
             </div>
         </div>
     </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    $(document).ready(function () {
+        let masterData = [];
 
-    <script>
-        $(document).ready(function () {
-            let masterData = [];
+        // Load master address data
+        loadMasterAddresses();
 
-            // Load master address data
-            loadMasterAddresses();
+        // --- Load data for simple registration (from ExternalRegistration example) ---
+        loadSimpleCountries();
+        loadSimpleCountryBusinesses();
+        loadSimpleTitles();
+        setSimpleRegistrationDate();
 
-            // --- Load data for simple registration (from ExternalRegistration example) ---
-            loadSimpleCountries();
-            loadSimpleCountryBusinesses();
-            loadSimpleTitles();
-            setSimpleRegistrationDate();
+        // Load full-registration lists (same APIs as simple)
+        loadFullCountries();
+        loadFullCountryBusinesses();
+        loadFullTitles();
+        setFullRegistrationDate();
+        loadFullBanks();
 
-            // Load full-registration lists (same APIs as simple)
-            loadFullCountries();
-            loadFullCountryBusinesses();
-            loadFullTitles();
-            setFullRegistrationDate();
-            loadFullBanks();
+        $('#simpleBirthDate').datepicker({
+                format: 'dd-mm-yyyy',
+                language: 'th-th', // 📌 คีย์เวิร์ดสำคัญ: ใช้ 'th-th' จะเป็น พ.ศ. ทันที!
+                autoclose: true
+        });
 
-            // Copy name-on-card into business name if business name is empty
-            $('#simpleFullName').on('input', function() {
-                if (!$('#simpleBusinessName').val()) {
-                    $('#simpleBusinessName').val($(this).val());
-                }
-            });
+        $('#fullBirthDate').datepicker({
+                format: 'dd-mm-yyyy',
+                language: 'th-th', // 📌 คีย์เวิร์ดสำคัญ: ใช้ 'th-th' จะเป็น พ.ศ. ทันที!
+                autoclose: true
+        });
 
-            // Switch to full registration tab
-            $('#btnSwitchToFull').click(function () {
-                $('#full-tab').tab('show');
-            });
+        // Switch to full registration tab
+        $('#btnSwitchToFull').click(function () {
+            $('#full-tab').tab('show');
+        });
 
-            // Reset simple form
-            $('#btnResetSimple').click(function () {
+        // Reset simple form
+        $('#btnResetSimple').click(function () {
+            if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
+
+                // 1. ล้างข้อมูลทุกช่องในฟอร์มกลับเป็นค่าเริ่มต้น
                 $('#simpleRegistrationForm')[0].reset();
-                $('#simpleReferrerName').val('Star1');
-                resetAddressDropdowns();
-                $('#simpleCountry').val('thailand');
-                $('#simpleDocumentType').val('citizen');
-                $('#simpleDocumentNumber').val('3341900571937');
-                $('#documentValidationMessage').text('');
-                // hide simple previews and clear file inputs
-                $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview').hide().attr('src', '');
-                $('#simpleIdCardCopy, #simpleBankCardCopy, #simpleBusinessPhoto').val('');
-            });
 
-            // Image preview handlers (simple + full)
-            function handleImagePreview(inputSelector, previewSelector) {
-                $(inputSelector).on('change', function () {
-                    const file = this.files && this.files[0];
-                    const preview = $(previewSelector);
-                    if (!file) {
-                        preview.hide().attr('src', '');
-                        return;
-                    }
+                // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
+                $('#simpleRegistrationForm .is-invalid').removeClass('is-invalid');
+                $('#documentValidationMessage').html(''); // ล้างข้อความแจ้งเตือนเลขบัตร ปชช.
 
-                    if (!file.type.startsWith('image/')) {
-                        toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
-                        $(this).val('');
-                        preview.hide().attr('src', '');
-                        return;
-                    }
+                // (เผื่อมีข้อความ Validation อื่นๆ ที่คุณดักไว้)
+                $('#simpleIdCardNameValidation, #simpleBusinessNameValidation, #mobileValidation, #emailValidation, #lineIdValidation').html('');
 
-                    const maxBytes = 5 * 1024 * 1024; // 5MB
-                    if (file.size > maxBytes) {
-                        toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
-                        $(this).val('');
-                        preview.hide().attr('src', '');
-                        return;
-                    }
-
-                    const url = URL.createObjectURL(file);
-                    preview.attr('src', url).show();
-                    preview.on('load', function () { URL.revokeObjectURL(url); });
-                });
-            }
-
-            handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
-            handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
-            handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
-
-            handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
-            handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
-            handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
-            handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
-
-            // Search referrer
-            $('#btnSearchReferrer').click(function () {
-                const referrerCode = $('#simpleReferrerCode').val();
-                if (referrerCode) {
-                    // Call API to find referrer
-                    $.get('/Registration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
-                        .done(function(response) {
-                            if (response.success) {
-                                $('#simpleReferrerName').val(response.memberName);
-                                toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
-                            } else {
-                                $('#simpleReferrerName').val('');
-                                toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
-                            }
-                        })
-                        .fail(function() {
-                            $('#simpleReferrerName').val('');
-                            toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-                        });
+                // 3. จัดการ Dropdown ที่อยู่ (เรียกใช้ฟังก์ชันเดิมของคุณ)
+                if (typeof resetAddressDropdowns === 'function') {
+                    resetAddressDropdowns();
                 } else {
-                    toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+                    // เผื่อฟังก์ชัน resetAddressDropdowns ไม่มี จะได้ใช้แบบแมนนวลแทน
+                    $('#simpleProvince').html('<option value="">-- รอผลจากรหัสไปรษณีย์ --</option>');
+                    $('#simpleDistrict').html('<option value="">-- เลือกอำเภอ --</option>');
+                    $('#simpleSubdistrict').html('<option value="">-- เลือกตำบล --</option>');
                 }
-            });
 
-            // Document validation
-            $('#btnValidateDocument').click(function () {
-                const docType = $('#simpleDocumentType').val();
-                const docNumber = $('#simpleDocumentNumber').val();
-                
-                if (!docType || !docNumber) {
-                    toastr.error('กรุณาเลือกประเภทเอกสารและกรอกเลขที่เอกสาร');
+                // 🔒 สำคัญ: บังคับ Disable Dropdown จังหวัด/อำเภอ/ตำบล กลับไปเหมือนเดิม
+                $('#simpleProvince, #simpleDistrict, #simpleSubdistrict').prop('disabled', true);
+
+                // 4. ซ่อนรูปภาพ Preview และเคลียร์ไฟล์
+                $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview')
+                    .hide()
+                    .attr('src', '');
+                $('#simpleIdCardCopy, #simpleBankCardCopy, #simpleBusinessPhoto').val('');
+
+                // 5. แจ้งเตือน User และเลื่อนหน้าจอกลับขึ้นด้านบนสุด
+                toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
+                $('html, body').animate({ scrollTop: $('#simpleRegistrationForm').offset().top - 50 }, 500);
+            }
+        });
+
+        // Image preview handlers (simple + full)
+        function handleImagePreview(inputSelector, previewSelector) {
+            $(inputSelector).on('change', function () {
+                const file = this.files && this.files[0];
+                const preview = $(previewSelector);
+                if (!file) {
+                    preview.hide().attr('src', '');
                     return;
                 }
 
-                if (docType === 'citizen') {
-                    // Validate Thai ID card (13 digits, valid checksum)
-                    if (validateThaiID(docNumber)) {
-                        $('#documentValidationMessage').html('<span class="text-success"><i class="fas fa-check-circle"></i> เลขบัตรประชาชนถูกต้อง</span>');
-                        toastr.success('เลขบัตรประชาชนถูกต้อง');
-                    } else {
-                        $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
-                        toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
-                    }
-                } else {
-                    $('#documentValidationMessage').html('<span class="text-info"><i class="fas fa-info-circle"></i> ตรวจสอบเอกสารแล้ว</span>');
-                    toastr.info('ตรวจสอบเอกสารแล้ว');
+                if (!file.type.startsWith('image/')) {
+                    toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
+                    $(this).val('');
+                    preview.hide().attr('src', '');
+                    return;
                 }
-            });
 
-            // Document type change
-            $('#simpleDocumentType').change(function () {
-                const docType = $(this).val();
-                $('#documentValidationMessage').text('');
-                
-                if (docType === 'citizen') {
-                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขบัตรประชาชน 13 หลัก');
-                } else if (docType === 'passport') {
-                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขพาสปอร์ต');
-                } else {
-                    $('#simpleDocumentNumber').attr('placeholder', 'กรอกเลขบัตรต่างด้าว');
+                const maxBytes = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxBytes) {
+                    toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
+                    $(this).val('');
+                    preview.hide().attr('src', '');
+                    return;
                 }
+
+                const url = URL.createObjectURL(file);
+                preview.attr('src', url).show();
+                preview.on('load', function () { URL.revokeObjectURL(url); });
             });
+        }
 
-            // Zipcode input for address lookup
-            $('#simplePostcode').on('input', function() {
-                var selectedZip = $(this).val();
-                resetAddressDropdowns();
+        handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
+        handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
+        handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
 
-                if (selectedZip.length === 5) {
-                    // Filter data by zipcode
-                    var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+        handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
+        handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
+        handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
+        handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
 
-                    if (filteredData.length > 0) {
-                        // Get unique provinces
-                        var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
-
-                        // Create province options
-                        $('#simpleProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
-                        $.each(uniqueProvinces, function(index, item) {
-                            $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
-                        });
-                        $('#simpleProvince').prop('disabled', false);
-
-                        // Auto select if only one province
-                        if (uniqueProvinces.length === 1) {
-                            $('#simpleProvince').val(uniqueProvinces[0].province_code).trigger('change');
+        //Search referrer
+        $('#btnFullSearchReferrer').click(function () {
+            const referrerCode = $('#fullReferrerCode').val();
+            if (referrerCode) {
+                // Call API to find referrer
+            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+                    .done(function(response) {
+                        if (response.success) {
+                            $('#fullReferrerName').val(response.memberName);
+                            toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
+                        } else {
+                            $('#fullReferrerName').val('');
+                            toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
                         }
-                    }
-                }
-            });
-
-            // Province change
-            $('#simpleProvince').change(function() {
-                var selectedZip = $('#simplePostcode').val();
-                var selectedProvCode = $(this).val();
-
-                resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
-                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-
-                if (selectedProvCode) {
-                    var filteredData = masterData.filter(item =>
-                        item.zipcode === selectedZip &&
-                        item.province_code == selectedProvCode
-                    );
-
-                    var uniqueDistricts = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
-
-                    $.each(uniqueDistricts, function(index, item) {
-                        $('#simpleDistrict').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                    })
+                    .fail(function() {
+                        $('#fullReferrerName').val('');
+                        toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
                     });
-                    $('#simpleDistrict').prop('disabled', false);
+            } else {
+                toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+            }
+        });
 
-                    if (uniqueDistricts.length === 1) {
-                        $('#simpleDistrict').val(uniqueDistricts[0].amphoe_code).trigger('change');
-                    }
-                }
-            });
-
-            // District change
-            $('#simpleDistrict').change(function() {
-                var selectedZip = $('#simplePostcode').val();
-                var selectedProvCode = $('#simpleProvince').val();
-                var selectedDistrictCode = $(this).val();
-
-                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-
-                if (selectedDistrictCode) {
-                    var filteredData = masterData.filter(item =>
-                        item.zipcode === selectedZip &&
-                        item.province_code == selectedProvCode &&
-                        item.amphoe_code == selectedDistrictCode
-                    );
-
-                    $.each(filteredData, function(index, item) {
-                        $('#simpleSubdistrict').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
-                    });
-                    $('#simpleSubdistrict').prop('disabled', false);
-                }
-            });
-
-            // --- Full: province/district change handlers (ID card) ---
-            $('#fullProvinceIdCard').change(function () {
-                const selectedZip = $('#fullPostcodeIdCard').val();
-                const selectedProv = $(this).val();
-
-                resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-                resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-
-                if (selectedProv) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
-                    const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
-                    districts.forEach(d => $('#fullDistrictIdCard').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
-                    $('#fullDistrictIdCard').prop('disabled', false);
-
-                    if (districts.length === 1) {
-                        $('#fullDistrictIdCard').val(districts[0].amphoe_code).trigger('change');
-                    }
-                }
-            });
-
-            $('#fullDistrictIdCard').change(function () {
-                const selectedZip = $('#fullPostcodeIdCard').val();
-                const prov = $('#fullProvinceIdCard').val();
-                const district = $(this).val();
-
-                resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-                if (district) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
-                    filtered.forEach(item => $('#fullSubdistrictIdCard').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
-                    $('#fullSubdistrictIdCard').prop('disabled', false);
-                }
-            });
-
-            // --- Full: province/district change handlers (Current address) ---
-            $('#fullCurrentProvince').change(function () {
-                const selectedZip = $('#fullCurrentPostcode').val();
-                const selectedProv = $(this).val();
-
-                resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-                resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-
-                if (selectedProv) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
-                    const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
-                    districts.forEach(d => $('#fullCurrentDistrict').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
-                    $('#fullCurrentDistrict').prop('disabled', false);
-
-                    if (districts.length === 1) {
-                        $('#fullCurrentDistrict').val(districts[0].amphoe_code).trigger('change');
-                    }
-                }
-            });
-
-            $('#fullCurrentDistrict').change(function () {
-                const selectedZip = $('#fullCurrentPostcode').val();
-                const prov = $('#fullCurrentProvince').val();
-                const district = $(this).val();
-
-                resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-                if (district) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
-                    filtered.forEach(item => $('#fullCurrentSubdistrict').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
-                    $('#fullCurrentSubdistrict').prop('disabled', false);
-                }
-            });
-
-            // Populate province/district/subdistrict when user types postcode (Full - ID card)
-            $('#fullPostcodeIdCard').on('input', function () {
-                const selectedZip = $(this).val();
-                resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-                resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-
-                if (selectedZip.length === 5) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip);
-                    if (filtered.length > 0) {
-                        const provinces = getUniqueList(filtered, 'province_code', 'province');
-                        $('#fullProvinceIdCard').empty().append('<option value="">-- เลือกจังหวัด --</option>');
-                        provinces.forEach(p => $('#fullProvinceIdCard').append(`<option value="${p.province_code}">${p.province}</option>`));
-                        $('#fullProvinceIdCard').prop('disabled', false);
-
-                        if (provinces.length === 1) {
-                            $('#fullProvinceIdCard').val(provinces[0].province_code).trigger('change');
+        // Search referrer
+        $('#btnSearchReferrer').click(function () {
+            const referrerCode = $('#simpleReferrerCode').val();
+            if (referrerCode) {
+                // Call API to find referrer
+            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+                    .done(function(response) {
+                        if (response.success) {
+                            $('#simpleReferrerName').val(response.memberName);
+                            toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
+                        } else {
+                            $('#simpleReferrerName').val('');
+                            toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
                         }
+                    })
+                    .fail(function() {
+                        $('#simpleReferrerName').val('');
+                        toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+                    });
+            } else {
+                toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+            }
+        });
+
+        $('#simpleDocumentNumber').on('blur', function() {
+            // 1. ดึงค่ามา ลบขีด (-) และช่องว่างออกให้เหลือแต่ตัวอักษร/ตัวเลขติดกัน
+            const docNumber = $(this).val().replace(/[- ]/g, '');
+
+            // 2. ล้างข้อความ Error เก่าออกก่อนเสมอเมื่อเริ่มเช็คใหม่
+            $(this).removeClass('is-invalid');
+            $('#documentValidationMessage').html('');
+
+            // 3. ถ้าไม่ได้กรอกอะไรเลย ให้ข้ามไป (ไม่ต้องเช็ค)
+            if (!docNumber) return;
+
+            // 4. เช็คว่าเข้าข่าย "บัตรประชาชนไทย" หรือไม่? (เป็นตัวเลขล้วน และยาว 13 หลักเป๊ะ)
+            if (/^[0-9]{13}$/.test(docNumber)) {
+
+                // เอาเลข 13 หลักไปเข้าสูตรคำนวณ
+                if (!validateThaiID(docNumber)) {
+                    // พิมพ์ 13 หลัก แต่สูตรคำนวณบอกว่า "บัตรปลอม/พิมพ์ผิด"
+                    $(this).addClass('is-invalid');
+                    $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
+                    toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+                } else {
+                    // ✅ UX เสริม: ถ้าบัตรถูกต้อง ให้เติมขีด (-) จัด Format อัตโนมัติ (x-xxxx-xxxxx-xx-x)
+                    const formattedID = docNumber.replace(/(\d{1})(\d{4})(\d{5})(\d{2})(\d{1})/, '$1-$2-$3-$4-$5');
+                    $(this).val(formattedID);
+                }
+
+            } else {
+                // 5. กรณีพิมพ์มาไม่ถึง 13 หลัก หรือมีตัวอักษรภาษาอังกฤษผสม (เช่น Passport)
+                // ถือว่าเป็นเอกสารประเภทอื่น และปล่อยผ่าน
+            }
+        });
+
+        // Zipcode input for address lookup
+        $('#simplePostcode').on('input', function() {
+            var selectedZip = $(this).val();
+            resetAddressDropdowns();
+
+            if (selectedZip.length === 5) {
+                // Filter data by zipcode
+                var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+
+                if (filteredData.length > 0) {
+                    // Get unique provinces
+                    var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+
+                    // Create province options
+                    $('#simpleProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    $.each(uniqueProvinces, function(index, item) {
+                        $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
+                    });
+                    $('#simpleProvince').prop('disabled', false);
+
+                    // Auto select if only one province
+                    if (uniqueProvinces.length === 1) {
+                        $('#simpleProvince').val(uniqueProvinces[0].province_code).trigger('change');
                     }
                 }
-            });
+            }
+        });
 
-            // Populate province/district/subdistrict when user types postcode (Full - Current address)
-            $('#fullCurrentPostcode').on('input', function () {
-                const selectedZip = $(this).val();
+        // Province change
+        $('#simpleProvince').change(function() {
+            var selectedZip = $('#simplePostcode').val();
+            var selectedProvCode = $(this).val();
+
+            resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+
+            if (selectedProvCode) {
+                var filteredData = masterData.filter(item =>
+                    item.zipcode === selectedZip &&
+                    item.province_code == selectedProvCode
+                );
+
+                var uniqueDistricts = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
+
+                $.each(uniqueDistricts, function(index, item) {
+                    $('#simpleDistrict').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                });
+                $('#simpleDistrict').prop('disabled', false);
+
+                if (uniqueDistricts.length === 1) {
+                    $('#simpleDistrict').val(uniqueDistricts[0].amphoe_code).trigger('change');
+                }
+            }
+        });
+
+        // District change
+        $('#simpleDistrict').change(function() {
+            var selectedZip = $('#simplePostcode').val();
+            var selectedProvCode = $('#simpleProvince').val();
+            var selectedDistrictCode = $(this).val();
+
+            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+
+            if (selectedDistrictCode) {
+                var filteredData = masterData.filter(item =>
+                    item.zipcode === selectedZip &&
+                    item.province_code == selectedProvCode &&
+                    item.amphoe_code == selectedDistrictCode
+                );
+
+                $.each(filteredData, function(index, item) {
+                    $('#simpleSubdistrict').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
+                });
+                $('#simpleSubdistrict').prop('disabled', false);
+            }
+        });
+
+        // --- Full: province/district change handlers (ID card) ---
+        $('#fullProvinceIdCard').change(function () {
+            const selectedZip = $('#fullPostcodeIdCard').val();
+            const selectedProv = $(this).val();
+
+            resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+
+            if (selectedProv) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
+                const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
+                districts.forEach(d => $('#fullDistrictIdCard').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
+                $('#fullDistrictIdCard').prop('disabled', false);
+
+                if (districts.length === 1) {
+                    $('#fullDistrictIdCard').val(districts[0].amphoe_code).trigger('change');
+                }
+            }
+        });
+
+        $('#fullDistrictIdCard').change(function () {
+            const selectedZip = $('#fullPostcodeIdCard').val();
+            const prov = $('#fullProvinceIdCard').val();
+            const district = $(this).val();
+
+            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+            if (district) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
+                filtered.forEach(item => $('#fullSubdistrictIdCard').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
+                $('#fullSubdistrictIdCard').prop('disabled', false);
+            }
+        });
+
+        // --- Full: province/district change handlers (Current address) ---
+        $('#fullCurrentProvince').change(function () {
+            const selectedZip = $('#fullCurrentPostcode').val();
+            const selectedProv = $(this).val();
+
+            resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+            if (selectedProv) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
+                const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
+                districts.forEach(d => $('#fullCurrentDistrict').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
+                $('#fullCurrentDistrict').prop('disabled', false);
+
+                if (districts.length === 1) {
+                    $('#fullCurrentDistrict').val(districts[0].amphoe_code).trigger('change');
+                }
+            }
+        });
+
+        $('#fullCurrentDistrict').change(function () {
+            const selectedZip = $('#fullCurrentPostcode').val();
+            const prov = $('#fullCurrentProvince').val();
+            const district = $(this).val();
+
+            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+            if (district) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
+                filtered.forEach(item => $('#fullCurrentSubdistrict').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
+                $('#fullCurrentSubdistrict').prop('disabled', false);
+            }
+        });
+
+        // Populate province/district/subdistrict when user types postcode (Full - ID card)
+        $('#fullPostcodeIdCard').on('input', function () {
+            const selectedZip = $(this).val();
+            resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+
+            if (selectedZip.length === 5) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip);
+                if (filtered.length > 0) {
+                    const provinces = getUniqueList(filtered, 'province_code', 'province');
+                    $('#fullProvinceIdCard').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    provinces.forEach(p => $('#fullProvinceIdCard').append(`<option value="${p.province_code}">${p.province}</option>`));
+                    $('#fullProvinceIdCard').prop('disabled', false);
+
+                    if (provinces.length === 1) {
+                        $('#fullProvinceIdCard').val(provinces[0].province_code).trigger('change');
+                    }
+                }
+            }
+        });
+
+        // Populate province/district/subdistrict when user types postcode (Full - Current address)
+        $('#fullCurrentPostcode').on('input', function () {
+            const selectedZip = $(this).val();
+            resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+            if (selectedZip.length === 5) {
+                const filtered = masterData.filter(item => item.zipcode === selectedZip);
+                if (filtered.length > 0) {
+                    const provinces = getUniqueList(filtered, 'province_code', 'province');
+                    $('#fullCurrentProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    provinces.forEach(p => $('#fullCurrentProvince').append(`<option value="${p.province_code}">${p.province}</option>`));
+                    $('#fullCurrentProvince').prop('disabled', false);
+
+                    if (provinces.length === 1) {
+                        $('#fullCurrentProvince').val(provinces[0].province_code).trigger('change');
+                    }
+                }
+            }
+        });
+
+        // When checkbox 'ใช้ที่อยู่ตามบัตร' is toggled copy/clear current address fields
+        $('#fullUseIdCardAddress').change(function () {
+            if ($(this).is(':checked')) {
+                // copy ID-card address into current address + propagate postcode -> province/district/subdistrict
+                $('#fullCurrentAddress').val($('#fullAddressIdCard').val());
+                $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
+            } else {
+                // clear current address fields
+                $('#fullCurrentAddress').val('');
+                $('#fullCurrentPostcode').val('');
                 resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
                 resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
                 resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-
-                if (selectedZip.length === 5) {
-                    const filtered = masterData.filter(item => item.zipcode === selectedZip);
-                    if (filtered.length > 0) {
-                        const provinces = getUniqueList(filtered, 'province_code', 'province');
-                        $('#fullCurrentProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
-                        provinces.forEach(p => $('#fullCurrentProvince').append(`<option value="${p.province_code}">${p.province}</option>`));
-                        $('#fullCurrentProvince').prop('disabled', false);
-
-                        if (provinces.length === 1) {
-                            $('#fullCurrentProvince').val(provinces[0].province_code).trigger('change');
-                        }
-                    }
-                }
-            });
-
-            // When checkbox 'ใช้ที่อยู่ตามบัตร' is toggled copy/clear current address fields
-            $('#fullUseIdCardAddress').change(function () {
-                if ($(this).is(':checked')) {
-                    // copy ID-card address into current address + propagate postcode -> province/district/subdistrict
-                    $('#fullCurrentAddress').val($('#fullAddressIdCard').val());
-                    $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
-                } else {
-                    // clear current address fields
-                    $('#fullCurrentAddress').val('');
-                    $('#fullCurrentPostcode').val('');
-                    resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-                    resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-                    resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-                }
-            });
+            }
+        });
 
             // Simple form submission
-            $('#simpleRegistrationForm').submit(async function (e) {
-                e.preventDefault();
+        $('#simpleRegistrationForm').submit(async function (e) {
+            e.preventDefault();
 
-                // Basic validation
-                const requiredFields = $('#simpleRegistrationForm .required');
-                let isValid = true;
+            let isValid = true;
 
-                requiredFields.each(function () {
-                    const field = $(this).find('input, select, textarea');
-                    if (!field.val()) {
+            // ==========================================
+            // 1. Basic validation (ค้นหาตัวที่บังคับกรอก)
+            // ==========================================
+            // ทริค: ค้นหาด้วย attribute [required] ไปเลย ชัวร์สุด!
+            const requiredFields = $(this).find('input[required], select[required], textarea[required]');
+
+            requiredFields.each(function () {
+                const field = $(this);
+
+                // ถ้าเป็น Radio หรือ Checkbox
+                if (field.is(':radio') || field.is(':checkbox')) {
+                    const name = field.attr('name');
+                    // เช็คว่ากลุ่มชื่อนี้ มีการติ๊กเลือกหรือยัง
+                    if ($('input[name="' + name + '"]:checked').length === 0) {
+                        // ถ้ายังไม่ติ๊ก ให้หาทุกตัวในกลุ่มแล้วใส่คลาสแดง
+                        $('input[name="' + name + '"]').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('input[name="' + name + '"]').removeClass('is-invalid');
+                    }
+                }
+                // ถ้าเป็น Text input หรือ Select
+                else {
+                    const val = $.trim(field.val());
+                    if (!val) {
                         field.addClass('is-invalid');
                         isValid = false;
                     } else {
                         field.removeClass('is-invalid');
                     }
-                });
-
-                // Validate Thai ID if selected
-                const docType = $('#simpleDocumentType').val();
-                const docNumber = $('#simpleDocumentNumber').val();
-                if (docType === 'citizen' && docNumber && !validateThaiID(docNumber)) {
-                    $('#simpleDocumentNumber').addClass('is-invalid');
-                    $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
-                    isValid = false;
-                    toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
-                }
-
-                // Validate address completeness if any address field is filled
-                const addressFields = ['#simpleAddressIdCard', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
-                let hasAddressData = false;
-                let addressComplete = true;
-
-                addressFields.forEach(fieldId => {
-                    if ($(fieldId).val()) {
-                        hasAddressData = true;
-                    }
-                });
-
-                if (hasAddressData) {
-                    addressFields.forEach(fieldId => {
-                        if (!$(fieldId).val()) {
-                            $(fieldId).addClass('is-invalid');
-                            addressComplete = false;
-                        } else {
-                            $(fieldId).removeClass('is-invalid');
-                        }
-                    });
-
-                    if (!addressComplete) {
-                        toastr.error('หากกรอกข้อมูลที่อยู่ กรุณากรอกให้ครบถ้วน');
-                        isValid = false;
-                    }
-                }
-
-                if (isValid) {
-                    // Run duplicate checks then send OTP (same flow as ExternalRegistration)
-                    Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-                    const formData = {
-                        country: $('#simpleCountry').val(),
-                        documentType: $('#simpleDocumentType').val(),
-                        documentNumber: $('#simpleDocumentNumber').val(),
-                        referrerCode: $('#simpleReferrerCode').val(),
-                        title: $('select[name="simpleTitle"]').val(),
-                        fullName: $('#simpleFullName').val(),
-                        mobile: $('#simpleMobile').val(),
-                        email: $('#simpleEmail').val(),
-                        lineId: $('#simpleLineId').val(),
-                        addressIdCard: $('#simpleAddressIdCard').val(),
-                        postcode: $('#simplePostcode').val(),
-                        provinceCode: $('#simpleProvince').val(),
-                        districtCode: $('#simpleDistrict').val(),
-                        subdistrictCode: $('#simpleSubdistrict').val()
-                    };
-
-                    try {
-                        const checks = [
-                            checkDuplicateIDCard(formData.documentNumber),
-                            checkDuplicateTelephone(formData.mobile),
-                            checkDuplicateEmail(formData.email),
-                            checkDuplicateIDCardName(formData.fullName),
-                            checkDuplicateBusinessName($('#simpleBusinessName').val())
-                        ];
-
-                        const results = await Promise.all(checks);
-                        const failed = results.find(r => r && r.success === false);
-                        if (failed) {
-                            Swal.fire('ไม่สามารถสมัครได้', failed.message, 'error');
-                            return;
-                        }
-
-                        // All checks passed -> send OTP and show modal
-                        await sendOTPAndShowInput(formData);
-
-                    } catch (err) {
-                        console.error(err);
-                        Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
-                    }
-                } else {
-                    toastr.error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
                 }
             });
 
-            // Full form submission — run same duplicate checks + OTP flow as Simple/ExternalRegistration
-            $('#fullRegistrationForm').submit(async function (e) {
-                e.preventDefault();
+            // ==========================================
+            // 2. Validate Thai ID (บัตร ปชช.)
+            // ==========================================
+            const docNumber = $('#simpleDocumentNumber').val().replace(/[- ]/g, '');
+            if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+                $('#simpleDocumentNumber').addClass('is-invalid');
+                $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
+                isValid = false;
+                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+            }
 
-                // Basic required-field checks (align with simple-tab behavior)
-                const requiredFull = [
-                    $('#fullRegistrationForm input[placeholder="กรอกชื่อบนบัตร"]').val(),
-                    $('#fullRegistrationForm input[placeholder="กรอกชื่อธุรกิจ"]').val(),
-                    $('#fullRegistrationForm input[placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง"]').val(),
-                    $('#fullRegistrationForm input[placeholder="กรอกเบอร์โทรศัพท์มือถือ"]').eq(1).val()
-                ];
+            // ==========================================
+            // 3. Validate Address (ถ้ากรอก ต้องกรอกให้ครบ)
+            // ==========================================
+            const addressFields = ['#simpleAddressIdCard', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
+            let hasAddressData = false;
+            let addressComplete = true;
 
-                if (requiredFull.some(v => !v)) {
-                    toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
-                    return;
+            addressFields.forEach(fieldId => {
+                if ($.trim($(fieldId).val())) {
+                    hasAddressData = true;
                 }
+            });
 
+            if (hasAddressData) {
+                addressFields.forEach(fieldId => {
+                    if (!$.trim($(fieldId).val())) {
+                        $(fieldId).addClass('is-invalid');
+                        addressComplete = false;
+                    } else {
+                        $(fieldId).removeClass('is-invalid');
+                    }
+                });
+
+                if (!addressComplete) {
+                    toastr.error('หากกรอกข้อมูลที่อยู่ กรุณากรอกให้ครบถ้วน');
+                    isValid = false;
+                }
+            }
+
+            // ==========================================
+            // 4. แสดงผลลัพธ์และส่งข้อมูล
+            // ==========================================
+            console.log("ฟอร์มผ่านหรือไม่: ", isValid);
+
+            if (isValid) {
                 Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
                 const formData = {
-                    _origin: 'full', // mark origin so finalRegistration reads full inputs
-                    country: $('select[name="country"]').val(),
-                    businessCountry: $('select[name="business_country"]').val(),
-                    referrerCode: $('#fullRegistrationForm input[placeholder="กรอกรหัสผู้อ้างอิง"]').eq(0).val(),
-                    referrerSide: $('input[name="referrer_side"]:checked').val() === 'referrer_left' ? 'left' : 'right',
-                    uplineCode: $('#fullRegistrationForm input[placeholder="กรอกรหัสอัพไลน์"]').val(),
-                    uplineSide: $('input[name="upline_side"]:checked').val() === 'uplineside_left' ? 'left' : 'right',
-                    businessType: $('input[name="business_type"]:checked').val() === 'businessman' ? 'businessman' : 'user',
-                    title: $('select[name="title"]').val(),
-                    language: $('#fullLanguage').val(),
-                    nameOnCard: $('#fullRegistrationForm input[placeholder="กรอกชื่อบนบัตร"]').val(),
-                    businessName: $('#fullRegistrationForm input[placeholder="กรอกชื่อธุรกิจ"]').val(),
-                    citizenNumber: $('#fullRegistrationForm input[placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง"]').val(),
-                    mobile: $('#fullRegistrationForm input[placeholder="กรอกเบอร์โทรศัพท์มือถือ"]').eq(1).val(),
-                    email: $('#fullRegistrationForm input[placeholder="กรอกรอกรอกอีเมล"]').eq(1).val(),
-
-                    // Bank & position
-                    bank: $('#fullBank').val(),
-                    position: $('#fullPosition').val(),
-
-                    // Address (ID card)
-                    addressIdCard: $('#fullAddressIdCard').val(),
-                    postcodeIdCard: $('#fullPostcodeIdCard').val(),
-                    provinceCodeIdCard: $('#fullProvinceIdCard').val(),
-                    districtCodeIdCard: $('#fullDistrictIdCard').val(),
-                    subdistrictCodeIdCard: $('#fullSubdistrictIdCard').val(),
-
-                    // Current / contact address
-                    useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
-                    currentAddress: $('#fullCurrentAddress').val(),
-                    currentPostcode: $('#fullCurrentPostcode').val(),
-                    currentProvinceCode: $('#fullCurrentProvince').val(),
-                    currentDistrictCode: $('#fullCurrentDistrict').val(),
-                    currentSubdistrictCode: $('#fullCurrentSubdistrict').val()
+                    country: $('#simpleCountry').val(),
+                    documentNumber: $('#simpleDocumentNumber').val().replace(/[- ]/g, ''), // คลีนก่อนส่งไปเช็คซ้ำ
+                    referrerCode: $('#simpleReferrerCode').val(),
+                    title: $('select[name="simpleTitle"]').val(),
+                    fullName: $('#simpleFullName').val(),
+                    mobile: $('#simpleMobile').val(),
+                    email: $('#simpleEmail').val(),
+                    lineId: $('#simpleLineId').val(),
+                    addressIdCard: $('#simpleAddressIdCard').val(),
+                    postcode: $('#simplePostcode').val(),
+                    provinceCode: $('#simpleProvince').val(),
+                    districtCode: $('#simpleDistrict').val(),
+                    subdistrictCode: $('#simpleSubdistrict').val(),
+                    businessName: $('#simpleBusinessName').val() // เพิ่มตัวนี้ให้ครบตามเช็คข้างล่าง
                 };
 
                 try {
                     const checks = [
-                        checkDuplicateIDCard(formData.citizenNumber),
+                        checkDuplicateIDCard(formData.documentNumber),
                         checkDuplicateTelephone(formData.mobile),
                         checkDuplicateEmail(formData.email),
-                        checkDuplicateIDCardName(formData.nameOnCard),
+                        checkDuplicateIDCardName(formData.fullName),
                         checkDuplicateBusinessName(formData.businessName)
                     ];
 
@@ -1355,426 +1365,624 @@
                         return;
                     }
 
-                    // All checks passed -> send OTP and continue (finalRegistration will handle memberpic for full)
+                    // ถ้าผ่านหมด -> ค่อยเรียกส่ง OTP
                     await sendOTPAndShowInput(formData);
+                    // Swal.close(); // ปิด Loading ชั่วคราว (ถ้าเปิดคอมเมนต์ sendOTP ให้ลบบรรทัดนี้)
+
                 } catch (err) {
                     console.error(err);
                     Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
                 }
-            });
-
-            // Cancel full registration
-            $('#btnCancelFull').click(function () {
-                if (confirm('คุณต้องการยกเลิกการลงทะเบียนหรือไม่?')) {
-                    $('#fullRegistrationForm')[0].reset();
-                    toastr.info('ยกเลิกการลงทะเบียนแล้ว');
-                    // hide full previews
-                    $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview').hide().attr('src', '');
-                    $('#fullApplicationForm').val('');
-
-                    // reset new address controls
-                    resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
-                    resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-                    resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-                    resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-                    resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-                    resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-                    $('#fullUseIdCardAddress').prop('checked', true).trigger('change');
+            } else {
+                // เลื่อนจอไปหาจุดที่ผิดที่แรกให้ User
+                const firstError = $('.is-invalid').first();
+                if (firstError.length > 0) {
+                    $('html, body').animate({ scrollTop: firstError.closest('.form-group').offset().top - 100 }, 500);
+                    firstError.focus();
                 }
-            });
-
-            // Sticky-action buttons wiring (mirror existing behaviors)
-            $('#btnSaveFullSticky').click(function () {
-                $('#fullRegistrationForm').submit();
-            });
-            $('#btnCancelFullSticky').click(function () {
-                $('#btnCancelFull').trigger('click');
-            });
-
-            // Add required field styling
-            $('.required').each(function () {
-                const label = $(this);
-                const text = label.text();
-                if (!text.includes('*')) {
-                    label.html(text + ' <span class="text-danger">*</span>');
-                }
-            });
-
-            // Helper functions
-            function loadMasterAddresses() {
-                // Use the same API as checkoutinfo.cshtml
-                $.get('/orders/GetMasterAddress', function(res) {
-                    // Handle the response format (same as checkoutinfo.cshtml)
-                    if (typeof res === 'string') {
-                        try { res = JSON.parse(res); } catch (e) { 
-                            console.error("JSON Error", e); 
-                            toastr.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้');
-                            return; 
-                        }
-                    }
-                    
-                    if (!Array.isArray(res)) {
-                        // Check if data is nested in .data or .result
-                        if (res.data && Array.isArray(res.data)) {
-                            masterData = res.data;
-                        } else if (res.result && Array.isArray(res.result)) {
-                            masterData = res.result;
-                        } else {
-                            masterData = [];
-                        }
-                    } else {
-                        masterData = res;
-                    }
-                    
-                    console.log("Loaded " + masterData.length + " rows of address data");
-                    $('#simplePostcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
-                    
-                    if (masterData.length === 0) {
-                        toastr.warning('ไม่พบข้อมูลที่อยู่ในระบบ');
-                    }
-                }).fail(function() {
-                    toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์เพื่อโหลดข้อมูลที่อยู่');
-                    console.error("Failed to load master address data");
-                });
-            }
-
-            // --- Simple registration helpers (from ExternalRegistration example) ---
-            function setSimpleRegistrationDate() {
-                const d = new Date();
-                $('#simpleRegistrationDate').val(d.toLocaleDateString('th-TH'));
-            }
-
-            function loadSimpleCountries() {
-                $.get('/ExternalRegistration/GetCountries').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#simpleCountry').empty().append('<option value="">-- เลือก --</option>');
-                    data.forEach(item => {
-                        $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                    });
-                }).fail(() => {
-                    // fallback: keep existing options
-                });
-            }
-
-            function loadSimpleCountryBusinesses() {
-                $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#simpleCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
-                    data.forEach(item => {
-                        $('#simpleCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                    });
-                }).fail(() => {});
-            }
-
-            function loadSimpleTitles() {
-                $.get('/orders/GetTitlename').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#simpleTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
-                    data.forEach(item => {
-                        $('#simpleTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
-                    });
-                }).fail(() => {
-                    $('#simpleTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
-                });
-            }
-
-            // --- Full registration helpers (mirror Simple) ---
-            function setFullRegistrationDate() {
-                const d = new Date();
-                $('#fullRegistrationDate').val(d.toLocaleDateString('th-TH'));
-            }
-
-            function loadFullCountries() {
-                $.get('/ExternalRegistration/GetCountries').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#fullCountry').empty().append('<option value="">-- เลือก --</option>');
-                    data.forEach(item => {
-                        $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                    });
-                }).fail(() => { /* fallback */ });
-            }
-
-            function loadFullCountryBusinesses() {
-                $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#fullCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
-                    data.forEach(item => {
-                        $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                    });
-                }).fail(() => { /* fallback */ });
-            }
-
-            function loadFullTitles() {
-                $.get('/orders/GetTitlename').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#fullTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
-                    data.forEach(item => {
-                        $('#fullTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
-                    });
-                }).fail(() => {
-                    $('#fullTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
-                });
-            }
-
-            // Load bank list for Full registration (calls Member/GetBanks)
-            function loadFullBanks() {
-                $.get('/Member/GetBanks').done(res => {
-                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                    data = Array.isArray(data) ? data : (data.data || []);
-                    $('#fullBank').empty().append('<option value="">-- เลือกธนาคาร --</option>');
-                    data.forEach(item => {
-                        // try common field names: code/name or BankCode/BankName
-                        const code = item.BankCode || item.code || item.M20_PX1 || item.bankcode || item.id;
-                        const name = item.BankName || item.name || item.M20_PX2 || item.bankname || item.title;
-                        $('#fullBank').append(`<option value="${code}">${name}</option>`);
-                    });
-                }).fail(() => {
-                    // fallback: keep empty
-                });
-            }
-
-            // Read selected file inputs and convert to base64 strings. Returns array of base64 strings (omit empty slots).
-            function readFilesAsBase64(selectors) {
-                return Promise.all(selectors.map(sel => {
-                    return new Promise(resolve => {
-                        const input = $(sel)[0];
-                        if (!input || !input.files || input.files.length === 0) return resolve(null);
-                        const file = input.files[0];
-                        const reader = new FileReader();
-                        reader.onload = function (e) {
-                            // strip data:<mime>;base64, prefix
-                            const s = (e.target.result || '').toString();
-                            const parts = s.split(',');
-                            resolve(parts.length > 1 ? parts[1] : parts[0]);
-                        };
-                        reader.onerror = function () { resolve(null); };
-                        reader.readAsDataURL(file);
-                    });
-                })).then(results => results.filter(r => r));
-            }
-
-            function validateThaiID(id) {
-                if (id.length !== 13) return false;
-                
-                let sum = 0;
-                for (let i = 0; i < 12; i++) {
-                    sum += parseInt(id.charAt(i)) * (13 - i);
-                }
-                
-                let checkDigit = (11 - (sum % 11)) % 10;
-                return checkDigit === parseInt(id.charAt(12));
-            }
-
-            function getUniqueList(data, codeKey, nameKey) {
-                var seen = new Set();
-                return data.filter(item => {
-                    var k = item[codeKey];
-                    return seen.has(k) ? false : seen.add(k);
-                }).sort((a, b) => a[nameKey].localeCompare(b[nameKey]));
-            }
-
-            function resetDropdown(selector, defaultText) {
-                $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
-            }
-
-            function resetAddressDropdowns() {
-                resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
-                resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-            }
-
-            // Ensure Full current address follows checkbox initial state
-            $('#fullUseIdCardAddress').trigger('change');
-
-            // --- Duplicate checks (reuse ExternalRegistration endpoints) ---
-            async function checkDuplicateIDCard(id) {
-                try {
-                    const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
-                    return (typeof response === 'string') ? JSON.parse(response) : response;
-                } catch (error) {
-                    console.error('Error checking duplicate ID card:', error);
-                    return { success: true };
-                }
-            }
-
-            async function checkDuplicateTelephone(phone) {
-                try {
-                    const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
-                    return (typeof response === 'string') ? JSON.parse(response) : response;
-                } catch (error) {
-                    console.error('Error checking duplicate telephone:', error);
-                    return { success: true };
-                }
-            }
-
-            async function checkDuplicateEmail(email) {
-                if (!email) return { success: true, message: '' };
-                try {
-                    const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
-                    return (typeof response === 'string') ? JSON.parse(response) : response;
-                } catch (error) {
-                    console.error('Error checking duplicate email:', error);
-                    return { success: true };
-                }
-            }
-
-            async function checkDuplicateIDCardName(name) {
-                try {
-                    const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
-                    return (typeof response === 'string') ? JSON.parse(response) : response;
-                } catch (error) {
-                    console.error('Error checking duplicate ID card name:', error);
-                    return { success: true };
-                }
-            }
-
-            async function checkDuplicateBusinessName(name) {
-                try {
-                    const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
-                    return (typeof response === 'string') ? JSON.parse(response) : response;
-                } catch (error) {
-                    console.error('Error checking duplicate business name:', error);
-                    return { success: true };
-                }
-            }
-
-            // --- OTP logic (shared with ExternalRegistration) ---
-            let countdownInterval;
-            window.currentFormData = null;
-            window.currentReferenceId = null;
-
-            async function sendOTPAndShowInput(formData) {
-                try {
-                    const sendOTPResponse = await $.ajax({
-                        url: '/ExternalRegistration/SendOTP',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ phone: formData.mobile, method: 'sms' })
-                    });
-
-                    if (sendOTPResponse && sendOTPResponse.success) {
-                        window.currentFormData = formData;
-                        window.currentReferenceId = sendOTPResponse.referenceId;
-
-                        $('#otpPhoneNumber').text(formData.mobile);
-                        $('#otpInput').val('').removeClass('is-invalid');
-                        $('#otpError').text('');
-
-                        const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
-                        otpModal.show();
-                        startResendCountdown();
-                        Swal.close();
-                    } else {
-                        Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
-                    }
-                } catch (e) {
-                    // Demo fallback: allow proceeding when SMS API fails in dev
-                    console.warn('SendOTP API failed, using demo fallback', e);
-                    window.currentFormData = formData;
-                    window.currentReferenceId = 'REF-DEMO';
-                    $('#otpPhoneNumber').text(formData.mobile);
-                    new bootstrap.Modal(document.getElementById('otpModal')).show();
-                    startResendCountdown();
-                    Swal.close();
-                }
-            }
-
-            function startResendCountdown() {
-                let countdown = 30;
-                const btn = $('#resendOTPBtn');
-                btn.prop('disabled', true);
-                clearInterval(countdownInterval);
-
-                countdownInterval = setInterval(() => {
-                    btn.find('small').text(`ส่งรหัสใหม่ (${countdown})`);
-                    countdown--;
-                    if (countdown < 0) {
-                        clearInterval(countdownInterval);
-                        btn.prop('disabled', false).find('small').text('ส่งรหัสใหม่');
-                    }
-                }, 1000);
-            }
-
-            $('#otpInput').on('input', function () {
-                this.value = this.value.replace(/\D/g, '');
-                $('#verifyOTPBtn').prop('disabled', this.value.length !== 6);
-            });
-
-            $('#verifyOTPBtn').click(async function () {
-                const otp = $('#otpInput').val();
-                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-
-                try {
-                    const verifyResponse = await $.ajax({
-                        url: '/ExternalRegistration/VerifyOTP',
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ phone: window.currentFormData.mobile, otp: otp, referenceId: window.currentReferenceId })
-                    });
-
-                    if (verifyResponse && verifyResponse.isValid) {
-                        bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
-                        await finalRegistration(window.currentFormData, otp);
-                    } else {
-                        $('#otpInput').addClass('is-invalid');
-                        $('#otpError').text('รหัส OTP ไม่ถูกต้อง');
-                        $(this).prop('disabled', false).html('ยืนยัน');
-                    }
-                } catch (e) {
-                    // Demo bypass
-                    bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
-                    await finalRegistration(window.currentFormData, otp);
-                }
-            });
-
-            async function finalRegistration(formData, otp) {
-                Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
-
-                // Choose which file inputs to read depending on origin (full vs simple)
-                const selectors = (formData && formData._origin === 'full')
-                    ? ['#fullIdCardCopy', '#fullBankCardCopy', '#fullApplicationForm', '#fullBusinessPhoto']
-                    : ['#simpleIdCardCopy', '#simpleBankCardCopy', '#simpleBusinessPhoto'];
-
-                const memberpics = await readFilesAsBase64(selectors);
-
-                const registrationData = {
-                    ...formData,
-                    verificationMethod: 'otp',
-                    otp: otp,
-                    referenceId: window.currentReferenceId,
-                    memberpic: memberpics
-                };
-
-                try {
-                    const targetUrl = (formData && formData._origin === 'full') ? '/Registration/fullregistration' : 'FinalizeRegistration';
-                    const response = await $.ajax({
-                        url: targetUrl,
-                        method: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify(registrationData)
-                    });
-
-                    const data = (typeof response === 'string') ? JSON.parse(response) : response;
-                    if (data && data.success) {
-                        Swal.fire('สำเร็จ', `ลงทะเบียนเรียบร้อย Member Code: ${data.memberCode}`, 'success')
-                            .then(() => location.reload());
-                    } else {
-                        Swal.fire('ไม่สำเร็จ', (data && data.message) || 'เกิดข้อผิดพลาด', 'error');
-                    }
-                } catch (err) {
-                    console.error(err);
-                    Swal.fire('Error', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
-                }
+                toastr.error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
             }
         });
-    </script>
-@section scripts{
-    <!-- App js -->
-    <script src="~/assets/js/app.js"></script>
+
+        // โบนัส: ซ่อนแจ้งเตือนตอน User เริ่มแก้ข้อผิดพลาด
+        $('#simpleRegistrationForm').on('input change', 'input, select, textarea', function() {
+            $(this).removeClass('is-invalid');
+            if ($(this).attr('id') === 'simpleDocumentNumber') {
+                $('#documentValidationMessage').html('');
+            }
+        });
+
+            // Full form submission — run same duplicate checks + OTP flow as Simple/ExternalRegistration
+        $('#fullRegistrationForm').submit(async function (e) {
+            e.preventDefault();
+
+            let isValid = true;
+
+            // ==========================================
+            // 1. ตรวจสอบฟิลด์บังคับกรอก (อ่านจากแท็ก required อัตโนมัติ)
+            // ==========================================
+            const requiredFields = $(this).find('input[required], select[required], textarea[required]');
+
+            requiredFields.each(function () {
+                const field = $(this);
+
+                // ถ้าเป็น Radio หรือ Checkbox
+                if (field.is(':radio') || field.is(':checkbox')) {
+                    const name = field.attr('name');
+                    if ($('#fullRegistrationForm input[name="' + name + '"]:checked').length === 0) {
+                        $('#fullRegistrationForm input[name="' + name + '"]').addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        $('#fullRegistrationForm input[name="' + name + '"]').removeClass('is-invalid');
+                    }
+                }
+                // ถ้าเป็น Input ปกติ
+                else {
+                    const val = $.trim(field.val());
+                    if (!val) {
+                        field.addClass('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.removeClass('is-invalid');
+                    }
+                }
+            });
+
+            // ==========================================
+            // 2. ตรวจสอบความถูกต้องของบัตรประชาชน
+            // ==========================================
+            const citizenInput = $('#fullRegistrationForm input[placeholder="กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง"]');
+            const docNumber = citizenInput.val().replace(/[- ]/g, '');
+
+            // ถ้าพิมพ์ 13 หลักแต่ผิดสูตร
+            if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+                citizenInput.addClass('is-invalid');
+
+                // สร้างข้อความเตือนสีแดงใต้ช่อง ถ้ายังไม่มี
+                if (citizenInput.next('.invalid-feedback-custom').length === 0) {
+                    citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</small>');
+                }
+
+                isValid = false;
+                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+            } else {
+                // ลบข้อความเตือนทิ้งถ้าถูกแล้ว
+                citizenInput.next('.invalid-feedback-custom').remove();
+            }
+
+            // ==========================================
+            // 3. แจ้งเตือน Error และเลื่อนหน้าจอไปจุดที่ผิด
+            // ==========================================
+            if (!isValid) {
+                const firstError = $('#fullRegistrationForm .is-invalid').first();
+                if (firstError.length > 0) {
+                    $('html, body').animate({ scrollTop: firstError.closest('.form-group, .row').offset().top - 100 }, 500);
+                    firstError.focus();
+                }
+                toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
+                return; // หยุดการทำงาน ไม่ให้ส่งฟอร์ม
+            }
+
+            // ==========================================
+            // 4. รวบรวมข้อมูลเพื่อส่งเช็ค (Duplicate Checks)
+            // ==========================================
+            Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            const formData = {
+                _origin: 'full', // mark origin so finalRegistration reads full inputs
+                country: $('#fullCountry').val(),
+                businessCountry: $('#fullCountryBusiness').val(),
+                referrerCode: $('#fullReferrerCode').val(),
+                referrerSide: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right',
+                uplineCode: $('#fullRegistrationForm input[placeholder="กรอกรหัสอัพไลน์"]').val() || '',
+                uplineSide: $('input[name="upline_side"]:checked').attr('id') === 'uplineside_left' ? 'left' : 'right',
+                businessType: $('input[name="business_type"]:checked').attr('id') === 'businessman' ? 'businessman' : 'user',
+                title: $('#fullTitle').val(),
+                language: $('#fullLanguage').val(),
+                nameOnCard: $('#fullRegistrationForm input[placeholder="กรอกชื่อบนบัตร"]').val() || '',
+                businessName: $('#fullRegistrationForm input[placeholder="กรอกชื่อธุรกิจ"]').val() || '',
+                citizenNumber: docNumber, // ใช้ตัวแปรที่ดึงมาลบขีดแล้ว
+                mobile: $('#fullRegistrationForm input[placeholder="กรอกเบอร์โทรศัพท์มือถือ"]').val() || '',
+                email: $('#fullRegistrationForm input[placeholder="กรอกอีเมล"]').val() || '', // แก้คำที่พิมพ์ผิดจาก 'กรอกรอกรอกอีเมล' ให้แล้วนะครับ
+
+                // Bank & position
+                bank: $('#fullBank').val(),
+                position: $('#fullPosition').val(),
+
+                // Address (ID card)
+                addressIdCard: $('#fullAddressIdCard').val(),
+                postcodeIdCard: $('#fullPostcodeIdCard').val(),
+                provinceCodeIdCard: $('#fullProvinceIdCard').val(),
+                districtCodeIdCard: $('#fullDistrictIdCard').val(),
+                subdistrictCodeIdCard: $('#fullSubdistrictIdCard').val(),
+
+                // Current / contact address
+                useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
+                currentAddress: $('#fullCurrentAddress').val(),
+                currentPostcode: $('#fullCurrentPostcode').val(),
+                currentProvinceCode: $('#fullCurrentProvince').val(),
+                currentDistrictCode: $('#fullCurrentDistrict').val(),
+                currentSubdistrictCode: $('#fullCurrentSubdistrict').val()
+            };
+
+            try {
+                const checks = [
+                    checkDuplicateIDCard(formData.citizenNumber),
+                    checkDuplicateTelephone(formData.mobile),
+                    checkDuplicateEmail(formData.email),
+                    checkDuplicateIDCardName(formData.nameOnCard),
+                    checkDuplicateBusinessName(formData.businessName)
+                ];
+
+                const results = await Promise.all(checks);
+                const failed = results.find(r => r && r.success === false);
+                if (failed) {
+                    Swal.fire('ไม่สามารถสมัครได้', failed.message, 'error');
+                    return;
+                }
+
+                // All checks passed -> send OTP and continue (finalRegistration will handle memberpic for full)
+                // await sendOTPAndShowInput(formData);
+
+                Swal.close(); // เอาออกได้ถ้าเปิดใช้งานโค้ดบรรทัดด้านบน
+
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
+            }
+        });
+
+        // โบนัส UX: ทันทีที่ User เริ่มแก้ไขช่องที่ผิด ให้เอาสีแดงแจ้งเตือนออกอัตโนมัติ
+        $('#fullRegistrationForm').on('input change', 'input, select, textarea', function() {
+            $(this).removeClass('is-invalid');
+            if ($(this).attr('placeholder') === 'กรอกเลขบัตรประชาชนหรือหนังสือเดินทาง') {
+                $(this).next('.invalid-feedback-custom').remove();
+            }
+        });
+
+        // Cancel / Reset full registration
+        $('#btnCancelFull, #btnCancelFullSticky').click(function () {
+            if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
+
+                // 1. ล้างข้อมูลทุกช่องในฟอร์มกลับเป็นค่าเริ่มต้น
+                $('#fullRegistrationForm')[0].reset();
+
+                // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
+                $('#fullRegistrationForm .is-invalid').removeClass('is-invalid');
+                $('#fullRegistrationForm .invalid-feedback-custom').remove(); // ลบข้อความเตือนเลขบัตร ปชช.
+
+                // 3. ซ่อนและล้างรูปภาพ Preview ของไฟล์อัปโหลด
+                $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview')
+                    .hide()
+                    .attr('src', '');
+
+                // (ไฟล์ Input จะถูกล้างไปพร้อมกับคำสั่ง reset() ในข้อ 1 แล้ว แต่กันเหนียวไว้ก่อนได้)
+                $('#fullIdCardCopy, #fullBankCardCopy, #fullBusinessPhoto, #fullApplicationForm').val('');
+
+                // 4. ล้างค่า Dropdown ที่อยู่ และ "บังคับให้เป็น Disabled (ล็อคไว้)" จนกว่าจะพิมพ์รหัสไปรษณีย์ใหม่
+                resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+                resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+                resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+                resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+                // 🔒 รักษาและบังคับสถานะ disabled ให้ Dropdown เหล่านี้
+                $('#fullProvinceIdCard, #fullDistrictIdCard, #fullSubdistrictIdCard, #fullCurrentProvince, #fullCurrentDistrict, #fullCurrentSubdistrict').prop('disabled', true);
+
+                // 5. ติ๊ก Checkbox ให้กลับไปใช้ "ที่อยู่ตามบัตร" พร้อมกับ Trigger ให้ระบบซ่อนกล่องฝั่งขวา
+                $('#fullUseIdCardAddress').prop('checked', true).trigger('change');
+
+                // แจ้งเตือน User
+                toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
+
+                // เลื่อนหน้าจอกลับไปบนสุดเพื่อเริ่มใหม่
+                $('html, body').animate({ scrollTop: 0 }, 500);
+            }
+        });
+
+        // Sticky-action buttons wiring (mirror existing behaviors)
+        $('#btnSaveFullSticky').click(function () {
+            $('#fullRegistrationForm').submit();
+        });
+        $('#btnCancelFullSticky').click(function () {
+            $('#btnCancelFull').trigger('click');
+        });
+
+        // Add required field styling
+        $('.required').each(function () {
+            const label = $(this);
+            const text = label.text();
+            if (!text.includes('*')) {
+                label.html(text + ' <span class="text-danger">*</span>');
+            }
+        });
+
+        // Helper functions
+        function loadMasterAddresses() {
+            // Use the same API as checkoutinfo.cshtml
+            $.get('/orders/GetMasterAddress', function(res) {
+                // Handle the response format (same as checkoutinfo.cshtml)
+                if (typeof res === 'string') {
+                    try { res = JSON.parse(res); } catch (e) {
+                        console.error("JSON Error", e);
+                        toastr.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้');
+                        return;
+                    }
+                }
+
+                if (!Array.isArray(res)) {
+                    // Check if data is nested in .data or .result
+                    if (res.data && Array.isArray(res.data)) {
+                        masterData = res.data;
+                    } else if (res.result && Array.isArray(res.result)) {
+                        masterData = res.result;
+                    } else {
+                        masterData = [];
+                    }
+                } else {
+                    masterData = res;
+                }
+
+                console.log("Loaded " + masterData.length + " rows of address data");
+                $('#simplePostcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
+
+                if (masterData.length === 0) {
+                    toastr.warning('ไม่พบข้อมูลที่อยู่ในระบบ');
+                }
+            }).fail(function() {
+                toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์เพื่อโหลดข้อมูลที่อยู่');
+                console.error("Failed to load master address data");
+            });
+        }
+
+        // --- Simple registration helpers (from ExternalRegistration example) ---
+        function setSimpleRegistrationDate() {
+            const d = new Date();
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const yearBE = d.getFullYear()
+
+            const formattedDateBE = `${day}-${month}-${yearBE}`;
+            $('#simpleRegistrationDate').val(formattedDateBE);
+        }
+
+        function loadSimpleCountries() {
+            $.get('/ExternalRegistration/GetCountries').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#simpleCountry').empty().append('<option value="">-- เลือก --</option>');
+                data.forEach(item => {
+                    $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+                });
+            }).fail(() => {
+                // fallback: keep existing options
+            });
+        }
+
+        function loadSimpleCountryBusinesses() {
+            $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#simpleCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
+                data.forEach(item => {
+                    $('#simpleCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+                });
+            }).fail(() => {});
+        }
+
+        function loadSimpleTitles() {
+            $.get('/orders/GetTitlename').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#simpleTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
+                data.forEach(item => {
+                    $('#simpleTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
+                });
+            }).fail(() => {
+                $('#simpleTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
+            });
+        }
+
+        // --- Full registration helpers (mirror Simple) ---
+        function setFullRegistrationDate() {
+            const d = new Date();
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const yearBE = d.getFullYear()
+
+            const formattedDateBE = `${day}-${month}-${yearBE}`;
+            $('#fullRegistrationDate').val(formattedDateBE);
+        }
+
+        function loadFullCountries() {
+            $.get('/ExternalRegistration/GetCountries').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#fullCountry').empty().append('<option value="">-- เลือก --</option>');
+                data.forEach(item => {
+                    $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+                });
+            }).fail(() => { /* fallback */ });
+        }
+
+        function loadFullCountryBusinesses() {
+            $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#fullCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
+                data.forEach(item => {
+                    $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+                });
+            }).fail(() => { /* fallback */ });
+        }
+
+        function loadFullTitles() {
+            $.get('/orders/GetTitlename').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#fullTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
+                data.forEach(item => {
+                    $('#fullTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
+                });
+            }).fail(() => {
+                $('#fullTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
+            });
+        }
+
+        // Load bank list for Full registration (calls Member/GetBanks)
+        function loadFullBanks() {
+            $.get('/Member/GetBanks').done(res => {
+                let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                data = Array.isArray(data) ? data : (data.data || []);
+                $('#fullBank').empty().append('<option value="">-- เลือกธนาคาร --</option>');
+                data.forEach(item => {
+                    // try common field names: code/name or BankCode/BankName
+                    const code = item.M17_PX1;
+                    const name = item.Thainame;
+                    $('#fullBank').append(`<option value="${code}">${name}</option>`);
+                });
+            }).fail(() => {
+                // fallback: keep empty
+            });
+        }
+
+        // Read selected file inputs and convert to base64 strings. Returns array of base64 strings (omit empty slots).
+        function readFilesAsBase64(selectors) {
+            return Promise.all(selectors.map(sel => {
+                return new Promise(resolve => {
+                    const input = $(sel)[0];
+                    if (!input || !input.files || input.files.length === 0) return resolve(null);
+                    const file = input.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        // strip data:<mime>;base64, prefix
+                        const s = (e.target.result || '').toString();
+                        const parts = s.split(',');
+                        resolve(parts.length > 1 ? parts[1] : parts[0]);
+                    };
+                    reader.onerror = function () { resolve(null); };
+                    reader.readAsDataURL(file);
+                });
+            })).then(results => results.filter(r => r));
+        }
+
+        function validateThaiID(id) {
+            if (id.length !== 13) return false;
+
+            let sum = 0;
+            for (let i = 0; i < 12; i++) {
+                sum += parseInt(id.charAt(i)) * (13 - i);
+            }
+
+            let checkDigit = (11 - (sum % 11)) % 10;
+            return checkDigit === parseInt(id.charAt(12));
+        }
+
+        function getUniqueList(data, codeKey, nameKey) {
+            var seen = new Set();
+            return data.filter(item => {
+                var k = item[codeKey];
+                return seen.has(k) ? false : seen.add(k);
+            }).sort((a, b) => a[nameKey].localeCompare(b[nameKey]));
+        }
+
+        function resetDropdown(selector, defaultText) {
+            $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+        }
+
+        function resetAddressDropdowns() {
+            resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+        }
+
+        // Ensure Full current address follows checkbox initial state
+        $('#fullUseIdCardAddress').trigger('change');
+
+        // --- Duplicate checks (reuse ExternalRegistration endpoints) ---
+        async function checkDuplicateIDCard(id) {
+            try {
+                const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
+                return (typeof response === 'string') ? JSON.parse(response) : response;
+            } catch (error) {
+                console.error('Error checking duplicate ID card:', error);
+                return { success: true };
+            }
+        }
+
+        async function checkDuplicateTelephone(phone) {
+            try {
+                const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
+                return (typeof response === 'string') ? JSON.parse(response) : response;
+            } catch (error) {
+                console.error('Error checking duplicate telephone:', error);
+                return { success: true };
+            }
+        }
+
+        async function checkDuplicateEmail(email) {
+            if (!email) return { success: true, message: '' };
+            try {
+                const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
+                return (typeof response === 'string') ? JSON.parse(response) : response;
+            } catch (error) {
+                console.error('Error checking duplicate email:', error);
+                return { success: true };
+            }
+        }
+
+        async function checkDuplicateIDCardName(name) {
+            try {
+                const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
+                return (typeof response === 'string') ? JSON.parse(response) : response;
+            } catch (error) {
+                console.error('Error checking duplicate ID card name:', error);
+                return { success: true };
+            }
+        }
+
+        async function checkDuplicateBusinessName(name) {
+            try {
+                const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
+                return (typeof response === 'string') ? JSON.parse(response) : response;
+            } catch (error) {
+                console.error('Error checking duplicate business name:', error);
+                return { success: true };
+            }
+        }
+
+        // --- OTP logic (shared with ExternalRegistration) ---
+        let countdownInterval;
+        window.currentFormData = null;
+        window.currentReferenceId = null;
+
+        async function sendOTPAndShowInput(formData) {
+            try {
+                const sendOTPResponse = await $.ajax({
+                    url: '/ExternalRegistration/SendOTP',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ phone: formData.mobile, method: 'sms' })
+                });
+
+                if (sendOTPResponse && sendOTPResponse.success) {
+                    window.currentFormData = formData;
+                    window.currentReferenceId = sendOTPResponse.referenceId;
+
+                    $('#otpPhoneNumber').text(formData.mobile);
+                    $('#otpInput').val('').removeClass('is-invalid');
+                    $('#otpError').text('');
+
+                    const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+                    otpModal.show();
+                    startResendCountdown();
+                    Swal.close();
+                } else {
+                    Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
+                }
+            } catch (e) {
+                // Demo fallback: allow proceeding when SMS API fails in dev
+                console.warn('SendOTP API failed, using demo fallback', e);
+                window.currentFormData = formData;
+                window.currentReferenceId = 'REF-DEMO';
+                $('#otpPhoneNumber').text(formData.mobile);
+                new bootstrap.Modal(document.getElementById('otpModal')).show();
+                startResendCountdown();
+                Swal.close();
+            }
+        }
+
+        function startResendCountdown() {
+            let countdown = 30;
+            const btn = $('#resendOTPBtn');
+            btn.prop('disabled', true);
+            clearInterval(countdownInterval);
+
+            countdownInterval = setInterval(() => {
+                btn.find('small').text(`ส่งรหัสใหม่ (${countdown})`);
+                countdown--;
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+                    btn.prop('disabled', false).find('small').text('ส่งรหัสใหม่');
+                }
+            }, 1000);
+        }
+
+        $('#otpInput').on('input', function () {
+            this.value = this.value.replace(/\D/g, '');
+            $('#verifyOTPBtn').prop('disabled', this.value.length !== 6);
+        });
+
+        $('#verifyOTPBtn').click(async function () {
+            const otp = $('#otpInput').val();
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+            try {
+                const verifyResponse = await $.ajax({
+                    url: '/ExternalRegistration/VerifyOTP',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ phone: window.currentFormData.mobile, otp: otp, referenceId: window.currentReferenceId })
+                });
+
+                if (verifyResponse && verifyResponse.isValid) {
+                    bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
+                    await finalRegistration(window.currentFormData, otp);
+                } else {
+                    $('#otpInput').addClass('is-invalid');
+                    $('#otpError').text('รหัส OTP ไม่ถูกต้อง');
+                    $(this).prop('disabled', false).html('ยืนยัน');
+                }
+            } catch (e) {
+                // Demo bypass
+                bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
+                await finalRegistration(window.currentFormData, otp);
+            }
+        });
+
+        async function finalRegistration(formData, otp) {
+            Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
+
+            // Choose which file inputs to read depending on origin (full vs simple)
+            const selectors = (formData && formData._origin === 'full')
+                ? ['#fullIdCardCopy', '#fullBankCardCopy', '#fullApplicationForm', '#fullBusinessPhoto']
+                : ['#simpleIdCardCopy', '#simpleBankCardCopy', '#simpleBusinessPhoto'];
+
+            const memberpics = await readFilesAsBase64(selectors);
+
+            const registrationData = {
+                ...formData,
+                verificationMethod: 'otp',
+                otp: otp,
+                referenceId: window.currentReferenceId,
+                memberpic: memberpics
+            };
+
+            try {
+                const targetUrl = (formData && formData._origin === 'full') ? '/Registration/fullregistration' : 'FinalizeRegistration';
+                const response = await $.ajax({
+                    url: targetUrl,
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(registrationData)
+                });
+
+                const data = (typeof response === 'string') ? JSON.parse(response) : response;
+                if (data && data.success) {
+                    Swal.fire('สำเร็จ', `ลงทะเบียนเรียบร้อย Member Code: ${data.memberCode}`, 'success')
+                        .then(() => location.reload());
+                } else {
+                    Swal.fire('ไม่สำเร็จ', (data && data.message) || 'เกิดข้อผิดพลาด', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                Swal.fire('Error', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+            }
+        }
+    });
+</script>
+@section scripts {
+<!-- App js -->
+<script src="~/assets/js/app.js"></script>
 }
