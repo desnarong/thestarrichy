@@ -131,15 +131,17 @@ namespace TheStarRichyApi.Services
                     //string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
 
-                    string query = "SELECT Membercode,PositionLevel,ChildCode,Membername,Sponsername,Memberposition,MemberpositionName,MemberpositionRanking";
+                    string query = "SELECT Membercode, PositionLevel, ChildCode, Membername, Sponsername, Memberposition, MemberpositionName, MemberpositionRanking";
                     query += ", MemberpositionRankingName, PersonalPV, LeftCountActive, RightCountActive, LeftBal, Rightbal, TotalBalance, CurrentLeftPV, CurrentRightPV";
                     query += ", BWDLeftPV, BWDRightPV, NewLeft, NewRight, Maxto2, TName1, TName2, EName1, EName2, Travelpoint1, travelpoint2";
                     query += ", CurrentMonthQualifyPV, LastMonthQualifyPV, LastMonthQualifyStatus, CurrentMonthQualifyStatus, FirstQdate";
-                    query += ", CurrentMonth, NextCMonth, CurrentMonth1, LastCMonth, MemberPostionPicture";             
-                    query += " FROM [000_Member_Binary_Team]  (nolock) ";
+                    query += ", CurrentMonth, NextCMonth, CurrentMonth1, LastCMonth, MemberPostionPicture";
 
-                 
-                    query += " where   Membercode = @Membercode";
+                    // เพิ่ม Field ใหม่ที่ต้องการ
+                    query += ", TotalLeftBalance, TotalRightBalance, NextPosition, NextPosaddLeftBalance, NextPosaddRightBalance";
+
+                    query += " FROM [000_Member_Binary_Team] (nolock) ";
+                    query += " WHERE Membercode = @Membercode";
                      
 
                     using (var command = new SqlCommand(query, con))

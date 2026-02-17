@@ -128,14 +128,17 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
  
-                    string query = "SELECT  aa.Membercode, aa.LevelName,  aa.DLCode,aa.DLName,aa.RegisterDate";
-                    query += ",aa.QualifyDate,aa.SIDE,aa.PositionName,aa.PrestigeRankingEngName  ,aa.PersonalPV,aa.Sidex,aa.PVLeft,aa.PVRight,aa.SponserName1 AS SponserName,aa.Qualify,";
-                    query += "aa.LastMonthQualifyPV,aa.PresentMonthQualifyPV,aa.LeftCountActive,aa.RightCountActive,aa.Travelpoint1,aa.Travelpoint2,COALESCE( aa.TotalBalance, 0) as TotalBalance ";
-                    query += " FROM [000_Member_SponserTeam] aa (nolock) ";
+                    string query = "SELECT aa.Membercode, aa.LevelName, aa.DLCode, aa.DLName, aa.RegisterDate";
+                    query += ", aa.QualifyDate, aa.SIDE, aa.PositionName, aa.PrestigeRankingEngName, aa.PersonalPV, aa.Sidex, aa.PVLeft, aa.PVRight, aa.SponserName1 AS SponserName, aa.Qualify";
+                    query += ", aa.LastMonthQualifyPV, aa.PresentMonthQualifyPV, aa.LeftCountActive, aa.RightCountActive, aa.Travelpoint1, aa.Travelpoint2";
+                    query += ", COALESCE(aa.TotalBalance, 0) as TotalBalance";
 
- 
-                    query += " where aa.Membercode = @Membercode";
-                    query += " ORDER BY aa.Item,aa.DLCode ";
+                    // เพิ่ม Field ใหม่ที่ต้องการ
+                    query += ", aa.TotalLeftBalance, aa.TotalRightBalance, aa.NextPosition, aa.NextPosaddLeftBalance, aa.NextPosaddRightBalance";
+
+                    query += " FROM [000_Member_SponserTeam] aa (nolock) ";
+                    query += " WHERE aa.Membercode = @Membercode";
+                    query += " ORDER BY aa.Item, aa.DLCode";
 
                     using (var command = new SqlCommand(query, con))
                     {

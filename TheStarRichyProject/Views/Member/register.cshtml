@@ -122,13 +122,13 @@
                                                         <input type="radio" class="form-check-input" name="position" id="positionRight" value="right" />
                                                         <label class="form-check-label" for="positionRight">ขวาสุด</label>
                                                     </div>
-                                                </div>
+                                                </div> 
                                             </div>
 
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label">ชื่อผู้แนะนำ</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="simpleReferrerName" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
+                                                    <input type="text" class="form-control" id="simpleReferrerName" value="@userinfo.bussinessName" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
 
@@ -319,20 +319,10 @@
                         </div>
 
                         <form id="fullRegistrationForm" method="post" novalidate>
-                            <div class="row mb-2">
-                                <div class="col-12">
-                                    <div class="text-center text-md-start">
-                                        <label class="col-form-label text-danger mb-0" data-key="t-member-register-warn">
-                                            <i class="fas fa-exclamation-triangle me-2"></i>คำเตือนการลงทะเบียนสมาชิก
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-
                             <div class="row">
                                 <div class="col-12 col-lg-6">
                                     <div class="card">
-                                        <div class="card-header">
+                                        <div class="card-header bg-light">
                                             <h5 data-key="t-general-information">ข้อมูลทั่วไป</h5>
                                         </div>
                                         <div class="card-block p-3">
@@ -379,56 +369,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-referrer-name">ชื่อผู้แนะนำ</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" id="fullReferrerName" class="form-control" value="@userinfo.idcardname" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="input-group">
-                                                        <input type="text" class="form-control" placeholder="กรอกรหัสอัพไลน์" required />
-                                                        <button type="button" class="btn btn-primary" data-key="t-search">
-                                                            <i class="fas fa-search"></i>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-upline-name">ชื่ออัพไลน์</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-upline-side">ด้านอัพไลน์ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_left" checked required />
-                                                        <label class="form-check-label" for="uplineside_left" data-key="t-referrer-left">ด้านซ้าย</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="upline_side" id="uplineside_right" required />
-                                                        <label class="form-check-label" for="uplineside_right" data-key="t-referrer-right">ด้านขวา</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-types-of-businessmen">ประเภทนักธุรกิจ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="business_type" id="businessman" checked required />
-                                                        <label class="form-check-label" for="businessman" data-key="t-businessman">นักธุรกิจ</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="business_type" id="user" required />
-                                                        <label class="form-check-label" for="user" data-key="t-user">ผู้ใช้</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-user-code">รหัสผู้ใช้</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" value="" readonly />
+                                                    <input type="text" id="fullReferrerName" class="form-control" value="@userinfo.bussinessName" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -553,7 +494,83 @@
                                     </div>
 
                                     <div class="card mt-3">
-                                        <div class="card-header">
+                                        <div class="card-header bg-light">
+                                            <h5 data-key="t-bank-information">ข้อมูลธนาคาร</h5>
+                                        </div>
+                                        <div class="card-block p-3">
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <select id="fullBank" name="bank" class="form-control" required>
+                                                        <option value="">-- เลือกธนาคาร --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" placeholder="กรอกสาขา" required />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" placeholder="กรอกชื่อผู้รับผลประโยชน์" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรผู้รับผลประโยชน์" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" required />
+                                                    <img id="fullIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" required />
+                                                    <img id="fullBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-application-form-submitted">ใบสมัครที่ส่งแล้ว (เพิ่มไฟล์)</label>
+                                                <div class="col-md-7">
+                                                    <input type="file" class="form-control" id="fullApplicationForm" accept="image/*" />
+                                                    <img id="fullApplicationFormPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview application form" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-picture">รูปภาพ</label>
+                                                <div class="col-md-7">
+                                                    <input type="file" class="form-control" id="fullBusinessPhoto" accept="image/*" />
+                                                    <img id="fullBusinessPhotoPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview profile" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-6">
+                                    <div class="card">
+                                        <div class="card-header bg-light">
                                             <h5 data-key="t-address-information">ข้อมูลที่อยู่</h5>
                                         </div>
                                         <div class="card-block p-3">
@@ -668,122 +685,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <div class="col-lg-6">
-                                    <div class="card">
-                                        <div class="card-header">
-                                            <h5 data-key="t-bank-information">ข้อมูลธนาคาร</h5>
-                                        </div>
-                                        <div class="card-block p-3">
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <select id="fullBank" name="bank" class="form-control" required>
-                                                        <option value="">-- เลือกธนาคาร --</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" required />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" required />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกสาขา" required />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อผู้รับผลประโยชน์" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรผู้รับผลประโยชน์" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-auto-transfer">โอนอัตโนมัติ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-yes" checked required />
-                                                        <label class="form-check-label" for="auto_transfer-yes" data-key="t-yes">ใช่</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="auto_transfer" id="auto_transfer-no" required />
-                                                        <label class="form-check-label" for="auto_transfer-no" data-key="t-no">ไม่ใช่</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-autoship">Autoship <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="autoship" id="deduct" checked required />
-                                                        <label class="form-check-label" for="deduct" data-key="t-deduct">หัก</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="autoship" id="not_deducted" required />
-                                                        <label class="form-check-label" for="not_deducted" data-key="t-not-deducted">ไม่หัก</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-position">ตำแหน่ง</label>
-                                                <div class="col-md-7">
-                                                    <select id="fullPosition" name="position" class="form-control">
-                                                        <option value="">-- (เว้นไว้) --</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-apply-through-the-center">สมัครผ่านศูนย์</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อศูนย์" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" required />
-                                                    <img id="fullIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" required />
-                                                    <img id="fullBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-application-form-submitted">ใบสมัครที่ส่งแล้ว (เพิ่มไฟล์)</label>
-                                                <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullApplicationForm" accept="image/*" />
-                                                    <img id="fullApplicationFormPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview application form" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-picture">รูปภาพ</label>
-                                                <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullBusinessPhoto" accept="image/*" />
-                                                    <img id="fullBusinessPhotoPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview profile" />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                             <div class="full-action-bar d-print-none">
                                 <div class="container-fluid d-flex justify-content-end align-items-center">
@@ -839,7 +740,7 @@
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
                 <button type="button" class="btn btn-primary" id="verifyOTPBtn" disabled>
                     <i class="fas fa-check me-2"></i>ยืนยัน
                 </button>
@@ -1506,12 +1407,16 @@
 
                 const formData = {
                     country: $('#simpleCountry').val(),
-                    // แก้ไข: ใช้ || "" ป้องกัน error
-                    documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''), 
+                    countryBusiness: $('#simpleCountryBusiness').val(), // เพิ่ม: ประเทศธุรกิจ
+                    documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''),
                     referrerCode: $('#simpleReferrerCode').val(),
+                    position: $('input[name="position"]:checked').val(), // เพิ่ม: ตำแหน่งสายงาน
                     title: $('select[name="simpleTitle"]').val(),
-                    fullName: $('#simpleFullName').val(),
+                    idCardName: $('#simpleFullName').val(), // เปลี่ยนชื่อจาก fullName เป็น idCardName
+                    birthDate: $('#simpleBirthDate').val(), // เพิ่ม: วันเกิด
+                    businessName: $('#simpleBusinessName').val(),
                     mobile: $('#simpleMobile').val(),
+                    homePhone: $('#simpleHomePhone').val(), // เพิ่ม: เบอร์บ้าน
                     email: $('#simpleEmail').val(),
                     lineId: $('#simpleLineId').val(),
                     addressIdCard: $('#simpleAddressIdCard').val(),
@@ -1519,7 +1424,7 @@
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
-                    businessName: $('#simpleBusinessName').val() 
+                    ipAddress: '0'
                 };
 
                 try {
@@ -1648,32 +1553,39 @@
             Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
             const formData = {
-                _origin: 'full', 
+                _origin: 'full',
                 country: $('#fullCountry').val(),
-                businessCountry: $('#fullCountryBusiness').val(),
+                countryBusiness: $('#fullCountryBusiness').val(), // เปลี่ยนจาก businessCountry
                 referrerCode: $('#fullReferrerCode').val(),
-                referrerSide: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right',
+                position: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right', // เปลี่ยนจาก referrerSide
                 uplineCode: $('#fullRegistrationForm input[placeholder="กรอกรหัสอัพไลน์"]').val() || '',
                 uplineSide: $('input[name="upline_side"]:checked').attr('id') === 'uplineside_left' ? 'left' : 'right',
-                businessType: $('input[name="business_type"]:checked').attr('id') === 'businessman' ? 'businessman' : 'user',
+
+                // แก้ไขการดึงค่า radio ให้ตรงกับ id ใน HTML
+                businessType: $('input[name="membership_type"]:checked').attr('id') === 'individual' ? 'businessman' : 'user',
+
                 title: $('#fullTitle').val(),
                 language: $('#fullLanguage').val(),
-                nameOnCard: $('#fullNameOnCard').val() || '',
+                idCardName: $('#fullNameOnCard').val() || '', // เปลี่ยนจาก nameOnCard
                 businessName: $('#fullBusinessName').val() || '',
-                citizenNumber: docNumber, 
+                birthDate: $('#fullBirthDate').val() || '', // เพิ่ม: วันเกิด
+                documentNumber: docNumber, // เปลี่ยนจาก citizenNumber
                 mobile: $('#fullMobile').val() || '',
-                email: $('#fullEmail').val() || '', 
+                homePhone: $('#fullHomePhone').val() || '', // เพิ่ม: เบอร์บ้าน
+                email: $('#fullEmail').val() || '',
 
-                // Bank & position
-                bank: $('#fullBank').val(),
-                position: $('#fullPosition').val(),
+                // Bank Information
+                bankCode: $('#fullBank').val(), // เปลี่ยนจาก bank
+                bankAccountNumber: $('#fullBankAccountNumber').val() || '', // ดึงจาก HTML ที่เพิ่ม ID แล้ว
+                bankAccountName: $('#fullBankAccountName').val() || '',
+                bankBranch: $('#fullBankBranch').val() || '',
 
-                // Address (ID card)
+                // Address (ID card) -> เปลี่ยน Key ไม่ให้มีคำว่า IdCard ห้อยท้าย (ให้ตรงกับ Model)
                 addressIdCard: $('#fullAddressIdCard').val(),
-                postcodeIdCard: $('#fullPostcodeIdCard').val(),
-                provinceCodeIdCard: $('#fullProvinceIdCard').val(),
-                districtCodeIdCard: $('#fullDistrictIdCard').val(),
-                subdistrictCodeIdCard: $('#fullSubdistrictIdCard').val(),
+                postcode: $('#fullPostcodeIdCard').val(),
+                provinceCode: $('#fullProvinceIdCard').val(),
+                districtCode: $('#fullDistrictIdCard').val(),
+                subdistrictCode: $('#fullSubdistrictIdCard').val(),
 
                 // Current / contact address
                 useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
@@ -1681,7 +1593,9 @@
                 currentPostcode: $('#fullCurrentPostcode').val(),
                 currentProvinceCode: $('#fullCurrentProvince').val(),
                 currentDistrictCode: $('#fullCurrentDistrict').val(),
-                currentSubdistrictCode: $('#fullCurrentSubdistrict').val()
+                currentSubdistrictCode: $('#fullCurrentSubdistrict').val(),
+
+                ipAddress: '0'
             };
 
             try {
@@ -1701,7 +1615,7 @@
                 }
 
                 Swal.close(); 
-                // await sendOTPAndShowInput(formData); // หากเปิดใช้งาน OTP ให้เอาคอมเม้นต์บรรทัดนี้ออก
+                await sendOTPAndShowInput(formData); // หากเปิดใช้งาน OTP ให้เอาคอมเม้นต์บรรทัดนี้ออก
 
             } catch (err) {
                 console.error(err);
@@ -2063,7 +1977,7 @@
 
         $('#otpInput').on('input', function () {
             this.value = this.value.replace(/\D/g, '');
-            $('#verifyOTPBtn').prop('disabled', this.value.length !== 6);
+            $('#verifyOTPBtn').prop('disabled', this.value.length < 0);
         });
 
         $('#verifyOTPBtn').click(async function () {
@@ -2110,7 +2024,7 @@
             };
 
             try {
-                const targetUrl = (formData && formData._origin === 'full') ? '/Registration/fullregistration' : 'FinalizeRegistration';
+                const targetUrl = (formData && formData._origin === 'full') ? 'FullFinalizeRegistration' : 'FinalizeRegistration';
                 const response = await $.ajax({
                     url: targetUrl,
                     method: 'POST',

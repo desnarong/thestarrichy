@@ -41,55 +41,74 @@ namespace TheStarRichyApi.Models
 
         // Uploaded member pictures (base64 strings). Maps from JSON property `memberpic`.
         public List<string>? Memberpic { get; set; }
+
+        public string? ipAddress { get; set; }
     }
 
     /// <summary>
     /// DTO สำหรับลงทะเบียนแบบเต็ม (Full Registration)
     /// </summary>
+
     public class FullRegistrationRequest
     {
+        // ==========================================
+        // 🟢 กลุ่มฟิลด์ที่ปรับชื่อให้ตรงกับ EasyRegistrationRequest
+        // ==========================================
         public string Country { get; set; } = string.Empty;
 
-        public string BusinessCountry { get; set; } = string.Empty;
+        // เดิม BusinessCountry -> เปลี่ยนเป็น CountryBusiness
+        public string? CountryBusiness { get; set; }
 
         public string ReferrerCode { get; set; } = string.Empty;
 
-        public string ReferrerSide { get; set; } = "left"; // left or right
-
-        public string? UplineCode { get; set; }
-        public string? UplineSide { get; set; } = "left";
-
-        public string BusinessType { get; set; } = "businessman"; // businessman or user
+        // เดิม ReferrerSide -> เปลี่ยนเป็น Position
+        public string? Position { get; set; }
 
         public string Title { get; set; } = string.Empty;
 
-        public string NameOnCard { get; set; } = string.Empty;
+        // เดิม NameOnCard -> เปลี่ยนเป็น IdCardName
+        public string? IdCardName { get; set; }
 
         public string? BusinessName { get; set; }
 
-        public DateTime? DateOfBirth { get; set; }
+        public string? BirthDate { get; set; }
 
-        public string CitizenNumber { get; set; } = string.Empty;
+        // เดิม CitizenNumber -> เปลี่ยนเป็น DocumentNumber
+        public string DocumentNumber { get; set; } = string.Empty;
 
         public string Mobile { get; set; } = string.Empty;
 
         public string? HomePhone { get; set; }
 
-        public string? Fax { get; set; }
-
         public string Email { get; set; } = string.Empty;
 
         public string? LineId { get; set; }
-        public string? Facebook { get; set; }
 
-        // Address Information
+        // Address Information (บัตรประชาชน)
         public string? AddressIdCard { get; set; }
         public string? Postcode { get; set; }
         public string? ProvinceCode { get; set; }
         public string? DistrictCode { get; set; }
         public string? SubdistrictCode { get; set; }
 
-        // Current Address (if different)
+        // Uploaded member pictures
+        public List<string>? Memberpic { get; set; }
+
+        public string? ipAddress { get; set; }
+
+
+        // ==========================================
+        // 🔵 กลุ่มฟิลด์เพิ่มเติมที่มีเฉพาะใน FullRegistration (คงชื่อเดิมไว้)
+        // ==========================================
+        public string? UplineCode { get; set; }
+        public string? UplineSide { get; set; } = "left";
+
+        public string BusinessType { get; set; } = "businessman"; // businessman or user
+
+        public string? Fax { get; set; }
+        public string? Facebook { get; set; }
+
+        // Current Address (ที่อยู่จัดส่ง / ปัจจุบัน)
         public bool UseIdCardAddress { get; set; } = true;
         public string? CurrentAddress { get; set; }
         public string? CurrentPostcode { get; set; }
@@ -103,15 +122,12 @@ namespace TheStarRichyApi.Models
         public string? BankAccountName { get; set; }
         public string? BankBranch { get; set; }
 
-        // Document Uploads (Base64 or file paths)
+        // Document Uploads (แยกตามประเภทไฟล์)
         public string? IdCardImageFront { get; set; }
         public string? IdCardImageBack { get; set; }
         public string? BankBookImage { get; set; }
         public string? ApplicationFormImage { get; set; }
         public string? ProfileImage { get; set; }
-
-        // If client sends `memberpic` (array of base64 strings) prefer that over individual image props
-        public List<string>? Memberpic { get; set; }
     }
 
     /// <summary>

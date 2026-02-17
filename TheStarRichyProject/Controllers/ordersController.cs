@@ -1085,7 +1085,7 @@ namespace TheStarRichyProject.Controllers
                             data = new
                             {
                                 dlCode = memberInfo.DLcode,
-                                dlName = memberInfo.DLcode ==  (string)userinfo.membercode ? (string)userinfo.idcardname : memberInfo.DlName,
+                                dlName = memberInfo.DLcode ==  (string)userinfo.membercode ? (string)userinfo.bussinessName : memberInfo.DlName,
                                 registerDate = memberInfo.RegisterDate?.ToString("dd/MM/yyyy")
                             }
                         });

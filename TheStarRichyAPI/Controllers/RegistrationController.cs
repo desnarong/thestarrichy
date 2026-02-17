@@ -56,6 +56,7 @@ namespace TheStarRichyApi.Controllers
 
                 // Get current member code from JWT token
                 var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                currentMemberCode += $":{request.ipAddress}";
 
                 var result = await _registrationService.EasyRegisterAsync(request, currentMemberCode);
 
@@ -105,7 +106,7 @@ namespace TheStarRichyApi.Controllers
                 }
 
                 // ตรวจสอบเลขบัตรประชาชน/เอกสารซ้ำ
-                if (await _registrationService.IsDocumentNumberExistsAsync(request.CitizenNumber))
+                if (await _registrationService.IsDocumentNumberExistsAsync(request.DocumentNumber))
                 {
                     return BadRequest(new RegistrationResponse
                     {
@@ -116,13 +117,14 @@ namespace TheStarRichyApi.Controllers
 
                 // Get current member code from JWT token
                 var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                currentMemberCode += $":{request.ipAddress}";
 
                 var result = await _registrationService.FullRegisterAsync(request, currentMemberCode);
 
                 if (result.Success)
                 {
-                    _logger.LogInformation("Full registration successful for {CitizenNumber} by {MemberCode}", 
-                        request.CitizenNumber, currentMemberCode);
+                    _logger.LogInformation("Full registration successful for {DocumentNumber} by {MemberCode}", 
+                        request.DocumentNumber, currentMemberCode);
                     return Ok(result);
                 }
                 else

@@ -50,8 +50,10 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Side", (object)MapSide(request.Position) ?? DBNull.Value);
 
                         // 💡 ใช้วันที่ปัจจุบันถ้าไม่ได้ส่งมา
-                        command.Parameters.AddWithValue("@Registerdate", (object)NormalizeString(request.RegistrationDate) ?? DateTime.Now.ToString("yyyy-MM-dd"));
-                        command.Parameters.AddWithValue("@birthDate", (object)NormalizeString(request.BirthDate) ?? DBNull.Value);
+                        DateTime registerDate = ParseCustomDate(NormalizeString(request.RegistrationDate)) ?? DateTime.Now;
+                        command.Parameters.AddWithValue("@Registerdate", registerDate);
+                        DateTime? birthDate = ParseCustomDate(NormalizeString(request.BirthDate));
+                        command.Parameters.AddWithValue("@birthDate", (object)birthDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@NameTitle", (object)NormalizeString(request.Title) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@IdcardName", (object)NormalizeString(request.IdCardName) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@BusinessName", (object)NormalizeString(request.BusinessName) ?? DBNull.Value);
@@ -160,16 +162,17 @@ namespace TheStarRichyApi.Services
                     {
                         command.CommandType = System.Data.CommandType.StoredProcedure;
                         command.Parameters.AddWithValue("@CountryCode", (object)NormalizeString(request.Country) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@BusinessCountryCode", (object)NormalizeString(request.BusinessCountry) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@BusinessCountryCode", (object)NormalizeString(request.CountryBusiness) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Sponsercode", (object)NormalizeString(request.ReferrerCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Uplinecode", (object)NormalizeString(request.UplineCode) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Side", (object)MapSide(request.UplineSide ?? request.ReferrerSide) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Side", (object)MapSide(request.UplineSide ?? request.Position) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Registerdate", DateTime.Now.ToString("yyyy-MM-dd"));
-                        command.Parameters.AddWithValue("@birthDate", (object)ToDateString(request.DateOfBirth) ?? DBNull.Value);
+                        DateTime? birthDate = ParseCustomDate(NormalizeString(request.BirthDate));
+                        command.Parameters.AddWithValue("@birthDate", (object)birthDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@NameTitle", (object)NormalizeString(request.Title) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@IdcardName", (object)NormalizeString(request.NameOnCard) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@IdcardName", (object)NormalizeString(request.IdCardName) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@BusinessName", (object)NormalizeString(request.BusinessName) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@IDCard", (object)NormalizeString(request.CitizenNumber) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@IDCard", (object)NormalizeString(request.DocumentNumber) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@MobilePhone", (object)NormalizeString(request.Mobile) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Homephone", (object)NormalizeString(request.HomePhone) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Email", (object)NormalizeString(request.Email) ?? DBNull.Value);
@@ -200,19 +203,19 @@ namespace TheStarRichyApi.Services
                     }
                 }
 
-                _logger.LogInformation("Full registration successful for {CitizenNumber}", request.CitizenNumber);
+                _logger.LogInformation("Full registration successful for {DocumentNumber}", request.DocumentNumber);
 
                 return new RegistrationResponse
                 {
                     Success = true,
                     Message = "ลงทะเบียนสำเร็จ",
-                    MemberName = request.NameOnCard,
+                    MemberName = request.IdCardName,
                     RegistrationDate = DateTime.Now
                 };
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during full registration for {CitizenNumber}", request.CitizenNumber);
+                _logger.LogError(ex, "Error during full registration for {DocumentNumber}", request.DocumentNumber);
                 return new RegistrationResponse
                 {
                     Success = false,
@@ -269,6 +272,24 @@ namespace TheStarRichyApi.Services
                     Message = "เกิดข้อผิดพลาดในการลงทะเบียน: " + ex.Message
                 };
             }
+        }
+
+        private DateTime? ParseCustomDate(string dateStr)
+        {
+            if (string.IsNullOrWhiteSpace(dateStr)) return null;
+
+            // ระบบหน้าบ้านส่งมาเป็น dd-MM-yyyy (เช่น 17-02-2026)
+            if (DateTime.TryParseExact(dateStr, "dd-MM-yyyy",
+                System.Globalization.CultureInfo.InvariantCulture,
+                System.Globalization.DateTimeStyles.None, out DateTime result))
+            {
+                return result;
+            }
+
+            // Fallback เผื่อส่งมาฟอร์แมตอื่น
+            if (DateTime.TryParse(dateStr, out result)) return result;
+
+            return null;
         }
 
         private static string? ToDateString(DateTime? date)

@@ -833,7 +833,8 @@
                     postcode: $('#simplePostcode').val(),
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
-                    subdistrictCode: $('#simpleSubdistrict').val()
+                    subdistrictCode: $('#simpleSubdistrict').val(),
+                    ipAddress: '0'
                 };
             }
 
@@ -924,7 +925,7 @@
 
             $('#otpInput').on('input', function() {
                 this.value = this.value.replace(/\D/g, '');
-                $('#verifyOTPBtn').prop('disabled', this.value.length !== 6);
+                $('#verifyOTPBtn').prop('disabled', this.value.length < 6);
             });
 
             $('#verifyOTPBtn').click(async function() {
@@ -1101,6 +1102,31 @@
                 const map = new Map();
                 data.forEach(item => map.set(item[key], item));
                 return Array.from(map.values()).sort((a,b) => a[label].localeCompare(b[label]));
+            }
+            function readFilesAsBase64(selectors) {
+                const promises = selectors.map(selector => {
+                    return new Promise((resolve, reject) => {
+                        const element = document.querySelector(selector);
+
+                        // Check if the input element exists and a file was selected
+                        if (element && element.files && element.files[0]) {
+                            const file = element.files[0];
+                            const reader = new FileReader();
+
+                            // When file is successfully read, resolve the promise with the Base64 string
+                            reader.onload = (e) => resolve(e.target.result);
+                            reader.onerror = (error) => reject(error);
+
+                            reader.readAsDataURL(file);
+                        } else {
+                            // If the file is optional and wasn't uploaded, return null safely
+                            resolve(null);
+                        }
+                    });
+                });
+
+                // Wait for all files to be read and return the array of results
+                return Promise.all(promises);
             }
         });
     </script>

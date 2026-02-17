@@ -6,6 +6,7 @@ using Newtonsoft.Json.Converters;
 using RestSharp;
 using System.Dynamic;
 using System.Net;
+using System.Text.Json.Nodes;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Models;
 
@@ -544,11 +545,85 @@ namespace TheStarRichyProject.Controllers
                     }
                 };
 
+                string ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string
                 string rawJsonString = request.GetRawText();
 
+                // 2. แปลง string ให้เป็น JsonObject (เพื่อให้เพิ่ม/แก้ไขข้อมูลได้)
+                var jsonObject = System.Text.Json.Nodes.JsonNode.Parse(rawJsonString).AsObject();
+
+                // ==========================================
+                // 🌟 เพิ่มบล็อกจัดการบันทึกรูปภาพ (แปลง Base64 -> ไฟล์รูป)
+                // ==========================================
+                var memberPicArray = jsonObject["memberpic"]?.AsArray();
+                if (memberPicArray != null && memberPicArray.Count > 0)
+                {
+                    string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "Memberpicture");
+                    if (!Directory.Exists(folderPath))
+                    {
+                        Directory.CreateDirectory(folderPath);
+                    }
+
+                    var newPathsArray = new System.Text.Json.Nodes.JsonArray();
+                    var index = 1;
+
+                    // พยายามดึงเลขบัตรมาตั้งชื่อไฟล์ รองรับทั้ง documentNumber และ citizenNumber
+                    string docNumber = jsonObject["documentNumber"]?.ToString()
+                                       ?? jsonObject["citizenNumber"]?.ToString()
+                                       ?? Guid.NewGuid().ToString("N").Substring(0, 13);
+
+                    string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+
+                    foreach (var picNode in memberPicArray)
+                    {
+                        string base64String = picNode?.ToString();
+
+                        // เช็คว่ามีข้อมูล Base64 จริงๆ
+                        if (!string.IsNullOrWhiteSpace(base64String) && base64String.Length > 100)
+                        {
+                            try
+                            {
+                                // ตัดส่วน Header data:image/jpeg;base64, ทิ้งถ้ามี
+                                var base64Data = base64String.Contains(",") ? base64String.Split(',')[1] : base64String;
+                                byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+                                // ตั้งชื่อไฟล์ Prefix ด้วย Reg_ (Registration)
+                                string fileName = $"reg_{docNumber}_{timeStamp}_{index++}.jpg";
+                                string filePath = Path.Combine(folderPath, fileName);
+
+                                await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                                // เก็บ Path ลง Array ใหม่
+                                newPathsArray.Add($"/Images/Memberpicture/{fileName}");
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogWarning(ex, "Failed to save member picture in FinalizeRegistration.");
+                                newPathsArray.Add((string)null);
+                            }
+                        }
+                        else
+                        {
+                            newPathsArray.Add((string)null);
+                        }
+                    }
+
+                    // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่าที่เป็น Base64
+                    jsonObject["memberpic"] = newPathsArray;
+                }
+                // ==========================================
+
+                // 3. แทรก IpAddress เข้าไปใน object
+                jsonObject["IpAddress"] = ipAddress;
+
+                // 4. แปลงกลับเป็น JSON string ตัวใหม่ที่สมบูรณ์ (Base64 ถูกแทนที่ด้วย Path แล้ว)
+                string finalJsonString = jsonObject.ToJsonString();
+
+                // ส่ง finalJsonString ไปกับ RestClient
                 var client = new RestClient(options);
                 var apiRequest = new RestRequest("/Registration/Finalize", Method.Post);
-                apiRequest.AddStringBody(rawJsonString, "application/json");
+                apiRequest.AddStringBody(finalJsonString, "application/json");
 
                 var response = await client.ExecuteAsync(apiRequest);
 

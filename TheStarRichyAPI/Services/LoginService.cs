@@ -120,6 +120,7 @@ namespace TheStarRichyApi.Services
                                         memberInfo.Email = reader.GetString(reader.GetOrdinal("Email"));
                                         memberInfo.CountryCode = reader.GetString(reader.GetOrdinal("CountryCode"));
                                         memberInfo.Countryname = reader.GetString(reader.GetOrdinal("Countryname"));
+                                        memberInfo.BussinessName = reader.GetString(reader.GetOrdinal("BussinessName"));
                                         memberInfo.MemberFlag = "Y";
                                     }
                                 }
@@ -199,5 +200,6 @@ namespace TheStarRichyApi.Services
         public string MobilePhone { get; set; } = "";
         public string Email { get; set; } = "";
         public string MemberFlag { get; set; } = "";
+        public string BussinessName { get; set; } = "";
     }
 }
