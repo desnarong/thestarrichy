@@ -56,7 +56,7 @@ namespace TheStarRichyApi.Controllers
 
                 // Get current member code from JWT token
                 var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                currentMemberCode += $":{request.ipAddress}";
+                
 
                 var result = await _registrationService.EasyRegisterAsync(request, currentMemberCode);
 
@@ -117,7 +117,7 @@ namespace TheStarRichyApi.Controllers
 
                 // Get current member code from JWT token
                 var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                currentMemberCode += $":{request.ipAddress}";
+                
 
                 var result = await _registrationService.FullRegisterAsync(request, currentMemberCode);
 

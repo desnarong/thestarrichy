@@ -76,11 +76,14 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)NormalizeString(request.DistrictCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Presentaddress_TAMBON_ID", DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@IPaddress", (object)NormalizeString(request.ipAddress) ?? DBNull.Value);
                         // Build memberpic JSON (if client sent base64 images) -> save files to Images/Memberpicture and store paths
                         string? memberPicJson = null;
                         if (request.Memberpic != null && request.Memberpic.Count > 0)
@@ -190,15 +193,16 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Bankbranch", (object)NormalizeString(request.BankBranch) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
-                        command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)NormalizeString(request.DistrictCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Presentaddress", (object)NormalizeString(GetPresentAddress(request)) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Presentaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Presentaddress_TAMBON_ID", (object)NormalizeString(GetPresentDistrict(request)) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_province", (object)NormalizeString(GetPresentProvince(request)) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_zipcode", (object)NormalizeString(GetPresentZipcode(request)) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@memberpic", (object)BuildMemberPicJson(request) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Createby", (object)NormalizeString(currentMemberCode) ?? DBNull.Value);
-
+                        command.Parameters.AddWithValue("@Createby", (object)NormalizeString(currentMemberCode) ?? DBNull.Value);//@IPaddress
+                        command.Parameters.AddWithValue("@IPaddress", (object)NormalizeString(request.ipAddress) ?? DBNull.Value);
                         await command.ExecuteNonQueryAsync();
                     }
                 }
@@ -349,7 +353,15 @@ namespace TheStarRichyApi.Services
 
             return request.CurrentAddress;
         }
+        private static string? GetPresentDistrict(FullRegistrationRequest request)
+        {
+            if (request.UseIdCardAddress || string.IsNullOrWhiteSpace(request.CurrentDistrictCode))
+            {
+                return request.DistrictCode;
+            }
 
+            return request.CurrentDistrictCode;
+        }
         private static string? GetPresentProvince(FullRegistrationRequest request)
         {
             if (request.UseIdCardAddress || string.IsNullOrWhiteSpace(request.CurrentProvinceCode))

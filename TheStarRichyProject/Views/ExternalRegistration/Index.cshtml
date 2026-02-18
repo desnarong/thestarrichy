@@ -19,8 +19,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
     <script src="~/assets/libs/sweetalert2/sweetalert2.min.js"></script>
-    <link href="~/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" />
-    <script src="~/plugins/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 
     <style>
         div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
@@ -106,14 +104,59 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="registrationDate" readonly required disabled />
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="regDay" required style="width: 70px;" disabled>
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="regMonth" required style="width: 110px;" disabled>
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="regYear" required style="width: 100px;" disabled>
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
+                                                    <input type="hidden" id="registrationDate" />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="birthDate" required />
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="birthDay" required style="width: 70px;">
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="birthMonth" required style="width: 110px;">
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="birthYear" required style="width: 100px;">
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -484,7 +527,7 @@
         }
 
         function validateForm() {
-            const required = ['country', 'countryBusiness', 'referrerCode', 'title', 'idCardName', 'businessName', 'documentNumber', 'mobile', 'birthDate', 'position'];
+            const required = ['country', 'countryBusiness', 'referrerCode', 'title', 'idCardName', 'businessName', 'documentNumber', 'mobile', 'birthDay', 'birthMonth', 'birthYear', 'position'];
             let isValid = true;
             required.forEach(id => {
                 const el = (id === 'position') ? $('input[name="position"]') : $('#' + id);
@@ -522,12 +565,114 @@
             loadTitles();
             loadMasterAddresses(); 
             setRegistrationDate();
+            
+            // Check for referrer ID from URL query parameter
+            var urlParams = new URLSearchParams(window.location.search);
+            var referrerId = urlParams.get('id');
+            
+            if (referrerId) {
+                // Extract member code and position
+                var memberCode = referrerId;
+                var position = 'left';
+                
+                // Check if ends with L or R
+                if (referrerId.length > 1) {
+                    var lastChar = referrerId.slice(-1).toUpperCase();
+                    if (lastChar === 'L' || lastChar === 'R') {
+                        memberCode = referrerId.slice(0, -1);
+                        position = (lastChar === 'L') ? 'left' : 'right';
+                    }
+                }
+                
+                // Set referrer code and disable
+                $('#referrerCode').val(memberCode).prop('disabled', true);
+                
+                // Disable search button
+                $('#btnSearchReferrer').prop('disabled', true);
+                
+                // Set position and disable
+                if (position === 'left') {
+                    $('#positionLeft').prop('checked', true);
+                } else {
+                    $('#positionRight').prop('checked', true);
+                }
+                $('input[name="position"]').prop('disabled', true);
+                
+                // Auto search referrer after a short delay to ensure DOM is ready
+                setTimeout(function() {
+                    $('#btnSearchReferrer').trigger('click');
+                }, 500);
+            }
 
-            $('#birthDate').datepicker({
-                format: 'dd-mm-yyyy',
-                language: 'th-th',
-                autoclose: true
-            });
+            // Initialize reg day dropdown
+            var regDaySelect = $('#regDay');
+            regDaySelect.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                regDaySelect.append(`<option value="${d}">${d}</option>`);
+            }
+            
+            // Initialize reg month dropdown
+            var regMonthSelect = $('#regMonth');
+            regMonthSelect.empty().append('<option value="">เดือน</option>');
+            var monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            for (var m = 1; m <= 12; m++) {
+                regMonthSelect.append(`<option value="${m}">${monthNames[m-1]}</option>`);
+            }
+            
+            // Initialize reg year dropdown
+            var regYearSelect = $('#regYear');
+            var today = new Date();
+            var currentYearBE = today.getFullYear() + 543;
+            regYearSelect.empty().append('<option value="">ปี</option>');
+            for (var y = currentYearBE; y >= currentYearBE - 10; y--) {
+                regYearSelect.append(`<option value="${y}">${y}</option>`);
+            }
+            
+            // Set initial registration date to today
+            $('#regDay').val(today.getDate());
+            $('#regMonth').val(today.getMonth() + 1);
+            $('#regYear').val(currentYearBE);
+            $('#registrationDate').val(`${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${currentYearBE}`);
+            
+            // Initialize birth day dropdown
+            var birthDaySelect = $('#birthDay');
+            birthDaySelect.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                birthDaySelect.append(`<option value="${d}">${d}</option>`);
+            }
+            
+            // Initialize birth year dropdown (พ.ศ.) - age 18 to 100
+            var birthYearSelect = $('#birthYear');
+            var currentYearBE = today.getFullYear() + 543;
+            var minAgeYearBE = currentYearBE - 18;
+            var maxAgeYearBE = currentYearBE - 100;
+            
+            birthYearSelect.empty().append('<option value="">ปี</option>');
+            for (var y = minAgeYearBE; y >= maxAgeYearBE; y--) {
+                birthYearSelect.append(`<option value="${y}">${y}</option>`);
+            }
+            
+            // Validation: Check age when year or month changes
+            function validateBirthAge() {
+                var day = $('#birthDay').val();
+                var month = $('#birthMonth').val();
+                var yearBE = $('#birthYear').val();
+                
+                if (!day || !month || !yearBE) return true;
+                
+                // Convert BE to CE for age calculation
+                var yearCE = parseInt(yearBE) - 543;
+                var birthDate = new Date(yearCE, parseInt(month) - 1, parseInt(day));
+                var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+                
+                if (age < 18) {
+                    toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+                    return false;
+                }
+                return true;
+            }
+            
+            $('#birthDay, #birthMonth, #birthYear').on('change', validateBirthAge);
 
             // 2. Event Listeners - Basic Inputs
             $('#idCardName').on('input', function() {
@@ -775,7 +920,31 @@
                 }
 
                 // ==========================================
-                // 4. แสดงผลลัพธ์และส่งข้อมูล
+                // 4. Validate Registration Date (วันที่สมัคร)
+                // ==========================================
+                var regDay = $('#regDay').val();
+                var regMonth = $('#regMonth').val();
+                var regYear = $('#regYear').val();
+                
+                if (!regDay || !regMonth || !regYear) {
+                    toastr.error('กรุณาเลือกวันที่สมัครให้ครบถ้วน');
+                    isValid = false;
+                }
+                
+                // ==========================================
+                // 5. Validate Birth Date (วันเกิด)
+                // ==========================================
+                var birthDay = $('#birthDay').val();
+                var birthMonth = $('#birthMonth').val();
+                var birthYear = $('#birthYear').val();
+                
+                if (!birthDay || !birthMonth || !birthYear) {
+                    toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+                    isValid = false;
+                }
+                
+                // ==========================================
+                // 5. แสดงผลลัพธ์และส่งข้อมูล
                 // ==========================================
                 if (!validateIdCardName()) { isValid = false; }
                 if (!validateBusinessName()) { isValid = false; }
@@ -813,13 +982,26 @@
 
             // --- Helper Functions ---
             function collectFormData() {
+                // Combine birth day, month, year into birthDate (format: dd-MM-yyyy for Thai/BE)
+                var birthDay = $('#birthDay').val();
+                var birthMonth = $('#birthMonth').val();
+                var birthYearBE = $('#birthYear').val();
+                
+                // Format as dd-MM-yyyy (Thai date format)
+                var birthDate = '';
+                if (birthDay && birthMonth && birthYearBE) {
+                    var dayStr = String(birthDay).padStart(2, '0');
+                    var monthStr = String(birthMonth).padStart(2, '0');
+                    birthDate = `${dayStr}-${monthStr}-${birthYearBE}`;
+                }
+                
                 return {
                     country: $('#country').val(),
                     countryBusiness: $('#countryBusiness').val(),
                     referrerCode: $('#referrerCode').val(),
                     position: $('input[name="position"]:checked').val(),
                     registrationDate: $('#registrationDate').val(),
-                    birthDate: $('#birthDate').val(),
+                    birthDate: birthDate,
                     title: $('#title').val(),
                     idCardName: $('#idCardName').val(),
                     businessName: $('#businessName').val(),
@@ -1078,13 +1260,31 @@
             
             function setRegistrationDate() {
                 const d = new Date();
-                const day = String(d.getDate()).padStart(2, '0');
-                const month = String(d.getMonth() + 1).padStart(2, '0');
-                const yearBE = d.getFullYear()
+                const day = d.getDate();
+                const month = d.getMonth() + 1;
+                const yearBE = d.getFullYear() + 543; // Convert to พ.ศ.
 
-                const formattedDateBE = `${day}-${month}-${yearBE}`;
+                // Set values for dropdowns
+                $('#regDay').val(day);
+                $('#regMonth').val(month);
+                $('#regYear').val(yearBE);
+                
+                // Also update hidden field for form submission
+                const formattedDateBE = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${yearBE}`;
                 $('#registrationDate').val(formattedDateBE);
             }
+            
+            // Update registration date hidden field when dropdowns change
+            $('#regDay, #regMonth, #regYear').on('change', function() {
+                var regDay = $('#regDay').val();
+                var regMonth = $('#regMonth').val();
+                var regYear = $('#regYear').val();
+                
+                if (regDay && regMonth && regYear) {
+                    var formattedDateBE = `${String(regDay).padStart(2, '0')}-${String(regMonth).padStart(2, '0')}-${regYear}`;
+                    $('#registrationDate').val(formattedDateBE);
+                }
+            });
             function loadMasterAddresses() {
                  $.get('/orders/GetMasterAddress').done(res => {
                      masterData = (typeof res === 'string') ? JSON.parse(res) : (res.data || res);

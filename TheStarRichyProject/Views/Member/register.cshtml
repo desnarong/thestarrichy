@@ -6,6 +6,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
     var cookieValue = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.UserInfoKey);
     var userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
+    
+    // Get language from cookie (default to 'th' if not set)
+    var currentLang = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.LanguageKey) ?? "th";
+    
+    // Determine year format based on language
+    var yearFormat = currentLang == "th" ? "yyyy" : "yyyy"; // bootstrap-datepicker uses Buddhist/S Buddhist/E Christian
+    var yearStartOffset = currentLang == "th" ? 543 : 0;
 }
 
 <style>
@@ -135,19 +142,58 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="simpleRegistrationDate" readonly required disabled />
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="simpleRegDay" required style="width: 70px;">
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="simpleRegMonth" required style="width: 110px;">
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="simpleRegYear" required style="width: 100px;">
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="simpleBirthDate"
-                                                           placeholder="dd-mm-yyyy"
-                                                           maxlength="10"
-                                                           pattern="\d{2}-\d{2}-\d{4}"
-                                                           title="กรุณากรอกวันที่ในรูปแบบ dd-mm-yyyy เช่น 14-02-2569"
-                                                           required>
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="simpleBirthDay" required style="width: 70px;">
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="simpleBirthMonth" required style="width: 110px;">
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="simpleBirthYear" required style="width: 100px;">
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
 
@@ -375,7 +421,29 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" id="fullRegistrationDate" class="form-control" readonly disabled required />
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="fullRegDay" required style="width: 70px;">
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="fullRegMonth" required style="width: 110px;">
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="fullRegYear" required style="width: 100px;">
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -403,12 +471,29 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-date-of-birth">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="fullBirthDate"
-                                                           placeholder="dd-mm-yyyy"
-                                                           maxlength="10"
-                                                           pattern="\d{2}-\d{2}-\d{4}"
-                                                           title="กรุณากรอกวันที่ในรูปแบบ dd-mm-yyyy เช่น 14-02-2569"
-                                                           required>
+                                                    <div class="d-flex gap-2">
+                                                        <select class="form-control" id="fullBirthDay" required style="width: 70px;">
+                                                            <option value="">วัน</option>
+                                                        </select>
+                                                        <select class="form-control" id="fullBirthMonth" required style="width: 110px;">
+                                                            <option value="">เดือน</option>
+                                                            <option value="1">มกราคม</option>
+                                                            <option value="2">กุมภาพันธ์</option>
+                                                            <option value="3">มีนาคม</option>
+                                                            <option value="4">เมษายน</option>
+                                                            <option value="5">พฤษภาคม</option>
+                                                            <option value="6">มิถุนายน</option>
+                                                            <option value="7">กรกฎาคม</option>
+                                                            <option value="8">สิงหาคม</option>
+                                                            <option value="9">กันยายน</option>
+                                                            <option value="10">ตุลาคม</option>
+                                                            <option value="11">พฤศจิกายน</option>
+                                                            <option value="12">ธันวาคม</option>
+                                                        </select>
+                                                        <select class="form-control" id="fullBirthYear" required style="width: 100px;">
+                                                            <option value="">ปี</option>
+                                                        </select>
+                                                    </div>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -906,16 +991,145 @@
         setFullRegistrationDate();
         loadFullBanks();
 
-        $('#simpleBirthDate').datepicker({
-            format: 'dd-mm-yyyy',
-            language: 'th-th', 
-            autoclose: true
-        });
-
-        $('#fullBirthDate').datepicker({
-            format: 'dd-mm-yyyy',
-            language: 'th-th', 
-            autoclose: true
+        // Get language from cookie or use default
+        var currentLang = '@currentLang';
+        
+        // Calculate date 18 years ago for age restriction
+        var today = new Date();
+        var currentYearCE = today.getFullYear();
+        var currentYearBE = currentYearCE + 543;
+        
+        // Initialize date dropdowns based on language
+        initializeDateDropdowns();
+        
+        // Function to initialize date dropdowns with proper year range
+        function initializeDateDropdowns() {
+            // Determine if using Thai (พ.ศ.) or English (ค.ศ.) year format
+            var isThaiLang = (currentLang === 'th');
+            var yearOffset = isThaiLang ? 543 : 0;
+            
+            // === Simple Registration Date ===
+            // Populate days (1-31)
+            var simpleRegDay = $('#simpleRegDay');
+            simpleRegDay.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                simpleRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+            }
+            
+            // Populate months (Thai names)
+            var simpleRegMonth = $('#simpleRegMonth');
+            var thaiMonths = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
+            simpleRegMonth.empty().append('<option value="">เดือน</option>');
+            for (var m = 1; m <= 12; m++) {
+                simpleRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+            }
+            
+            // Populate years (range: 100 years ago to current year)
+            var simpleRegYear = $('#simpleRegYear');
+            simpleRegYear.empty().append('<option value="">ปี</option>');
+            var startYear = currentYearCE - 100 + yearOffset;
+            var endYear = currentYearCE + yearOffset;
+            for (var y = endYear; y >= startYear; y--) {
+                simpleRegYear.append('<option value="' + y + '">' + y + '</option>');
+            }
+            
+            // Set default to current date
+            simpleRegDay.val(String(today.getDate()).padStart(2, '0'));
+            simpleRegMonth.val(today.getMonth() + 1);
+            simpleRegYear.val(currentYearCE + yearOffset);
+            
+            // === Simple Birth Date (with 18+ restriction) ===
+            var simpleBirthDay = $('#simpleBirthDay');
+            simpleBirthDay.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                simpleBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+            }
+            
+            var simpleBirthMonth = $('#simpleBirthMonth');
+            simpleBirthMonth.empty().append('<option value="">เดือน</option>');
+            for (var m = 1; m <= 12; m++) {
+                simpleBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+            }
+            
+            var simpleBirthYear = $('#simpleBirthYear');
+            simpleBirthYear.empty().append('<option value="">ปี</option>');
+            // For birth year: 18-100 years ago
+            var minBirthYearCE = currentYearCE - 100;
+            var maxBirthYearCE = currentYearCE - 18; // Must be at least 18 years old
+            for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
+                simpleBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
+            }
+            
+            // === Full Registration Date ===
+            var fullRegDay = $('#fullRegDay');
+            fullRegDay.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                fullRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+            }
+            
+            var fullRegMonth = $('#fullRegMonth');
+            fullRegMonth.empty().append('<option value="">เดือน</option>');
+            for (var m = 1; m <= 12; m++) {
+                fullRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+            }
+            
+            var fullRegYear = $('#fullRegYear');
+            fullRegYear.empty().append('<option value="">ปี</option>');
+            for (var y = endYear; y >= startYear; y--) {
+                fullRegYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
+            }
+            
+            // Set default to current date
+            fullRegDay.val(String(today.getDate()).padStart(2, '0'));
+            fullRegMonth.val(today.getMonth() + 1);
+            fullRegYear.val(currentYearCE + yearOffset);
+            
+            // === Full Birth Date (with 18+ restriction) ===
+            var fullBirthDay = $('#fullBirthDay');
+            fullBirthDay.empty().append('<option value="">วัน</option>');
+            for (var d = 1; d <= 31; d++) {
+                fullBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+            }
+            
+            var fullBirthMonth = $('#fullBirthMonth');
+            fullBirthMonth.empty().append('<option value="">เดือน</option>');
+            for (var m = 1; m <= 12; m++) {
+                fullBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+            }
+            
+            var fullBirthYear = $('#fullBirthYear');
+            fullBirthYear.empty().append('<option value="">ปี</option>');
+            for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
+                fullBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
+            }
+        }
+        
+        // Validation: Check age when birth date dropdowns change
+        $('#simpleBirthDay, #simpleBirthMonth, #simpleBirthYear, #fullBirthDay, #fullBirthMonth, #fullBirthYear').on('change', function() {
+            var isSimple = $(this).attr('id').startsWith('simple');
+            var daySel = isSimple ? '#simpleBirthDay' : '#fullBirthDay';
+            var monthSel = isSimple ? '#simpleBirthMonth' : '#fullBirthMonth';
+            var yearSel = isSimple ? '#simpleBirthYear' : '#fullBirthYear';
+            
+            var day = parseInt($(daySel).val());
+            var month = parseInt($(monthSel).val());
+            var yearBE = parseInt($(yearSel).val());
+            
+            if (!day || !month || !yearBE) return;
+            
+            // Convert BE to CE for age calculation
+            var yearCE = yearBE;
+            if (currentLang === 'th' && yearBE > 2500) {
+                yearCE = yearBE - 543;
+            }
+            
+            var birthDate = new Date(yearCE, month - 1, day);
+            var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+            
+            if (age < 18) {
+                toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+                $(yearSel).val('');
+            }
         });
 
         // Switch to full registration tab
@@ -1405,6 +1619,14 @@
             if (isValid) {
                 Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
+                // Construct birth date from dropdowns (format: dd-mm-yyyy)
+                var simpleBirthDay = $('#simpleBirthDay').val();
+                var simpleBirthMonth = $('#simpleBirthMonth').val();
+                var simpleBirthYear = $('#simpleBirthYear').val();
+                var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear 
+                    ? simpleBirthDay + '-' + simpleBirthMonth + '-' + simpleBirthYear 
+                    : '';
+
                 const formData = {
                     country: $('#simpleCountry').val(),
                     countryBusiness: $('#simpleCountryBusiness').val(), // เพิ่ม: ประเทศธุรกิจ
@@ -1413,7 +1635,7 @@
                     position: $('input[name="position"]:checked').val(), // เพิ่ม: ตำแหน่งสายงาน
                     title: $('select[name="simpleTitle"]').val(),
                     idCardName: $('#simpleFullName').val(), // เปลี่ยนชื่อจาก fullName เป็น idCardName
-                    birthDate: $('#simpleBirthDate').val(), // เพิ่ม: วันเกิด
+                    birthDate: simpleBirthDateStr, // วันเกิดจาก dropdown
                     businessName: $('#simpleBusinessName').val(),
                     mobile: $('#simpleMobile').val(),
                     homePhone: $('#simpleHomePhone').val(), // เพิ่ม: เบอร์บ้าน
@@ -1552,14 +1774,20 @@
 
             Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
+            // Construct birth date from dropdowns (format: dd-mm-yyyy)
+            var fullBirthDay = $('#fullBirthDay').val();
+            var fullBirthMonth = $('#fullBirthMonth').val();
+            var fullBirthYear = $('#fullBirthYear').val();
+            var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear 
+                ? fullBirthDay + '-' + fullBirthMonth + '-' + fullBirthYear 
+                : '';
+
             const formData = {
                 _origin: 'full',
                 country: $('#fullCountry').val(),
                 countryBusiness: $('#fullCountryBusiness').val(), // เปลี่ยนจาก businessCountry
                 referrerCode: $('#fullReferrerCode').val(),
-                position: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right', // เปลี่ยนจาก referrerSide
-                uplineCode: $('#fullRegistrationForm input[placeholder="กรอกรหัสอัพไลน์"]').val() || '',
-                uplineSide: $('input[name="upline_side"]:checked').attr('id') === 'uplineside_left' ? 'left' : 'right',
+                position: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right',
 
                 // แก้ไขการดึงค่า radio ให้ตรงกับ id ใน HTML
                 businessType: $('input[name="membership_type"]:checked').attr('id') === 'individual' ? 'businessman' : 'user',
@@ -1568,7 +1796,7 @@
                 language: $('#fullLanguage').val(),
                 idCardName: $('#fullNameOnCard').val() || '', // เปลี่ยนจาก nameOnCard
                 businessName: $('#fullBusinessName').val() || '',
-                birthDate: $('#fullBirthDate').val() || '', // เพิ่ม: วันเกิด
+                birthDate: fullBirthDateStr, // วันเกิดจาก dropdown
                 documentNumber: docNumber, // เปลี่ยนจาก citizenNumber
                 mobile: $('#fullMobile').val() || '',
                 homePhone: $('#fullHomePhone').val() || '', // เพิ่ม: เบอร์บ้าน
