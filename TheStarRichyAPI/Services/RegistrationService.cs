@@ -128,6 +128,40 @@ namespace TheStarRichyApi.Services
                 _logger.LogInformation("Easy registration successful for {DocumentNumber}. Generated MemberCode: {MemberCode}",
                     request.DocumentNumber, newMemberCode);
 
+                // 📱 ส่ง SMS ต้อนรับ (ถ้ามีเบอร์โทรศัพท์)
+                if (!string.IsNullOrWhiteSpace(request.Mobile))
+                {
+                    try
+                    {
+                        var smsManager = new SMSManager(_configuration);
+                        // ดึงข้อความต้อนรับจาก config
+                        string welcomeMessage = GetWelcomeMessage(newMemberCode);
+                        
+                        if (!string.IsNullOrEmpty(welcomeMessage))
+                        {
+                            // ตรวจสอบและแปลงเบอร์โทรให้ถูก format
+                            string normalizedPhone = NormalizePhoneNumber(request.Mobile);
+                            var smsResult = smsManager.SendMessageExt(welcomeMessage, normalizedPhone);
+                            
+                            if (!string.IsNullOrEmpty(smsResult) && smsResult != "SMS_DISABLED")
+                            {
+                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}", 
+                                    normalizedPhone, newMemberCode);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}", 
+                                    normalizedPhone, smsManager.ErrorMessage);
+                            }
+                        }
+                    }
+                    catch (Exception smsEx)
+                    {
+                        // ไม่ให้ SMS error ทำให้ registration response ล้มเหลว
+                        _logger.LogError(smsEx, "Error sending welcome SMS for {MemberCode}", newMemberCode);
+                    }
+                }
+
                 // 📦 ส่งค่ากลับไปให้ Controller -> Client
                 return new RegistrationResponse
                 {
@@ -158,6 +192,8 @@ namespace TheStarRichyApi.Services
         {
             try
             {
+                string newMemberCode = string.Empty;
+
                 using (var connection = new SqlConnection(_connectionString))
                 {
                     await connection.OpenAsync();
@@ -203,17 +239,74 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@memberpic", (object)BuildMemberPicJson(request) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Createby", (object)NormalizeString(currentMemberCode) ?? DBNull.Value);//@IPaddress
                         command.Parameters.AddWithValue("@IPaddress", (object)NormalizeString(request.ipAddress) ?? DBNull.Value);
-                        await command.ExecuteNonQueryAsync();
+
+                        var result = await command.ExecuteScalarAsync();
+                        newMemberCode = result?.ToString() ?? string.Empty;
                     }
                 }
 
-                _logger.LogInformation("Full registration successful for {DocumentNumber}", request.DocumentNumber);
+                // 🛡️ เช็คเงื่อนไข Error จาก Store Procedure
+                if (newMemberCode == "ERROR_DUPLICATE")
+                {
+                    _logger.LogWarning("Full registration failed: Duplicate member code for {DocumentNumber}", request.DocumentNumber);
+
+                    return new RegistrationResponse
+                    {
+                        Success = false,
+                        Message = "มีรหัสสมาชิกหรือข้อมูลนี้อยู่ในระบบแล้ว",
+                        MemberName = request.IdCardName
+                    };
+                }
+
+                // 🛡️ กันเหนียว กรณี Store Procedure ทำงานจบแต่ไม่ยอม Return อะไรกลับมา
+                if (string.IsNullOrWhiteSpace(newMemberCode))
+                {
+                    throw new Exception("ลงทะเบียนในฐานข้อมูลสำเร็จ แต่ไม่ได้รับรหัสสมาชิก (MemberCode) กลับมาจากระบบ");
+                }
+
+                _logger.LogInformation("Full registration successful for {DocumentNumber}. Generated MemberCode: {MemberCode}", 
+                    request.DocumentNumber, newMemberCode);
+
+                // 📱 ส่ง SMS ต้อนรับ (ถ้ามีเบอร์โทรศัพท์)
+                if (!string.IsNullOrWhiteSpace(request.Mobile))
+                {
+                    try
+                    {
+                        var smsManager = new SMSManager(_configuration);
+                        // ดึงข้อความต้อนรับจาก config
+                        string welcomeMessage = GetWelcomeMessage(newMemberCode);
+                        
+                        if (!string.IsNullOrEmpty(welcomeMessage))
+                        {
+                            // ตรวจสอบและแปลงเบอร์โทรให้ถูก format
+                            string normalizedPhone = NormalizePhoneNumber(request.Mobile);
+                            var smsResult = smsManager.SendMessageExt(welcomeMessage, normalizedPhone);
+                            
+                            if (!string.IsNullOrEmpty(smsResult) && smsResult != "SMS_DISABLED")
+                            {
+                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}", 
+                                    normalizedPhone, newMemberCode);
+                            }
+                            else
+                            {
+                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}", 
+                                    normalizedPhone, smsManager.ErrorMessage);
+                            }
+                        }
+                    }
+                    catch (Exception smsEx)
+                    {
+                        // ไม่ให้ SMS error ทำให้ registration response ล้มเหลว
+                        _logger.LogError(smsEx, "Error sending welcome SMS for {MemberCode}", newMemberCode);
+                    }
+                }
 
                 return new RegistrationResponse
                 {
                     Success = true,
                     Message = "ลงทะเบียนสำเร็จ",
                     MemberName = request.IdCardName,
+                    MemberCode = newMemberCode,
                     RegistrationDate = DateTime.Now
                 };
             }
@@ -226,6 +319,82 @@ namespace TheStarRichyApi.Services
                     Message = "เกิดข้อผิดพลาดในการลงทะเบียน: " + ex.Message
                 };
             }
+        }
+
+        /// <summary>
+        /// ดึงข้อความต้อนรับจาก database config และแทนที่รหัสสมาชิก
+        /// </summary>
+        private string GetWelcomeMessage(string memberCode)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    connection.Open();
+                    string query = "SELECT TOP 1 SMSWelcome, SMSWelcomeEng FROM S02";
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                string? smsWelcome = reader["SMSWelcome"]?.ToString();
+                                string? smsWelcomeEng = reader["SMSWelcomeEng"]?.ToString();
+                                
+                                // ตรวจสอบภาษาจาก config หรือใช้ default เป็นภาษาไทย
+                                string? selectedMessage = !string.IsNullOrEmpty(smsWelcome) ? smsWelcome : smsWelcomeEng;
+                                
+                                if (!string.IsNullOrEmpty(selectedMessage))
+                                {
+                                    // แทนที่รหัสสมาชิกในข้อความ
+                                    // รองรับทั้ง "รหัส" และ "Membercode" ตามที่ระบุ
+                                    string message = selectedMessage
+                                        .Replace("รหัส", "รหัส " + memberCode)
+                                        .Replace("Membercode", "Membercode " + memberCode);
+                                    
+                                    return message;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting welcome message from config");
+            }
+            
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// แปลงเบอร์โทรศัพท์ให้อยู่ในรูปแบบที่ถูกต้องสำหรับการส่ง SMS
+        /// </summary>
+        private string NormalizePhoneNumber(string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(phoneNumber))
+                return string.Empty;
+
+            // ลบช่องว่างทั้งหมด
+            phoneNumber = phoneNumber.Trim().Replace(" ", "");
+
+            // ถ้าเริ่มต้นด้วย +66 ให้เปลี่ยนเป็น 0
+            if (phoneNumber.StartsWith("+66"))
+            {
+                phoneNumber = "0" + phoneNumber.Substring(3);
+            }
+            // ถ้าเริ่มต้นด้วย 66 แต่ไม่ใช่ 0 ให้เติม 0
+            else if (phoneNumber.StartsWith("66") && !phoneNumber.StartsWith("660"))
+            {
+                phoneNumber = "0" + phoneNumber.Substring(2);
+            }
+            // ถ้าไม่เริ่มต้นด้วย 0 ให้เติม 0
+            else if (!phoneNumber.StartsWith("0"))
+            {
+                phoneNumber = "0" + phoneNumber;
+            }
+
+            return phoneNumber;
         }
 
         /// <summary>
