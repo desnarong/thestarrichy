@@ -275,6 +275,73 @@ namespace TheStarRichyProject.Controllers
 
         [HttpGet]
         [AllowAnonymous]
+        public IActionResult GetClientIP()
+        {
+            try
+            {
+                // Get client IP address from request headers
+                var ipAddress = GetClientIPAddress();
+                
+                return Ok(new 
+                { 
+                    success = true, 
+                    ip = ipAddress,
+                    message = "Client IP address retrieved successfully"
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting client IP address");
+                return Ok(new 
+                { 
+                    success = false, 
+                    ip = "0",
+                    message = "Could not detect client IP address"
+                });
+            }
+        }
+
+        private string GetClientIPAddress()
+        {
+            try
+            {
+                // Check for forwarded headers (when behind proxy/load balancer)
+                var forwardedFor = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(forwardedFor))
+                {
+                    // X-Forwarded-For can contain multiple IPs, the first one is the client IP
+                    var ips = forwardedFor.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    if (ips.Length > 0)
+                    {
+                        return ips[0].Trim();
+                    }
+                }
+
+                // Check for other common proxy headers
+                var realIp = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
+                if (!string.IsNullOrEmpty(realIp))
+                {
+                    return realIp;
+                }
+
+                // Fall back to remote IP address
+                var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
+                if (!string.IsNullOrEmpty(remoteIp) && remoteIp != "::1")
+                {
+                    return remoteIp;
+                }
+
+                // Localhost or IPv6 localhost
+                return "127.0.0.1";
+            }
+            catch
+            {
+                return "0";
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetTitles()
         {
             try

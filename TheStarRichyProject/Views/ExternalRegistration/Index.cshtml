@@ -554,10 +554,67 @@
         }
 
         // ==========================================
+        // IP ADDRESS FUNCTIONS
+        // ==========================================
+        let clientIpAddress = '0'; // Default value
+
+        async function getClientIP() {
+            try {
+                // First try to get IP from server-side endpoint (most accurate)
+                try {
+                    const response = await fetch('/ExternalRegistration/GetClientIP');
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && data.ip) {
+                            clientIpAddress = data.ip;
+                            console.log('Client IP detected from server:', clientIpAddress);
+                            return clientIpAddress;
+                        }
+                    }
+                } catch (e) {
+                    console.log('Server-side IP detection failed:', e.message);
+                }
+
+                // Fallback: Try public IP detection services
+                const services = [
+                    'https://api.ipify.org?format=json',
+                    'https://api64.ipify.org?format=json',
+                    'https://ipinfo.io/json'
+                ];
+
+                for (const service of services) {
+                    try {
+                        const response = await fetch(service, { timeout: 3000 });
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.ip) {
+                                clientIpAddress = data.ip;
+                                console.log('Client IP detected from public service:', clientIpAddress);
+                                return clientIpAddress;
+                            }
+                        }
+                    } catch (e) {
+                        console.log(`IP service ${service} failed:`, e.message);
+                        continue;
+                    }
+                }
+
+                console.warn('Could not detect client IP, using default');
+                return '0';
+            } catch (error) {
+                console.error('Error getting client IP:', error);
+                return '0';
+            }
+        }
+
+        // ==========================================
         // DOCUMENT READY
         // ==========================================
-        $(document).ready(function () {
+        $(document).ready(async function () {
             let masterData = [];
+
+            // Get client IP address on page load
+            clientIpAddress = await getClientIP();
 
             // 1. Initial Data Loading
             loadCountries();
@@ -676,10 +733,12 @@
 
             // 2. Event Listeners - Basic Inputs
             $('#idCardName').on('input', function() {
-                if (!$('#businessName').val()) {
-                    $('#businessName').val($(this).val());
-                    validateBusinessName(); 
-                }
+                // if (!$('#businessName').val()) {
+                //     $('#businessName').val($(this).val());
+                //     validateBusinessName(); 
+                // }
+                $('#businessName').val($(this).val());
+                validateBusinessName();
                 validateIdCardName();
             });
 
@@ -1016,7 +1075,7 @@
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
-                    ipAddress: '0'
+                    ipAddress: clientIpAddress
                 };
             }
 

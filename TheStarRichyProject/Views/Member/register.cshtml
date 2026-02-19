@@ -143,10 +143,10 @@
                                                 <label class="col-md-5 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
-                                                        <select class="form-control" id="simpleRegDay" required style="width: 70px;">
+                                                        <select class="form-control" id="simpleRegDay" required style="width: 70px;" disabled>
                                                             <option value="">วัน</option>
                                                         </select>
-                                                        <select class="form-control" id="simpleRegMonth" required style="width: 110px;">
+                                                        <select class="form-control" id="simpleRegMonth" required style="width: 110px;" disabled>
                                                             <option value="">เดือน</option>
                                                             <option value="1">มกราคม</option>
                                                             <option value="2">กุมภาพันธ์</option>
@@ -161,7 +161,7 @@
                                                             <option value="11">พฤศจิกายน</option>
                                                             <option value="12">ธันวาคม</option>
                                                         </select>
-                                                        <select class="form-control" id="simpleRegYear" required style="width: 100px;">
+                                                        <select class="form-control" id="simpleRegYear" required style="width: 100px;" disabled>
                                                             <option value="">ปี</option>
                                                         </select>
                                                     </div>
@@ -422,10 +422,10 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
-                                                        <select class="form-control" id="fullRegDay" required style="width: 70px;">
+                                                        <select class="form-control" id="fullRegDay" required style="width: 70px;" disabled>
                                                             <option value="">วัน</option>
                                                         </select>
-                                                        <select class="form-control" id="fullRegMonth" required style="width: 110px;">
+                                                        <select class="form-control" id="fullRegMonth" required style="width: 110px;" disabled>
                                                             <option value="">เดือน</option>
                                                             <option value="1">มกราคม</option>
                                                             <option value="2">กุมภาพันธ์</option>
@@ -440,7 +440,7 @@
                                                             <option value="11">พฤศจิกายน</option>
                                                             <option value="12">ธันวาคม</option>
                                                         </select>
-                                                        <select class="form-control" id="fullRegYear" required style="width: 100px;">
+                                                        <select class="form-control" id="fullRegYear" required style="width: 100px;" disabled>
                                                             <option value="">ปี</option>
                                                         </select>
                                                     </div>
@@ -452,20 +452,6 @@
                                                     <select id="fullTitle" name="title" class="form-control" required>
                                                         <option value="">-- เลือกคำนำหน้า --</option>
                                                     </select>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <input type="text" id="fullNameOnCard" class="form-control" placeholder="กรอกชื่อบนบัตร" required />
-                                                    <small class="text-muted mt-1" id="fullNameOnCardValidation"></small>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
-                                                <div class="col-md-7">
-                                                    <input type="text" id="fullBusinessName" class="form-control" placeholder="กรอกชื่อธุรกิจ" />
-                                                    <small class="text-muted mt-1" id="fullBusinessNameValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -494,6 +480,20 @@
                                                             <option value="">ปี</option>
                                                         </select>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-name-on-the-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullNameOnCard" class="form-control" placeholder="กรอกชื่อบนบัตร" required />
+                                                    <small class="text-muted mt-1" id="fullNameOnCardValidation"></small>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" id="fullBusinessName" class="form-control" placeholder="กรอกชื่อธุรกิจ" />
+                                                    <small class="text-muted mt-1" id="fullBusinessNameValidation"></small>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -970,10 +970,67 @@
     }
 
     // ==========================================
+    // IP ADDRESS FUNCTIONS
+    // ==========================================
+    let clientIpAddress = '0'; // Default value
+
+    async function getClientIP() {
+        try {
+            // First try to get IP from server-side endpoint (most accurate)
+            try {
+                const response = await fetch('/ExternalRegistration/GetClientIP');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.ip) {
+                        clientIpAddress = data.ip;
+                        console.log('Client IP detected from server:', clientIpAddress);
+                        return clientIpAddress;
+                    }
+                }
+            } catch (e) {
+                console.log('Server-side IP detection failed:', e.message);
+            }
+
+            // Fallback: Try public IP detection services
+            const services = [
+                'https://api.ipify.org?format=json',
+                'https://api64.ipify.org?format=json',
+                'https://ipinfo.io/json'
+            ];
+
+            for (const service of services) {
+                try {
+                    const response = await fetch(service, { timeout: 3000 });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.ip) {
+                            clientIpAddress = data.ip;
+                            console.log('Client IP detected from public service:', clientIpAddress);
+                            return clientIpAddress;
+                        }
+                    }
+                } catch (e) {
+                    console.log(`IP service ${service} failed:`, e.message);
+                    continue;
+                }
+            }
+
+            console.warn('Could not detect client IP, using default');
+            return '0';
+        } catch (error) {
+            console.error('Error getting client IP:', error);
+            return '0';
+        }
+    }
+
+    // ==========================================
     // DOCUMENT READY
     // ==========================================
-    $(document).ready(function () {
+    $(document).ready(async function () {
         let masterData = [];
+
+        // Get client IP address on page load
+        clientIpAddress = await getClientIP();
 
         // Load master address data
         loadMasterAddresses();
@@ -1002,17 +1059,21 @@
         var urlParams = new URLSearchParams(window.location.search);
         var referrerId = urlParams.get('id');
         // Check if ends with L or R
-        if (referrerId.length > 1) {
+        if (referrerId && referrerId.length > 1) {
             var lastChar = referrerId.slice(-1).toUpperCase();
             if (lastChar === 'L' || lastChar === 'R') {
                 memberCode = referrerId.slice(0, -1);
                 position = (lastChar === 'L') ? 'left' : 'right';
             }
 
-            $('#simpleReferrerCode').val(memberCode);
-            $('#fullReferrerCode').val(memberCode);
-            $('#simpleReferrerName').val(memberCode);
-            $('#fullReferrerName').val(memberCode);
+            $('#simpleReferrerCode').val(memberCode).prop('disabled', true);
+            $('#fullReferrerCode').val(memberCode).prop('disabled', true);
+
+            $('input[name="position"]').prop('disabled', true);
+
+            // Disable search button
+            $('#btnSearchReferrer').prop('disabled', true);
+            $('#fullReferrerCode').prop('disabled', true);
 
             setTimeout(function() {
                     $('#btnSearchReferrer').trigger('click');
@@ -1021,14 +1082,16 @@
                 setTimeout(function() {
                     $('#fullReferrerCode').trigger('click');
                 }, 500);
+
+             // Set position and disable
+            if (position === 'left') {
+                $('#positionLeft').prop('checked', true);
+            } else {
+                $('#positionRight').prop('checked', true);
+            }
         }
         
-        // Set position and disable
-        if (position === 'left') {
-            $('#positionLeft').prop('checked', true);
-        } else {
-            $('#positionRight').prop('checked', true);
-        }
+        
         
         // Initialize date dropdowns based on language
         initializeDateDropdowns();
@@ -1342,12 +1405,13 @@
 
         // Auto-copy name-on-card -> business name (only if user hasn't edited business name)
         $('#simpleFullName').on('input', function() {
-            if (!$('#simpleBusinessName').data('userEdited')) {
-                $('#simpleBusinessName').val($(this).val());
-            }
+            $('#simpleBusinessName').val($(this).val());
             validateSimpleFullName();
         });
-        $('#simpleBusinessName').on('input', function(){ $(this).data('userEdited', true); validateSimpleBusinessName(); });
+        $('#simpleBusinessName').on('input', function(){ 
+            $(this).data('userEdited', true); 
+            validateSimpleBusinessName(); 
+        });
 
         $('#fullNameOnCard').on('input', function() {
             if (!$('#fullBusinessName').data('userEdited')) {
@@ -1677,7 +1741,7 @@
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
-                    ipAddress: '0'
+                    ipAddress: clientIpAddress
                 };
 
                 try {
@@ -1854,7 +1918,7 @@
                 currentDistrictCode: $('#fullCurrentDistrict').val(),
                 currentSubdistrictCode: $('#fullCurrentSubdistrict').val(),
 
-                ipAddress: '0'
+                ipAddress: clientIpAddress
             };
 
             try {
