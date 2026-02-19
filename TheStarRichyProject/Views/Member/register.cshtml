@@ -998,6 +998,37 @@
         var today = new Date();
         var currentYearCE = today.getFullYear();
         var currentYearBE = currentYearCE + 543;
+
+        var urlParams = new URLSearchParams(window.location.search);
+        var referrerId = urlParams.get('id');
+        // Check if ends with L or R
+        if (referrerId.length > 1) {
+            var lastChar = referrerId.slice(-1).toUpperCase();
+            if (lastChar === 'L' || lastChar === 'R') {
+                memberCode = referrerId.slice(0, -1);
+                position = (lastChar === 'L') ? 'left' : 'right';
+            }
+
+            $('#simpleReferrerCode').val(memberCode);
+            $('#fullReferrerCode').val(memberCode);
+            $('#simpleReferrerName').val(memberCode);
+            $('#fullReferrerName').val(memberCode);
+
+            setTimeout(function() {
+                    $('#btnSearchReferrer').trigger('click');
+                }, 500);
+
+                setTimeout(function() {
+                    $('#fullReferrerCode').trigger('click');
+                }, 500);
+        }
+        
+        // Set position and disable
+        if (position === 'left') {
+            $('#positionLeft').prop('checked', true);
+        } else {
+            $('#positionRight').prop('checked', true);
+        }
         
         // Initialize date dropdowns based on language
         initializeDateDropdowns();

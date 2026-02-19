@@ -103,6 +103,14 @@
         }
     }
 
+    async function registerTeam(memberCode) {
+        let url = '/member/register';
+        if (memberCode) {
+            url += `?id=${memberCode}`;
+        }
+            window.location.href=url;
+    }
+
     async function loadBinaryTeam(memberCode) {
         try {
             showLoading(true);
@@ -293,7 +301,7 @@
         if (isEmpty) {
             // แสดง node ว่าง
             html += `
-                <div class="empty-node" onclick="event.stopPropagation()">
+                <div class="empty-node" onclick="registerTeam('${membercode}')">
                     <i class="ri-add-circle-line ri-2x"></i>
                     <span>ว่าง</span>
                 </div>
@@ -338,7 +346,7 @@
                 html += `</div>`;
             } else {
                 html += `<div class="child-branch left">
-                    <div class="empty-node small" onclick="event.stopPropagation()">
+                        <div class="empty-node small" onclick="registerTeam('${membercode}L')">
                         <i class="ri-add-circle-line"></i>
                         <span>ว่าง</span>
                     </div>
@@ -352,7 +360,7 @@
                 html += `</div>`;
             } else {
                 html += `<div class="child-branch right">
-                    <div class="empty-node small" onclick="event.stopPropagation()">
+                        <div class="empty-node small" onclick="registerTeam('${membercode}R')">
                         <i class="ri-add-circle-line"></i>
                         <span>ว่าง</span>
                     </div>
