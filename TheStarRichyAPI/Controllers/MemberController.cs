@@ -426,11 +426,11 @@ namespace TheStarRichyApi.Controllers
 
         /*==================== UPDATE 2025-09-07 ====================*/
         [HttpGet("memberbinaryteam")]
-        public async Task<IActionResult> GetMemberBinaryTeam()
+        public async Task<IActionResult> GetMemberBinaryTeam([FromQuery] string? membercode = null)
         {
             try
             {
-                var result = await _memberBinaryTeamService.GetDisplayAsync();
+                var result = await _memberBinaryTeamService.GetDisplayAsync(membercode);
                 return Ok(result);
             }
             catch (Exception)

@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <div class="input-group">
                             <input type="text" id="memberCodeSearch" class="form-control" 
                                    placeholder="ค้นหารหัสสมาชิก...">
@@ -19,12 +19,18 @@
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-6 text-end">
+                    <div class="col-md-8 text-end">
                         <button class="btn btn-info" onclick="loadCurrentMember()">
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
                         <button class="btn btn-secondary" onclick="goToParent()">
                             <i class="ri-arrow-up-line"></i> สายงานบน
+                        </button>
+                        <button class="btn btn-success" onclick="expandAll()">
+                            <i class="ri-arrow-down-line"></i> ขยายทั้งหมด
+                        </button>
+                        <button class="btn btn-warning" onclick="collapseAll()">
+                            <i class="ri-collapse-line"></i> ย่อทั้งหมด
                         </button>
                     </div>
                 </div>
@@ -36,7 +42,7 @@
         <div class="card">
             <div class="card-header bg-info">
                 <h5 class="card-title text-white mb-0">
-                    <i class="ri-organization-chart"></i> โครงสร้างทีมไบนารี่
+                    <i class="ri-organization-chart"></i> โครงสร้างทีมไบนารี่ (แบบต้นไม้)
                 </h5>
             </div>
             <div class="card-body">
@@ -56,6 +62,7 @@
 <script>
     let currentMemberCode = '';
     let parentMemberCode = '';
+    let treeData = null;
 
     $(document).ready(function() {
         loadCurrentMember();
@@ -64,16 +71,35 @@
     async function loadCurrentMember() {
         try {
             const response = await fetch('/home/GetMemberInfo');
+            
+            if (!response.ok) {
+                throw new Error('Failed to load member info');
+            }
+            
             const data = await response.json();
             
-            if (data) {
-                const memberInfo = JSON.parse(data);
+            // Handle both string (JSON) and object response
+            let memberInfo;
+            if (typeof data === 'string') {
+                memberInfo = JSON.parse(data);
+            } else {
+                memberInfo = data;
+            }
+            
+            // Response is flat object with membercode directly, not memberInfo[0]
+            if (memberInfo && memberInfo.membercode) {
+                currentMemberCode = memberInfo.membercode;
+                loadBinaryTeam(currentMemberCode);
+            } else if (memberInfo && memberInfo.memberInfo && memberInfo.memberInfo.length > 0) {
+                // Fallback for nested format
                 currentMemberCode = memberInfo.memberInfo[0].membercode;
                 loadBinaryTeam(currentMemberCode);
+            } else {
+                showAlert('warning', 'ไม่พบข้อมูลสมาชิก');
             }
         } catch (error) {
             console.error('Error:', error);
-            showAlert('danger', 'ไม่สามารถโหลดข้อมูลสมาชิกได้');
+            showAlert('danger', 'ไม่สามารถโหลดข้อมูลสมาชิกได้: ' + error.message);
         }
     }
 
@@ -81,35 +107,273 @@
         try {
             showLoading(true);
             
-            const response = await fetch(`/teaminfomation/GetBinaryTeam?memberCode=${memberCode}`);
+            // สร้าง URL - ถ้ามี memberCode ให้ส่งไปด้วย (สำหรับค้นหา/คลิกดูทีมคนอื่น)
+            // ถ้าไม่มี จะดึงจาก JWT อัตโนมัติ
+            let url = '/home/GetMemberBinaryTeam';
+            if (memberCode) {
+                url += `?membercode=${memberCode}`;
+            }
+            
+            const response = await fetch(url);
             
             if (!response.ok) {
                 throw new Error('Failed to load binary team');
             }
             
-            const result = await response.json();
-            renderBinaryTree(result, memberCode);
+            const data = await response.json();
+            
+            // Handle both string (JSON) and object response
+            let result;
+            if (typeof data === 'string') {
+                result = JSON.parse(data);
+            } else {
+                result = data;
+            }
+            
+            treeData = result;
+            renderBinaryTree(result, memberCode || (result[0]?.Membercode || ''));
         } catch (error) {
             console.error('Error:', error);
-            showAlert('danger', 'เกิดข้อผิดพลาดในการโหลดข้อมูล');
+            showAlert('danger', 'เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message);
         } finally {
             showLoading(false);
         }
     }
 
-    function renderBinaryTree(data, centerCode) {
-        const container = $('#binaryTreeContainer');
-        container.empty();
+        function renderBinaryTree(data, centerCode) {
+            const container = $('#binaryTreeContainer');
+            container.empty();
 
-        if (!data || !Array.isArray(data) || data.length === 0) {
-            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
-            return;
+            if (!data || !Array.isArray(data) || data.length === 0) {
+                container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
+                return;
+            }
+
+            // สร้าง Tree ใหม่จากข้อมูล Flat Array
+            // (ละทิ้ง BinaryTree ที่ได้จาก API เพราะข้อมูลชั้นลูกลึกๆ ส่งมาไม่ครบ)
+            const builtTree = buildTreeFromFlatData(data);
+
+            if (!builtTree || builtTree.length === 0) {
+                renderOldStyle(data, centerCode);
+                return;
+            }
+
+            let html = `<div class="binary-tree-container">`;
+            builtTree.forEach((rootNode, index) => {
+                html += renderTreeNode(rootNode, 0, index);
+            });
+            html += `</div>`;
+
+            container.html(html);
         }
 
-        const center = data.find(m => m.membercode === centerCode) || data[0];
-        const left = data.find(m => m.position === 'L');
-        const right = data.find(m => m.position === 'R');
+        // ฟังก์ชันใหม่: ใช้ประกอบร่าง Tree 3 ชั้นจาก PositionLevel ใน Flat Array
+        function buildTreeFromFlatData(flatData) {
+            const getNode = (posLevel) => {
+                const node = flatData.find(n => n.PositionLevel === posLevel);
+                if (!node) return null;
 
+                // ในข้อมูล Flat Data รหัสสมาชิกตัวจริงของชั้นลูกๆ จะซ่อนอยู่ใน ChildCode
+                let actualCode = node.ChildCode;
+                if (!actualCode || actualCode === 'ว่าง/Empty') {
+                    actualCode = '';
+                } else if (posLevel === 'Membercode' || posLevel === 'Root') {
+                    actualCode = node.ChildCode || node.Membercode;
+                }
+
+                return {
+                    ...node,
+                    Membercode: actualCode, // นำรหัสจริงมาใส่ใน Membercode เพื่อให้ renderTreeNode ใช้งานได้
+                    Children: []
+                };
+            };
+
+            const root = getNode('Membercode') || flatData[0];
+            if (!root) return [];
+
+            // Level 1
+            const left1 = getNode('Leftcode1');
+            const right1 = getNode('Rightcode1');
+            if (left1) root.Children.push(left1);
+            if (right1) root.Children.push(right1);
+
+            // Level 2
+            const left21 = getNode('Leftcode21');
+            const right22 = getNode('Rightcode22');
+            if (left1) {
+                if (left21) left1.Children.push(left21);
+                if (right22) left1.Children.push(right22);
+            }
+
+            const left23 = getNode('Leftcode23');
+            const right24 = getNode('Rightcode24');
+            if (right1) {
+                if (left23) right1.Children.push(left23);
+                if (right24) right1.Children.push(right24);
+            }
+
+            // Level 3
+            const left31 = getNode('Leftcode31');
+            const right32 = getNode('Rightcode32');
+            if (left21) {
+                if (left31) left21.Children.push(left31);
+                if (right32) left21.Children.push(right32);
+            }
+
+            const left33 = getNode('Leftcode33');
+            const right34 = getNode('Rightcode34');
+            if (right22) {
+                if (left33) right22.Children.push(left33);
+                if (right34) right22.Children.push(right34);
+            }
+
+            const left35 = getNode('Leftcode35');
+            const right36 = getNode('Rightcode36');
+            if (left23) {
+                if (left35) left23.Children.push(left35);
+                if (right36) left23.Children.push(right36);
+            }
+
+            const left37 = getNode('Leftcode37');
+            const right38 = getNode('Rightcode38');
+            if (right24) {
+                if (left37) right24.Children.push(left37);
+                if (right38) right24.Children.push(right38);
+            }
+
+            return [root];
+        }
+
+    function renderTreeNode(node, level, index = 0) {
+        if (!node) return '';
+        
+        const membercode = node.Membercode || '';
+        const membername = node.Membername || node.Idcardname || 'N/A';
+        const personalPV = node.PersonalPV || 0;
+        const memberposition = node.Memberposition || '';
+        const memberpositionName = node.MemberpositionName || '';
+        const children = node.Children || [];
+        const levelInfo = node.Level || 1;
+        
+        // หา left และ right จาก PositionLevel
+        // Leftcode = left, Rightcode = right
+        const isLeft = node.PositionLevel && node.PositionLevel.toString().includes('Left');
+        const isRight = node.PositionLevel && node.PositionLevel.toString().includes('Right');
+        
+        const leftCount = node.LeftCountActive || 0;
+        const rightCount = node.RightCountActive || 0;
+        
+        // กรองเอาเฉพาะ left และ right children
+        const leftChildren = children.filter(c => c.PositionLevel && c.PositionLevel.toString().includes('Left'));
+        const rightChildren = children.filter(c => c.PositionLevel && c.PositionLevel.toString().includes('Right'));
+        
+        const leftChild = leftChildren.length > 0 ? leftChildren[0] : null;
+        const rightChild = rightChildren.length > 0 ? rightChildren[0] : null;
+        
+        // สีตาม position
+        let gradientClass = 'gradient-center';
+        if (memberposition === 'SS' || memberposition === 'Silver Star') {
+            gradientClass = 'gradient-silver';
+        } else if (memberposition === 'GS' || memberposition === 'Gold Star') {
+            gradientClass = 'gradient-gold';
+        } else if (memberposition === 'DGS' || memberposition === 'Double Gold Star') {
+            gradientClass = 'gradient-diamond';
+        } else if (isLeft) {
+            gradientClass = 'gradient-left';
+        } else if (isRight) {
+            gradientClass = 'gradient-right';
+        }
+                // อ้างอิงจาก Membercode เป็นหลัก ถ้าไม่มีโค้ดแสดงว่าเป็นกล่องว่างจริงๆ
+        const isEmpty = !membercode || membercode === '' || membercode === 'ว่าง/Empty';
+        
+        let html = `
+            <div class="tree-node-wrapper" data-level="${level}">
+        `;
+        
+        if (isEmpty) {
+            // แสดง node ว่าง
+            html += `
+                <div class="empty-node" onclick="event.stopPropagation()">
+                    <i class="ri-add-circle-line ri-2x"></i>
+                    <span>ว่าง</span>
+                </div>
+            `;
+        } else {
+            // แสดง node ปกติ
+            html += `
+                <div class="tree-node ${gradientClass}" onclick="loadBinaryTeam('${membercode}')" title="คลิกเพื่อดูทีม">
+                    <div class="node-main">
+                        <div class="node-avatar">
+                            <i class="ri-user-star-line ri-2x"></i>
+                        </div>
+                        <div class="node-details">
+                            <div class="member-name">${membername}</div>
+                            <div class="member-code">${membercode}</div>
+                            <div class="member-position">${memberpositionName || memberposition}</div>
+                            <div class="member-pv">PV: ${personalPV}</div>
+                        </div>
+                    </div>
+                    <div class="node-stats">
+                        <div class="stat-left">
+                            <span class="badge bg-success">L: ${leftCount}</span>
+                        </div>
+                        <div class="stat-right">
+                            <span class="badge bg-warning">R: ${rightCount}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ถ้ามี children ให้แสดง
+        if (children && children.length > 0) {
+            html += `<div class="tree-children">`;
+            html += `<div class="tree-connector"></div>`;
+            html += `<div class="children-container">`;
+            
+            // Left side
+            if (leftChild && leftChild.Membercode) {
+                html += `<div class="child-branch left">`;
+                html += renderTreeNode(leftChild, level + 1, 0);
+                html += `</div>`;
+            } else {
+                html += `<div class="child-branch left">
+                    <div class="empty-node small" onclick="event.stopPropagation()">
+                        <i class="ri-add-circle-line"></i>
+                        <span>ว่าง</span>
+                    </div>
+                </div>`;
+            }
+            
+            // Right side
+            if (rightChild && rightChild.Membercode) {
+                html += `<div class="child-branch right">`;
+                html += renderTreeNode(rightChild, level + 1, 1);
+                html += `</div>`;
+            } else {
+                html += `<div class="child-branch right">
+                    <div class="empty-node small" onclick="event.stopPropagation()">
+                        <i class="ri-add-circle-line"></i>
+                        <span>ว่าง</span>
+                    </div>
+                </div>`;
+            }
+            
+            html += `</div>`; // children-container
+            html += `</div>`; // tree-children
+        }
+        
+        html += `</div>`; // tree-node-wrapper
+        
+        return html;
+    }
+
+    // สำหรับกรณีไม่มี BinaryTree (ใช้ข้อมูลเดิม)
+    function renderOldStyle(data, centerCode) {
+        const container = $('#binaryTreeContainer');
+        
+        const center = data.find(m => m.membercode === centerCode) || data[0];
+        
         let html = `
             <div class="binary-tree">
                 <div class="tree-level">
@@ -117,8 +381,8 @@
                 </div>
                 <div class="tree-level mt-4">
                     <div class="row justify-content-center">
-                        <div class="col-md-6">${renderNode(left, 'left')}</div>
-                        <div class="col-md-6">${renderNode(right, 'right')}</div>
+                        <div class="col-md-6">${renderNode(null, 'left')}</div>
+                        <div class="col-md-6">${renderNode(null, 'right')}</div>
                     </div>
                 </div>
             </div>
@@ -166,9 +430,29 @@
         loadBinaryTeam(memberCode);
     }
 
-    async function goToParent() {
-        // Implement logic to go to parent node
-        showAlert('info', 'ฟีเจอร์นี้กำลังพัฒนา');
+    function goToParent() {
+        const container = $('#binaryTreeContainer');
+        if (!treeData || treeData.length === 0) return;
+        
+        const currentMember = treeData[0];
+        const childCode = currentMember.ChildCode;
+        
+        if (!childCode) {
+            showAlert('info', 'ไม่มีสายงานบนแล้ว');
+            return;
+        }
+        
+        loadBinaryTeam(childCode);
+    }
+
+    function expandAll() {
+        $('.tree-children').slideDown();
+        $('.child-branch').removeClass('collapsed');
+    }
+
+    function collapseAll() {
+        $('.tree-children').slideUp();
+        $('.child-branch').addClass('collapsed');
     }
 
     function showLoading(show) {
@@ -200,6 +484,200 @@
 </script>
 
 <style>
+.binary-tree-container {
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.tree-node-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.tree-node {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: 2px solid #fff;
+    border-radius: 16px;
+    padding: 15px 25px;
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    min-width: 200px;
+    position: relative;
+}
+
+.tree-node:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+}
+
+/* Gradient ตามตำแหน่ง */
+.tree-node.gradient-center {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.tree-node.gradient-left {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+}
+
+.tree-node.gradient-right {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.tree-node.gradient-silver {
+    background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+}
+
+.tree-node.gradient-gold {
+    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+    color: #333;
+}
+
+.tree-node.gradient-diamond {
+    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+    color: #333;
+}
+
+.tree-node .node-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.tree-node .node-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid rgba(255,255,255,0.5);
+}
+
+.tree-node .node-details {
+    text-align: left;
+}
+
+.tree-node .member-name {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 2px;
+}
+
+.tree-node .member-code {
+    font-size: 12px;
+    opacity: 0.9;
+    font-family: monospace;
+}
+
+.tree-node .member-position {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+    font-weight: 500;
+}
+
+.tree-node .member-pv {
+    font-size: 11px;
+    opacity: 0.8;
+    margin-top: 2px;
+}
+
+.tree-node .node-stats {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 8px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+}
+
+.tree-children {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    position: relative;
+}
+
+.tree-connector {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    width: 2px;
+    height: 20px;
+    background: #667eea;
+}
+
+.children-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    position: relative;
+}
+
+.children-container::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: #667eea;
+}
+
+.child-branch {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.empty-node {
+    width: 150px;
+    height: 80px;
+    border: 2px dashed #ccc;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #f9f9f9;
+}
+
+.empty-node.small {
+    width: 120px;
+    height: 60px;
+}
+
+.empty-node:hover {
+    border-color: #667eea;
+    color: #667eea;
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.empty-node i {
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.empty-node.small i {
+    font-size: 18px;
+    margin-bottom: 2px;
+}
+
+.empty-node span {
+    font-size: 12px;
+}
+
+.empty-node.small span {
+    font-size: 10px;
+}
+
+/* สไตล์เดิมยังคงใช้งานได้ */
 .binary-tree {
     padding: 20px;
 }
@@ -263,6 +741,19 @@
 
 .node-info p {
     margin-bottom: 5px;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .children-container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .tree-node {
+        min-width: 150px;
+        padding: 10px 15px;
+    }
 }
 </style>
 }

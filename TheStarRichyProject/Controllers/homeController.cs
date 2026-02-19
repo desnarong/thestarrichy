@@ -456,5 +456,61 @@ namespace TheStarRichyProject.Controllers
             }
             return Error();
         }
+
+        [HttpGet]
+        [Route("home/GetMemberBinaryTeam")]
+        public async Task<IActionResult> GetMemberBinaryTeam(string? membercode = null)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            var options = new RestClientOptions(_config["Api:Url"])
+            {
+                ThrowOnAnyError = true,
+                ConfigureMessageHandler = handler =>
+                {
+                    var httpClientHandler = new HttpClientHandler
+                    {
+                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+                    return httpClientHandler;
+                }
+            };
+            var passkey = _config["Api:Passkey"];
+            var token = Request.Cookies[CookieHelper.UserKey];
+            var client = new RestClient(options);
+
+            var apiUrl = "/Member/memberbinaryteam";
+            if (!string.IsNullOrEmpty(membercode))
+            {
+                apiUrl += $"?membercode={membercode}";
+            }
+
+            var request = new RestRequest(apiUrl, Method.Get);
+            request.AddHeader("X-Passkey", passkey);
+            request.AddHeader("Authorization", $"Bearer {token}");
+
+            RestResponse response = null;
+            try
+            {
+                // บรรทัดที่ 493 ของคุณน่าจะเป็นบรรทัดนี้
+                response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful)
+                {
+                    // ถ้า API คืนค่า 500 ให้แสดงข้อความที่ API ตอบกลับมา (ซึ่งจะมี Error ตัวจริงซ่อนอยู่)
+                    return Content($"API Error: {response.StatusCode} - {response.Content}");
+                }
+
+                // ทำงานปกติต่อไปถ้า IsSuccessful เป็น true...
+            }
+            catch (Exception ex)
+            {
+                // ถ้า RestSharp โยน Exception ให้จับตรงนี้
+                string errorDetail = response != null ? response.Content : ex.Message;
+                return Content($"Request Failed: {errorDetail} | Stack: {ex.StackTrace}");
+            }
+            // ถ้าสำเร็จ ก็ดึงข้อมูลไปใช้ต่อ
+            return Ok(response.Content);
+        }
     }
 }
