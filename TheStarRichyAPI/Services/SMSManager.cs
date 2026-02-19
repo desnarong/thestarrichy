@@ -120,7 +120,7 @@ namespace TheStarRichyApi.Services
             strType = "corporate";
 
             strPostData = "&msisdn=" + strMobileNumber
-                + "&message=" + strMessage //+ " " + strSMSShortURL
+                + "&message=" + strMessage + " " + strSMSShortURL
                 + "&sender=" + strSMSSENDER
                 + "&force=" + strType
                 + "&shorten_url=" + "true";

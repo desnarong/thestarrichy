@@ -84,15 +84,13 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Presentaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@IPaddress", (object)NormalizeString(request.ipAddress) ?? DBNull.Value);
-                        // Build memberpic JSON (if client sent base64 images) -> save files to Images/Memberpicture and store paths
+                        // Build memberpic JSON (Controller already saved images and sent paths)
                         string? memberPicJson = null;
                         if (request.Memberpic != null && request.Memberpic.Count > 0)
                         {
-                            var saved = SaveMemberPicsToDisk(request.Memberpic);
-                            if (saved != null && saved.Count > 0)
-                            {
-                                memberPicJson = JsonSerializer.Serialize(saved);
-                            }
+                            // Controller already saved images to disk and sent paths
+                            // Just serialize the paths as JSON
+                            memberPicJson = JsonSerializer.Serialize(request.Memberpic);
                         }
                         command.Parameters.AddWithValue("@memberpic", (object?)memberPicJson ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Createby", (object)NormalizeString(currentMemberCode) ?? DBNull.Value);
@@ -553,18 +551,14 @@ namespace TheStarRichyApi.Services
 
         private static string? BuildMemberPicJson(FullRegistrationRequest request)
         {
-            // If client provided Memberpic (base64 or already paths), save base64 -> files and return saved paths
+            // Controller already saved images to disk and sent paths
+            // Just serialize the paths as JSON
             if (request.Memberpic != null && request.Memberpic.Count > 0)
             {
-                var saved = SaveMemberPicsToDisk(request.Memberpic);
-                if (saved != null && saved.Count > 0)
-                {
-                    return JsonSerializer.Serialize(saved);
-                }
-
-                // If SaveMemberPicsToDisk returned empty, fallthrough to other sources
+                return JsonSerializer.Serialize(request.Memberpic);
             }
 
+            // Fallback to other image sources if Memberpic is empty
             var pics = new List<string>();
 
             var idCardFront = request.IdCardImageFront;
@@ -600,116 +594,6 @@ namespace TheStarRichyApi.Services
 
             var trimmed = value.Trim();
             return trimmed.Length == 0 ? null : trimmed;
-        }
-
-        // Save base64 images to disk under TheStarRichyProject/wwwroot/Images/Memberpicture when possible
-        // Returns list of web-relative paths like "/Images/Memberpicture/filename.jpg"
-        private static List<string>? SaveMemberPicsToDisk(List<string>? base64List)
-        {
-            if (base64List == null || base64List.Count == 0) return null; // nothing to do
-
-            var saved = new List<string>();
-            try
-            {
-                // Prefer saving into the web project's wwwroot so files are web-accessible.
-                // Look for sibling folder named "TheStarRichyProject" by traversing upwards.
-                string current = Directory.GetCurrentDirectory();
-                string? rootCandidate = current;
-                string? webProjectRoot = null;
-
-                for (int i = 0; i < 6 && rootCandidate != null; i++)
-                {
-                    var sibling = Path.Combine(rootCandidate, "TheStarRichyProject");
-                    if (Directory.Exists(sibling))
-                    {
-                        webProjectRoot = sibling;
-                        break;
-                    }
-                    rootCandidate = Directory.GetParent(rootCandidate)?.FullName;
-                }
-
-                string imagesDir;
-                if (!string.IsNullOrEmpty(webProjectRoot))
-                {
-                    imagesDir = Path.Combine(webProjectRoot, "wwwroot", "Images", "Memberpicture");
-                }
-                else
-                {
-                    // fallback to app's local Images folder
-                    imagesDir = Path.Combine(Directory.GetCurrentDirectory(), "Images", "Memberpicture");
-                }
-
-                if (!Directory.Exists(imagesDir)) Directory.CreateDirectory(imagesDir);
-
-                var dataUriRegex = new Regex(@"^data:(?<mime>[^;]+);base64,(?<data>.+)$", RegexOptions.Compiled);
-
-                foreach (var item in base64List)
-                {
-                    if (string.IsNullOrWhiteSpace(item)) continue;
-
-                    // if item already looks like a path/URL keep as-is
-                    if (item.StartsWith("/") || item.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                    {
-                        saved.Add(item);
-                        continue;
-                    }
-
-                    string base64Data = item;
-                    string? mime = null;
-                    var m = dataUriRegex.Match(item);
-                    if (m.Success)
-                    {
-                        mime = m.Groups["mime"].Value;
-                        base64Data = m.Groups["data"].Value;
-                    }
-
-                    byte[] bytes;
-                    try
-                    {
-                        bytes = Convert.FromBase64String(base64Data);
-                    }
-                    catch
-                    {
-                        // invalid base64 -> skip
-                        continue;
-                    }
-
-                    // limit size to 5 MB per file
-                    const int maxBytes = 5 * 1024 * 1024;
-                    if (bytes.Length > maxBytes) continue;
-
-                    string ext = ".jpg";
-                    if (!string.IsNullOrWhiteSpace(mime))
-                    {
-                        if (mime.Contains("png")) ext = ".png";
-                        else if (mime.Contains("jpeg") || mime.Contains("jpg")) ext = ".jpg";
-                        else if (mime.Contains("gif")) ext = ".gif";
-                        else ext = ".jpg"; // fallback
-                    }
-
-                    var fileName = $"member_{DateTime.UtcNow:yyyyMMddHHmmss}_{Guid.NewGuid():N}{ext}";
-                    var filePath = Path.Combine(imagesDir, fileName);
-
-                    File.WriteAllBytes(filePath, bytes);
-
-                    // If saved under web project's wwwroot, return path starting with /Images/Memberpicture
-                    if (!string.IsNullOrEmpty(webProjectRoot))
-                    {
-                        saved.Add($"/Images/Memberpicture/{fileName}");
-                    }
-                    else
-                    {
-                        // saved under API app folder, return path relative to API (still usable for storage)
-                        saved.Add($"/Images/Memberpicture/{fileName}");
-                    }
-                }
-
-                return saved.Count == 0 ? null : saved;
-            }
-            catch
-            {
-                return null;
-            }
         }
 
         /// <summary>
