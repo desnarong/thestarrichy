@@ -702,7 +702,7 @@
 
                                                     <div class="form-group mb-2">
                                                         <div class="form-check form-check-inline me-3">
-                                                            <input class="form-check-input" type="checkbox" id="fullUseIdCardAddress" checked />
+                                                            <input class="form-check-input" type="checkbox" id="fullUseIdCardAddress" />
                                                             <label class="form-check-label" for="fullUseIdCardAddress">ใช้ที่อยู่ตามบัตร</label>
                                                         </div>
                                                     </div>
@@ -845,8 +845,8 @@
             errorTarget.text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
             return false;
         }
-        if (!/^[a-zA-Z\u0E00-\u0E7F\s.]+$/.test(val)) {
-            errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
+        if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
+            errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
             return false;
         }
         if (val.length < 2 || val.length > 100) {
@@ -891,8 +891,9 @@
             $('#fullNameOnCardValidation').text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
             return false;
         }
-        if (!/^[a-zA-Z\u0E00-\u0E7F\s.]+$/.test(val)) {
-            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
+        if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
+            // แนะนำให้ปรับข้อความแจ้งเตือนด้วย เพื่อให้ผู้ใช้รู้ว่าใส่ตัวเลขได้แล้ว
+            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
             return false;
         }
         $('#fullNameOnCardValidation').text('').removeClass('validation-error');

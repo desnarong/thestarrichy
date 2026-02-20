@@ -384,7 +384,7 @@
             }
 
             // แก้ไข: ลบ double backslash ออก ใช้ \u0E00-\u0E7F ปกติ
-            if (!/^[a-zA-Z\u0E00-\u0E7F\s.]+$/.test(name)) {
+            if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(name)) {
                 validationEl.text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
                 return false;
             }
