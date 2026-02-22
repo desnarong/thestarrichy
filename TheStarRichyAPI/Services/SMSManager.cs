@@ -153,7 +153,113 @@ namespace TheStarRichyApi.Services
 
             return strResult;
         }
+        public string SendOTPExt(string strMessage, string strMobileNumber)
+        {
+            string strResult;
+            string strErrcode;
+            string strPostData;
 
+            string strSmsUser = "";
+            string strSmsPass = "";
+            string strSMTPServer = "";
+            string strSMSSENDER = "";
+            string strSMSapiSend = "";
+            string strSMWelcome = "";
+            string strSMSShortURL = "";
+            string strSMSWelcome = "";
+            string strSMSWelcomeEng = "";
+            string strSendSMS = "";
+            string strType = "";
+
+            // Get SMS config from database
+            string smsConnectionString = _configuration.GetConnectionString("MLMConnectionString")
+                ?? throw new InvalidOperationException("MLM connection string 'MLMConnectionString' not found.");
+
+            using (SqlConnection iConnect = new SqlConnection(smsConnectionString))
+            {
+                SqlCommand iCommand1 = new SqlCommand();
+                iConnect.Open();
+                iCommand1.Connection = iConnect;
+                iCommand1.CommandType = System.Data.CommandType.Text;
+
+                // Check Complete
+                iCommand1.CommandText = "Select * from S02";
+                System.Data.SqlClient.SqlDataAdapter da = new SqlDataAdapter(iCommand1);
+                System.Data.DataSet ds = new System.Data.DataSet();
+                da.Fill(ds);
+
+                if (ds.Tables[0].Rows.Count == 1)
+                {
+                    strSmsUser = ds.Tables[0].Rows[0]["smsapikey"].ToString();
+                    strSmsPass = ds.Tables[0].Rows[0]["smsapisecret"].ToString();
+                    strSMTPServer = ds.Tables[0].Rows[0]["smsSMTPmail"].ToString();
+                    strSMSSENDER = ds.Tables[0].Rows[0]["smssendername"].ToString();
+                    strSMSapiSend = ds.Tables[0].Rows[0]["smsapiSend"].ToString();
+                    strSMSShortURL = ds.Tables[0].Rows[0]["smsShortURL"].ToString();
+                    strSMSWelcome = ds.Tables[0].Rows[0]["SMSWelcome"].ToString();
+                    strSMSWelcomeEng = ds.Tables[0].Rows[0]["SMSWelcomeEng"].ToString();
+                    strSendSMS = ds.Tables[0].Rows[0]["S02_X132"].ToString();   // 0-เปิดใช้งานการส่ง  1-ปิด
+                }
+                else
+                {
+                    strSmsUser = "";
+                    strSmsPass = "";
+                    strSMTPServer = "";
+                    strSMSSENDER = "";
+                    strSMSapiSend = "";
+                    strSMSShortURL = "";
+                    strSMSWelcome = "";
+                    strSMSWelcomeEng = "";
+                    strSendSMS = "";
+                }
+                iConnect.Close();
+            }
+
+            // Check if SMS sending is enabled
+            if (strSendSMS == "1")
+            {
+                this.strErrorMessage = "การส่ง SMS ถูกปิดใช้งาน";
+                return "SMS_DISABLED";
+            }
+
+            strPostData = "";
+            strResult = "";
+            strType = "corporate";
+
+            strPostData = "&msisdn=" + strMobileNumber
+                + "&message=" + strMessage
+                + "&sender=" + strSMSSENDER
+                + "&force=" + strType
+                + "&shorten_url=" + "true";
+
+            strResult = WebRequest4(strPostData, strSMSapiSend, strSmsUser, strSmsPass);
+
+            strErrcode = "";
+
+            Match match = Regex.Match(strResult, "\"code\"\\s*:\\s*(\\d+)");
+            if (match.Success)
+            {
+                strErrcode = Convert.ToInt32(match.Groups[1].Value).ToString();
+            }
+
+            if (strErrcode != "" && strErrcode != "0")
+            {
+                if (strErrcode == "113")
+                {
+                    this.strErrorMessage = "จำนวนข้อความยาวเกินไป อังกฤษ 160ตัวอักษร ไทย 70ตัวอักษร";
+                }
+                else if (strErrcode == "111")
+                {
+                    this.strErrorMessage = "กรุณาระบุ Sender Number เป็นตัวเลข 4-10 หลัก";
+                }
+                else
+                {
+                    this.strErrorMessage = "เกิดข้อผิดพลาดในการส่ง SMS: " + strErrcode;
+                }
+            }
+
+            return strResult;
+        }
         #endregion
 
         #region WebRequest...

@@ -30,7 +30,7 @@ namespace TheStarRichyApi.Services
             try
             {
                 var smsManager = new SMSManager(_configuration);
-                var result = smsManager.SendMessageExt(message, phoneNumber);
+                var result = smsManager.SendOTPExt(message, phoneNumber);
 
                 if (string.IsNullOrEmpty(result) || result == "SMS_DISABLED")
                 {

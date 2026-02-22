@@ -539,19 +539,6 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-membership-type">ประเภทสมาชิก <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="membership_type" id="individual" checked required />
-                                                        <label class="form-check-label" for="individual" data-key="t-individual">บุคคล</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="membership_type" id="legal_entity" required />
-                                                        <label class="form-check-label" for="legal_entity" data-key="t-legal-entity">นิติบุคคล</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-marital-status">สถานะสมรส <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
@@ -1360,42 +1347,42 @@
             }
         });
 
-        $('#simpleDocumentNumber').on('blur', function() {
-            // แก้ไข: ใช้ || "" เพื่อป้องกัน error
-            const docNumber = ($(this).val() || "").replace(/[- ]/g, '');
+        $('#simpleDocumentNumber, #fullDocumentNumber').on('input', function() {
+            // โค้ดด้านในเหมือนเดิมทุกอย่างครับ
+            // เปลี่ยนแค่ตอนอ้างอิงไอดี error message ให้เช็คว่ากำลังพิมพ์ช่องไหนอยู่
 
-            // 2. ล้างข้อความ Error เก่าออกก่อนเสมอเมื่อเริ่มเช็คใหม่
-            $(this).removeClass('is-invalid');
-            $('#documentValidationMessage').html('');
+            const isSimple = $(this).attr('id') === 'simpleDocumentNumber';
+            const errorTarget = isSimple ? '#documentValidationMessage' : '#fullDocumentValidationMessage';
+            const countryVal = isSimple ? $('#simpleCountry').val() : $('#fullCountry').val();
 
-            // 3. ถ้าไม่ได้กรอกอะไรเลย ให้ข้ามไป (ไม่ต้องเช็ค)
-            if (!docNumber) return;
+            if (countryVal === '66') {
+                let docNumber = $(this).val().replace(/[^0-9]/g, '');
 
-            // 4. เช็คว่าเข้าข่าย "บัตรประชาชนไทย" หรือไม่? (เป็นตัวเลขล้วน และยาว 13 หลักเป๊ะ)
-            if (/^[0-9]{13}$/.test(docNumber)) {
+                if (docNumber.length > 13) docNumber = docNumber.substring(0, 13);
+                $(this).val(docNumber);
 
-                // เอาเลข 13 หลักไปเข้าสูตรคำนวณ
-                if (!validateThaiID(docNumber)) {
-                    // พิมพ์ 13 หลัก แต่สูตรคำนวณบอกว่า "บัตรปลอม/พิมพ์ผิด"
+                $(this).removeClass('is-invalid is-valid');
+                $(errorTarget).html('');
+                $(this).next('.invalid-feedback-custom').remove(); // เผื่อของฟอร์มเต็มที่ Generate ขึ้นมา
+
+                if (!docNumber) return;
+
+                if (docNumber.length < 13 || (docNumber.length === 13 && !validateThaiID(docNumber))) {
                     $(this).addClass('is-invalid');
-                    $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
-                    toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
-                } else {
-                    // ✅ UX เสริม: ถ้าบัตรถูกต้อง ให้เติมขีด (-) จัด Format อัตโนมัติ (x-xxxx-xxxxx-xx-x)
-                    $(this).val(docNumber);
+                    $(errorTarget).html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
                 }
-
-            } else {
-                // 5. กรณีพิมพ์มาไม่ถึง 13 หลัก หรือมีตัวอักษรภาษาอังกฤษผสม (เช่น Passport)
-                // ถือว่าเป็นเอกสารประเภทอื่น และปล่อยผ่าน
+                else if (docNumber.length === 13 && validateThaiID(docNumber)) {
+                    $(this).addClass('is-valid');
+                    $(errorTarget).html('');
+                }
             }
         });
 
         // --- New input filters & validators (simple + full) ---
         // Strip '-' and spaces while typing for document numbers
-        $('#simpleDocumentNumber, #fullDocumentNumber').on('input', function () {
+        /*$('#simpleDocumentNumber, #fullDocumentNumber').on('input', function () {
             this.value = this.value.replace(/[-\s]/g, '');
-        });
+        });*/
 
         // Allow only digits for phone inputs (keeps leading 0)
         $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone').on('input', function () {
@@ -1614,11 +1601,26 @@
         // When checkbox 'ใช้ที่อยู่ตามบัตร' is toggled copy/clear current address fields
         $('#fullUseIdCardAddress').change(function () {
             if ($(this).is(':checked')) {
-                // copy ID-card address into current address + propagate postcode -> province/district/subdistrict
+                // 1. ก๊อปปี้บ้านเลขที่
                 $('#fullCurrentAddress').val($('#fullAddressIdCard').val());
+
+                // 2. ยัดรหัสไปรษณีย์ + สั่ง trigger('input')
+                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> จังหวัดเสร็จ จึงจะไปบรรทัดที่ 3
                 $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
+
+                // 3. ยัดค่าจังหวัด + สั่ง trigger('change')
+                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> อำเภอเสร็จ จึงจะไปบรรทัดที่ 4
+                $('#fullCurrentProvince').val($('#fullProvinceIdCard').val()).trigger('change');
+
+                // 4. ยัดค่าอำเภอ + สั่ง trigger('change')
+                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> ตำบลเสร็จ จึงจะไปบรรทัดที่ 5
+                $('#fullCurrentDistrict').val($('#fullDistrictIdCard').val()).trigger('change');
+
+                // 5. ยัดค่าตำบล (จบกระบวนการ ไม่ต้อง trigger ต่อแล้ว)
+                $('#fullCurrentSubdistrict').val($('#fullSubdistrictIdCard').val());
+
             } else {
-                // clear current address fields
+                // ล้างข้อมูลเมื่อเอาติ๊กถูกออก
                 $('#fullCurrentAddress').val('');
                 $('#fullCurrentPostcode').val('');
                 resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
@@ -1783,10 +1785,11 @@
 
         // โบนัส: ซ่อนแจ้งเตือนตอน User เริ่มแก้ข้อผิดพลาด
         $('#simpleRegistrationForm').on('input change', 'input, select, textarea', function() {
-            $(this).removeClass('is-invalid');
+            
             const id = $(this).attr('id');
-            if (id === 'simpleDocumentNumber') {
+            if (id !== 'simpleDocumentNumber') {
                 $('#documentValidationMessage').html('');
+                $(this).removeClass('is-invalid');
             }
             if (id === 'simpleFullName') {
                 $('#simpleIdCardNameValidation').text('');
@@ -1887,9 +1890,6 @@
                 referrerCode: $('#fullReferrerCode').val(),
                 position: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right',
 
-                // แก้ไขการดึงค่า radio ให้ตรงกับ id ใน HTML
-                businessType: $('input[name="membership_type"]:checked').attr('id') === 'individual' ? 'businessman' : 'user',
-
                 title: $('#fullTitle').val(),
                 language: $('#fullLanguage').val(),
                 idCardName: $('#fullNameOnCard').val() || '', // เปลี่ยนจาก nameOnCard
@@ -1951,13 +1951,15 @@
 
         // โบนัส UX: ทันทีที่ User เริ่มแก้ไขช่องที่ผิด ให้เอาสีแดงแจ้งเตือนออกอัตโนมัติ
         $('#fullRegistrationForm').on('input change', 'input, select, textarea', function() {
-            $(this).removeClass('is-invalid');
-
             const id = $(this).attr('id');
-            if (id === 'fullDocumentNumber') {
-                $(this).next('.invalid-feedback-custom').remove();
-                $('#fullDocumentValidationMessage').text('');
+
+            // ✅ ยกเว้นช่องเลขบัตร ปชช. ของฟอร์มเต็ม ไม่ให้ลบคลาส is-invalid อัตโนมัติ
+            if (id !== 'fullDocumentNumber') {
+                $(this).removeClass('is-invalid');
             }
+
+            // (ส่วนของ fullDocumentNumber เราตัดทิ้งไปได้เลยครับ ให้ Event Real-time ของมันจัดการเอง)
+
             if (id === 'fullNameOnCard') {
                 $('#fullNameOnCardValidation').text('').removeClass('validation-error');
             }
