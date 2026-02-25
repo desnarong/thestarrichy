@@ -277,7 +277,7 @@ namespace TheStarRichyProject.Controllers
                     }
                 };
 
-                string ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string
                 string rawJsonString = request.GetRawText();
@@ -316,11 +316,29 @@ namespace TheStarRichyProject.Controllers
                                 var base64Data = base64String.Contains(",") ? base64String.Split(',')[1] : base64String;
                                 byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-                                // ตั้งชื่อไฟล์ เติม Prefix 'Easy_' เพื่อแยกแยะง่ายขึ้น
-                                string fileName = $"Easy_{docNumber}_{timeStamp}_{index++}.jpg";
+                                // ตั้งชื่อไฟล์ ใช้รูปแบบ reg_ เพื่อให้เหมือนกันทั้งหมด
+                                string fileName = $"reg_{docNumber}_{timeStamp}_{index++}.jpg";
                                 string filePath = Path.Combine(folderPath, fileName);
 
                                 await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                                // ✅ ตรวจสอบว่าไฟล์ถูกบันทึกสำเร็จ
+                                if (!System.IO.File.Exists(filePath))
+                                {
+                                    _logger.LogWarning("File was not created successfully: {FilePath}", filePath);
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
+
+                                // ✅ ตรวจสอบว่าไฟล์มีขนาดมากกว่า 0 bytes
+                                var fileInfo = new FileInfo(filePath);
+                                if (fileInfo.Length == 0)
+                                {
+                                    _logger.LogWarning("File is empty (0 bytes): {FilePath}", filePath);
+                                    System.IO.File.Delete(filePath); // ลบไฟล์ที่ว่างเปล่า
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
 
                                 newPathsArray.Add($"/Images/Memberpicture/{fileName}");
                             }
@@ -334,6 +352,14 @@ namespace TheStarRichyProject.Controllers
                         {
                             newPathsArray.Add((string)null);
                         }
+                    }
+
+                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
+                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
+                    if (!hasValidFiles)
+                    {
+                        _logger.LogWarning("No valid image files were saved for easy registration");
+                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
                     }
 
                     // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่า
@@ -394,7 +420,7 @@ namespace TheStarRichyProject.Controllers
                     }
                 };
 
-                string ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string และแปลงเป็น JsonObject
                 string rawJsonString = request.GetRawText();
@@ -414,8 +440,10 @@ namespace TheStarRichyProject.Controllers
                     var newPathsArray = new JsonArray(); // สร้าง Array ใหม่เพื่อเก็บ Path
                     var index = 1;
 
-                    // ดึงเลขบัตร ปชช. มาใช้ตั้งชื่อไฟล์ (หรือใช้ GUID ถ้าไม่มี)
-                    string citizenNumber = jsonObject["citizenNumber"]?.ToString() ?? Guid.NewGuid().ToString("N").Substring(0, 13);
+                    // ใช้ documentNumber แทน citizenNumber เพื่อให้รูปแบบชื่อไฟล์เหมือนกันทั้งหมด
+                    string docNumber = jsonObject["documentNumber"]?.ToString() 
+                                       ?? jsonObject["citizenNumber"]?.ToString()
+                                       ?? Guid.NewGuid().ToString("N").Substring(0, 13);
                     string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmss");
 
                     foreach (var picNode in memberPicArray)
@@ -431,12 +459,30 @@ namespace TheStarRichyProject.Controllers
                                 var base64Data = base64String.Contains(",") ? base64String.Split(',')[1] : base64String;
                                 byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-                                // ตั้งชื่อไฟล์ (ใช้ เลขบัตร_วันเวลา_ลำดับ.jpg เพื่อป้องกันชื่อซ้ำ)
-                                string fileName = $"{citizenNumber}_{timeStamp}_{index++}.jpg";
+                                // ตั้งชื่อไฟล์ ใช้รูปแบบ reg_ เพื่อให้เหมือนกันทั้งหมด
+                                string fileName = $"reg_{docNumber}_{timeStamp}_{index++}.jpg";
                                 string filePath = Path.Combine(folderPath, fileName);
 
                                 // บันทึกไฟล์ลง Disk
                                 await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
+
+                                // ✅ ตรวจสอบว่าไฟล์ถูกบันทึกสำเร็จ
+                                if (!System.IO.File.Exists(filePath))
+                                {
+                                    _logger.LogWarning("File was not created successfully: {FilePath}", filePath);
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
+
+                                // ✅ ตรวจสอบว่าไฟล์มีขนาดมากกว่า 0 bytes
+                                var fileInfo = new FileInfo(filePath);
+                                if (fileInfo.Length == 0)
+                                {
+                                    _logger.LogWarning("File is empty (0 bytes): {FilePath}", filePath);
+                                    System.IO.File.Delete(filePath); // ลบไฟล์ที่ว่างเปล่า
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
 
                                 // เก็บ Path สั้นๆ ใส่เข้าไปใน Array ใหม่แทน Base64 เดิม
                                 newPathsArray.Add($"/Images/Memberpicture/{fileName}");
@@ -455,11 +501,19 @@ namespace TheStarRichyProject.Controllers
                         }
                     }
 
+                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
+                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
+                    if (!hasValidFiles)
+                    {
+                        _logger.LogWarning("No valid image files were saved for full registration");
+                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
+                    }
+
                     // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่าใน jsonObject
                     jsonObject["memberpic"] = newPathsArray;
                 }
 
-                // 4. แทรก IpAddress
+                // 4. แทรก IpAddress (ใช้ ipAddress ที่ได้จาก function)
                 jsonObject["IpAddress"] = ipAddress;
 
                 // 5. แปลงกลับเป็น JSON string ตัวใหม่ที่สมบูรณ์ (พร้อม Path รูปแทน Base64)

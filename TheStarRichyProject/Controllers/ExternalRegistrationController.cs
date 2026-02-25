@@ -612,7 +612,7 @@ namespace TheStarRichyProject.Controllers
                     }
                 };
 
-                string ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string
                 string rawJsonString = request.GetRawText();
@@ -661,8 +661,29 @@ namespace TheStarRichyProject.Controllers
 
                                 await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
 
+                                // ✅ ตรวจสอบว่าไฟล์ถูกบันทึกสำเร็จ
+                                if (!System.IO.File.Exists(filePath))
+                                {
+                                    _logger.LogWarning("File was not created successfully: {FilePath}", filePath);
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
+
+                                // ✅ ตรวจสอบว่าไฟล์มีขนาดมากกว่า 0 bytes
+                                var fileInfo = new FileInfo(filePath);
+                                if (fileInfo.Length == 0)
+                                {
+                                    _logger.LogWarning("File is empty (0 bytes): {FilePath}", filePath);
+                                    System.IO.File.Delete(filePath); // ลบไฟล์ที่ว่างเปล่า
+                                    newPathsArray.Add((string)null);
+                                    continue;
+                                }
+
                                 // เก็บ Path ลง Array ใหม่
                                 newPathsArray.Add($"/Images/Memberpicture/{fileName}");
+                                
+                                // Log สำหรับ debugging
+                                _logger.LogInformation("Saved image: {FileName} for document {DocNumber}", fileName, docNumber);
                             }
                             catch (Exception ex)
                             {
@@ -676,8 +697,25 @@ namespace TheStarRichyProject.Controllers
                         }
                     }
 
+                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
+                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
+                    if (!hasValidFiles)
+                    {
+                        _logger.LogWarning("No valid image files were saved for registration");
+                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
+                    }
+
                     // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่าที่เป็น Base64
-                    jsonObject["memberpic"] = newPathsArray;
+                    // ใช้ "Memberpic" (ตัวใหญ่ M) เพื่อให้ตรงกับ property ใน FinalizeRegistrationRequest
+                    jsonObject["Memberpic"] = newPathsArray;
+                    
+                    // Log สำหรับ debugging
+                    _logger.LogInformation("Converted memberpic from Base64 to paths: {Paths}", 
+                        string.Join(", ", newPathsArray.Where(p => p != null).Select(p => p.ToString())));
+                }
+                else
+                {
+                    _logger.LogWarning("No memberpic array found in request");
                 }
                 // ==========================================
 

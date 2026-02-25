@@ -62,7 +62,7 @@ namespace TheStarRichyProject.Controllers
                     }
                 };
 
-                string ipAddress = HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault() ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+                string ipAddress = GetClientIPAddress();
 
                 // Create the JSON payload
                 var payload = new

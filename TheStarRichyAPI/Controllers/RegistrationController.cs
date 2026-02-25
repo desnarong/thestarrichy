@@ -621,7 +621,9 @@ namespace TheStarRichyApi.Controllers
                     var ips = forwardedFor.Split(',', StringSplitOptions.RemoveEmptyEntries);
                     if (ips.Length > 0)
                     {
-                        return ips[0].Trim();
+                        var clientIp = ips[0].Trim();
+                        // Convert IPv6 to IPv4 if possible
+                        return NormalizeIPAddress(clientIp);
                     }
                 }
 
@@ -629,14 +631,14 @@ namespace TheStarRichyApi.Controllers
                 var realIp = HttpContext.Request.Headers["X-Real-IP"].FirstOrDefault();
                 if (!string.IsNullOrEmpty(realIp))
                 {
-                    return realIp;
+                    return NormalizeIPAddress(realIp);
                 }
 
                 // Fall back to remote IP address
                 var remoteIp = HttpContext.Connection.RemoteIpAddress?.ToString();
                 if (!string.IsNullOrEmpty(remoteIp) && remoteIp != "::1")
                 {
-                    return remoteIp;
+                    return NormalizeIPAddress(remoteIp);
                 }
 
                 // Localhost or IPv6 localhost
@@ -646,6 +648,53 @@ namespace TheStarRichyApi.Controllers
             {
                 return "0";
             }
+        }
+
+        private string NormalizeIPAddress(string ipAddress)
+        {
+            if (string.IsNullOrEmpty(ipAddress))
+                return "0";
+
+            // If it's IPv6 localhost, return IPv4 localhost
+            if (ipAddress == "::1" || ipAddress == "0:0:0:0:0:0:0:1")
+                return "127.0.0.1";
+
+            // If it's IPv6-mapped IPv4 address (::ffff:192.168.1.1), extract IPv4
+            if (ipAddress.StartsWith("::ffff:"))
+            {
+                var ipv4Part = ipAddress.Substring(7);
+                if (System.Net.IPAddress.TryParse(ipv4Part, out var ipv4Addr))
+                {
+                    return ipv4Addr.ToString();
+                }
+            }
+
+            // If it's a pure IPv6 address, try to convert to IPv4 if possible
+            if (System.Net.IPAddress.TryParse(ipAddress, out var ipAddr))
+            {
+                // If it's IPv4, return as is
+                if (ipAddr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+                {
+                    return ipAddr.ToString();
+                }
+                
+                // If it's IPv6, check if it's an IPv4-mapped IPv6 address
+                if (ipAddr.AddressFamily == System.Net.Sockets.AddressFamily.InterNetworkV6)
+                {
+                    // Check if it's an IPv4-mapped IPv6 address
+                    if (ipAddr.IsIPv4MappedToIPv6)
+                    {
+                        return ipAddr.MapToIPv4().ToString();
+                    }
+                    
+                    // For other IPv6 addresses, return the original (or could return "0" if you only want IPv4)
+                    // For now, return the original IPv6
+                    return ipAddr.ToString();
+                }
+            }
+
+            // Return original if parsing failed
+            return ipAddress;
         }
 
         #endregion

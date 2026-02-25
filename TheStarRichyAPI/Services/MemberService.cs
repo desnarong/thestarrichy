@@ -176,7 +176,7 @@ namespace TheStarRichyApi.Services
                                     string m06X50 = reader["M06_X50"]?.ToString() ?? "";
                                     string position = reader["Position1"]?.ToString() ?? "0";
                                     string prestigeRanking = reader["PrestigeRanking"]?.ToString() ?? "";
-
+                                    string ssex = reader["Sex"]?.ToString() ?? "";
                                     memberInfo = new GetInfoMember2
                                     {
                                         MemberType = memberType,
@@ -383,7 +383,9 @@ namespace TheStarRichyApi.Services
                                     else
                                     {
                                         string suffix1 = ".gif";
-                                        if (m06X9 == "0" || m06X65 == "0") suffix1 = "_o_g.gif";
+                                        if (ssex == "FeMale") suffix1 = "_F.gif";
+                                        if (m06X9 == "0" || m06X65 == "0") suffix1 = "_o_g" + suffix1;
+
                                         memberInfo.MemberPicture = $"{pictureBase}{suffix1}";
                                     }
                                     // Set LeftURL and RightURL

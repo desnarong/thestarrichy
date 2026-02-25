@@ -526,19 +526,6 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-sms-news-updates">รับข่าวสาร SMS <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-yes" checked required />
-                                                        <label class="form-check-label" for="sms_news_updates-yes" data-key="t-yes">ใช่</label>
-                                                    </div>
-                                                    <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="sms_news_updates" id="sms_news_updates-no" required />
-                                                        <label class="form-check-label" for="sms_news_updates-no" data-key="t-no">ไม่ใช่</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-marital-status">สถานะสมรส <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
@@ -554,12 +541,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-spouses-name">ชื่อคู่สมรส</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" value="" />
-                                                </div>
-                                            </div>
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-document-verification">การตรวจสอบเอกสาร</label>
-                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="fullSpouseName" value="" />
                                                 </div>
                                             </div>
                                         </div>
@@ -581,44 +563,44 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขที่บัญชี" required />
+                                                    <input type="text" class="form-control" id="fullBankAccountNumber" placeholder="กรอกเลขที่บัญชี" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อบัญชี" required />
+                                                    <input type="text" class="form-control" id="fullBankAccountName" placeholder="กรอกชื่อบัญชี" required disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกสาขา" required />
+                                                    <input type="text" class="form-control" id="fullBankBranch" placeholder="กรอกสาขา" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-beneficiary">ผู้รับผลประโยชน์</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกชื่อผู้รับผลประโยชน์" />
+                                                    <input type="text" class="form-control" id="fullBeneficiary" placeholder="กรอกชื่อผู้รับผลประโยชน์" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-beneficiary-card-number">เลขบัตรผู้รับผลประโยชน์</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอกเลขบัตรผู้รับผลประโยชน์" />
+                                                    <input type="text" class="form-control" id="fullBeneficiaryCardNumber" placeholder="กรอกเลขบัตรผู้รับผลประโยชน์" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-id-card">สำเนาบัตรประชาชน</label>
                                                 <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" required />
+                                                    <input type="file" class="form-control" id="fullIdCardCopy" accept="image/*" />
                                                     <img id="fullIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label" data-key="t-copy-of-bank-account-book">สำเนาสมุดบัญชีธนาคาร</label>
                                                 <div class="col-md-7">
-                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" required />
+                                                    <input type="file" class="form-control" id="fullBankCardCopy" accept="image/*" />
                                                     <img id="fullBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
                                                 </div>
                                             </div>
@@ -751,7 +733,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-line-id">Line ID</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" placeholder="กรอก Line ID" />
+                                                    <input type="text" class="form-control" id="fullLineId" placeholder="กรอก Line ID" />
                                                 </div>
                                             </div>
                                         </div>
@@ -764,7 +746,7 @@
                                         <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
                                             <i class="fas fa-times me-2"></i>ยกเลิก
                                         </button>
-                                        <button type="submit" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
+                                        <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
                                             <i class="fas fa-save me-2"></i>บันทึกข้อมูล
                                         </button>
                                     </div>
@@ -918,32 +900,88 @@
     function validateSimpleEmail() {
         const email = ($('#simpleEmail').val() || "").trim();
         const validationEl = $('#emailValidation');
+        const inputEl = $('#simpleEmail');
+        
+        inputEl.removeClass('is-invalid');
+        validationEl.text('').removeClass('validation-error');
+        
         if (!email) {
-            validationEl.text(''); 
             return true;
         }
         const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email)) {
+            inputEl.addClass('is-invalid');
             validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
             return false;
         }
-        validationEl.text('').removeClass('validation-error');
         return true;
     }
 
     function validateFullEmail() {
         const email = ($('#fullEmail').val() || "").trim();
         const validationEl = $('#fullEmailValidation');
+        const inputEl = $('#fullEmail');
+        
+        inputEl.removeClass('is-invalid');
+        validationEl.text('').removeClass('validation-error');
+        
         if (!email) {
-            validationEl.text(''); 
             return true;
         }
         const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
         if (!emailRegex.test(email)) {
+            inputEl.addClass('is-invalid');
             validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
             return false;
         }
+        return true;
+    }
+
+    function validateSimpleLineId() {
+        const lineId = ($('#simpleLineId').val() || "").trim();
+        const validationEl = $('#lineIdValidation');
+        const inputEl = $('#simpleLineId');
+        
+        inputEl.removeClass('is-invalid');
         validationEl.text('').removeClass('validation-error');
+        
+        if (!lineId) {
+            return true;
+        }
+        // Line ID validation: allow alphanumeric, underscores, dots, hyphens
+        const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
+        if (!lineIdRegex.test(lineId)) {
+            inputEl.addClass('is-invalid');
+            validationEl.text('Line ID สามารถใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และเครื่องหมาย _ . - เท่านั้น').addClass('validation-error');
+            return false;
+        }
+        if (lineId.length < 4 || lineId.length > 20) {
+            inputEl.addClass('is-invalid');
+            validationEl.text('Line ID ต้องมีความยาว 4-20 ตัวอักษร').addClass('validation-error');
+            return false;
+        }
+        return true;
+    }
+
+    function validateFullLineId() {
+        const lineId = ($('#fullLineId').val() || "").trim();
+        const inputEl = $('#fullLineId');
+        
+        inputEl.removeClass('is-invalid');
+        
+        if (!lineId) {
+            return true;
+        }
+        // Line ID validation: allow alphanumeric, underscores, dots, hyphens
+        const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
+        if (!lineIdRegex.test(lineId)) {
+            inputEl.addClass('is-invalid');
+            return false;
+        }
+        if (lineId.length < 4 || lineId.length > 20) {
+            inputEl.addClass('is-invalid');
+            return false;
+        }
         return true;
     }
 
@@ -1407,6 +1445,8 @@
             if (!$('#fullBusinessName').data('userEdited')) {
                 $('#fullBusinessName').val($(this).val());
             }
+            // Auto-populate bank account name with name from ID card
+            $('#fullBankAccountName').val($(this).val());
             validateFullNameOnCard();
         });
         $('#fullBusinessName').on('input', function(){ $(this).data('userEdited', true); validateFullBusinessName(); });
@@ -1708,11 +1748,12 @@
             // 4. แสดงผลลัพธ์และส่งข้อมูล
             // ==========================================
 
-            // Additional content validation (name/business/mobile)
+            // Additional content validation (name/business/mobile/email/lineId)
             if (!validateSimpleFullName()) { isValid = false; }
             if (!validateSimpleBusinessName()) { isValid = false; }
             if (!validateSimpleEmail()) { isValid = false; }
             if (!validateSimpleMobile()) { isValid = false; }
+            if (!validateSimpleLineId()) { isValid = false; }
 
             console.log("ฟอร์มผ่านหรือไม่: ", isValid);
 
@@ -1766,6 +1807,8 @@
                     }
 
                     // ถ้าผ่านหมด -> ค่อยเรียกส่ง OTP
+                    Swal.close();
+                    console.log("sample ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
                     await sendOTPAndShowInput(formData);
 
                 } catch (err) {
@@ -1899,12 +1942,16 @@
                 mobile: $('#fullMobile').val() || '',
                 homePhone: $('#fullHomePhone').val() || '', // เพิ่ม: เบอร์บ้าน
                 email: $('#fullEmail').val() || '',
+                lineId: $('#fullLineId').val() || '', // เพิ่ม: Line ID
+                spouseName: $('#fullSpouseName').val() || '', // เพิ่ม: ชื่อคู่สมรส
 
                 // Bank Information
                 bankCode: $('#fullBank').val(), // เปลี่ยนจาก bank
                 bankAccountNumber: $('#fullBankAccountNumber').val() || '', // ดึงจาก HTML ที่เพิ่ม ID แล้ว
                 bankAccountName: $('#fullBankAccountName').val() || '',
                 bankBranch: $('#fullBankBranch').val() || '',
+                beneficiary: $('#fullBeneficiary').val() || '', // เพิ่ม: ผู้รับผลประโยชน์
+                beneficiaryCardNumber: $('#fullBeneficiaryCardNumber').val() || '', // เพิ่ม: เลขบัตรผู้รับผลประโยชน์
 
                 // Address (ID card) -> เปลี่ยน Key ไม่ให้มีคำว่า IdCard ห้อยท้าย (ให้ตรงกับ Model)
                 addressIdCard: $('#fullAddressIdCard').val(),
@@ -1926,7 +1973,7 @@
 
             try {
                 const checks = [
-                    checkDuplicateIDCard(formData.citizenNumber),
+                    checkDuplicateIDCard(formData.documentNumber),
                     checkDuplicateTelephone(formData.mobile),
                     checkDuplicateEmail(formData.email),
                     checkDuplicateIDCardName(formData.nameOnCard),
@@ -1941,6 +1988,7 @@
                 }
 
                 Swal.close(); 
+                console.log("full ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
                 await sendOTPAndShowInput(formData); // หากเปิดใช้งาน OTP ให้เอาคอมเม้นต์บรรทัดนี้ออก
 
             } catch (err) {

@@ -260,16 +260,33 @@
         const personalPV = node.PersonalPV || 0;
         const memberposition = node.Memberposition || '';
         const memberpositionName = node.MemberpositionName || '';
+        const memberpositionRanking = node.MemberpositionRankingName || node.MemberpositionRanking || '';
         const children = node.Children || [];
         const levelInfo = node.Level || 1;
         
         // หา left และ right จาก PositionLevel
-        // Leftcode = left, Rightcode = right
         const isLeft = node.PositionLevel && node.PositionLevel.toString().includes('Left');
         const isRight = node.PositionLevel && node.PositionLevel.toString().includes('Right');
         
-        const leftCount = node.LeftCountActive || 0;
-        const rightCount = node.RightCountActive || 0;
+        // ข้อมูลสำหรับแสดงผล
+        const currentLeftPV = node.CurrentLeftPV || 0;
+        const currentRightPV = node.CurrentRightPV || 0;
+        const newLeft = node.NewLeft || 0;
+        const newRight = node.NewRight || 0;
+        const leftCountActive = node.LeftCountActive || 0;
+        const rightCountActive = node.RightCountActive || 0;
+        const totalLeftBalance = node.TotalLeftBalance || 0;
+        const totalRightBalance = node.TotalRightBalance || 0;
+        
+        // สถานะรักษายอด
+        const lastMonthQualifyStatus = node.LastMonthQualifyStatus || 'No';
+        const currentMonthQualifyStatus = node.CurrentMonthQualifyStatus || 'No';
+        
+        // สีการ์ดตามสถานะรักษายอด (ใช้สีพื้นหลังแทน badge)
+        const cardColorClass = lastMonthQualifyStatus === 'Yes' ? 'card-green' : 'card-red';
+        
+        // รูปภาพสมาชิก
+        const memberPicture = node.MemberPostionPicture || 'images/1_Black1_40x40.gif';
         
         // กรองเอาเฉพาะ left และ right children
         const leftChildren = children.filter(c => c.PositionLevel && c.PositionLevel.toString().includes('Left'));
@@ -291,7 +308,8 @@
         } else if (isRight) {
             gradientClass = 'gradient-right';
         }
-                // อ้างอิงจาก Membercode เป็นหลัก ถ้าไม่มีโค้ดแสดงว่าเป็นกล่องว่างจริงๆ
+        
+        // อ้างอิงจาก Membercode เป็นหลัก ถ้าไม่มีโค้ดแสดงว่าเป็นกล่องว่างจริงๆ
         const isEmpty = !membercode || membercode === '' || membercode === 'ว่าง/Empty';
         
         let html = `
@@ -309,24 +327,46 @@
         } else {
             // แสดง node ปกติ
             html += `
-                <div class="tree-node ${gradientClass}" onclick="loadBinaryTeam('${membercode}')" title="คลิกเพื่อดูทีม">
+                <div class="tree-node ${gradientClass} ${cardColorClass}" onclick="loadBinaryTeam('${membercode}')" title="คลิกเพื่อดูทีม">
                     <div class="node-main">
                         <div class="node-avatar">
-                            <i class="ri-user-star-line ri-2x"></i>
+                            <img src="${memberPicture}" alt="${membername}" class="member-picture">
                         </div>
                         <div class="node-details">
                             <div class="member-name">${membername}</div>
                             <div class="member-code">${membercode}</div>
                             <div class="member-position">${memberpositionName || memberposition}</div>
-                            <div class="member-pv">PV: ${personalPV}</div>
+                            <div class="member-position-ranking">${memberpositionRanking}</div>
                         </div>
                     </div>
                     <div class="node-stats">
-                        <div class="stat-left">
-                            <span class="badge bg-success">L: ${leftCount}</span>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-value left-card">[L:${currentLeftPV}]</div>
+                                <div class="middle-text">คะแนน</div>
+                                <div class="stat-value right-card">[R:${currentRightPV}]</div>
+                            </div>
                         </div>
-                        <div class="stat-right">
-                            <span class="badge bg-warning">R: ${rightCount}</span>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-value left-card">[L:${newLeft}]</div>
+                                <div class="middle-text">คะแนนมาใหม่</div>
+                                <div class="stat-value right-card">[R:${newRight}]</div>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-value left-card">[L:${leftCountActive}]</div>
+                                <div class="middle-text">Active</div>
+                                <div class="stat-value right-card">[R:${rightCountActive}]</div>
+                            </div>
+                        </div>
+                        <div class="stats-row">
+                            <div class="stat-item">
+                                <div class="stat-value left-card">[L:${totalLeftBalance}]</div>
+                                <div class="middle-text">Balance</div>
+                                <div class="stat-value right-card">[R:${totalRightBalance}]</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -595,11 +635,134 @@
     margin-top: 2px;
 }
 
+/* สีการ์ดตามสถานะรักษายอดเดือนที่แล้ว */
+.tree-node.card-green {
+    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+    border-color: #28a745;
+    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+}
+
+.tree-node.card-red {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+    border-color: #dc3545;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+}
+
+/* รูปภาพสมาชิก */
+.tree-node .node-avatar img.member-picture {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.tree-node .member-position-ranking {
+    font-size: 10px;
+    opacity: 0.9;
+    margin-top: 2px;
+    font-weight: 600;
+    color: #ffd700;
+}
+
+.tree-node .qualify-status {
+    margin-top: 5px;
+}
+
+.tree-node .qualify-status .badge {
+    font-size: 9px;
+    padding: 2px 6px;
+}
+
+/* สไตล์ใหม่สำหรับสถิติ */
 .tree-node .node-stats {
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-top: 8px;
+}
+
+.tree-node .stats-row {
     display: flex;
     justify-content: space-between;
-    padding-top: 8px;
-    border-top: 1px solid rgba(255,255,255,0.3);
+    margin-bottom: 5px;
+}
+
+.tree-node .stat-item {
+    flex: 1;
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin: 0 2px;
+    text-align: center;
+}
+
+.tree-node .stat-item {
+    flex: 1;
+    border-radius: 6px;
+    padding: 4px 6px;
+    margin: 0 2px;
+    text-align: center;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tree-node .stat-value {
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.2;
+    white-space: nowrap;
+    flex: 1;
+    text-align: center;
+    border-radius: 4px;
+    padding: 2px 4px;
+    color: white;
+}
+
+.tree-node .stat-value.left-card {
+    background-color: #198754; /* เขียวเข้ม */
+}
+
+.tree-node .stat-value.right-card {
+    background-color: #ffc107; /* เหลือง */
+    color: #333; /* ตัวหนังสือสีเข้มสำหรับพื้นหลังเหลือง */
+}
+
+.tree-node .middle-text {
+    color: white;
+    font-size: 9px;
+    font-weight: 600;
+    margin: 0 5px;
+    flex: 1;
+    text-align: center;
+    background-color: transparent;
+}
+
+/* ปรับขนาดการ์ดให้ใหญ่ขึ้นเพื่อรองรับข้อมูลใหม่ */
+.tree-node {
+    min-width: 250px;
+    padding: 12px 15px;
+}
+
+.tree-node .node-main {
+    margin-bottom: 8px;
+}
+
+.tree-node .node-details {
+    flex: 1;
+}
+
+.tree-node .member-name {
+    font-size: 13px;
+    margin-bottom: 1px;
+}
+
+.tree-node .member-code {
+    font-size: 11px;
+}
+
+.tree-node .member-position {
+    font-size: 10px;
+    margin-top: 1px;
 }
 
 .tree-children {

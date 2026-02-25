@@ -95,22 +95,22 @@
                                     @if (permissions.M4.ToString() != "Y" && permissions.Registerflag.ToString() != "1" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
-                                            <a href="@Url.Action("teambinary", "teaminfomation")" class="nav-link" data-key="t-teambinary"> ทีมไบนารี่ </a>
+                                            <a href="@Url.Action("teambinary", "teaminfomation")" class="nav-link" data-key="t-teambinary"> ผังสายงาน Binary </a>
                                         </li>
                                     }
                                     @if (permissions.M5.ToString() != "Y" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
-                                            <a href="@Url.Action("sponsorteam", "teaminfomation")" class="nav-link" data-key="t-sponsorteam"> ทีมสปอนเซอร์ </a>
+                                            <a href="@Url.Action("sponsorteam", "teaminfomation")" class="nav-link" data-key="t-sponsorteam"> ทีมงานแนะนำตรง </a>
                                         </li>
                                     }
                                     @if (permissions.M6.ToString() != "Y" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
-                                            <a href="@Url.Action("leftteam", "teaminfomation")" class="nav-link" data-key="t-leftteam"> ทีมซ้าย </a>
+                                            <a href="@Url.Action("leftteam", "teaminfomation")" class="nav-link" data-key="t-leftteam"> ทีมงานด้านซ้าย </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="@Url.Action("rightteam", "teaminfomation")" class="nav-link" data-key="t-rightteam"> ทีมขวา </a>
+                                            <a href="@Url.Action("rightteam", "teaminfomation")" class="nav-link" data-key="t-rightteam"> ทีมงานด้านขวา </a>
                                         </li>
                                     }
                                 </ul>
@@ -166,22 +166,10 @@
                             </a>
                             <div class="collapse menu-dropdown" id="sidebarbuyorders">
                                 <ul class="nav nav-sm flex-column">
-                                    @if (permissions.M7.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.PaymentFlag.ToString() != "1" && permissions.MemberType.ToString() != "00")
-                                    {
-                                        <li class="nav-item">
-                                            <a href="@Url.Action("buyorderbyewallet", "buyorders")" class="nav-link" data-key="t-buyorderbyewallet"> Buy Orderbye Wallet </a>
-                                        </li>
-                                    }
                                     @if (permissions.M10.ToString() != "Y" && permissions.SaleFlag.ToString() != "0" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
-                                            <a href="@Url.Action("saleorderfromhold", "buyorders")" class="nav-link" data-key="t-saleorderfromhold"> Sale Order From Hold </a>
-                                        </li>
-                                    }
-                                    @if (permissions.M9.ToString() != "Y" && permissions.Ewalletflag.ToString() != "0" && permissions.MemberType.ToString() != "00")
-                                    {
-                                        <li class="nav-item">
-                                            <a href="@Url.Action("ewallettransfer", "buyorders")" class="nav-link" data-key="t-ewallettransfer"> การโอนอีวอลเล็ต </a>
+                                            <a href="@Url.Action("saleorderfromhold", "buyorders")" class="nav-link" data-key="t-saleorderfromhold"> แจงยอด </a>
                                         </li>
                                     }
                                 </ul>

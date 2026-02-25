@@ -91,6 +91,14 @@ namespace TheStarRichyApi.Services
                             // Controller already saved images to disk and sent paths
                             // Just serialize the paths as JSON
                             memberPicJson = JsonSerializer.Serialize(request.Memberpic);
+                            
+                            // Log for debugging
+                            _logger.LogInformation("Memberpic JSON for {DocumentNumber}: {Json}", 
+                                request.DocumentNumber, memberPicJson);
+                        }
+                        else
+                        {
+                            _logger.LogWarning("No memberpic provided for {DocumentNumber}", request.DocumentNumber);
                         }
                         command.Parameters.AddWithValue("@memberpic", (object?)memberPicJson ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Createby", (object)NormalizeString(currentMemberCode) ?? DBNull.Value);
@@ -227,6 +235,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Bankbranch", (object)NormalizeString(request.BankBranch) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
+                        command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)NormalizeString(request.DistrictCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
@@ -403,36 +412,41 @@ namespace TheStarRichyApi.Services
         {
             try
             {
-                // Convert to EasyRegistrationRequest and call EasyRegisterAsync
-                var easyRequest = new EasyRegistrationRequest
-                {
-                    Country = request.Country,
-                    DocumentNumber = request.DocumentNumber,
-                    ReferrerCode = request.ReferrerCode,
-                    Title = request.Title,
-                    IdCardName = request.IdCardName,
-                    Mobile = request.Mobile,
-                    Email = request.Email,
-                    LineId = request.LineId,
-                    AddressIdCard = request.AddressIdCard,
-                    Postcode = request.Postcode,
-                    ProvinceCode = request.ProvinceCode,
-                    DistrictCode = request.DistrictCode,
-                    SubdistrictCode = request.SubdistrictCode,
-                    VerificationMethod = request.VerificationMethod,
-                    CountryBusiness = request.CountryBusiness,
-                    Position = request.Position,
-                    RegistrationDate = request.RegistrationDate,
-                    BirthDate = request.BirthDate,
-                    BusinessName = request.BusinessName,
-                    HomePhone = request.HomePhone
-                };
+        // Convert to EasyRegistrationRequest and call EasyRegisterAsync
+        var easyRequest = new EasyRegistrationRequest
+        {
+            Country = request.Country,
+            DocumentNumber = request.DocumentNumber,
+            ReferrerCode = request.ReferrerCode,
+            Title = request.Title,
+            IdCardName = request.IdCardName,
+            Mobile = request.Mobile,
+            Email = request.Email,
+            LineId = request.LineId,
+            AddressIdCard = request.AddressIdCard,
+            Postcode = request.Postcode,
+            ProvinceCode = request.ProvinceCode,
+            DistrictCode = request.DistrictCode,
+            SubdistrictCode = request.SubdistrictCode,
+            VerificationMethod = request.VerificationMethod,
+            CountryBusiness = request.CountryBusiness,
+            Position = request.Position,
+            RegistrationDate = request.RegistrationDate,
+            BirthDate = request.BirthDate,
+            BusinessName = request.BusinessName,
+            HomePhone = request.HomePhone,
+            Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
+            ipAddress = request.ipAddress // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
+        };
 
-                _logger.LogInformation("External registration from source: {Source}, campaign: {Campaign}", 
-                    request.SourcePage, request.CampaignCode);
+        _logger.LogInformation("External registration from source: {Source}, campaign: {Campaign}", 
+            request.SourcePage, request.CampaignCode);
+        
+        _logger.LogInformation("ExternalRegisterAsync: Memberpic count = {Count}, ipAddress = {Ip}", 
+            request.Memberpic?.Count ?? 0, request.ipAddress);
 
-                // Call without current member code (external registration)
-                return await EasyRegisterAsync(easyRequest, null);
+        // Call without current member code (external registration)
+        return await EasyRegisterAsync(easyRequest, null);
             }
             catch (Exception ex)
             {
@@ -1318,34 +1332,45 @@ namespace TheStarRichyApi.Services
                 //    };
                 //}
 
-                // TODO: Proceed with registration using existing ExternalRegisterAsync
-                // But add file URLs if available
-                var externalRequest = new ExternalRegistrationRequest {
-                    Country = request.Country,
-                    DocumentNumber = request.DocumentNumber,
-                    ReferrerCode = request.ReferrerCode,
-                    Title = request.Title,
-                    IdCardName = request.IdCardName,
-                    Mobile = request.Mobile,
-                    Email = request.Email,
-                    LineId = request.LineId,
-                    AddressIdCard = request.AddressIdCard,
-                    Postcode = request.Postcode,
-                    ProvinceCode = request.ProvinceCode,
-                    DistrictCode = request.DistrictCode,
-                    SubdistrictCode = request.SubdistrictCode,
-                    VerificationMethod = request.VerificationMethod,
-                    SourcePage = request.SourcePage,
-                    CampaignCode = request.CampaignCode,
-                    CountryBusiness = request.CountryBusiness,
-                    Position = request.Position,
-                    RegistrationDate = request.RegistrationDate,
-                    BirthDate = request.BirthDate,
-                    BusinessName = request.BusinessName,
-                    HomePhone = request.HomePhone
-                };
+        // TODO: Proceed with registration using existing ExternalRegisterAsync
+        // But add file URLs if available
+        var externalRequest = new ExternalRegistrationRequest {
+            Country = request.Country,
+            DocumentNumber = request.DocumentNumber,
+            ReferrerCode = request.ReferrerCode,
+            Title = request.Title,
+            IdCardName = request.IdCardName,
+            Mobile = request.Mobile,
+            Email = request.Email,
+            LineId = request.LineId,
+            AddressIdCard = request.AddressIdCard,
+            Postcode = request.Postcode,
+            ProvinceCode = request.ProvinceCode,
+            DistrictCode = request.DistrictCode,
+            SubdistrictCode = request.SubdistrictCode,
+            VerificationMethod = request.VerificationMethod,
+            SourcePage = request.SourcePage,
+            CampaignCode = request.CampaignCode,
+            CountryBusiness = request.CountryBusiness,
+            Position = request.Position,
+            RegistrationDate = request.RegistrationDate,
+            BirthDate = request.BirthDate,
+            BusinessName = request.BusinessName,
+            HomePhone = request.HomePhone,
+            Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
+            ipAddress = request.ipAddress // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
+        };
 
-                return await ExternalRegisterAsync(externalRequest);
+        _logger.LogInformation("FinalizeRegistration: Memberpic count = {Count}", 
+            request.Memberpic?.Count ?? 0);
+        
+        if (request.Memberpic != null && request.Memberpic.Count > 0)
+        {
+            _logger.LogInformation("FinalizeRegistration: First memberpic path = {Path}", 
+                request.Memberpic.FirstOrDefault());
+        }
+
+        return await ExternalRegisterAsync(externalRequest);
             }
             catch (Exception ex)
             {
