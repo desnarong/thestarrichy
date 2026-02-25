@@ -279,6 +279,18 @@ label,
     color: #4d4e54 !important;
 }
 
+label,
+.col-form-label,
+.form-check-label,
+.form-control {
+    font-size: 0.90rem;
+    color: #4d4e54 !important;
+}
+
+#btnViewCart,
+.btn-add-to-cart span {
+    color: white !important;
+}
 /* Small adjustment to keep form-control line-height consistent */
 .form-control {
     line-height: 1.5;
