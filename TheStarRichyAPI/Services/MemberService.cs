@@ -177,6 +177,9 @@ namespace TheStarRichyApi.Services
                                     string position = reader["Position1"]?.ToString() ?? "0";
                                     string prestigeRanking = reader["PrestigeRanking"]?.ToString() ?? "";
                                     string ssex = reader["Sex"]?.ToString() ?? "";
+
+
+
                                     memberInfo = new GetInfoMember2
                                     {
                                         MemberType = memberType,
@@ -277,19 +280,19 @@ namespace TheStarRichyApi.Services
                                         NextCMonth = reader["NextCMonth"]?.ToString() ?? "",
                                         CurrentMonth1 = reader["CurrentMonth1"]?.ToString() ?? "",
                                         LastCMonth = reader["LastCMonth"]?.ToString() ?? "",
-                                        FlaqSendIDCard = reader["FlaqSendIDCard"]?.ToString() ?? "" ,
+                                        FlaqSendIDCard = reader["FlaqSendIDCard"]?.ToString() ?? "",
                                         FlaqBookBank = reader["FlaqBookBank"]?.ToString() ?? "",
                                         MemberIDPicture = reader["PIC1"]?.ToString() ?? "",
-                                        MemberBookPicture = reader["PIC2"]?.ToString() ?? "" ,
-                                        weakleg = reader["weakleg"]?.ToString() ?? "0" ,
+                                        MemberBookPicture = reader["PIC2"]?.ToString() ?? "",
+                                        weakleg = reader["weakleg"]?.ToString() ?? "0",
                                         RunMessage = reader["RunMessage"]?.ToString() ?? "",
                                         Systemname = reader["Systemname"]?.ToString() ?? "",
                                         kyc = reader["kyc"]?.ToString() ?? "",
                                         LeftCountActive = reader["LeftCountActive"]?.ToString() ?? "0",
-                                        RightCountActive = reader["RightCountActive"]?.ToString() ?? "0" ,
+                                        RightCountActive = reader["RightCountActive"]?.ToString() ?? "0",
 
-                                        TotalLeftBalanceTeam = reader["Total_Left_Sponser_PV"]?.ToString() ?? "0" ,
-                                        TotalRightBalanceTeam = reader["Total_Right_Sponser_PV"]?.ToString() ?? "0" ,
+                                        TotalLeftBalanceTeam = reader["Total_Left_Sponser_PV"]?.ToString() ?? "0",
+                                        TotalRightBalanceTeam = reader["Total_Right_Sponser_PV"]?.ToString() ?? "0",
                                         TotalNewMonthLeftPV = reader["LeftSP"]?.ToString() ?? "0",
                                         TotalNewMonthRightPV = reader["RightSP"]?.ToString() ?? "0",
                                         Totalmember = reader["Totalmember"]?.ToString() ?? "0",
@@ -362,7 +365,8 @@ namespace TheStarRichyApi.Services
                                             case "CDS": pictureBase = "images/1_CDS_40x40"; break;
                                         }
                                         string suffix = ".gif";
-                                        if (m06X9 == "0" || m06X65 == "0") suffix = "_o_g.gif";
+                                        if (ssex == "FeMale") suffix = "_F.gif";
+                                        if (m06X9 == "0" || m06X65 == "0") suffix = "_o_g" + suffix;
                                         /*else if (m06X96 == "9") suffix = "_xx.gif";
                                         else if (m06X50 == "1") suffix = "_Block.gif";
                                         else if (m06X50 == "9") suffix = "_x.gif";
@@ -375,16 +379,17 @@ namespace TheStarRichyApi.Services
                                         memberInfo.MemberPositionPicture = pictureBase;
                                     }
                                     string mpic = reader["Pic4"]?.ToString() ?? "";
-                                    if (mpic != "")                   
+                                    if (mpic != "")
                                     {
-                                        memberInfo.MemberPicture =   reader["Pic4"]?.ToString() ?? "";
+                                        memberInfo.MemberPicture = reader["Pic4"]?.ToString() ?? "";
                                     }
-                                  
+
                                     else
                                     {
                                         string suffix1 = ".gif";
                                         if (ssex == "FeMale") suffix1 = "_F.gif";
                                         if (m06X9 == "0" || m06X65 == "0") suffix1 = "_o_g" + suffix1;
+
 
                                         memberInfo.MemberPicture = $"{pictureBase}{suffix1}";
                                     }
