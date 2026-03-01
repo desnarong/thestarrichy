@@ -112,7 +112,6 @@
         <div class="d-flex align-items-lg-center flex-lg-row flex-column">
             <div class="flex-grow-1">
                 <h4 class="fs-16 mb-1">Good Morning, @userinfo.idcardname</h4>
-                <p class="text-muted mb-0">ข่าวสาร</p>
             </div>
         </div><!-- end card header -->
     </div>
@@ -268,9 +267,9 @@
                                     </div>
                                 </div>
                                 <div class="col-xl-6">
-                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-rigthcountactive">สมาชิกแอคทีพขวา (คน)</strong></h6>
+                                    <h6 class="mb-1"><strong class="text-secondary" data-key="t-rightCountActive">สมาชิกแอคทีพขวา (คน)</strong></h6>
                                     <div class="alert bg-pink border-pink h6 text-white material-shadow text-center mb-1" role="alert">
-                                        <strong id="rigthCountActive"></strong>
+                                        <strong id="rightCountActive"></strong>
                                     </div>
                                 </div>
                             </div>
@@ -650,7 +649,7 @@
                     $('#totalBonus').text(formatNumberWithComma(member.totalBonus || '0'));
                     $('#totalBalance').text(formatNumberWithComma(member.totalBalance || '0'));
                     $('#leftCountActive').text(Number(member.leftCountActive || '0').toLocaleString("en-US"));
-                    $('#rigthCountActive').text(Number(member.rigthCountActive || '0').toLocaleString("en-US"));
+                    $('#rightCountActive').text(Number(member.rightCountActive || '0').toLocaleString("en-US"));
                     $('#ewallet').text(formatNumberWithComma(member.ewallet || '0'));
                     $('#holdPV').text(formatNumberWithComma(member.holdPV || '0'));
                     $('#qualifyDate').text(member.qualifyDate || 'N/A');
@@ -1137,7 +1136,7 @@
 
                         tableHtml += `<hr />
                             <div class="col-xl-6">
-                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-nextposition">คุณวุฒิที่คาดว่าจะขึ้น</strong></h6>
+                                <h6 class="mb-1"><strong class="text-secondary" data-key="t-nextposition">คุณวุฒิปัจจุบัน</strong></h6>
                                 <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" role="alert">
                                     <strong>${(item.EstimatePosistion || 'N/A')}</strong>
                                 </div>
@@ -1458,7 +1457,7 @@
         // แสดงข้อความใน Modal
         function showMessage(index) {
             if (allMessages.length === 0) {
-                alert('ไม่มีข้อความที่จะแสดง');
+                //alert('ไม่มีข้อความที่จะแสดง');
                 return;
             }
 
@@ -1522,14 +1521,14 @@
                         showMessage(0);
                         messageModal.show();
                     } else {
-                        alert('ไม่พบข้อความที่ต้องแสดง');
+                        //alert('ไม่พบข้อความที่ต้องแสดง');
                     }
                 } else {
-                    alert('ไม่มีข้อมูลจาก API');
+                    //alert('ไม่มีข้อมูลจาก API');
                 }
             } catch (error) {
-                console.error('Error loading messages:', error);
-                alert('เกิดข้อผิดพลาดในการโหลดข้อความ');
+                //console.error('Error loading messages:', error);
+                //alert('เกิดข้อผิดพลาดในการโหลดข้อความ');
             }
         }
 
