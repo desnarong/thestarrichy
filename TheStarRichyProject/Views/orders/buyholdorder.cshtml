@@ -154,6 +154,15 @@
     .card-title {
         font-size: 14px;
     }
+
+    .btn-add-to-cart,
+    .btn-add-to-cart:hover,
+    .btn-add-to-cart:focus,
+    .btn-add-to-cart:active,
+    .btn-add-to-cart i,
+    .btn-add-to-cart span {
+        color: #fff !important;
+    }
 </style>
 
 <!-- Header -->
@@ -351,7 +360,7 @@
                             <div class="card-img-top-wrapper">
                                 @if (!string.IsNullOrEmpty(product.ImageUrl))
                                 {
-                                    <img src="/@product.ImageUrl"
+                                    <img src="@product.ImageUrl"
                                          class="card-img-top"
                                          alt="@product.ProductName"
                                          style="width: 100%; height: 100%; object-fit: cover;">
@@ -535,6 +544,7 @@
             // ⭐ เพิ่มส่วนนี้ (บรรทัดแรก)
             let selectedDL = null;
             let selectedCenter = null;
+            let cartSummaryRefreshTimer = null;
 
             // โหลด DL/Center ที่บันทึกไว้
             const savedDL = sessionStorage.getItem('selectedDL');
@@ -579,6 +589,62 @@
             // ===================================
             // ADD TO CART (แก้ไข)
             // ===================================
+            const pageBillType = 3;
+
+            function addProductToCart(productId, quantity, limit, quantityInput) {
+                $.ajax({
+                    url: '/Orders/AddToCart',
+                    type: 'POST',
+                    data: {
+                        productId: productId,
+                        quantity: quantity,
+                        limit: limit,
+                        dlCode: selectedDL.dlCode,
+                        dlName: selectedDL.dlName,
+                        registerDate: selectedDL.registerDate,
+                        centerCode: selectedCenter ? selectedCenter.centerCode : '',
+                        centerName: selectedCenter ? selectedCenter.centerName : '',
+                        billType: pageBillType
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            updateCartSummary();
+                            if (typeof window.updateHeaderCartBadge === 'function') {
+                                window.updateHeaderCartBadge();
+                            }
+                            showNotification('success', response.message || 'เพิ่มสินค้าลงตะกร้าเรียบร้อย');
+
+                            if (quantityInput.length > 0) {
+                                quantityInput.val(1);
+                            }
+                        } else {
+                            showNotification('error', response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showNotification('error', 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
+                        console.error('AddToCart Error:', error);
+                    }
+                });
+            }
+
+            function clearCartThenAdd(productId, quantity, limit, quantityInput) {
+                $.ajax({
+                    url: '/Orders/ClearCart',
+                    type: 'POST',
+                    success: function(clearResponse) {
+                        if (clearResponse.success) {
+                            addProductToCart(productId, quantity, limit, quantityInput);
+                        } else {
+                            showNotification('error', clearResponse.message || 'ไม่สามารถล้างตะกร้าได้');
+                        }
+                    },
+                    error: function() {
+                        showNotification('error', 'เกิดข้อผิดพลาดในการล้างตะกร้า');
+                    }
+                });
+            }
+
             $('.btn-add-to-cart').click(function() {
                 // ⭐ เช็ค DL
                 if (!selectedDL || !selectedDL.dlCode) {
@@ -599,38 +665,39 @@
                 }
 
                 $.ajax({
-                    url: '/Orders/AddToCart',
-                    type: 'POST',
-                    data: {
-                        productId: productId,
-                        quantity: quantity,
-                        limit: limit,
-                        dlCode: selectedDL.dlCode,
-                        dlName: selectedDL.dlName,
-                        registerDate: selectedDL.registerDate,
-                        centerCode: selectedCenter ? selectedCenter.centerCode : '',
-                        centerName: selectedCenter ? selectedCenter.centerName : '',
-                        billType: 3
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            updateCartSummary();
-                            if (typeof window.updateHeaderCartBadge === 'function') {
-                                window.updateHeaderCartBadge();
-                            }
-                            showNotification('success', response.message || 'เพิ่มสินค้าลงตะกร้าเรียบร้อย');
-
-                            // รีเซ็ตจำนวนกลับเป็น 1
-                            if (quantityInput.length > 0) {
-                                quantityInput.val(1);
-                            }
-                        } else {
-                            showNotification('error', response.message);
+                    url: '/Orders/GetCart',
+                    type: 'GET',
+                    success: function(cartResponse) {
+                        if (!cartResponse.success) {
+                            showNotification('error', cartResponse.message || 'ไม่สามารถตรวจสอบตะกร้าได้');
+                            return;
                         }
+
+                        const itemCount = cartResponse.itemCount || 0;
+                        const cartBillType = parseInt(cartResponse.billType, 10);
+                        const hasTypeMismatch = itemCount > 0 && !isNaN(cartBillType) && cartBillType !== pageBillType;
+
+                        if (hasTypeMismatch) {
+                            Swal.fire({
+                                title: 'ประเภทสินค้าไม่ตรงกัน',
+                                text: 'ตะกร้ามีสินค้าคนละประเภทอยู่แล้ว ต้องการล้างตะกร้าเดิมและเพิ่มสินค้านี้แทนหรือไม่?',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Yes',
+                                cancelButtonText: 'No',
+                                reverseButtons: true
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    clearCartThenAdd(productId, quantity, limit, quantityInput);
+                                }
+                            });
+                            return;
+                        }
+
+                        addProductToCart(productId, quantity, limit, quantityInput);
                     },
-                    error: function(xhr, status, error) {
-                        showNotification('error', 'เกิดข้อผิดพลาดในการเพิ่มสินค้า');
-                        console.error('AddToCart Error:', error);
+                    error: function() {
+                        showNotification('error', 'เกิดข้อผิดพลาดในการตรวจสอบตะกร้า');
                     }
                 });
             });
@@ -812,6 +879,33 @@
                     }
                 });
             }
+
+            function startCartSummaryAutoRefresh() {
+                if (cartSummaryRefreshTimer) {
+                    clearInterval(cartSummaryRefreshTimer);
+                }
+
+                updateCartSummary();
+                if (typeof window.updateHeaderCartBadge === 'function') {
+                    window.updateHeaderCartBadge();
+                }
+
+                cartSummaryRefreshTimer = setInterval(function() {
+                    updateCartSummary();
+                    if (typeof window.updateHeaderCartBadge === 'function') {
+                        window.updateHeaderCartBadge();
+                    }
+                }, 10000);
+            }
+
+            $(window).on('beforeunload', function() {
+                if (cartSummaryRefreshTimer) {
+                    clearInterval(cartSummaryRefreshTimer);
+                    cartSummaryRefreshTimer = null;
+                }
+            });
+
+            startCartSummaryAutoRefresh();
 
             // ===================================
             // SHOW NOTIFICATION

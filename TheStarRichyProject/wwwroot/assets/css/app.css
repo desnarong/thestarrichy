@@ -13548,6 +13548,8 @@ span.flatpickr-weekday {
   cursor: pointer;
 }
 .profile-user .user-profile-image {
+  width: 96px;
+  height: 96px;
   -o-object-fit: cover;
      object-fit: cover;
 }

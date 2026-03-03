@@ -1039,9 +1039,18 @@
 
             // 6. Reset Form
             $('#btnResetSimple').click(function () {
+                const selectedRegDay = $('#regDay').val();
+                const selectedRegMonth = $('#regMonth').val();
+                const selectedRegYear = $('#regYear').val();
+
                 $('#simpleRegistrationForm')[0].reset();
                 $('#referrerName').val('');
-                setRegistrationDate();
+
+                // คงค่าวันที่สมัครเดิมไว้แม้กดล้างข้อมูล
+                $('#regDay').val(selectedRegDay);
+                $('#regMonth').val(selectedRegMonth);
+                $('#regYear').val(selectedRegYear);
+
                 resetAddressDropdowns();
                 $('.text-danger:not(.required .text-danger), .text-success, .validation-error').text('').css('color', ''); 
                 $('input, select, textarea').removeClass('is-invalid');

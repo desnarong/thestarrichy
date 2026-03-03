@@ -2,6 +2,26 @@
 
 <script>
     $(document).ready(function () {
+        function pick(obj, keys, defaultValue = '') {
+            for (const key of keys) {
+                if (obj && obj[key] !== undefined && obj[key] !== null) {
+                    return obj[key];
+                }
+            }
+            return defaultValue;
+        }
+
+        function normalizeRows(payload) {
+            let data = payload;
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch (e) { data = []; }
+            }
+            if (data && Array.isArray(data.data)) {
+                data = data.data;
+            }
+            return Array.isArray(data) ? data : [];
+        }
+
         $("#table-tab1").DataTable({
             "responsive": true,
             "processing": true,
@@ -14,31 +34,60 @@
             "destroy": true,
             "searching": false,
             "contentType": "application/json; charset=utf-8",
+            "ajax": {
+                "url": '@Url.Action("GetOrderHistoryData", "reports")',
+                "type": 'GET',
+                "data": { orderType: 'personal' },
+                "dataSrc": function (json) {
+                    return normalizeRows(json).map(function (item) {
+                        return {
+                            billNo: pick(item, ['BillNo', 'billNo']),
+                            billDate: pick(item, ['BillDate', 'billDate']),
+                            referenceNo: pick(item, ['ReferenceNo', 'referenceNo']),
+                            hybridGoldId: pick(item, ['HybridGOLDID', 'hybridGoldId']),
+                            billType: pick(item, ['Billtype', 'billType']),
+                            productId: pick(item, ['ProductID', 'productID']),
+                            productName: pick(item, ['ProductName', 'productName']),
+                            unit: pick(item, ['Unit', 'unit']),
+                            unitPrice: pick(item, ['UnitPrice', 'unitPrice'], 0),
+                            pv: pick(item, ['PV', 'pv'], 0),
+                            totalPrice: pick(item, ['TotalPrice', 'totalPrice'], 0),
+                            billConfirmType: pick(item, ['BillConfirmType', 'billConfirmType']),
+                            trackingUrl: pick(item, ['TrackingURL', 'trackingUrl']),
+                            slip1: pick(item, ['Slip1', 'slip1']),
+                            slip2: pick(item, ['Slip2', 'slip2']),
+                            slip3: pick(item, ['Slip3', 'slip3']),
+                            slip4: pick(item, ['Slip4', 'slip4']),
+                            slip5: pick(item, ['Slip5', 'slip5'])
+                        };
+                    });
+                }
+            },
             "columns": [
-                { title: "เลขที่ใบเสร็จ", "data": '', "targets": 0, "orderable": true, "data-key": "t-receipt-number" },
-                { title: "วันที่", "data": '', "data-key": "t-date" },
-                { title: "เลขที่อ้างอิง", "data": '', "data-key": "t-reference-number" },
-                { title: "รหัสศูนย์", "data": '', "data-key": "t-center-code" },
-                { title: "รหัสโมบาย", "data": '', "data-key": "t-mobile-code" },
-                { title: "ประเภทการสั่งซื้อ", "data": '', "data-key": "t-purchase-type" },
-                { title: "ประเภทการรักษายอด", "data": '', "data-key": "t-retention-type" },
-                { title: "รหัสสินค้า", "data": '', "data-key": "t-product-code" },
-                { title: "ชื่อสินค้า", "data": '', "data-key": "t-product-name" },
-                { title: "จำนวน", "data": '', "data-key": "t-quantity" },
-                { title: "ราคา/หน่วย", "data": '', "data-key": "t-price-unit" },
-                { title: "PV", "data": '', "data-key": "t-pv" },
-                { title: "ยอดรวม", "data": '', "data-key": "t-amount" },
-                { title: "สถานะ", "data": '', "data-key": "t-status" },
-                { title: "เลขติดตาม Flash", "data": '', "data-key": "t-flash-tracking-number" },
-                { title: "เลขติดตาม Kerry", "data": '', "data-key": "t-kerry-tracking-number" },
-                { title: "เลขติดตาม J&T", "data": '', "data-key": "t-jt-tracking-number" },
-                { title: "เลขติดตาม Thaipost", "data": '', "data-key": "t-thaipost-tracking-number" },
-                { title: "สลิปโอน 1", "data": '', "data-key": "t-slip-transfer-1" },
-                { title: "สลิปโอน 2", "data": '', "data-key": "t-slip-transfer-2" },
-                { title: "สลิปโอน 3", "data": '', "data-key": "t-slip-transfer-3" },
-                { title: "สลิปโอน 4", "data": '', "data-key": "t-slip-transfer-4" },
-                { title: "สลิปโอน 5", "data": '', "data-key": "t-slip-transfer-5" },
-                { title: "ดูรายละเอียด", "data": '', "data-key": "t-view-details" }
+                { title: "เลขที่ใบเสร็จ", "data": 'billNo', "targets": 0, "orderable": true, "data-key": "t-receipt-number" },
+                { title: "วันที่", "data": 'billDate', "data-key": "t-date" },
+                { title: "เลขที่อ้างอิง", "data": 'referenceNo', "data-key": "t-reference-number" },
+                { title: "รหัสศูนย์", "data": 'hybridGoldId', "data-key": "t-center-code" },
+                { title: "รหัสโมบาย", "data": 'hybridGoldId', "data-key": "t-mobile-code" },
+                { title: "ประเภทการสั่งซื้อ", "data": 'billType', "data-key": "t-purchase-type" },
+                { title: "ประเภทการรักษายอด", "data": 'billType', "data-key": "t-retention-type" },
+                { title: "รหัสสินค้า", "data": 'productId', "data-key": "t-product-code" },
+                { title: "ชื่อสินค้า", "data": 'productName', "data-key": "t-product-name" },
+                { title: "จำนวน", "data": 'unit', "data-key": "t-quantity" },
+                { title: "ราคา/หน่วย", "data": 'unitPrice', "data-key": "t-price-unit" },
+                { title: "PV", "data": 'pv', "data-key": "t-pv" },
+                { title: "ยอดรวม", "data": 'totalPrice', "data-key": "t-amount" },
+                { title: "สถานะ", "data": 'billConfirmType', "data-key": "t-status" },
+                { title: "เลขติดตาม Flash", "data": 'trackingUrl', "data-key": "t-flash-tracking-number" },
+                { title: "เลขติดตาม Kerry", "data": 'trackingUrl', "data-key": "t-kerry-tracking-number" },
+                { title: "เลขติดตาม J&T", "data": 'trackingUrl', "data-key": "t-jt-tracking-number" },
+                { title: "เลขติดตาม Thaipost", "data": 'trackingUrl', "data-key": "t-thaipost-tracking-number" },
+                { title: "สลิปโอน 1", "data": 'slip1', "data-key": "t-slip-transfer-1" },
+                { title: "สลิปโอน 2", "data": 'slip2', "data-key": "t-slip-transfer-2" },
+                { title: "สลิปโอน 3", "data": 'slip3', "data-key": "t-slip-transfer-3" },
+                { title: "สลิปโอน 4", "data": 'slip4', "data-key": "t-slip-transfer-4" },
+                { title: "สลิปโอน 5", "data": 'slip5', "data-key": "t-slip-transfer-5" },
+                { title: "ดูรายละเอียด", "data": 'billNo', "data-key": "t-view-details" }
             ],
         });
     });

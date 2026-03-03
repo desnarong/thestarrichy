@@ -1096,6 +1096,7 @@
             $('#fullReferrerCode').val(memberCode).prop('disabled', true);
 
             $('input[name="position"]').prop('disabled', true);
+            $('input[name="referrer_side"]').prop('disabled', true);
 
             // Disable search button
             $('#btnSearchReferrer').prop('disabled', true);
@@ -1262,9 +1263,17 @@
         // Reset simple form
         $('#btnResetSimple').click(function () {
             if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
+                const selectedRegDay = $('#simpleRegDay').val();
+                const selectedRegMonth = $('#simpleRegMonth').val();
+                const selectedRegYear = $('#simpleRegYear').val();
 
                 // 1. ล้างข้อมูลทุกช่องในฟอร์มกลับเป็นค่าเริ่มต้น
                 $('#simpleRegistrationForm')[0].reset();
+
+                // คงค่าวันที่สมัครเดิมไว้แม้กดล้างข้อมูล
+                $('#simpleRegDay').val(selectedRegDay);
+                $('#simpleRegMonth').val(selectedRegMonth);
+                $('#simpleRegYear').val(selectedRegYear);
 
                 // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
                 $('#simpleRegistrationForm .is-invalid').removeClass('is-invalid');

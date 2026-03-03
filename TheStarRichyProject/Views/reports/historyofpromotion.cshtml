@@ -117,6 +117,19 @@
 
 <script>
     $(document).ready(function () {
+        let currentRows = [];
+
+        function normalizeRows(payload) {
+            let data = payload;
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch (e) { data = []; }
+            }
+            if (data && Array.isArray(data.data)) {
+                data = data.data;
+            }
+            return Array.isArray(data) ? data : [];
+        }
+
         // Initialize DataTable
         var table = $('#promotionHistoryTable').DataTable({
             "pageLength": 25,
@@ -125,12 +138,47 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
             },
             "ajax": {
-                "url": "/api/reports/promotionhistory",
+                "url": "@Url.Action("GetPromotionHistoryData", "reports")",
                 "type": "GET",
-                "data": function (d) {
-                    d.fromDate = $('#fromDate').val();
-                    d.toDate = $('#toDate').val();
-                    d.promotionType = $('#promotionType').val();
+                "dataSrc": function (json) {
+                    const data = normalizeRows(json);
+
+                    const fromDate = $('#fromDate').val();
+                    const toDate = $('#toDate').val();
+                    const promotionType = $('#promotionType').val();
+
+                    const rows = data
+                        .map(function (item, index) {
+                            const rawType = (item.TypeofBonus || item.typeofBonus || 'bonus').toString().toLowerCase();
+                            const type = rawType.includes('discount') ? 'discount'
+                                : rawType.includes('point') ? 'point'
+                                : rawType.includes('gift') ? 'gift'
+                                : 'bonus';
+                            const paymentDate = item.PaymentDate || item.paymentDate || item.Startdate || item.startdate || '';
+                            const totalBonus = parseFloat(item.TotalBonus || item.totalBonus || item.NetBonus || item.netBonus || 0) || 0;
+                            return {
+                                index: index + 1,
+                                date: paymentDate,
+                                promotionCode: item.PeriodName || item.periodName || '-',
+                                promotionName: item.Remark || item.remark || 'โบนัสตามรอบ',
+                                type: type,
+                                value: totalBonus,
+                                status: 'active'
+                            };
+                        })
+                        .filter(function (row) {
+                            if (!fromDate && !toDate) return true;
+                            if (!row.date) return false;
+                            const rowDate = new Date(row.date);
+                            if (fromDate && rowDate < new Date(fromDate)) return false;
+                            if (toDate && rowDate > new Date(toDate)) return false;
+                                if (promotionType && row.type !== promotionType) return false;
+                            return true;
+                        });
+
+                            currentRows = rows;
+                            updateSummary(currentRows);
+                            return rows;
                 }
             },
             "columns": [
@@ -162,10 +210,7 @@
                     }
                 }
             ],
-            "drawCallback": function(settings) {
-                // Update summary after data loads
-                updateSummary(settings.json);
-            }
+            "drawCallback": function() {}
         });
 
         // Search button click
@@ -174,15 +219,15 @@
         });
 
         // Update summary function
-        function updateSummary(data) {
-            if (!data || !data.data) return;
-            
-            var totalPromotions = data.data.length;
+        function updateSummary(rows) {
+            rows = Array.isArray(rows) ? rows : [];
+
+            var totalPromotions = rows.length;
             var totalDiscount = 0;
             var totalBonus = 0;
             var totalPoints = 0;
 
-            data.data.forEach(function(item) {
+            rows.forEach(function(item) {
                 if (item.type === 'discount') {
                     totalDiscount += parseFloat(item.value);
                 } else if (item.type === 'bonus') {
@@ -211,9 +256,12 @@
     });
 </script>
 
-@section scripts{
-    <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+<!-- DataTables -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+
+@section scripts {
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
 }

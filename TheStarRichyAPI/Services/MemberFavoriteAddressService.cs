@@ -168,11 +168,22 @@ namespace TheStarRichyApi.Services
                                 var rowDict = (IDictionary<string, object>)row;
 
                                 // Read each column dynamically
+                                // Read each column dynamically
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
                                     object columnValue = reader.GetValue(i);
-                                    rowDict[columnName] = columnValue;
+
+                                    // ดักจับ DBNull ถ้าเจอให้เปลี่ยนเป็น null
+                                    if (columnValue == DBNull.Value)
+                                    {
+                                        rowDict[columnName] = null;
+                                        // หรือถ้าอยากให้เป็น String ว่างๆ ก็ใช้ rowDict[columnName] = ""; ก็ได้ครับ
+                                    }
+                                    else
+                                    {
+                                        rowDict[columnName] = columnValue;
+                                    }
                                 }
 
                                 result.Add(row);

@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using TheStarRichyApi.Models;
 using TheStarRichyApi.Services;
 
 namespace TheStarRichyApi.Controllers
@@ -188,6 +191,31 @@ namespace TheStarRichyApi.Controllers
                 return StatusCode(500, new { message = "Internal server error" });
             }
         }
+
+        [HttpPut("profile")]
+        public async Task<IActionResult> UpdateMemberProfile([FromBody] UpdateMemberProfileRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return BadRequest(new { success = false, message = "Request body is required" });
+                }
+
+                var result = await _memberService.UpdateMemberProfileAsync(request);
+                if (result.Success)
+                {
+                    return Ok(new { success = true, message = result.Message });
+                }
+
+                return StatusCode(501, new { success = false, message = result.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
         [HttpGet("incomebyperiod")]
         public async Task<IActionResult> GetMemberIncomeByPeriod()
         {
@@ -431,13 +459,23 @@ namespace TheStarRichyApi.Controllers
             try
             {
                 var result = await _memberBinaryTeamService.GetDisplayAsync(membercode);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
+                    MaxDepth = 64
+                };
+
                 return Ok(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Internal server error" });
+                return StatusCode(500, new { message = "Internal server error", error = ex.Message });
             }
         }
+
         [HttpGet("finduplinebinary")]
         public async Task<IActionResult> GetFindUplineBinary()
         {
@@ -788,7 +826,27 @@ namespace TheStarRichyApi.Controllers
             try
             {
                 var result = await _memberFavoriteAddressService.GetDisplayAsync();
-                return Ok(result);
+
+                if (result.Count > 0)
+                {
+                    // ✅ เติม Ok() เพื่อครอบ Object และส่ง HTTP Status 200 กลับไป
+                    return Ok(new
+                    {
+                        Success = true,
+                        Message = "Success",
+                        Data = result
+                    });
+                }
+                else
+                {
+                    // ✅ เติม Ok() เช่นกัน (API ทำงานสำเร็จตามปกติ แค่ไม่มีข้อมูล)
+                    return Ok(new
+                    {
+                        Success = false,
+                        Message = "Not found",
+                        Data = new List<dynamic>()
+                    });
+                }
             }
             catch (Exception)
             {

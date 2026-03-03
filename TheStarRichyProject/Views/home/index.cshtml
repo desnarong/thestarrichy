@@ -628,7 +628,7 @@
                     //console.info(member);
                     //console.log('JWT Token:', member);
                     // Update UI with member data
-                    $('#user-profile-image').attr('src', '/' + member.memberPositionPicture || 'N/A');
+                    $('#user-profile-image').attr('src', member.memberPositionPicture || 'N/A');
                     $('#membercode').text(member.membercode || 'N/A');
                     $('#idcardname').text(member.idcardname || 'N/A');
                     $('#personalPV').text(formatNumberWithComma(member.personalPV || '0'));

@@ -17,9 +17,9 @@
             <div class="card-body p-4">
                 <div class="text-center">
                     <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                        <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow" alt="user-profile-image">
-                        <div class="avatar-xs p-0 rounded-circle profile-photo-edit d-none">
-                            <input id="profile-img-file-input" type="file" class="profile-img-file-input">
+                        <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow mt-2" alt="user-profile-image">
+                        <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
+                            <input id="profile-img-file-input" type="file" class="profile-img-file-input" accept="image/*">
                             <label for="profile-img-file-input" class="profile-photo-edit avatar-sm">
                                 <span class="avatar-title rounded-circle bg-light text-body material-shadow">
                                     <i class="ri-camera-fill ri-2x"></i>
@@ -69,31 +69,29 @@
     <div class="col-xxl-9">
         <div class="card">
             <div class="card-header">
-                <div class="row align-items-center">
-                    <div class="col">
-                        <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link fw-semibold active" data-bs-toggle="tab" href="#tab-personalinformation" role="tab" aria-selected="true" data-key="t-personalinformation">
-                                    ข้อมูลส่วนบุคคล
-                                </a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#tab-addressinformation" role="tab" aria-selected="false" tabindex="-1" data-key="t-addressinformation">
-                                    ข้อมูลที่อยู่
-                                </a>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <a class="nav-link fw-semibold" data-bs-toggle="tab" href="#tab-bankinformation" role="tab" aria-selected="false" tabindex="-1" data-key="t-bankinformation">
-                                    ข้อมูลธนาคาร
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
+                <h4 class="mb-1">จัดการข้อมูลสมาชิก</h4>
+                <p class="text-muted mb-0">เลือกหมวดข้อมูลที่ต้องการแก้ไข</p>
             </div>
             <div class="card-body">
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="member-personal-tab" data-bs-toggle="tab" data-bs-target="#tab-personalinformation" type="button" role="tab" aria-controls="tab-personalinformation" aria-selected="true" data-key="t-personalinformation">
+                            <i class="ri-user-3-line me-2"></i>ข้อมูลส่วนบุคคล
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="member-address-tab" data-bs-toggle="tab" data-bs-target="#tab-addressinformation" type="button" role="tab" aria-controls="tab-addressinformation" aria-selected="false" data-key="t-addressinformation">
+                            <i class="ri-map-pin-line me-2"></i>ข้อมูลที่อยู่
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="member-bank-tab" data-bs-toggle="tab" data-bs-target="#tab-bankinformation" type="button" role="tab" aria-controls="tab-bankinformation" aria-selected="false" data-key="t-bankinformation">
+                            <i class="ri-bank-card-line me-2"></i>ข้อมูลธนาคาร
+                        </button>
+                    </li>
+                </ul>
                 <div class="tab-content">
-                    <div id="tab-personalinformation" class="tab-pane active show" role="tabpanel">
+                    <div id="tab-personalinformation" class="tab-pane fade show active" role="tabpanel" aria-labelledby="member-personal-tab">
                         <div class="row gy-4">
                             <div class="col-sm-12 col-md-4">
                                 <div>
@@ -191,8 +189,8 @@
                                 <div>
                                     <label for="info-lang" class="form-label" data-key="t-lang">ภาษา</label>
                                     <select id="info-lang" class="form-select" aria-label=".form-select-sm">
-                                        <option value="01" data-key="t-thai">ไทย</option>
-                                        <option value="02" data-key="t-english">อังกฤษ</option>
+                                        <option value="th" data-key="t-thai">ไทย</option>
+                                        <option value="en" data-key="t-english">อังกฤษ</option>
                                     </select>
                                 </div>
                             </div>
@@ -239,202 +237,208 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tab-addressinformation" class="tab-pane" role="tabpanel">
-                        <div class="row gy-4">
+                    <div id="tab-addressinformation" class="tab-pane fade" role="tabpanel" aria-labelledby="member-address-tab">
+                        <div class="row g-4">
                             <div class="col-sm-12 col-md-6">
-                                <div class="row gy-4">
-                                    <div class="col-sm-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14" data-key="t-idcardaddress">ที่อยู่ตามบัตรประชาชน</h4>
+                                <div class="card shadow-sm h-100 mb-0">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0" data-key="t-idcardaddress">ที่อยู่ตามบัตรประชาชน</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-sm-12">
+                                                <div>
+                                                    <label for="info-idcardaddress" class="form-label" data-key="t-address">ที่อยู่</label>
+                                                    <textarea type="text" class="form-control" id="info-idcardaddress" rows="5"></textarea>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div>
-                                            <label for="info-idcardaddress" class="form-label" data-key="t-address">ที่อยู่</label>
-                                            <textarea type="text" class="form-control" id="info-idcardaddress" rows="5" disabled></textarea>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-idcardprovince" class="form-label" data-key="t-province">จังหวัด</label>
-                                            <select id="info-idcardprovince" class="form-select" aria-label=".form-select-sm" disabled>
-                                                <option value="54" data-key="t-thai">แพร่</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-idcarddistrict" class="form-label" data-key="t-district">อำเภอ</label>
-                                            <select id="info-idcarddistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-idcardsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
-                                            <select id="info-idcardsubdistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-idcardpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
-                                            <input type="text" class="form-control" id="info-idcardpostcode" disabled>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-idcardpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                                    <input type="text" class="form-control" id="info-idcardpostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-idcardprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                                    <select id="info-idcardprovince" class="form-select" aria-label=".form-select-sm">
+                                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-idcarddistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                                    <select id="info-idcarddistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-idcardsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                                    <select id="info-idcardsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-6">
-                                <div class="row gy-4">
-                                    <div class="col-sm-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14" data-key="t-presentaddress">ที่อยู่ปัจจุบัน</h4>
+                                <div class="card shadow-sm h-100 mb-0">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0" data-key="t-presentaddress">ที่อยู่ปัจจุบัน</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-sm-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="info-sameidcardaddress">
+                                                    <label class="form-check-label" for="info-sameidcardaddress" data-key="t-sameidcardaddress">
+                                                        เหมือนที่อยู่ตามบัตร
+                                                    </label>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="info-sameidcardaddress">
-                                            <label class="form-check-label" for="info-sameidcardaddress" data-key="t-sameidcardaddress">
-                                                เหมือนที่อยู่ตามบัตร
-                                            </label>
-                                        </div>
-                                    </div>
 
-                                    <div class="col-sm-12">
-                                        <label for="info-presentaddress" class="form-label" data-key="t-address">ที่อยู่</label>
-                                        <textarea type="text" class="form-control" id="info-presentaddress" rows="5"></textarea>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentprovince" class="form-label" data-key="t-province">จังหวัด</label>
-                                            <select id="info-presentprovince" class="form-select" aria-label=".form-select-sm">
-                                                <option value="54" data-key="t-thai">แพร่</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentdistrict" class="form-label" data-key="t-district">อำเภอ</label>
-                                            <select id="info-presentdistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
-                                            <select id="info-presentsubdistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
-                                            <input type="text" class="form-control" id="info-presentpostcode">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row gy-4" style="padding-top: var(--vz-gutter-y);">
-                            <div class="col-sm-12 col-md-6">
-                                <div>
-                                    <label for="info-mobilephone" class="form-label" data-key="t-mobilephone">โทรศัพท์มือถือ</label>
-                                    <input type="text" class="form-control" id="info-mobilephone" disabled>
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-6">
-                                <div>
-                                    <label for="info-homephone" class="form-label" data-key="t-homephone">โทรศัพท์บ้าน</label>
-                                    <input type="text" class="form-control" id="info-homephone">
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-6">
-                                <div>
-                                    <label for="info-email" class="form-label" data-key="t-email">อีเมล</label>
-                                    <input type="text" class="form-control" id="info-email" disabled>
-                                </div>
-                            </div>
-                            <div class="col-sm-12 col-md-6">
-                                <div>
-                                    <label for="info-lineid" class="form-label" data-key="t-lineid">ไอดีไลน์</label>
-                                    <input type="text" class="form-control" id="info-lineid" disabled>
-                                </div>
-                            </div>
-                        </div>
-                        <hr />
-                        <div class="row gy-4">
-                            
-                            
-                            <div class="col-sm-12 col-md-6">
-                                <div class="row gy-4">
-                                    <div class="col-sm-12">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h4 class="card-title mb-0 flex-grow-1 text-secondary text-center fs-14">ที่อยู่ออกใบกำกับภาษี</h4>
+                                            <div class="col-sm-12">
+                                                <label for="info-presentaddress" class="form-label" data-key="t-address">ที่อยู่</label>
+                                                <textarea type="text" class="form-control" id="info-presentaddress" rows="5"></textarea>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-presentpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                                    <input type="text" class="form-control" id="info-presentpostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-presentprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                                    <select id="info-presentprovince" class="form-select" aria-label=".form-select-sm">
+                                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-presentdistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                                    <select id="info-presentdistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-presentsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                                    <select id="info-presentsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="checkbox" id="info-sameidcardaddress">
-                                            <label class="form-check-label" for="info-sameidcardaddress" data-key="t-sameidcardaddress">
-                                                เหมือนที่อยู่ตามบัตร
-                                            </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-4 mt-1">
+                            <div class="col-sm-12">
+                                <div class="card shadow-sm mb-0">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">ข้อมูลติดต่อ</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-mobilephone" class="form-label" data-key="t-mobilephone">โทรศัพท์มือถือ</label>
+                                                    <input type="text" class="form-control" id="info-mobilephone" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-homephone" class="form-label" data-key="t-homephone">โทรศัพท์บ้าน</label>
+                                                    <input type="text" class="form-control" id="info-homephone">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-email" class="form-label" data-key="t-email">อีเมล</label>
+                                                    <input type="text" class="form-control" id="info-email" disabled>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-lineid" class="form-label" data-key="t-lineid">ไอดีไลน์</label>
+                                                    <input type="text" class="form-control" id="info-lineid" disabled>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">ในนามบริษัท</label>
-                                            <input type="text" class="form-control" id="info-presentpostcode">
-                                        </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="card shadow-sm mb-0">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">ที่อยู่ออกใบกำกับภาษี</h5>
                                     </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">เลขทะเบียนการค้าของบริษัท</label>
-                                            <input type="text" class="form-control" id="info-presentpostcode">
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12">
-                                        <label for="info-presentaddress" class="form-label" data-key="t-presentaddress">ที่อยู่ออกใบกำกับภาษี</label>
-                                        <textarea type="text" class="form-control" id="info-presentaddress" rows="5"></textarea>
-                                    </div>
+                                    <div class="card-body">
+                                        <div class="row g-3">
+                                            <div class="col-sm-12">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="info-sameidcardaddress-inv">
+                                                    <label class="form-check-label" for="info-sameidcardaddress-inv" data-key="t-sameidcardaddress">
+                                                        เหมือนที่อยู่ตามบัตร
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invcompanyname" class="form-label" data-key="t-postcode">ในนามบริษัท</label>
+                                                    <input type="text" class="form-control" id="info-invcompanyname">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invcompanyregister" class="form-label" data-key="t-postcode">เลขทะเบียนการค้าของบริษัท</label>
+                                                    <input type="text" class="form-control" id="info-invcompanyregister">
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <label for="info-invaddress" class="form-label" data-key="t-presentaddress">ที่อยู่ออกใบกำกับภาษี</label>
+                                                <textarea type="text" class="form-control" id="info-invaddress" rows="5"></textarea>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
+                                                    <input type="text" class="form-control" id="info-invpostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก">
+                                                </div>
+                                            </div>
 
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-invprovince" class="form-label" data-key="t-province">จังหวัด</label>
-                                            <select id="info-invprovince" class="form-select" aria-label=".form-select-sm">
-                                                <option value="54" data-key="t-thai">แพร่</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-invdistrict" class="form-label" data-key="t-district">อำเภอ</label>
-                                            <select id="info-invdistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-invsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
-                                            <select id="info-invsubdistrict" class="form-select" aria-label=".form-select-sm">
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-sm-12 col-md-6">
-                                        <div>
-                                            <label for="info-presentpostcode" class="form-label" data-key="t-postcode">รหัสไปรษณีย์</label>
-                                            <input type="text" class="form-control" id="info-presentpostcode">
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invprovince" class="form-label" data-key="t-province">จังหวัด</label>
+                                                    <select id="info-invprovince" class="form-select" aria-label=".form-select-sm">
+                                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invdistrict" class="form-label" data-key="t-district">อำเภอ</label>
+                                                    <select id="info-invdistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 col-md-6">
+                                                <div>
+                                                    <label for="info-invsubdistrict" class="form-label" data-key="t-subdistrict">ตำบล</label>
+                                                    <select id="info-invsubdistrict" class="form-select" aria-label=".form-select-sm">
+                                                    </select>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="row g-4 justify-content-end" style="padding-top: var(--vz-gutter-y);">
+                        <div class="row g-4 justify-content-end mt-1">
                             <div class="col-sm-auto">
                                 <div>
                                     <button class="btn btn-success h4" id="btn-addressupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
@@ -442,7 +446,7 @@
                             </div>
                         </div>
                     </div>
-                    <div id="tab-bankinformation" class="tab-pane" role="tabpanel">
+                    <div id="tab-bankinformation" class="tab-pane fade" role="tabpanel" aria-labelledby="member-bank-tab">
                         <div class="row gy-4">
                             <div class="col-sm-12 col-md-4">
                                 <div>
@@ -472,7 +476,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row gy-4" style="padding-top: var(--vz-gutter-y);">
+                        <div class="row gy-4 mt-2">
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-beneficiary" class="form-label" data-key="t-beneficiary">ผู้รับประโยชน์</label>
@@ -529,8 +533,8 @@
                                         <label for="info-copyidcard" class="form-label" data-key="t-copyidcard">สำเนาบัตรประชาชน</label>
                                     </div>
                                     <div class="col-sm-12">
-                                        <input type="file" id="info-uploadcopyidcard" class="form-control" />
-                                        <img id="info-copyidcard" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/d9a142f8-a869-474e-a505-45274b7521ff/Mockup+Thai+card-01.jpg" alt="" style="max-height: 210px;max-width: auto;">
+                                        <input type="file" id="info-uploadcopyidcard" class="form-control" accept="image/*" />
+                                        <img id="info-copyidcard" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/d9a142f8-a869-474e-a505-45274b7521ff/Mockup+Thai+card-01.jpg" alt="" class="mt-2" style="max-height: 210px;max-width: auto;">
                                     </div>
                                 </div>
                             </div>
@@ -540,8 +544,8 @@
                                         <label for="info-copybankaccountbook" class="form-label" data-key="t-copybankaccountbook">สำเนาสมุดบัญชีธนาคาร</label>
                                     </div>
                                     <div class="col-sm-12">
-                                        <input type="file" id="info-uploadcopybankaccountbook" class="form-control" />
-                                        <img id="info-copybankaccountbook" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/6f022280-7881-4495-8dd4-bd864dcff7aa/Mockup+Thai+card-12.jpg" alt="" style="max-height: 410px; max-width: auto;">
+                                        <input type="file" id="info-uploadcopybankaccountbook" class="form-control" accept="image/*" />
+                                        <img id="info-copybankaccountbook" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/6f022280-7881-4495-8dd4-bd864dcff7aa/Mockup+Thai+card-12.jpg" alt="" class="mt-2" style="max-height: 410px; max-width: auto;">
                                     </div>
                                 </div>
                             </div>
@@ -551,8 +555,8 @@
                                         <label for="info-applicationsubmitte" class="form-label" data-key="t-applicationformhasbeensubmitted">แบบฟอร์มใบสมัครได้รับการส่งแล้ว</label>
                                     </div>
                                     <div class="col-sm-12">
-                                        <input type="file" id="info-uploadapplicationsubmitte" class="form-control" />
-                                        <img id="info-applicationsubmitte" src="" alt="" style="max-height: 510px; max-width: auto;">
+                                        <input type="file" id="info-uploadapplicationsubmitte" class="form-control" accept="image/*" />
+                                        <img id="info-applicationsubmitte" src="" alt="" class="mt-2" style="max-height: 510px; max-width: auto;">
                                     </div>
                                 </div>
                             </div>
@@ -578,6 +582,291 @@
 
 <script>
     const language = localStorage.getItem("language");
+    let memberinfo = null;
+    let masterAddressData = [];
+    const uploadState = {
+        profileImage: null,
+        copyIdCard: null,
+        copyBankBook: null,
+        applicationForm: null
+    };
+
+    function previewImage(file, targetSelector) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            $(targetSelector).attr('src', e.target.result);
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function bindUploadPreview() {
+        $('#profile-img-file-input').on('change', function (event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            uploadState.profileImage = file;
+            previewImage(file, '#user-profile-image');
+        });
+
+        $('#info-uploadcopyidcard').on('change', function (event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            uploadState.copyIdCard = file;
+            previewImage(file, '#info-copyidcard');
+            $('#info-flagsendidcard').prop('checked', true);
+        });
+
+        $('#info-uploadcopybankaccountbook').on('change', function (event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            uploadState.copyBankBook = file;
+            previewImage(file, '#info-copybankaccountbook');
+            $('#info-flagsendbookbank').prop('checked', true);
+        });
+
+        $('#info-uploadapplicationsubmitte').on('change', function (event) {
+            const file = event.target.files?.[0];
+            if (!file) return;
+            uploadState.applicationForm = file;
+            previewImage(file, '#info-applicationsubmitte');
+            $('#info-registerfrombranch').prop('checked', true);
+        });
+    }
+
+    function getUniqueAddressList(data, codeKey, nameKey) {
+        const seen = new Set();
+        return data.filter(item => {
+            const key = item[codeKey];
+            if (seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        }).sort((a, b) => (a[nameKey] || '').localeCompare(b[nameKey] || ''));
+    }
+
+    function resetAddressDropdown(selector, defaultText) {
+        $(selector)
+            .empty()
+            .append(`<option value="">${defaultText}</option>`)
+            .prop('disabled', true);
+    }
+
+    function bindAddressByPostcode(config) {
+        const postcodeSelector = config.postcodeSelector;
+        const provinceSelector = config.provinceSelector;
+        const districtSelector = config.districtSelector;
+        const subdistrictSelector = config.subdistrictSelector;
+
+        resetAddressDropdown(provinceSelector, '-- รอผลจากรหัสไปรษณีย์ --');
+        resetAddressDropdown(districtSelector, '-- เลือกอำเภอ --');
+        resetAddressDropdown(subdistrictSelector, '-- เลือกตำบล --');
+
+        $(postcodeSelector).off('input').on('input', function () {
+            const cleaned = ($(this).val() || '').replace(/\D/g, '').slice(0, 5);
+            $(this).val(cleaned);
+
+            resetAddressDropdown(provinceSelector, '-- รอผลจากรหัสไปรษณีย์ --');
+            resetAddressDropdown(districtSelector, '-- เลือกอำเภอ --');
+            resetAddressDropdown(subdistrictSelector, '-- เลือกตำบล --');
+
+            if (cleaned.length !== 5 || masterAddressData.length === 0) {
+                return;
+            }
+
+            const filtered = masterAddressData.filter(item => item.zipcode === cleaned);
+            if (filtered.length === 0) {
+                return;
+            }
+
+            const provinces = getUniqueAddressList(filtered, 'province_code', 'province');
+            $(provinceSelector).empty().append('<option value="">-- เลือกจังหวัด --</option>');
+            provinces.forEach(p => {
+                $(provinceSelector).append(`<option value="${p.province_code}">${p.province}</option>`);
+            });
+            $(provinceSelector).prop('disabled', false);
+
+            if (provinces.length === 1) {
+                $(provinceSelector).val(provinces[0].province_code).trigger('change');
+            }
+        });
+
+        $(provinceSelector).off('change').on('change', function () {
+            const selectedZip = $(postcodeSelector).val();
+            const selectedProvCode = $(this).val();
+
+            resetAddressDropdown(districtSelector, '-- เลือกอำเภอ --');
+            resetAddressDropdown(subdistrictSelector, '-- เลือกตำบล --');
+
+            if (!selectedZip || !selectedProvCode) {
+                return;
+            }
+
+            const filtered = masterAddressData.filter(item =>
+                item.zipcode === selectedZip && item.province_code == selectedProvCode
+            );
+
+            const districts = getUniqueAddressList(filtered, 'amphoe_code', 'amphoe');
+            $(districtSelector).empty().append('<option value="">-- เลือกอำเภอ --</option>');
+            districts.forEach(d => {
+                $(districtSelector).append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`);
+            });
+            $(districtSelector).prop('disabled', false);
+
+            if (districts.length === 1) {
+                $(districtSelector).val(districts[0].amphoe_code).trigger('change');
+            }
+        });
+
+        $(districtSelector).off('change').on('change', function () {
+            const selectedZip = $(postcodeSelector).val();
+            const selectedProvCode = $(provinceSelector).val();
+            const selectedDistrictCode = $(this).val();
+
+            resetAddressDropdown(subdistrictSelector, '-- เลือกตำบล --');
+
+            if (!selectedZip || !selectedProvCode || !selectedDistrictCode) {
+                return;
+            }
+
+            const filtered = masterAddressData.filter(item =>
+                item.zipcode === selectedZip &&
+                item.province_code == selectedProvCode &&
+                item.amphoe_code == selectedDistrictCode
+            );
+
+            $(subdistrictSelector).empty().append('<option value="">-- เลือกตำบล --</option>');
+            filtered.forEach(item => {
+                $(subdistrictSelector).append(`<option value="${item.tambon_code}">${item.tambon}</option>`);
+            });
+            $(subdistrictSelector).prop('disabled', false);
+        });
+    }
+
+    function copyAddressFromSource(source, target) {
+        if (source.addressSelector && target.addressSelector) {
+            $(target.addressSelector).val($(source.addressSelector).val() || '');
+        }
+
+        const postcode = (($(source.postcodeSelector).val() || '').toString()).replace(/\D/g, '').slice(0, 5);
+        $(target.postcodeSelector).val(postcode).trigger('input');
+
+        const provinceCode = $(source.provinceSelector).val() || '';
+        if (provinceCode) {
+            $(target.provinceSelector).val(provinceCode).trigger('change');
+        }
+
+        const districtCode = $(source.districtSelector).val() || '';
+        if (districtCode) {
+            $(target.districtSelector).val(districtCode).trigger('change');
+        }
+
+        const subdistrictCode = $(source.subdistrictSelector).val() || '';
+        if (subdistrictCode) {
+            $(target.subdistrictSelector).val(subdistrictCode);
+        }
+    }
+
+    function initializeAddressLookups() {
+        bindAddressByPostcode({
+            postcodeSelector: '#info-idcardpostcode',
+            provinceSelector: '#info-idcardprovince',
+            districtSelector: '#info-idcarddistrict',
+            subdistrictSelector: '#info-idcardsubdistrict'
+        });
+
+        bindAddressByPostcode({
+            postcodeSelector: '#info-presentpostcode',
+            provinceSelector: '#info-presentprovince',
+            districtSelector: '#info-presentdistrict',
+            subdistrictSelector: '#info-presentsubdistrict'
+        });
+
+        bindAddressByPostcode({
+            postcodeSelector: '#info-invpostcode',
+            provinceSelector: '#info-invprovince',
+            districtSelector: '#info-invdistrict',
+            subdistrictSelector: '#info-invsubdistrict'
+        });
+
+        $('#info-sameidcardaddress').off('change').on('change', function () {
+            if ($(this).is(':checked')) {
+                copyAddressFromSource(
+                    {
+                        addressSelector: '#info-idcardaddress',
+                        postcodeSelector: '#info-idcardpostcode',
+                        provinceSelector: '#info-idcardprovince',
+                        districtSelector: '#info-idcarddistrict',
+                        subdistrictSelector: '#info-idcardsubdistrict'
+                    },
+                    {
+                        addressSelector: '#info-presentaddress',
+                        postcodeSelector: '#info-presentpostcode',
+                        provinceSelector: '#info-presentprovince',
+                        districtSelector: '#info-presentdistrict',
+                        subdistrictSelector: '#info-presentsubdistrict'
+                    }
+                );
+            } else {
+                $('#info-presentaddress').val('');
+                $('#info-presentpostcode').val('');
+                resetAddressDropdown('#info-presentprovince', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetAddressDropdown('#info-presentdistrict', '-- เลือกอำเภอ --');
+                resetAddressDropdown('#info-presentsubdistrict', '-- เลือกตำบล --');
+            }
+        });
+
+        $('#info-sameidcardaddress-inv').off('change').on('change', function () {
+            if ($(this).is(':checked')) {
+                copyAddressFromSource(
+                    {
+                        addressSelector: '#info-idcardaddress',
+                        postcodeSelector: '#info-idcardpostcode',
+                        provinceSelector: '#info-idcardprovince',
+                        districtSelector: '#info-idcarddistrict',
+                        subdistrictSelector: '#info-idcardsubdistrict'
+                    },
+                    {
+                        addressSelector: '#info-invaddress',
+                        postcodeSelector: '#info-invpostcode',
+                        provinceSelector: '#info-invprovince',
+                        districtSelector: '#info-invdistrict',
+                        subdistrictSelector: '#info-invsubdistrict'
+                    }
+                );
+            } else {
+                $('#info-invaddress').val('');
+                $('#info-invpostcode').val('');
+                resetAddressDropdown('#info-invprovince', '-- รอผลจากรหัสไปรษณีย์ --');
+                resetAddressDropdown('#info-invdistrict', '-- เลือกอำเภอ --');
+                resetAddressDropdown('#info-invsubdistrict', '-- เลือกตำบล --');
+            }
+        });
+    }
+
+    async function loadMasterAddresses() {
+        try {
+            const response = await fetch('/orders/GetMasterAddress', {
+                method: 'GET',
+                credentials: 'include'
+            });
+
+            const res = await response.json();
+            if (Array.isArray(res)) {
+                masterAddressData = res;
+            } else if (res?.data && Array.isArray(res.data)) {
+                masterAddressData = res.data;
+            } else if (res?.result && Array.isArray(res.result)) {
+                masterAddressData = res.result;
+            } else {
+                masterAddressData = [];
+            }
+
+            initializeAddressLookups();
+        } catch (error) {
+            console.error('Error loading master addresses:', error);
+            masterAddressData = [];
+            initializeAddressLookups();
+        }
+    }
     // Load member info from API
     async function loadMemberInfo() {
         try {
@@ -615,14 +904,17 @@
                 $('#info-membershiptype').val(member.typeofperson || '');
                 $('#info-lang').val(member.lang || '');
                 $('#info-smsType').text(member.smsType || '');//smsType
-
                 //address
                 $('#info-idcardaddress').val(member.idcardAddress || '');
-                $('#info-idcardprovince').val(member.iDcardDustrictCode || '');
-                $('#info-idcardpostcode').val(member.iDcardPostcode || '');
+                $('#info-idcardpostcode').val((member.iDcardPostcode || '').toString().replace(/\D/g, '').slice(0, 5)).trigger('input');
+                if (member.iDcardDustrictCode) {
+                    $('#info-idcardprovince').val(member.iDcardDustrictCode).trigger('change');
+                }
                 $('#info-presentaddress').val(member.presentAddress || '');
-                $('#info-presentprovince').val(member.presentDistrictCode || '');
-                $('#info-presentpostcode').val(member.presentPostcode || '');
+                $('#info-presentpostcode').val((member.presentPostcode || '').toString().replace(/\D/g, '').slice(0, 5)).trigger('input');
+                if (member.presentDistrictCode) {
+                    $('#info-presentprovince').val(member.presentDistrictCode).trigger('change');
+                }
                 $('#info-mobilephone').val(member.mobilePhone || '');
                 $('#info-homephone').val(member.homephone || '');
                 $('#info-email').val(member.email || '');
@@ -672,19 +964,14 @@
                 $('#rightURL').html(member.rightURL || 'N/A');
                 $('#rightURL').attr('href', member.rightURL || 'N/A');
 
-                $('#user-profile-image').attr('src', '/' + member.memberPositionPicture || 'N/A');
-                $('#info-copyidcard').attr('src', '/' + member.memberIDPicture || 'N/A');
-                $('#info-copybankaccountbook').attr('src', '/' + member.memberBookPicture || 'N/A');
+                $('#user-profile-image').attr('src', member.memberPicture || member.memberPositionPicture || 'N/A');
+                $('#info-copyidcard').attr('src', member.memberIDPicture || 'N/A');
+                $('#info-copybankaccountbook').attr('src', member.memberBookPicture || 'N/A');
                 $('#info-applicationsubmitte').attr('src', '');
 
-                if (member.memberIDPicture != '') $('#info-uploadcopyidcard').addClass('d-none');
-                if (member.memberBookPicture != '') $('#info-uploadcopybankaccountbook').addClass('d-none');
-                //if (member.memberPositionPicture != '') $('#info-uploadapplicationsubmitte').addClass('d-none');
-                //
-
-                $('#info-flagsendidcard').attr('checked', (member.memberPositionPicture ? true : false));
-                $('#info-flagsendbookbank').attr('checked', (member.memberIDPicture ? true : false));
-                $('#info-registerfrombranch').attr('checked', false);
+                $('#info-flagsendidcard').prop('checked', (member.memberIDPicture ? true : false));
+                $('#info-flagsendbookbank').prop('checked', (member.memberBookPicture ? true : false));
+                $('#info-registerfrombranch').prop('checked', (member.registerfromBranch ? true : false));
 
 
                 await loadBanks(member.bankname || '');
@@ -809,7 +1096,6 @@
             if (data) {
                 //console.info(data);
                 const $idcardselect = $('#info-idcardprovince');
-                const $presentselect = $('#info-presentprovince');
                 let tableHtml = ``;
                 $.each(data, function (index, item) {
                     let id = item.M32_PX1;
@@ -820,7 +1106,6 @@
                 });
                 // เพิ่มตารางเข้าใน container
                 $idcardselect.append(tableHtml);
-                $presentselect.append(tableHtml);
             } else {
                 console.error('No token found');
                 return null;
@@ -870,6 +1155,86 @@
         }
     }
 
+    function buildMemberUpdatePayload(updateScope) {
+        const payload = {
+            personalInfo: {
+                bussinessName: $('#info-bussinessname').val() || null,
+                languageCode: $('#info-lang').val() || null
+            },
+            addressInfo: {
+                idCardAddress: {
+                    addressLine: $('#info-idcardaddress').val() || null,
+                    postcode: $('#info-idcardpostcode').val() || null,
+                    provinceCode: $('#info-idcardprovince').val() || null,
+                    districtCode: $('#info-idcarddistrict').val() || null,
+                    subdistrictCode: $('#info-idcardsubdistrict').val() || null
+                },
+                presentAddress: {
+                    addressLine: $('#info-presentaddress').val() || null,
+                    postcode: $('#info-presentpostcode').val() || null,
+                    provinceCode: $('#info-presentprovince').val() || null,
+                    districtCode: $('#info-presentdistrict').val() || null,
+                    subdistrictCode: $('#info-presentsubdistrict').val() || null
+                }
+            },
+            invoiceInfo: {
+                companyName: $('#info-invcompanyname').val() || null,
+                companyRegistrationNo: $('#info-invcompanyregister').val() || null,
+                invoiceAddress: {
+                    addressLine: $('#info-invaddress').val() || null,
+                    postcode: $('#info-invpostcode').val() || null,
+                    provinceCode: $('#info-invprovince').val() || null,
+                    districtCode: $('#info-invdistrict').val() || null,
+                    subdistrictCode: $('#info-invsubdistrict').val() || null
+                }
+            },
+            bankInfo: {
+                bankCode: $('#info-bankname').val() || null,
+                accountNumber: $('#info-accountnumber').val() || null,
+                accountName: $('#info-bookbankname').val() || null,
+                branchName: $('#info-branchname').val() || null,
+                beneficiary: $('#info-beneficiary').val() || null,
+                beneficiaryIdCard: $('#info-beneficiaryidcard').val() || null
+            },
+            documentInfo: {
+                profileImageUrl: $('#user-profile-image').attr('src') || null,
+                idCardImageUrl: $('#info-copyidcard').attr('src') || null,
+                bankBookImageUrl: $('#info-copybankaccountbook').attr('src') || null,
+                applicationFormImageUrl: $('#info-applicationsubmitte').attr('src') || null
+            },
+            updateScope
+        };
+
+        return payload;
+    }
+
+    async function submitMemberProfileUpdate(updateScope) {
+        const payload = buildMemberUpdatePayload(updateScope);
+
+        const response = await fetch('/Member/UpdateMemberProfile', {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const raw = await response.text();
+        let result = null;
+        try {
+            result = JSON.parse(raw);
+        } catch {
+            result = { success: response.ok, message: raw || '' };
+        }
+
+        if (!response.ok || result?.success === false) {
+            throw new Error(result?.message || 'ไม่สามารถอัปเดตข้อมูลได้');
+        }
+
+        return result;
+    }
+
     document.getElementById("btn-personalupdate").addEventListener("click", function () {
         Swal.fire({
             title: "ยืนยัน",
@@ -883,16 +1248,31 @@
             confirmButtonText: "ยืนยัน",
             buttonsStyling: !1,
             showCloseButton: !0
-        }).then(function (t) {
-            /*t.value && Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success",
-                customClass: {
-                    confirmButton: "btn btn-primary w-xs mt-2"
-                },
-                buttonsStyling: !1
-            })*/
+        }).then(async function (t) {
+            if (!t.value) return;
+
+            try {
+                await submitMemberProfileUpdate('personal');
+                Swal.fire({
+                    title: "บันทึกแล้ว",
+                    text: "ส่งคำขออัปเดตข้อมูลส่วนตัวเรียบร้อย",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: "ยังไม่พร้อมใช้งาน",
+                    text: error?.message || "ยังไม่สามารถอัปเดตข้อมูลได้",
+                    icon: "warning",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            }
         })
     })
 
@@ -909,20 +1289,35 @@
             confirmButtonText: "ยืนยัน",
             buttonsStyling: !1,
             showCloseButton: !0
-        }).then(function (t) {
-            /*t.value && Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success",
-                customClass: {
-                    confirmButton: "btn btn-primary w-xs mt-2"
-                },
-                buttonsStyling: !1
-            })*/
+        }).then(async function (t) {
+            if (!t.value) return;
+
+            try {
+                await submitMemberProfileUpdate('address');
+                Swal.fire({
+                    title: "บันทึกแล้ว",
+                    text: "ส่งคำขออัปเดตข้อมูลที่อยู่เรียบร้อย",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: "ยังไม่พร้อมใช้งาน",
+                    text: error?.message || "ยังไม่สามารถอัปเดตข้อมูลได้",
+                    icon: "warning",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            }
         })
     })
 
-    document.getElementById("btn-docupdate").addEventListener("click", function () {
+    document.getElementById("btn-docupdate").addEventListener("click", async function () {
         Swal.fire({
             title: "ยืนยัน",
             text: "ยืนยันอัพเดทข้อมูล",
@@ -935,25 +1330,102 @@
             confirmButtonText: "ยืนยัน",
             buttonsStyling: !1,
             showCloseButton: !0
-        }).then(function (t) {
-            /*t.value && Swal.fire({
-                title: "Deleted!",
-                text: "Your file has been deleted.",
-                icon: "success",
-                customClass: {
-                    confirmButton: "btn btn-primary w-xs mt-2"
-                },
-                buttonsStyling: !1
-            })*/
+        }).then(async function (t) {
+            if (!t.value) {
+                return;
+            }
+
+            const hasFileToUpload = uploadState.profileImage || uploadState.copyIdCard || uploadState.copyBankBook || uploadState.applicationForm;
+            if (!hasFileToUpload) {
+                Swal.fire({
+                    title: "ไม่มีไฟล์",
+                    text: "กรุณาเลือกไฟล์ที่ต้องการอัปโหลดอย่างน้อย 1 รายการ",
+                    icon: "warning",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                if (memberinfo?.membercode) {
+                    formData.append('memberCode', memberinfo.membercode);
+                }
+
+                if (uploadState.profileImage) formData.append('profileImage', uploadState.profileImage);
+                if (uploadState.copyIdCard) formData.append('copyIdCard', uploadState.copyIdCard);
+                if (uploadState.copyBankBook) formData.append('copyBankBook', uploadState.copyBankBook);
+                if (uploadState.applicationForm) formData.append('applicationForm', uploadState.applicationForm);
+
+                const response = await fetch('/Member/UploadMemberDocuments', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result?.success) {
+                    throw new Error(result?.message || 'Upload failed');
+                }
+
+                if (result.urls?.profileImage) {
+                    $('#user-profile-image').attr('src', result.urls.profileImage);
+                }
+                if (result.urls?.copyIdCard) {
+                    $('#info-copyidcard').attr('src', result.urls.copyIdCard);
+                    $('#info-flagsendidcard').prop('checked', true);
+                }
+                if (result.urls?.copyBankBook) {
+                    $('#info-copybankaccountbook').attr('src', result.urls.copyBankBook);
+                    $('#info-flagsendbookbank').prop('checked', true);
+                }
+                if (result.urls?.applicationForm) {
+                    $('#info-applicationsubmitte').attr('src', result.urls.applicationForm);
+                    $('#info-registerfrombranch').prop('checked', true);
+                }
+
+                uploadState.profileImage = null;
+                uploadState.copyIdCard = null;
+                uploadState.copyBankBook = null;
+                uploadState.applicationForm = null;
+                $('#profile-img-file-input').val('');
+                $('#info-uploadcopyidcard').val('');
+                $('#info-uploadcopybankaccountbook').val('');
+                $('#info-uploadapplicationsubmitte').val('');
+
+                Swal.fire({
+                    title: "สำเร็จ",
+                    text: "อัปโหลดเอกสารเรียบร้อยแล้ว",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            } catch (error) {
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด",
+                    text: error?.message || "ไม่สามารถอัปโหลดไฟล์ได้",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            }
         })
     })
 
     // Load member info when page loads using jQuery
     $(document).ready(function () {
+        bindUploadPreview();
         (async () => {
+            await loadMasterAddresses();
             await loadCountries();
             await loadCountryBusinesses();
-            await loadDistricts();
             await loadMemberInfo();
         })();
     });

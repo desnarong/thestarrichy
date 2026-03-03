@@ -58,6 +58,8 @@
     let currentMemberCode = '';
     let parentMemberCode = '';
     let treeData = null;
+    let currentViewedMemberCode = '';
+    let navigationHistory = [];
 
     $(document).ready(function() {
         loadCurrentMember();
@@ -84,11 +86,11 @@
             // Response is flat object with membercode directly, not memberInfo[0]
             if (memberInfo && memberInfo.membercode) {
                 currentMemberCode = memberInfo.membercode;
-                loadBinaryTeam(currentMemberCode);
+                loadBinaryTeam(currentMemberCode, { resetHistory: true });
             } else if (memberInfo && memberInfo.memberInfo && memberInfo.memberInfo.length > 0) {
                 // Fallback for nested format
                 currentMemberCode = memberInfo.memberInfo[0].membercode;
-                loadBinaryTeam(currentMemberCode);
+                loadBinaryTeam(currentMemberCode, { resetHistory: true });
             } else {
                 showAlert('warning', 'ไม่พบข้อมูลสมาชิก');
             }
@@ -106,15 +108,34 @@
             window.location.href=url;
     }
 
-    async function loadBinaryTeam(memberCode) {
+    async function loadBinaryTeam(memberCode, options = {}) {
         try {
             showLoading(true);
+
+            const isBackNavigation = !!options.isBackNavigation;
+            const shouldResetHistory = !!options.resetHistory;
+            const requestedCode = (memberCode || '').toString().trim();
+
+            if (shouldResetHistory) {
+                navigationHistory = [];
+                currentViewedMemberCode = '';
+            }
+
+            if (requestedCode) {
+                if (!isBackNavigation && currentViewedMemberCode && currentViewedMemberCode !== requestedCode) {
+                    navigationHistory.push(currentViewedMemberCode);
+                }
+
+                if (isBackNavigation && navigationHistory.length > 0 && navigationHistory[navigationHistory.length - 1] === requestedCode) {
+                    navigationHistory.pop();
+                }
+            }
             
             // สร้าง URL - ถ้ามี memberCode ให้ส่งไปด้วย (สำหรับค้นหา/คลิกดูทีมคนอื่น)
             // ถ้าไม่มี จะดึงจาก JWT อัตโนมัติ
             let url = '/home/GetMemberBinaryTeam';
-            if (memberCode) {
-                url += `?membercode=${memberCode}`;
+            if (requestedCode) {
+                url += `?membercode=${requestedCode}`;
             }
             
             const response = await fetch(url);
@@ -134,7 +155,19 @@
             }
             
             treeData = result;
-            renderBinaryTree(result, memberCode || (result[0]?.Membercode || ''));
+
+            const payload = Array.isArray(result) ? (result[0] || null) : result;
+            const binaryTree = payload ? getNodeValue(payload, ['BinaryTree', 'binaryTree'], null) : null;
+            const currentNode = Array.isArray(binaryTree)
+                ? (binaryTree[0] || null)
+                : (binaryTree || payload);
+            const resolvedCode = requestedCode || getFirstNonEmptyValue(currentNode, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
+
+            if (resolvedCode) {
+                currentViewedMemberCode = resolvedCode;
+            }
+
+            renderBinaryTree(result, resolvedCode || (Array.isArray(result) ? (result[0]?.Membercode || '') : ''));
         } catch (error) {
             console.error('Error:', error);
             showAlert('danger', 'เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message);
@@ -143,161 +176,171 @@
         }
     }
 
-        function renderBinaryTree(data, centerCode) {
-            const container = $('#binaryTreeContainer');
-            container.empty();
+    function getNodeValue(node, keys, fallback = null) {
+        if (!node || !Array.isArray(keys)) return fallback;
+        for (const key of keys) {
+            if (node[key] !== undefined && node[key] !== null) {
+                return node[key];
+            }
+        }
+        return fallback;
+    }
 
-            if (!data || !Array.isArray(data) || data.length === 0) {
-                container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
-                return;
+    function getNodeChildren(node) {
+        const children = getNodeValue(node, ['Children', 'children'], []);
+        return Array.isArray(children) ? children : [];
+    }
+
+    function findNodeInTree(nodes, targetCode) {
+        if (!Array.isArray(nodes) || nodes.length === 0 || !targetCode) {
+            return null;
+        }
+
+        const normalizedTarget = targetCode.toString().trim().toUpperCase();
+
+        for (const node of nodes) {
+            const memberCode = getFirstNonEmptyValue(node, ['Membercode', 'membercode'], '').toUpperCase();
+            const childCode = getFirstNonEmptyValue(node, ['ChildCode', 'childCode'], '').toUpperCase();
+
+            if (memberCode === normalizedTarget || childCode === normalizedTarget) {
+                return node;
             }
 
-            // ข้อมูลจาก API เป็น array ของ objects ทุกตำแหน่ง
-            // BinaryTree อยู่ใน property BinaryTree ของ object แรก
-            const mainData = data[0];
-            
-            if (!mainData) {
-                container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
-                return;
+            const foundInChildren = findNodeInTree(getNodeChildren(node), normalizedTarget);
+            if (foundInChildren) {
+                return foundInChildren;
             }
+        }
 
-            // ดึง BinaryTree จากข้อมูลหลัก
-            const binaryTree = mainData.BinaryTree;
-            
-            if (binaryTree && Array.isArray(binaryTree) && binaryTree.length > 0) {
-                // สร้าง dictionary จากข้อมูลทั้งหมดเพื่อค้นหา children
-                const positionDict = {};
-                data.forEach(item => {
-                    if (item.PositionLevel) {
-                        positionDict[item.PositionLevel] = item;
-                    }
-                });
-                
-                // ส่งข้อมูลทั้งหมดและ dictionary ไปให้ renderTreeNode
-                let html = `<div class="binary-tree-container">`;
-                binaryTree.forEach((rootNode, index) => {
-                    html += renderTreeNode(rootNode, 0, index, data, positionDict);
-                });
-                html += `</div>`;
-                container.html(html);
-            } else if (binaryTree && binaryTree.Membercode) {
-                // ถ้า BinaryTree เป็น single object
-                const positionDict = {};
-                data.forEach(item => {
-                    if (item.PositionLevel) {
-                        positionDict[item.PositionLevel] = item;
-                    }
-                });
-                
-                let html = `<div class="binary-tree-container">`;
-                html += renderTreeNode(binaryTree, 0, 0, data, positionDict);
-                html += `</div>`;
-                container.html(html);
+        return null;
+    }
+
+    function getFirstNonEmptyValue(node, keys, fallback = '') {
+        if (!node || !Array.isArray(keys)) return fallback;
+        for (const key of keys) {
+            const value = node[key];
+            if (value !== undefined && value !== null && value.toString().trim() !== '') {
+                return value.toString().trim();
+            }
+        }
+        return fallback;
+    }
+
+    function isTreeEmptyNode(node) {
+        if (!node) return true;
+        const isEmptyFlag = !!getNodeValue(node, ['IsEmptyNode', 'isEmptyNode'], false);
+        const membercode = (getNodeValue(node, ['Membercode', 'membercode'], '') || '').toString();
+        const childCode = (getNodeValue(node, ['ChildCode', 'childCode'], '') || '').toString();
+        const membername = (getNodeValue(node, ['Membername', 'membername'], '') || '').toString();
+        return isEmptyFlag || membercode.startsWith('EMPTY_') || membername === '(ว่าง)' || (!membercode && !childCode);
+    }
+
+    function pickBinaryChildren(children) {
+        if (!Array.isArray(children) || children.length === 0) {
+            return { leftChild: null, rightChild: null };
+        }
+
+        const leftCandidates = [];
+        const rightCandidates = [];
+        const neutralCandidates = [];
+
+        children.forEach((child) => {
+            const level = (getNodeValue(child, ['PositionLevel', 'positionLevel'], '') || '').toString().toLowerCase();
+            if (level.includes('left')) {
+                leftCandidates.push(child);
+            } else if (level.includes('right')) {
+                rightCandidates.push(child);
             } else {
-                // Fallback ใช้ข้อมูลเดิม
-                renderOldStyle(data, centerCode);
+                neutralCandidates.push(child);
             }
+        });
+
+        const leftReal = leftCandidates.find(c => !isTreeEmptyNode(c));
+        const rightReal = rightCandidates.find(c => !isTreeEmptyNode(c));
+        const neutralReal = neutralCandidates.find(c => !isTreeEmptyNode(c));
+
+        let leftChild = leftReal || leftCandidates[0] || neutralReal || neutralCandidates[0] || rightReal || rightCandidates[0] || null;
+        let rightChild = rightReal || rightCandidates.find(c => c !== leftChild) || neutralReal || neutralCandidates.find(c => c !== leftChild) || leftReal || leftCandidates.find(c => c !== leftChild) || null;
+
+        if (leftChild && rightChild && leftChild === rightChild) {
+            rightChild = children.find(c => c !== leftChild) || null;
         }
 
-    function renderTreeNode(node, level, index = 0, allData = null, positionDict = null) {
-        if (!node) return '';
-        
-        const membercode = node.ChildCode || '';
-        const membername = node.Membername || node.Idcardname || 'N/A';
-        const personalPV = node.PersonalPV || 0;
-        const memberposition = node.Memberposition || '';
-        const memberpositionName = node.MemberpositionName || '';
-        const memberthaiName = node.thaiName || 'ไม่มีตำแหน่ง';
-        const currentMonth1 = node.currentMonth1 || '';
-        const lastmonthQualifyPV = node.lastmonthQualifyPV || 0;
-        const memberpositionRanking = node.MemberpositionRankingName || node.MemberpositionRanking || '';
-        const children = node.Children || [];
-        const levelInfo = node.Level || 1;
-        const positionLevel = node.PositionLevel || '';
-        
-        // หา left และ right จาก PositionLevel
-        const isLeft = positionLevel && positionLevel.toString().includes('Left');
-        const isRight = positionLevel && positionLevel.toString().includes('Right');
-        
-        // ข้อมูลสำหรับแสดงผล
-        const currentLeftPV = node.CurrentLeftPV || 0;
-        const currentRightPV = node.CurrentRightPV || 0;
-        const newLeft = node.NewLeft || 0;
-        const newRight = node.NewRight || 0;
-        const leftCountActive = node.LeftCountActive || 0;
-        const rightCountActive = node.RightCountActive || 0;
-        const totalLeftBalance = node.TotalLeftBalance || 0;
-        const totalRightBalance = node.TotalRightBalance || 0;
-        
-        // สถานะรักษายอด
-        const lastMonthQualifyStatus = node.LastMonthQualifyStatus || 'No';
-        const currentMonthQualifyStatus = node.CurrentMonthQualifyStatus || 'No';
-        
-        // สีการ์ดตามสถานะรักษายอด (ใช้สีพื้นหลังแทน badge)
-        const cardColorClass = lastMonthQualifyStatus === 'Yes' ? 'card-green' : 'card-red';
-        
-        // รูปภาพสมาชิก
-        const memberPicture = node.MemberPostionPicture || 'images/1_Black1_40x40.gif';
-        
-        // หา children จาก positionDict ถ้ามี
-        let leftChild = null;
-        let rightChild = null;
-        
-        if (positionDict && positionLevel) {
-            // หา children ตามโครงสร้างไบนารี่จาก JSON
-            // ใช้ ChildCode เพื่อค้นหา children ที่ถูกต้อง
-            const childCode = node.ChildCode || '';
-            
-            if (positionLevel === 'Root' || positionLevel === 'Membercode') {
-                // Root -> Leftcode1 และ Rightcode1
-                leftChild = positionDict['Leftcode1'] || null;
-                rightChild = positionDict['Rightcode1'] || null;
-            } else if (positionLevel === 'Leftcode1') {
-                // Leftcode1 -> Leftcode21 และ Rightcode22
-                leftChild = positionDict['Leftcode21'] || null;
-                rightChild = positionDict['Rightcode22'] || null;
-            } else if (positionLevel === 'Rightcode1') {
-                // Rightcode1 -> Leftcode23 และ Rightcode24
-                leftChild = positionDict['Leftcode23'] || null;
-                rightChild = positionDict['Rightcode24'] || null;
-            } else if (positionLevel === 'Leftcode21') {
-                // Leftcode21 -> Leftcode31 และ Rightcode32
-                leftChild = positionDict['Leftcode31'] || null;
-                rightChild = positionDict['Rightcode32'] || null;
-            } else if (positionLevel === 'Rightcode22') {
-                // Rightcode22 -> Leftcode33 และ Rightcode34
-                leftChild = positionDict['Leftcode33'] || null;
-                rightChild = positionDict['Rightcode34'] || null;
-            } else if (positionLevel === 'Leftcode23') {
-                // Leftcode23 -> Leftcode35 และ Rightcode36
-                leftChild = positionDict['Leftcode35'] || null;
-                rightChild = positionDict['Rightcode36'] || null;
-            } else if (positionLevel === 'Rightcode24') {
-                // Rightcode24 -> Leftcode37 และ Rightcode38
-                leftChild = positionDict['Leftcode37'] || null;
-                rightChild = positionDict['Rightcode38'] || null;
-            }
-            
-            // ตรวจสอบว่า child มีข้อมูลจริงหรือไม่
-            // ถ้า ChildCode เป็น "ว่าง/Empty" หรือไม่มี Membercode ให้ถือว่าเป็น empty
-            if (leftChild && (leftChild.ChildCode === 'ว่าง/Empty' || !leftChild.Membercode || leftChild.Membercode === '')) {
-                leftChild = null;
-            }
-            if (rightChild && (rightChild.ChildCode === 'ว่าง/Empty' || !rightChild.Membercode || rightChild.Membercode === '')) {
-                rightChild = null;
-            }
+        return { leftChild, rightChild };
+    }
+
+    function renderBinaryTree(data, centerCode) {
+        const container = $('#binaryTreeContainer');
+        container.empty();
+
+        if (!data) {
+            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
+            return;
         }
-        
-        // ตรวจสอบว่าเป็น level สุดท้ายหรือไม่ (level 3)
-        // ถ้าเป็น level 3 (Leftcode31-38) ไม่ต้องแสดง children container อีก
-        const isLevel3 = positionLevel && (
-            positionLevel === 'Leftcode31' || positionLevel === 'Rightcode32' ||
-            positionLevel === 'Leftcode33' || positionLevel === 'Rightcode34' ||
-            positionLevel === 'Leftcode35' || positionLevel === 'Rightcode36' ||
-            positionLevel === 'Leftcode37' || positionLevel === 'Rightcode38'
-        );
-        
-        // สีตาม position
+
+        const payload = Array.isArray(data) ? (data[0] || null) : data;
+        if (!payload) {
+            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
+            return;
+        }
+
+        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
+        if (!binaryTree) {
+            renderOldStyle(Array.isArray(data) ? data : [data], centerCode);
+            return;
+        }
+
+        const rootNodes = Array.isArray(binaryTree) ? binaryTree : [binaryTree];
+        if (rootNodes.length === 0) {
+            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
+            return;
+        }
+
+        let html = `<div class="binary-tree-container">`;
+        rootNodes.forEach((rootNode) => {
+            html += renderTreeNode(rootNode, 0);
+        });
+        html += `</div>`;
+        container.html(html);
+    }
+
+    function renderTreeNode(node, level) {
+        if (!node) return '';
+
+        const membercode = getFirstNonEmptyValue(node, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
+        const nodeMemberCode = getFirstNonEmptyValue(node, ['Membercode', 'membercode'], '');
+        const membername = getNodeValue(node, ['Membername', 'membername', 'Idcardname', 'idcardname'], 'N/A');
+        const memberposition = getNodeValue(node, ['Memberposition', 'memberposition'], '');
+        const memberpositionName = getNodeValue(node, ['MemberpositionName', 'memberpositionName'], '');
+        const memberthaiName = getNodeValue(node, ['MemberpositionRankingName', 'memberpositionRankingName', 'MemberpositionRanking', 'memberpositionRanking'], 'ไม่มีตำแหน่ง');
+        const currentMonth1 = getNodeValue(node, ['currentMonth1', 'CurrentMonth1'], '');
+        const lastmonthQualifyPV = getNodeValue(node, ['lastmonthQualifyPV', 'LastmonthQualifyPV', 'lastMonthQualifyPV', 'LastMonthQualifyPV'], 0);
+        const positionLevel = (getNodeValue(node, ['PositionLevel', 'positionLevel'], '') || '').toString();
+
+        const currentLeftPV = getNodeValue(node, ['CurrentLeftPV', 'currentLeftPV'], 0);
+        const currentRightPV = getNodeValue(node, ['CurrentRightPV', 'currentRightPV'], 0);
+        const newLeft = getNodeValue(node, ['NewLeft', 'newLeft'], 0);
+        const newRight = getNodeValue(node, ['NewRight', 'newRight'], 0);
+        const leftCountActive = getNodeValue(node, ['LeftCountActive', 'leftCountActive'], 0);
+        const rightCountActive = getNodeValue(node, ['RightCountActive', 'rightCountActive'], 0);
+        const totalLeftBalance = getNodeValue(node, ['TotalLeftBalance', 'totalLeftBalance'], 0);
+        const totalRightBalance = getNodeValue(node, ['TotalRightBalance', 'totalRightBalance'], 0);
+
+        const lastMonthQualifyStatus = (getNodeValue(node, ['LastMonthQualifyStatus', 'lastMonthQualifyStatus'], 'No') || 'No').toString();
+        const cardColorClass = lastMonthQualifyStatus === 'Yes' ? 'card-green' : 'card-red';
+        const memberPicture = getNodeValue(node, ['MemberPostionPicture', 'memberPostionPicture', 'MemberPositionPicture', 'memberPositionPicture'], '/images/1_Black1_40x40.gif');
+
+        const children = getNodeChildren(node);
+        const { leftChild, rightChild } = pickBinaryChildren(children);
+
+        const hasLeftChild = !!leftChild;
+        const hasRightChild = !!rightChild;
+        const hasRealLeft = hasLeftChild && !isTreeEmptyNode(leftChild);
+        const hasRealRight = hasRightChild && !isTreeEmptyNode(rightChild);
+
+        const isLeft = positionLevel.toLowerCase().includes('left');
+        const isRight = positionLevel.toLowerCase().includes('right');
+
         let gradientClass = 'gradient-center';
         if (memberposition === 'SS' || memberposition === 'Silver Star') {
             gradientClass = 'gradient-silver';
@@ -310,26 +353,25 @@
         } else if (isRight) {
             gradientClass = 'gradient-right';
         }
-        
-        // อ้างอิงจาก Membercode เป็นหลัก ถ้าไม่มีโค้ดแสดงว่าเป็นกล่องว่างจริงๆ
-        const isEmpty = !membercode || membercode === '' || membercode === 'ว่าง/Empty';
-        
-        let html = `
-            <div class="tree-node-wrapper" data-level="${level}">
-        `;
-        
+
+        const isEmpty = isTreeEmptyNode(node);
+        const isLastLevel = children.length === 0;
+        const safeMemberCode = (membercode || nodeMemberCode).replace(/'/g, "\\'");
+        const registerBaseCodeRaw = nodeMemberCode || membercode || 'root';
+        const registerBaseCode = registerBaseCodeRaw.replace(/'/g, "\\'");
+
+        let html = `<div class="tree-node-wrapper" data-level="${level}">`;
+
         if (isEmpty) {
-            // แสดง node ว่าง
             html += `
-                <div class="empty-node" onclick="registerTeam('${membercode}')">
+                <div class="empty-node" onclick="registerTeam('${registerBaseCode}')">
                     <i class="ri-add-circle-line ri-2x"></i>
                     <span>ว่าง</span>
                 </div>
             `;
         } else {
-            // แสดง node ปกติ
             html += `
-                <div class="tree-node ${gradientClass} ${cardColorClass}" onclick="loadBinaryTeam('${membercode}')" title="คลิกเพื่อดูทีม">
+                <div class="tree-node ${gradientClass} ${cardColorClass} ${isLastLevel ? 'level-last' : ''}" onclick="loadBinaryTeam('${safeMemberCode}')" title="คลิกเพื่อดูทีม">
                     <div class="node-main">
                         <div class="node-avatar">
                             <img src="${memberPicture}" alt="${membername}" class="member-picture">
@@ -339,9 +381,10 @@
                             <div class="member-name">${membername}</div>
                             <div class="member-code">${membercode}</div>
                             <div class="member-position">${memberpositionName || memberposition}</div>
-                            <div class="member-position-ranking">การรักษายอดเดือน ${currentMonth1} - ${lastmonthQualifyPV}</div>
+                            <div class="member-position-ranking">รักษายอด ${currentMonth1} - ${lastmonthQualifyPV}</div>
                         </div>
                     </div>
+                    ${!isLastLevel ? `
                     <div class="node-stats">
                         <div class="stats-row">
                             <div class="stat-item">
@@ -372,54 +415,99 @@
                             </div>
                         </div>
                     </div>
+                    ` : ''}
                 </div>
             `;
         }
-        
-        // แสดง children container เฉพาะถ้าไม่ใช่ level 3
-        if (!isLevel3) {
+
+        if (!isLastLevel) {
             html += `<div class="tree-children">`;
             html += `<div class="tree-connector"></div>`;
-            html += `<div class="children-container">`;
-            
-            // Left side - แสดงเสมอไม่ว่าจะมีข้อมูลหรือไม่
-            if (leftChild && leftChild.Membercode && leftChild.Membercode !== 'ว่าง/Empty') {
-                html += `<div class="child-branch left">`;
-                html += renderTreeNode(leftChild, level + 1, 0, allData, positionDict);
-                html += `</div>`;
-            } else {
-                // สร้าง empty node สำหรับ left side
-                const parentCode = membercode || 'root';
-                html += `<div class="child-branch left">
-                        <div class="empty-node small" onclick="registerTeam('${parentCode}L')">
-                        <i class="ri-add-circle-line"></i>
-                        <span>ว่าง</span>
+            const leftIsLast = !hasRealLeft || getNodeChildren(leftChild).length === 0;
+            const rightIsLast = !hasRealRight || getNodeChildren(rightChild).length === 0;
+            const childrenContainerClass = (leftIsLast && rightIsLast)
+                ? `children-container children-container-last`
+                : `children-container children-container-level-${level + 1}`;
+            const leftIsEmpty = !hasRealLeft;
+            const rightIsEmpty = !hasRealRight;
+            const level1LeftEmptyClass = (level + 1 === 1 && leftIsEmpty)
+                ? ' children-container-level-1-left-empty'
+                : '';
+            const level1NoEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty)
+                ? ' children-container-level-1-no-empty'
+                : '';
+            const level1RightEmptyClass = (level + 1 === 1 && rightIsEmpty)
+                ? ' children-container-level-1-right-empty'
+                : '';
+            const leftGrandChildren = getNodeChildren(leftChild);
+            const leftGrandChildrenPicked = pickBinaryChildren(leftGrandChildren);
+            const leftLevel2RightEmpty = !leftGrandChildrenPicked.rightChild || isTreeEmptyNode(leftGrandChildrenPicked.rightChild);
+            const level1NoEmptyLeftLevel2RightEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty && leftLevel2RightEmpty)
+                ? ' children-container-level-1-no-empty-left-level2-right-empty'
+                : '';
+            const rightGrandChildren = getNodeChildren(rightChild);
+            const rightLevel2AllEmpty = rightGrandChildren.length >= 2 && rightGrandChildren.every(child => isTreeEmptyNode(child));
+            const level1LeftEmptyRightLevel2AllEmptyClass = (level + 1 === 1 && leftIsEmpty && rightLevel2AllEmpty)
+                ? ' children-container-level-1-left-empty-right-level2-all-empty'
+                : '';
+            const level1RightLevel2AllEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty && rightLevel2AllEmpty)
+                ? ' children-container-level-1-right-level2-all-empty'
+                : '';
+            const level2RightEmptyClass = (level + 1 === 2 && rightIsEmpty)
+                ? ' children-container-level-2-right-empty'
+                : '';
+
+            html += `<div class="${childrenContainerClass}${level1LeftEmptyClass}${level1NoEmptyClass}${level1RightEmptyClass}${level1NoEmptyLeftLevel2RightEmptyClass}${level1LeftEmptyRightLevel2AllEmptyClass}${level1RightLevel2AllEmptyClass}${level2RightEmptyClass}">`;
+
+            if (hasRealLeft) {
+                html += `<div class="child-branch left">${renderTreeNode(leftChild, level + 1)}</div>`;
+            } else if (hasLeftChild) {
+                html += `
+                    <div class="child-branch left">
+                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}L')">
+                            <i class="ri-add-circle-line"></i>
+                            <span>ว่าง</span>
+                        </div>
                     </div>
-                </div>`;
-            }
-            
-            // Right side - แสดงเสมอไม่ว่าจะมีข้อมูลหรือไม่
-            if (rightChild && rightChild.Membercode && rightChild.Membercode !== 'ว่าง/Empty') {
-                html += `<div class="child-branch right">`;
-                html += renderTreeNode(rightChild, level + 1, 1, allData, positionDict);
-                html += `</div>`;
+                `;
             } else {
-                // สร้าง empty node สำหรับ right side
-                const parentCode = membercode || 'root';
-                html += `<div class="child-branch right">
-                        <div class="empty-node small" onclick="registerTeam('${parentCode}R')">
-                        <i class="ri-add-circle-line"></i>
-                        <span>ว่าง</span>
+                html += `
+                    <div class="child-branch left">
+                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}L')">
+                            <i class="ri-add-circle-line"></i>
+                            <span>ว่าง</span>
+                        </div>
                     </div>
-                </div>`;
+                `;
             }
-            
-            html += `</div>`; // children-container
-            html += `</div>`; // tree-children
+
+            if (hasRealRight) {
+                html += `<div class="child-branch right">${renderTreeNode(rightChild, level + 1)}</div>`;
+            } else if (hasRightChild) {
+                html += `
+                    <div class="child-branch right">
+                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}R')">
+                            <i class="ri-add-circle-line"></i>
+                            <span>ว่าง</span>
+                        </div>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div class="child-branch right">
+                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}R')">
+                            <i class="ri-add-circle-line"></i>
+                            <span>ว่าง</span>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            html += `</div>`;
         }
-        
-        html += `</div>`; // tree-node-wrapper
-        
+
+        html += `</div>`;
         return html;
     }
 
@@ -482,22 +570,53 @@
             showAlert('warning', 'กรุณากรอกรหัสสมาชิก');
             return;
         }
-        loadBinaryTeam(memberCode);
+        loadBinaryTeam(memberCode, { resetHistory: true });
     }
 
     function goToParent() {
-        const container = $('#binaryTreeContainer');
-        if (!treeData || treeData.length === 0) return;
-        
-        const currentMember = treeData[0];
-        const childCode = currentMember.ChildCode;
-        
-        if (!childCode) {
-            showAlert('info', 'ไม่มีสายงานบนแล้ว');
+        if (!treeData) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
             return;
         }
-        
-        loadBinaryTeam(childCode);
+
+        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
+        if (!payload) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        console.log('Payload for goToParent:', payload);
+
+        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
+        const rootNodes = Array.isArray(binaryTree)
+            ? binaryTree
+            : (binaryTree ? [binaryTree] : []);
+
+        const currentNode = rootNodes.length > 0
+            ? (findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0])
+            : payload;
+
+        if (!currentNode) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        const parentCode = getFirstNonEmptyValue(currentNode, ['ParentCode', 'parentCode'], '');
+        if (parentCode && !parentCode.startsWith('EMPTY_')) {
+            loadBinaryTeam(parentCode, { isBackNavigation: true });
+            return;
+        }
+
+        const fallbackParentCode = navigationHistory.length > 0
+            ? navigationHistory[navigationHistory.length - 1]
+            : '';
+
+        if (fallbackParentCode) {
+            loadBinaryTeam(fallbackParentCode, { isBackNavigation: true });
+            return;
+        }
+
+        showAlert('info', 'ไม่มีสายงานบนแล้ว');
     }
 
     function expandAll() {
@@ -613,7 +732,7 @@
     justify-content: center;
     border: 2px solid rgba(255,255,255,0.5);
     flex-direction: column;
-    padding: 5px;
+    padding: 0;
     box-sizing: border-box;
     flex-shrink: 0;
     position: relative;
@@ -622,8 +741,8 @@
 }
 
 .tree-node .node-avatar img.member-picture {
-    width: 40px;
-    height: 40px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     object-fit: cover;
 }
@@ -650,6 +769,7 @@
 .tree-node .node-details {
     text-align: left;
     flex: 1;
+    min-width: 0;
 }
 
 .tree-node .member-name {
@@ -676,24 +796,25 @@
 }
 
 .tree-node .member-position-ranking {
-    font-size: 10px;
+    font-size: 8px;
     opacity: 0.9;
     margin-top: 2px;
     font-weight: 600;
     color: #ffd700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* สีการ์ดตามสถานะรักษายอดเดือนที่แล้ว */
 .tree-node.card-green {
-    background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
-    border-color: #28a745;
-    box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    border-color: #11998e;
 }
 
 .tree-node.card-red {
-    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-    border-color: #dc3545;
-    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    border-color: #f5576c;
 }
 
 /* สไตล์ใหม่สำหรับสถิติ */
@@ -765,6 +886,99 @@
     overflow: hidden;
 }
 
+.tree-node.level-last {
+    min-width: 170px;
+    max-width: 170px;
+    min-height: 75px;
+    max-height: 75px;
+    padding: 2px 6px;
+}
+
+.tree-node.level-last .node-main {
+    gap: 8px;
+    margin-bottom: 0;
+}
+
+.tree-node.level-last .node-avatar {
+    width: 46px;
+    height: 46px;
+    margin: 1px 4px 10px 4px;
+}
+
+.tree-node.level-last .node-avatar img.member-picture {
+    width: 100%;
+    height: 100%;
+}
+
+.tree-node.level-last .member-name {
+    font-size: 11px;
+    width: 95px;
+}
+
+.children-container.children-container-last::before {
+    left: calc(24%);
+    right: calc(24%);
+}
+
+.children-container.children-container-level-2::before {
+    left: calc(25% - 1px);
+    right: calc(25% - 2px);
+}
+
+.children-container.children-container-level-1::before {
+    left: calc(33% + 1px);
+    right: calc(16% + 2px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-left-empty::before {
+    left: calc(12% + 1px);
+    right: calc(37% + 1px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-left-empty.children-container-level-1-left-empty-right-level2-all-empty::before {
+    left: calc(16% + 1px);
+    right: calc(33% + 1px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-no-empty::before {
+    left: calc(24% + 11px);
+    right: calc(24% + 11px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-no-empty.children-container-level-1-no-empty-left-level2-right-empty::before {
+    left: calc(16% + 5px);
+    right: calc(32% + 11px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-right-empty::before {
+    left: calc(37% + 2px);
+    right: calc(12% - 2px);
+}
+
+.children-container.children-container-level-1.children-container-level-1-right-level2-all-empty::before {
+    left: calc(32% + 12px);
+    right: calc(15% + 13px);
+}
+
+.children-container.children-container-level-2.children-container-level-2-right-empty::before {
+    left: calc(33% + 1px);
+    right: calc(16% + 1px);
+}
+
+.tree-node.level-last .member-code,
+.tree-node.level-last .member-position,
+.tree-node.level-last .member-position {
+    font-size: 9px;
+}
+
+.tree-node.level-last .member-position-ranking {
+    font-size: 8px;
+}
+
+.tree-node.level-last .member-thainame {
+    font-size: 8px;
+}
+
 .tree-node .node-main {
     display: flex;
     align-items: center;
@@ -775,27 +989,18 @@
 .tree-children {
     display: flex;
     justify-content: center;
-    margin-top: 20px;
+    align-items: flex-start;
+    margin-top: 18px;
     position: relative;
-}
-
-.tree-children::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    height: 2px;
-    background: #667eea;
 }
 
 .tree-connector {
     position: absolute;
-    top: -20px;
+    top: -18px;
     left: 50%;
+    transform: translateX(-50%);
     width: 2px;
-    height: 10px;
+    height: 18px;
     background: #667eea;
 }
 
@@ -804,36 +1009,16 @@
     justify-content: center;
     gap: 10px;
     position: relative;
+    padding-top: 18px;
 }
 
 .children-container::before {
     content: '';
     position: absolute;
-    top: -10px;
-    left: 25%;
-    right: 25%;
+    top: 0;
+    left: calc(25% + 2px);
+    right: calc(25% + 2px);
     height: 2px;
-    background: #667eea;
-}
-
-/* เส้นขีดลงที่ปลายแต่ละข้าง */
-.children-container::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: 75%;
-    width: 2px;
-    height: 10px;
-    background: #667eea;
-}
-
-.children-container::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    right: 25%;
-    width: 2px;
-    height: 10px;
     background: #667eea;
 }
 
@@ -848,6 +1033,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+}
+
+.child-branch::before {
+    content: '';
+    position: absolute;
+    top: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 18px;
+    background: #667eea;
 }
 
 .empty-node {
@@ -866,8 +1063,12 @@
 }
 
 .empty-node.small {
-    width: 190px;
-    height: 175px;
+    width: 170px;
+    height: 75px;
+    min-width: 170px;
+    max-width: 170px;
+    min-height: 75px;
+    max-height: 75px;
     border: 2px dashed #ccc;
     border-radius: 16px;
     display: flex;

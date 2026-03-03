@@ -10,6 +10,7 @@ using System.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Text;
 using System.Text.Json.Nodes;
 using TheStarRichyProject.Helper;
@@ -249,6 +250,133 @@ namespace TheStarRichyProject.Controllers
             }
             return Error();
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateMemberProfile([FromBody] JObject requestBody)
+        {
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var options = new RestClientOptions(_config["Api:Url"]!)
+                {
+                    ThrowOnAnyError = false,
+                    ConfigureMessageHandler = handler =>
+                    {
+                        var httpClientHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        };
+                        return httpClientHandler;
+                    }
+                };
+
+                var passkey = _config["Api:Passkey"]!;
+                var token = Request.Cookies[CookieHelper.UserKey];
+                var client = new RestClient(options);
+                var apiRequest = new RestRequest("/Member/profile", Method.Put);
+                apiRequest.AddHeader("X-Passkey", passkey);
+                apiRequest.AddHeader("Authorization", $"Bearer {token}");
+                apiRequest.AddHeader("Accept", "application/json");
+                apiRequest.AddStringBody(requestBody?.ToString() ?? "{}", "application/json");
+
+                var response = await client.ExecuteAsync(apiRequest);
+                if (response.IsSuccessful)
+                {
+                    return Ok(response.Content);
+                }
+
+                return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode), response.Content);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calling UpdateMemberProfile API");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการอัปเดตข้อมูลสมาชิก" });
+            }
+        }
+
+        [HttpPost]
+        [RequestSizeLimit(25_000_000)]
+        public async Task<IActionResult> UploadMemberDocuments(
+            [FromForm] string? memberCode,
+            [FromForm] IFormFile? profileImage,
+            [FromForm] IFormFile? copyIdCard,
+            [FromForm] IFormFile? copyBankBook,
+            [FromForm] IFormFile? applicationForm)
+        {
+            try
+            {
+                if (profileImage == null && copyIdCard == null && copyBankBook == null && applicationForm == null)
+                {
+                    return BadRequest(new { success = false, message = "กรุณาเลือกไฟล์อย่างน้อย 1 รายการ" });
+                }
+
+                string safeMemberCode = string.IsNullOrWhiteSpace(memberCode)
+                    ? "unknown"
+                    : Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
+
+                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "MemberUploads", safeMemberCode);
+                if (!Directory.Exists(rootPath))
+                {
+                    Directory.CreateDirectory(rootPath);
+                }
+
+                var urls = new Dictionary<string, string?>
+                {
+                    ["profileImage"] = await SaveUploadFileAsync(profileImage, rootPath, "profile"),
+                    ["copyIdCard"] = await SaveUploadFileAsync(copyIdCard, rootPath, "idcard"),
+                    ["copyBankBook"] = await SaveUploadFileAsync(copyBankBook, rootPath, "bankbook"),
+                    ["applicationForm"] = await SaveUploadFileAsync(applicationForm, rootPath, "application")
+                };
+
+                return Ok(new { success = true, urls });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading member documents");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการอัปโหลดเอกสาร" });
+            }
+        }
+
+        private async Task<string?> SaveUploadFileAsync(IFormFile? file, string destinationFolder, string filePrefix)
+        {
+            if (file == null || file.Length == 0)
+            {
+                return null;
+            }
+
+            var allowedTypes = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            };
+
+            if (!allowedTypes.Contains(file.ContentType))
+            {
+                throw new InvalidOperationException("รองรับเฉพาะไฟล์รูปภาพประเภท JPG, PNG และ WEBP เท่านั้น");
+            }
+
+            string extension = Path.GetExtension(file.FileName);
+            if (string.IsNullOrWhiteSpace(extension))
+            {
+                extension = ".jpg";
+            }
+
+            string filename = $"{filePrefix}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
+            string fullPath = Path.Combine(destinationFolder, filename);
+
+            await using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            string relativeFolder = destinationFolder
+                .Replace(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "")
+                .Replace("\\", "/");
+
+            return $"{relativeFolder}/{filename}";
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

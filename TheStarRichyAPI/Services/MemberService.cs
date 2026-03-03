@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR.Protocol;
 using Microsoft.IdentityModel.Tokens;
 using System.Data.SqlClient;
 using System.Security.Claims;
+using TheStarRichyApi.Models;
 
 namespace TheStarRichyApi.Services
 {
@@ -12,6 +13,7 @@ namespace TheStarRichyApi.Services
         Task<string> DecodeAsync(string password);
         Task<string> GetPasskeyAsync(string column);
         Task<List<GetInfoMember2>> GetMember2DisplayAsync(string baseUrl);
+        Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(UpdateMemberProfileRequest request);
     }
     public class MemberService : IMemberService
     {
@@ -432,6 +434,100 @@ namespace TheStarRichyApi.Services
 
             result.Add(memberInfo);
             return result;
+        }
+
+        public Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(UpdateMemberProfileRequest request)
+        {
+            string memberCode = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(memberCode))
+            {
+                return Task.FromResult(new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = "ไม่พบข้อมูลสมาชิกจาก Token"
+                });
+            }
+
+            if (request == null)
+            {
+                return Task.FromResult(new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = "ไม่พบข้อมูลสำหรับอัปเดต"
+                });
+            }
+
+            return UpdateMemberProfileInternalAsync(memberCode, request);
+        }
+
+        private async Task<UpdateMemberProfileResult> UpdateMemberProfileInternalAsync(string memberCode, UpdateMemberProfileRequest request)
+        {
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+
+            try
+            {
+                using var con = new SqlConnection(connectionString);
+                await con.OpenAsync();
+
+                const string sql = @"
+UPDATE M06
+SET
+    M06_X5 = COALESCE(@BussinessName, M06_X5),
+    M06_X11 = COALESCE(@PresentAddress, M06_X11),
+    M06_X12 = COALESCE(@IdcardAddress, M06_X12),
+    M06_X25 = COALESCE(@Bookbankname, M06_X25),
+    M06_X27 = COALESCE(@Accountnumber, M06_X27),
+    M06_X28 = COALESCE(@Branchname, M06_X28),
+    PIC1 = COALESCE(@Pic1, PIC1),
+    PIC2 = COALESCE(@Pic2, PIC2),
+    PIC3 = COALESCE(@Pic3, PIC3),
+    PIC4 = COALESCE(@Pic4, PIC4)
+WHERE M06_PX1 = @Membercode
+  AND M06_X47 = N'0';";
+
+                using var command = new SqlCommand(sql, con);
+                command.Parameters.AddWithValue("@Membercode", memberCode);
+                command.Parameters.AddWithValue("@BussinessName", ToDbValue(request.PersonalInfo?.BussinessName));
+                command.Parameters.AddWithValue("@PresentAddress", ToDbValue(request.AddressInfo?.PresentAddress?.AddressLine));
+                command.Parameters.AddWithValue("@IdcardAddress", ToDbValue(request.AddressInfo?.IdCardAddress?.AddressLine));
+                command.Parameters.AddWithValue("@Bookbankname", ToDbValue(request.BankInfo?.AccountName));
+                command.Parameters.AddWithValue("@Accountnumber", ToDbValue(request.BankInfo?.AccountNumber));
+                command.Parameters.AddWithValue("@Branchname", ToDbValue(request.BankInfo?.BranchName));
+                command.Parameters.AddWithValue("@Pic1", ToDbValue(request.DocumentInfo?.IdCardImageUrl));
+                command.Parameters.AddWithValue("@Pic2", ToDbValue(request.DocumentInfo?.BankBookImageUrl));
+                command.Parameters.AddWithValue("@Pic3", ToDbValue(request.DocumentInfo?.ApplicationFormImageUrl));
+                command.Parameters.AddWithValue("@Pic4", ToDbValue(request.DocumentInfo?.ProfileImageUrl));
+
+                int rows = await command.ExecuteNonQueryAsync();
+                if (rows <= 0)
+                {
+                    return new UpdateMemberProfileResult
+                    {
+                        Success = false,
+                        Message = "ไม่พบข้อมูลสมาชิกสำหรับอัปเดต"
+                    };
+                }
+
+                return new UpdateMemberProfileResult
+                {
+                    Success = true,
+                    Message = "อัปเดตข้อมูลสมาชิกเรียบร้อย"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = $"เกิดข้อผิดพลาดในการอัปเดตข้อมูล: {ex.Message}"
+                };
+            }
+        }
+
+        private static object ToDbValue(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value.Trim();
         }
     }
     public class GetInfoMember2

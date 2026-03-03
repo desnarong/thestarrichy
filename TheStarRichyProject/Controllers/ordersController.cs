@@ -91,6 +91,49 @@ namespace TheStarRichyProject.Controllers
             return _config["Api:Passkey"];
         }
 
+        private decimal CalculateShippingFeeFallback(List<CartItem>? cartItems)
+        {
+            try
+            {
+                if (cartItems == null || cartItems.Count == 0)
+                    return 0;
+
+                var productListJson = HttpContext.Session.GetString("ProductList");
+                if (string.IsNullOrWhiteSpace(productListJson))
+                    return 0;
+
+                var productList = JsonSerializer.Deserialize<List<Product>>(productListJson,
+                    new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+                if (productList == null || productList.Count == 0)
+                    return 0;
+
+                var firstCartItem = cartItems.FirstOrDefault();
+                if (firstCartItem == null)
+                    return 0;
+
+                var product = productList.FirstOrDefault(p =>
+                    string.Equals(p.ProductId, firstCartItem.ProductID, StringComparison.OrdinalIgnoreCase));
+
+                if (product == null)
+                    return 0;
+
+                var totalPV = cartItems.Sum(x => x.PV * x.Quantity);
+                var totalAmount = cartItems.Sum(x => x.Price * x.Quantity);
+
+                if (product.TypeofFee == "1")
+                {
+                    return totalPV > product.CondFee ? 0 : (product.DeliveryFee1 ?? 0);
+                }
+
+                return totalAmount > product.CondFee ? 0 : (product.DeliveryFee1 ?? 0);
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
         #endregion
 
         #region Step 1: Shopping Cart (เลือกสินค้า)
@@ -1180,6 +1223,12 @@ namespace TheStarRichyProject.Controllers
 
                 if (result.Success)
                 {
+                    var shippingFee = result.Data.ShippingFee;
+                    if (shippingFee <= 0)
+                    {
+                        shippingFee = CalculateShippingFeeFallback(result.Data.Items);
+                    }
+
                     return Json(new
                     {
                         success = true,
@@ -1188,7 +1237,8 @@ namespace TheStarRichyProject.Controllers
                         totalPrice = result.Data.TotalAmount,
                         totalPV = result.Data.TotalPV,
                         totalBV = result.Data.TotalBV,
-                        shippingFee = result.Data.ShippingFee,
+                        billType = result.Data.BillType,
+                        shippingFee,
                         memberCode = result.Data.MemberCode,
                         centerCode = result.Data.CenterCode
                     });

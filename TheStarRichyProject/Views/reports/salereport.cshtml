@@ -16,36 +16,36 @@
                     <div class="form-group row mb-3">
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-center-mobile-code">รหัสศูนย์/โมบาย :</label>
                         <div class="col-lg-4 col-md-6">
-                            <input type="text" class="form-control" value="S00000029" disabled />
+                            <input type="text" class="form-control" id="centerCodeDisplay" value="-" disabled />
                         </div>
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-amount">ยอดรวม :</label>
                         <div class="col-lg-4 col-md-6">
-                            <input type="text" class="form-control" value="0.00" disabled />
+                            <input type="text" class="form-control" id="totalAmountDisplay" value="0.00" disabled />
                         </div>
                     </div>
                     <div class="form-group row mb-3">
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-quantity-of-pv">จำนวน PV :</label>
                         <div class="col-lg-4 col-md-6">
-                            <input type="text" class="form-control" value="0.00" disabled />
+                            <input type="text" class="form-control" id="totalPvDisplay" value="0.00" disabled />
                         </div>
                     </div>
                     <div class="form-group row mb-3">
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-report-type">ประเภทรายงาน :</label>
                         <div class="col-lg-10 col-md-6">
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="view_all" value="" checked>
+                                <input class="form-check-input" type="radio" name="report_type" id="view_all" value="all" checked>
                                 <label class="form-check-label" for="view_all" data-key="t-view-all">ดูทั้งหมด</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="daily" value="">
+                                <input class="form-check-input" type="radio" name="report_type" id="daily" value="daily">
                                 <label class="form-check-label" for="daily" data-key="t-daily">รายวัน</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="weekly" value="">
+                                <input class="form-check-input" type="radio" name="report_type" id="weekly" value="weekly">
                                 <label class="form-check-label" for="weekly" data-key="t-weekly">รายสัปดาห์</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="monthly" value="">
+                                <input class="form-check-input" type="radio" name="report_type" id="monthly" value="monthly">
                                 <label class="form-check-label" for="monthly" data-key="t-monthly">รายเดือน</label>
                             </div>
                         </div>
@@ -53,14 +53,17 @@
                     <div class="form-group row mb-3">
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-from-date">จากวันที่ :</label>
                         <div class="col-lg-3 col-md-6">
-                            <input type="text" class="form-control" value="" />
+                            <input type="date" class="form-control" id="fromDate" value="" />
                         </div>
                         <label class="col-lg-2 col-md-4 col-form-label" data-key="t-to-date">ถึงวันที่ :</label>
                         <div class="col-lg-3 col-md-6">
-                            <input type="text" class="form-control" value="" />
+                            <input type="date" class="form-control" id="toDate" value="" />
                         </div>
                         <div class="col-md-2">
-                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button class="btn btn-light" id="btnResetSale" type="button">รีเซ็ต</button>
+                                <button class="btn btn-primary" id="btnSearchSale" type="button" data-key="t-search">ค้นหา</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -79,33 +82,175 @@
 
 <script>
     $(document).ready(function () {
-        $("#data-table-responsive").DataTable({
-            "responsive": true,
-            "processing": true,
-            "serverSide": false,
-            "filter": false,
-            "orderMulti": false,
-            "ordering": true,
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
-            "pageLength": 25,
-            "destroy": true,
-            "searching": false,
-            "contentType": "application/json; charset=utf-8",
-            "columns": [
-                { title: "เลขที่ใบเสร็จ", "data": '', "targets": 0, "orderable": true, "data-key": "t-receipt-number" },
-                { title: "วันที่ใบเสร็จ", "data": '', "data-key": "t-receipt-date" },
-                { title: "รหัสสาขา", "data": '', "data-key": "t-branch-code" },
-                { title: "รหัสศูนย์", "data": '', "data-key": "t-center-code" },
-                { title: "รหัสโมบาย", "data": '', "data-key": "t-mobile-code" },
-                { title: "รหัสชุดสต็อก", "data": '', "data-key": "t-stock-kit-code" },
-                { title: "รหัสสมาชิก", "data": '', "data-key": "t-member-code" },
-                { title: "ชื่อสมาชิก", "data": '', "data-key": "t-member-name" },
-                { title: "ประเภทการสั่งซื้อ", "data": '', "data-key": "t-purchase-type" },
-                { title: "ยอดรวม", "data": '', "data-key": "t-amount" },
-                { title: "PV", "data": '', "data-key": "t-pv" },
-                { title: "สถานะใบเสร็จ", "data": '', "data-key": "t-receipt-status" },
-                { title: "ดูรายละเอียด", "data": '', "data-key": "t-view-details" }
-            ],
+        function pick(obj, keys, defaultValue = '') {
+            for (const key of keys) {
+                if (obj && obj[key] !== undefined && obj[key] !== null) {
+                    return obj[key];
+                }
+            }
+            return defaultValue;
+        }
+
+        function normalizeRows(payload) {
+            let data = payload;
+
+            if (typeof data === 'string') {
+                try {
+                    data = JSON.parse(data);
+                } catch (e) {
+                    data = [];
+                }
+            }
+
+            if (data && Array.isArray(data.data)) {
+                data = data.data;
+            }
+
+            return Array.isArray(data) ? data : [];
+        }
+
+        function toDate(value) {
+            if (!value) return null;
+            const date = new Date(value);
+            return isNaN(date.getTime()) ? null : date;
+        }
+
+        function getWeekStartDate(date) {
+            const weekDate = new Date(date);
+            const day = weekDate.getDay();
+            const diff = weekDate.getDate() - day + (day === 0 ? -6 : 1);
+            weekDate.setDate(diff);
+            weekDate.setHours(0, 0, 0, 0);
+            return weekDate;
+        }
+
+        function applyReportFormat(rows, reportType) {
+            if (reportType === 'all' || reportType === 'daily') {
+                return rows;
+            }
+
+            const grouped = {};
+            rows.forEach(function (row) {
+                const rowDate = toDate(row.billDate);
+                if (!rowDate) return;
+
+                let key = '';
+                let label = '';
+                if (reportType === 'weekly') {
+                    const weekStart = getWeekStartDate(rowDate);
+                    key = `week-${weekStart.toISOString().split('T')[0]}`;
+                    label = `สัปดาห์ของ ${weekStart.toLocaleDateString('th-TH')}`;
+                } else {
+                    key = `month-${rowDate.getFullYear()}-${rowDate.getMonth() + 1}`;
+                    label = rowDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
+                }
+
+                if (!grouped[key]) {
+                    grouped[key] = {
+                        billNo: key,
+                        billDate: label,
+                        hybridGoldId: '-',
+                        memberCode: '-',
+                        memberName: reportType === 'weekly' ? 'รวมรายสัปดาห์' : 'รวมรายเดือน',
+                        billType: '-',
+                        totalAmount: 0,
+                        totalPV: 0,
+                        billConfirmType: '-',
+                        referenceNo: '-'
+                    };
+                }
+
+                grouped[key].totalAmount += row.totalAmount || 0;
+                grouped[key].totalPV += row.totalPV || 0;
+            });
+
+            return Object.values(grouped);
+        }
+
+        const table = $("#data-table-responsive").DataTable({
+            responsive: true,
+            processing: true,
+            serverSide: false,
+            filter: false,
+            orderMulti: false,
+            ordering: true,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
+            pageLength: 25,
+            destroy: true,
+            searching: false,
+            contentType: "application/json; charset=utf-8",
+            ajax: {
+                url: '@Url.Action("GetSaleReportData", "reports")',
+                type: 'GET',
+                dataSrc: function (json) {
+                    const fromDate = $('#fromDate').val();
+                    const toDate = $('#toDate').val();
+                    const reportType = $('input[name="report_type"]:checked').val() || 'all';
+
+                    const rows = normalizeRows(json).map(function (item) {
+                        return {
+                            billNo: pick(item, ['BillNo', 'billNo']),
+                            billDate: pick(item, ['BillDate', 'billDate']),
+                            hybridGoldId: pick(item, ['HybridGOLDID', 'hybridGoldId']),
+                            memberCode: pick(item, ['Membercode', 'memberCode']),
+                            memberName: pick(item, ['Membername', 'memberName']),
+                            billType: pick(item, ['Billtype', 'billType']),
+                            totalAmount: parseFloat(pick(item, ['TotalAmount', 'totalAmount'], 0)) || 0,
+                            totalPV: parseFloat(pick(item, ['TotalPV', 'totalPV'], 0)) || 0,
+                            billConfirmType: pick(item, ['BillConfirmType', 'billConfirmType']),
+                            referenceNo: pick(item, ['ReferenceNo', 'referenceNo'])
+                        };
+                    });
+
+                    const dateFilteredRows = rows.filter(function (row) {
+                        if (!fromDate && !toDate) return true;
+                        const rowDate = toDate(row.billDate);
+                        if (!rowDate) return false;
+                        if (fromDate && rowDate < new Date(fromDate)) return false;
+                        if (toDate) {
+                            const endDate = new Date(toDate);
+                            endDate.setHours(23, 59, 59, 999);
+                            if (rowDate > endDate) return false;
+                        }
+                        return true;
+                    });
+
+                    const finalRows = applyReportFormat(dateFilteredRows, reportType);
+
+                    const amountSum = finalRows.reduce((sum, row) => sum + row.totalAmount, 0);
+                    const pvSum = finalRows.reduce((sum, row) => sum + row.totalPV, 0);
+                    const firstCenter = finalRows.length > 0 ? finalRows[0].hybridGoldId : '-';
+
+                    $('#centerCodeDisplay').val(firstCenter || '-');
+                    $('#totalAmountDisplay').val(amountSum.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+                    $('#totalPvDisplay').val(pvSum.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+
+                    return finalRows;
+                }
+            },
+            columns: [
+                { title: "เลขที่ใบเสร็จ", data: 'billNo', orderable: true },
+                { title: "วันที่ใบเสร็จ", data: 'billDate' },
+                { title: "รหัสศูนย์", data: 'hybridGoldId' },
+                { title: "รหัสสมาชิก", data: 'memberCode' },
+                { title: "ชื่อสมาชิก", data: 'memberName' },
+                { title: "ประเภทการสั่งซื้อ", data: 'billType' },
+                { title: "ยอดรวม", data: 'totalAmount', render: function (d) { return (d || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); } },
+                { title: "PV", data: 'totalPV', render: function (d) { return (d || 0).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); } },
+                { title: "สถานะใบเสร็จ", data: 'billConfirmType' },
+                { title: "เลขอ้างอิง", data: 'referenceNo' }
+            ]
+        });
+
+        $('#btnSearchSale').on('click', function () {
+            table.ajax.reload();
+        });
+
+        $('#btnResetSale').on('click', function () {
+            $('#view_all').prop('checked', true);
+            $('#fromDate').val('');
+            $('#toDate').val('');
+            table.ajax.reload();
         });
     });
 </script>

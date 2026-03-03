@@ -144,6 +144,19 @@
 
 <script>
     $(document).ready(function () {
+        let currentRows = [];
+
+        function normalizeRows(payload) {
+            let data = payload;
+            if (typeof data === 'string') {
+                try { data = JSON.parse(data); } catch (e) { data = []; }
+            }
+            if (data && Array.isArray(data.data)) {
+                data = data.data;
+            }
+            return Array.isArray(data) ? data : [];
+        }
+
         // Initialize DataTable
         var table = $('#travelPointsTable').DataTable({
             "pageLength": 25,
@@ -152,12 +165,48 @@
                 "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Thai.json"
             },
             "ajax": {
-                "url": "/api/reports/travelpoints",
+                "url": "@Url.Action("GetTravelPointsData", "reports")",
                 "type": "GET",
-                "data": function (d) {
-                    d.fromDate = $('#fromDate').val();
-                    d.toDate = $('#toDate').val();
-                    d.transactionType = $('#transactionType').val();
+                "dataSrc": function (json) {
+                    const data = normalizeRows(json);
+
+                    const fromDate = $('#fromDate').val();
+                    const toDate = $('#toDate').val();
+                    const transactionType = $('#transactionType').val();
+
+                    const rows = data
+                        .map(function (item, index) {
+                            const points = parseFloat(item.NetBonus || item.netBonus || item.TotalBonus || item.totalBonus || 0) || 0;
+                            const rowType = points >= 0 ? 'earned' : 'used';
+                            return {
+                                index: index + 1,
+                                date: item.PaymentDate || item.paymentDate || item.FromDate || item.fromDate || '',
+                                description: item.PeriodName || item.periodName || 'โบนัสรายรอบ',
+                                type: rowType,
+                                points: points,
+                                balance: points,
+                                remark: item.Remark || item.remark || ''
+                            };
+                        })
+                        .filter(function (row) {
+                            if (transactionType && row.type !== transactionType) {
+                                return false;
+                            }
+                            if (!fromDate && !toDate) {
+                                return true;
+                            }
+                            if (!row.date) {
+                                return false;
+                            }
+                            const rowDate = new Date(row.date);
+                            if (fromDate && rowDate < new Date(fromDate)) return false;
+                            if (toDate && rowDate > new Date(toDate)) return false;
+                            return true;
+                        });
+
+                    currentRows = rows;
+                    updateSummary(currentRows);
+                    return rows;
                 }
             },
             "columns": [
@@ -213,10 +262,7 @@
                 },
                 { "data": "remark" }
             ],
-            "drawCallback": function(settings) {
-                // Update summary after data loads
-                updateSummary(settings.json);
-            }
+            "drawCallback": function() {}
         });
 
         // Search button click
@@ -225,13 +271,22 @@
         });
 
         // Update summary function
-        function updateSummary(data) {
-            if (!data || !data.summary) return;
-            
-            $('#totalTravelPoints').text(data.summary.totalPoints);
-            $('#availablePoints').text(data.summary.availablePoints);
-            $('#usedPoints').text(data.summary.usedPoints);
-            $('#expiredPoints').text(data.summary.expiredPoints);
+        function updateSummary(rows) {
+            rows = Array.isArray(rows) ? rows : [];
+
+            const total = rows.reduce((sum, row) => sum + (parseFloat(row.points) || 0), 0);
+            const used = rows
+                .filter(row => row.type === 'used' || row.type === 'expired')
+                .reduce((sum, row) => sum + Math.abs(parseFloat(row.points) || 0), 0);
+            const expired = rows
+                .filter(row => row.type === 'expired')
+                .reduce((sum, row) => sum + Math.abs(parseFloat(row.points) || 0), 0);
+            const available = total - used;
+
+            $('#totalTravelPoints').text(total.toLocaleString('th-TH'));
+            $('#availablePoints').text(available.toLocaleString('th-TH'));
+            $('#usedPoints').text(used.toLocaleString('th-TH'));
+            $('#expiredPoints').text(expired.toLocaleString('th-TH'));
         }
 
         // Redeem button click
@@ -241,28 +296,9 @@
                 toastr.warning('กรุณาเลือกแพ็คเกจท่องเที่ยว');
                 return;
             }
-            
-            // Confirm redemption
+
             if (confirm('คุณต้องการแลกคะแนนสำหรับแพ็คเกจนี้ใช่หรือไม่?')) {
-                // Call API to redeem points
-                $.ajax({
-                    url: '/api/reports/redeemtravelpoints',
-                    type: 'POST',
-                    data: {
-                        packageId: selectedPackage
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            toastr.success('แลกคะแนนสำเร็จ: ' + response.message);
-                            table.ajax.reload(); // Refresh table
-                        } else {
-                            toastr.error('แลกคะแนนไม่สำเร็จ: ' + response.message);
-                        }
-                    },
-                    error: function() {
-                        toastr.error('เกิดข้อผิดพลาดในการแลกคะแนน');
-                    }
-                });
+                toastr.info('ยังไม่มี API สำหรับแลกคะแนนท่องเที่ยวในระบบปัจจุบัน');
             }
         });
 
@@ -279,12 +315,15 @@
     });
 </script>
 
+<!-- DataTables -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+<script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+<!-- Toastr for notifications -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 @section scripts{
-    <!-- DataTables -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
-    <!-- Toastr for notifications -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
 }

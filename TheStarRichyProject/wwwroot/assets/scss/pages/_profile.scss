@@ -104,6 +104,8 @@ $value in $theme-colors {
     }
 
     .user-profile-image {
+        width: 96px;
+        height: 96px;
         object-fit: cover;
     }
 

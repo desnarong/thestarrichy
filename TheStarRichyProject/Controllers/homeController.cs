@@ -462,22 +462,33 @@ namespace TheStarRichyProject.Controllers
         public async Task<IActionResult> GetMemberBinaryTeam(string? membercode = null)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
             var options = new RestClientOptions(_config["Api:Url"])
             {
                 ThrowOnAnyError = true,
+                MaxTimeout = 300000, // 5 นาที (เป็น milliseconds)
                 ConfigureMessageHandler = handler =>
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
                         // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
-                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+                        MaxResponseHeadersLength = 256, // เพิ่มขนาด headers
+                        AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
                     };
                     return httpClientHandler;
                 }
             };
+
             var passkey = _config["Api:Passkey"];
             var token = Request.Cookies[CookieHelper.UserKey];
-            var client = new RestClient(options);
+
+            // ใช้ HttpClient โดยตรงแทน RestClient เพื่อควบคุมได้มากขึ้น
+            using var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri(_config["Api:Url"]);
+            httpClient.Timeout = TimeSpan.FromMinutes(5);
+            httpClient.DefaultRequestHeaders.Add("X-Passkey", passkey);
+            httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
             var apiUrl = "/Member/memberbinaryteam";
             if (!string.IsNullOrEmpty(membercode))
@@ -485,32 +496,33 @@ namespace TheStarRichyProject.Controllers
                 apiUrl += $"?membercode={membercode}";
             }
 
-            var request = new RestRequest(apiUrl, Method.Get);
-            request.AddHeader("X-Passkey", passkey);
-            request.AddHeader("Authorization", $"Bearer {token}");
-
-            RestResponse response = null;
             try
             {
-                // บรรทัดที่ 493 ของคุณน่าจะเป็นบรรทัดนี้
-                response = await client.ExecuteAsync(request);
+                // ใช้ HttpCompletionOption.ResponseHeadersRead เพื่ออ่าน content ทีละส่วน
+                var response = await httpClient.GetAsync(apiUrl, HttpCompletionOption.ResponseHeadersRead);
 
-                if (!response.IsSuccessful)
+                if (!response.IsSuccessStatusCode)
                 {
-                    // ถ้า API คืนค่า 500 ให้แสดงข้อความที่ API ตอบกลับมา (ซึ่งจะมี Error ตัวจริงซ่อนอยู่)
-                    return Content($"API Error: {response.StatusCode} - {response.Content}");
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return Content($"API Error: {response.StatusCode} - {errorContent}");
                 }
 
-                // ทำงานปกติต่อไปถ้า IsSuccessful เป็น true...
+                // อ่าน content เป็น string
+                var content = await response.Content.ReadAsStringAsync();
+                return Ok(content);
+            }
+            catch (HttpRequestException ex)
+            {
+                return Content($"HttpRequestException: {ex.Message}");
+            }
+            catch (TaskCanceledException ex)
+            {
+                return Content($"Timeout: {ex.Message}");
             }
             catch (Exception ex)
             {
-                // ถ้า RestSharp โยน Exception ให้จับตรงนี้
-                string errorDetail = response != null ? response.Content : ex.Message;
-                return Content($"Request Failed: {errorDetail} | Stack: {ex.StackTrace}");
+                return Content($"Request Failed: {ex.Message} | Stack: {ex.StackTrace}");
             }
-            // ถ้าสำเร็จ ก็ดึงข้อมูลไปใช้ต่อ
-            return Ok(response.Content);
         }
     }
 }
