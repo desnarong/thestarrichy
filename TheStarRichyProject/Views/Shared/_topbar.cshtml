@@ -34,6 +34,235 @@
         padding: 0 1.5rem 0 calc(1.5rem * .5);
         color: white !important;
     }
+
+    .navbar-header-marquee .marquee-container {
+        overflow: hidden;
+        position: relative;
+        /* Fade out near the left edge so text disappears smoothly */
+        -webkit-mask-image: linear-gradient(to right, transparent 0, #000 42px, #000 100%);
+        mask-image: linear-gradient(to right, transparent 0, #000 42px, #000 100%);
+    }
+
+    .navbar-header-marquee .marquee-text {
+        will-change: transform;
+    }
+
+    #globalCartModal .modal-dialog {
+        margin: 1rem auto;
+    }
+
+    #globalCartModal .modal-content {
+        max-height: calc(100dvh - 2rem);
+        overflow: hidden;
+        border-radius: 12px;
+        background-color: #ffffff;
+        color: #212529;
+    }
+
+    #globalCartModal .modal-body {
+        overflow-x: auto;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        background-color: #ffffff;
+    }
+
+    #globalCartModal .modal-header,
+    #globalCartModal .modal-footer {
+        background-color: #ffffff;
+    }
+
+    #globalCartItemsContainer .cart-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    #globalCartItemsContainer .cart-item {
+        border: 1px solid #e9ecef;
+        border-radius: 10px;
+        padding: 12px;
+        background: #fff;
+    }
+
+    #globalCartItemsContainer .cart-item-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    #globalCartItemsContainer .cart-item-name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #2c3e50;
+        line-height: 1.35;
+    }
+
+    #globalCartItemsContainer .cart-item-code {
+        font-size: 0.78rem;
+        color: #6c757d;
+    }
+
+    #globalCartItemsContainer .btn-remove-item {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        padding: 0;
+    }
+
+    #globalCartItemsContainer .cart-item-body {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+        align-items: end;
+    }
+
+    #globalCartItemsContainer .cart-meta {
+        display: grid;
+        gap: 4px;
+    }
+
+    #globalCartItemsContainer .cart-meta-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 0.88rem;
+    }
+
+    #globalCartItemsContainer .cart-meta-label {
+        color: #6c757d;
+        min-width: 62px;
+    }
+
+    #globalCartItemsContainer .cart-meta-value {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+
+    #globalCartItemsContainer .cart-qty-wrap {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    #globalCartItemsContainer .cart-qty-label {
+        color: #6c757d;
+        font-size: 0.78rem;
+    }
+
+    #globalCartItemsContainer .cart-item-quantity {
+        width: 56px;
+        height: 34px;
+        text-align: center;
+        font-weight: 600;
+        background: #f8f9fa;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+    }
+
+    #globalCartItemsContainer .cart-qty-control {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #globalCartItemsContainer .cart-qty-btn {
+        width: 34px;
+        height: 34px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        border-radius: 0;
+        border-color: #ced4da;
+    }
+
+    #globalCartItemsContainer .cart-qty-decrease {
+        border-top-left-radius: 6px;
+        border-bottom-left-radius: 6px;
+    }
+
+    #globalCartItemsContainer .cart-qty-increase {
+        border-top-right-radius: 6px;
+        border-bottom-right-radius: 6px;
+    }
+
+    #globalCartModal .modal-footer {
+        gap: 10px;
+    }
+
+    @@media (max-width: 767.98px) {
+        #globalCartModal .modal-dialog {
+            width: calc(100vw - 1rem);
+            margin: 0.5rem auto;
+        }
+
+        #globalCartModal .modal-content {
+            max-height: calc(100dvh - 1rem);
+            border-radius: 10px;
+        }
+
+        #globalCartModal .modal-header {
+            padding: 0.75rem 0.85rem;
+        }
+
+        #globalCartModal .modal-title {
+            font-size: 1rem;
+            line-height: 1.3;
+        }
+
+        #globalCartModal .modal-body {
+            padding: 0.75rem;
+        }
+
+        #globalCartItemsContainer .cart-item {
+            padding: 10px;
+        }
+
+        #globalCartItemsContainer .cart-item-body {
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        #globalCartItemsContainer .cart-qty-wrap {
+            align-items: stretch;
+        }
+
+        #globalCartItemsContainer .cart-item-quantity {
+            width: 48px;
+            min-width: 48px;
+        }
+
+        #globalCartItemsContainer .cart-qty-control {
+            justify-content: flex-end;
+        }
+
+        #globalCartModal .modal-footer {
+            flex-direction: column;
+            align-items: stretch !important;
+            padding: 0.75rem;
+        }
+
+        #globalCartModal .modal-footer > div {
+            width: 100%;
+        }
+
+        #globalCartModal .modal-footer > div:last-child {
+            display: flex;
+            gap: 8px;
+        }
+
+        #globalCartModal .modal-footer button {
+            flex: 1 1 auto;
+            min-height: 40px;
+        }
+    }
 </style>
 <header id="page-topbar">
     <div class="layout-width">
@@ -130,7 +359,6 @@
                                         </div>
                                     </div>
                                     <h5 class="mb-3">ตะกร้าว่างเปล่า!</h5>
-                                    <a href="/Orders/BuyPersonalOrder" class="btn btn-success w-md mb-3">ซื้อสินค้า</a>
                                 </div>
                             </div>
                         </div>
@@ -141,7 +369,7 @@
                                     <h5 class="m-0 text-success" id="headerCartTotal">฿ 0.00</h5>
                                 </div>
                             </div>
-                            <a href="/Orders/BuyPersonalOrder" class="btn btn-success text-center w-100">
+                            <a href="javascript:void(0);" id="headerGoToCartBtn" class="btn btn-success text-center w-100">
                                 <i class="bx bx-cart"></i> ไปที่ตะกร้า
                             </a>
                         </div>
@@ -266,6 +494,34 @@
     </div>
 </div>
 
+<div class="modal fade" id="globalCartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" style="color: var(--vz-heading-color);">
+                    <i class="bx bx-cart"></i> ตะกร้าสินค้า
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="globalCartItemsContainer"></div>
+            </div>
+            <div class="modal-footer d-flex justify-content-between">
+                <div>
+                    <h5>ยอดรวม: <span class="text-success" id="globalCartModalTotal">฿0.00</span></h5>
+                    <small class="text-muted">PV: <span id="globalCartModalPV">0</span></small>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ปิด</button>
+                    <button type="button" class="btn btn-success" id="globalCartConfirmOrder">
+                        <i class="bx bx-check"></i> ชำระเงิน
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(document).ready(function () {
         let textmaxlength = 65;
@@ -309,7 +565,6 @@
                             </div>
                         </div>
                         <h5 class="mb-3">ตะกร้าว่างเปล่า!</h5>
-                        <a href="/Orders/BuyPersonalOrder" class="btn btn-success w-md mb-3">ซื้อสินค้า</a>
                     </div>
                 `);
                 $('#headerCartCheckout').hide();
@@ -382,9 +637,180 @@
             }
         }
 
+        function notifyGlobalCartUpdated() {
+            loadHeaderCart();
+            $(document).trigger('global-cart-updated');
+        }
+
+        function renderGlobalCartItems(items) {
+            let html = '';
+
+            if (!items || items.length === 0) {
+                html = '<div class="alert alert-info">ตะกร้าว่างเปล่า</div>';
+            } else {
+                html = '<div class="cart-list">';
+
+                items.forEach(item => {
+                    const productId = item.productID || item.productId;
+                    const total = (item.price * item.quantity).toFixed(2);
+                    html += `
+                        <div class="cart-item">
+                            <div class="cart-item-top">
+                                <div>
+                                    <div class="cart-item-name">${item.productName}</div>
+                                    <div class="cart-item-code">${item.productCode || productId}</div>
+                                </div>
+                                <button class="btn btn-danger btn-sm btn-remove-item" data-product-id="${productId}" title="ลบสินค้า">
+                                    <i class="bx bx-trash"></i>
+                                </button>
+                            </div>
+
+                            <div class="cart-item-body">
+                                <div class="cart-meta">
+                                    <div class="cart-meta-row">
+                                        <span class="cart-meta-label">ราคา</span>
+                                        <span class="cart-meta-value">฿${item.price.toFixed(2)}</span>
+                                    </div>
+                                    <div class="cart-meta-row">
+                                        <span class="cart-meta-label">รวม</span>
+                                        <span class="cart-meta-value text-success">฿${total}</span>
+                                    </div>
+                                </div>
+
+                                <div class="cart-qty-wrap">
+                                    <span class="cart-qty-label">จำนวน</span>
+                                    <div class="cart-qty-control">
+                                        <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-decrease" data-product-id="${productId}" aria-label="ลดจำนวน">
+                                            <i class="bx bx-minus"></i>
+                                        </button>
+                                        <input type="text" class="form-control form-control-sm cart-item-quantity" value="${item.quantity}" readonly data-product-id="${productId}">
+                                        <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-increase" data-product-id="${productId}" aria-label="เพิ่มจำนวน">
+                                            <i class="bx bx-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+            }
+
+            $('#globalCartItemsContainer').html(html);
+
+            $('#globalCartItemsContainer .cart-qty-decrease').click(function () {
+                const productId = $(this).data('product-id');
+                const qtyInput = $(`#globalCartItemsContainer .cart-item-quantity[data-product-id="${productId}"]`);
+                const currentQty = parseInt(qtyInput.val(), 10) || 1;
+
+                if (currentQty > 1) {
+                    updateGlobalCartQuantity(productId, currentQty - 1);
+                }
+            });
+
+            $('#globalCartItemsContainer .cart-qty-increase').click(function () {
+                const productId = $(this).data('product-id');
+                const qtyInput = $(`#globalCartItemsContainer .cart-item-quantity[data-product-id="${productId}"]`);
+                const currentQty = parseInt(qtyInput.val(), 10) || 1;
+
+                updateGlobalCartQuantity(productId, currentQty + 1);
+            });
+
+            $('#globalCartItemsContainer .btn-remove-item').click(function () {
+                removeGlobalCartItem($(this).data('product-id'));
+            });
+        }
+
+        function loadGlobalCartItems() {
+            $.ajax({
+                url: '/Orders/GetCart',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success) {
+                        renderGlobalCartItems(response.items || []);
+                        $('#globalCartModalTotal').text('฿ ' + (response.totalPrice || 0).toFixed(2));
+                        $('#globalCartModalPV').text((response.totalPV || 0).toFixed(0));
+                    }
+                }
+            });
+        }
+
+        function updateGlobalCartQuantity(productId, quantity) {
+            $.ajax({
+                url: '/Orders/UpdateCart',
+                type: 'POST',
+                data: { productId: productId, quantity: quantity },
+                success: function (response) {
+                    if (response.success) {
+                        loadGlobalCartItems();
+                        notifyGlobalCartUpdated();
+                    }
+                }
+            });
+        }
+
+        function removeGlobalCartItem(productId) {
+            if (!confirm('ต้องการลบสินค้านี้ออกจากตะกร้าใช่หรือไม่?')) {
+                return;
+            }
+
+            $.ajax({
+                url: '/Orders/RemoveFromCart',
+                type: 'POST',
+                data: { productId: productId },
+                success: function (response) {
+                    if (response.success) {
+                        loadGlobalCartItems();
+                        notifyGlobalCartUpdated();
+                    }
+                }
+            });
+        }
+
+        function openGlobalCartModal() {
+            loadGlobalCartItems();
+
+            const modalEl = document.getElementById('globalCartModal');
+            if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+                return;
+            }
+
+            if (typeof $.fn.modal === 'function') {
+                $('#globalCartModal').modal('show');
+            }
+        }
+
         // ⭐ เมื่อเปิด Cart Dropdown
         $('#page-header-cart-dropdown').on('click', function () {
             loadHeaderCart();
+        });
+
+        // ⭐ ปุ่ม "ไปที่ตะกร้า" ที่ header: เปิด cartModal แทนการ redirect
+        $('#headerGoToCartBtn').on('click', function (e) {
+            e.preventDefault();
+            openGlobalCartModal();
+        });
+
+        $('#globalCartConfirmOrder').on('click', function () {
+            $.ajax({
+                url: '/Orders/GetCart',
+                type: 'GET',
+                success: function (response) {
+                    if (response.success && response.items && response.items.length > 0) {
+                        window.location.href = '/Orders/CheckoutInfo';
+                    } else if (typeof Swal !== 'undefined') {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'ไม่พบสินค้า',
+                            text: 'กรุณาเลือกสินค้าก่อนดำเนินการต่อ',
+                            timer: 1800,
+                            showConfirmButton: false
+                        });
+                    }
+                }
+            });
         });
 
         // ⭐ โหลด Cart ครั้งแรกเมื่อเปิดหน้า
@@ -394,6 +820,8 @@
         window.updateHeaderCartBadge = function() {
             loadHeaderCart();
         };
+
+        window.openGlobalCartModal = openGlobalCartModal;
 
         // ฟังก์ชันตัดข้อความไม่เกิน maxLength ตัวอักษร
         function truncateText(text, maxLength) {

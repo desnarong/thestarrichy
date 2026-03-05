@@ -36,7 +36,7 @@
         <div class="card">
             <div class="card-header bg-primary">
                 <h5 class="card-title text-white mb-0">
-                    <i class="ri-team-line"></i> รายชื่อทีมสปอนเซอร์
+                    <i class="ri-team-line"></i> รายชื่อทีมงานแนะนำตรง
                 </h5>
             </div>
             <div class="card-body">
@@ -82,12 +82,16 @@
         try {
             const response = await fetch('/home/GetMemberInfo');
             const data = await response.json();
-            
-            if (data) {
-                const memberInfo = JSON.parse(data);
-                currentMemberCode = memberInfo.memberInfo[0].membercode;
-                await loadTeam();
+            const memberInfo = typeof data === 'string' ? JSON.parse(data) : data;
+            const directCode = memberInfo?.membercode;
+            const nestedCode = memberInfo?.memberInfo?.[0]?.membercode;
+            currentMemberCode = (directCode || nestedCode || '').toString().trim();
+
+            if (!currentMemberCode) {
+                throw new Error('ไม่พบรหัสสมาชิก');
             }
+
+            await loadTeam();
         } catch (error) {
             console.error('Error:', error);
             showError('ไม่สามารถโหลดข้อมูลสมาชิกได้');
@@ -97,18 +101,75 @@
     async function loadTeam() {
         try {
             const response = await fetch(`/teaminfomation/GetSponsorTeam?memberCode=${currentMemberCode}`);
-            
+
             if (!response.ok) {
                 throw new Error('Failed to load team');
             }
-            
-            const result = await response.json();
-            teamData = Array.isArray(result) ? result : [];
-            renderTable(teamData);
+
+            const raw = await response.json();
+            const normalized = normalizeApiPayload(raw);
+
+            // ดึง rows จากรูปแบบที่เป็นไปได้ก่อน แล้วค่อย flatten
+            const rows = extractRows(normalized);
+            const source = rows.length > 0 ? rows : normalized;
+            const flattened = flattenDeep(source);
+
+            // ตรวจสอบว่า flattened มีข้อมูลหรือไม่
+            if (flattened.length > 0) {
+                teamData = flattened;
+                renderTable(teamData);
+            } else {
+                teamData = [];
+                renderTable(teamData);
+            }
+
         } catch (error) {
-            console.error('Error:', error);
             showError('เกิดข้อผิดพลาดในการโหลดข้อมูล');
         }
+    }
+
+    function normalizeApiPayload(payload) {
+        let value = payload;
+
+        // บาง endpoint ส่ง JSON string ซ้อนมา 2-3 ชั้น
+        for (let i = 0; i < 3; i++) {
+            if (typeof value !== 'string') break;
+
+            const text = value.trim();
+            if (!text) break;
+
+            const startsLikeJson = text.startsWith('{') || text.startsWith('[') || text.startsWith('"');
+            if (!startsLikeJson) break;
+
+            try {
+                value = JSON.parse(text);
+            } catch {
+                break;
+            }
+        }
+
+        return value;
+    }
+
+    // ฟังก์ชัน flatten อย่างเดียว
+    function flattenDeep(arr) {
+        const result = [];
+
+        function extract(item) {
+            if (Array.isArray(item)) {
+                // ถ้าเป็น array ให้ไล่ลึกไปเรื่อยๆ
+                item.forEach(extract);
+            } else if (item && typeof item === 'object') {
+                // ถ้าเป็น object (ที่ไม่ใช่ array) ให้เก็บ
+                // ตรวจสอบว่ามี properties จริงๆ
+                if (Object.keys(item).length > 0) {
+                    result.push(item);
+                }
+            }
+        }
+
+        extract(arr);
+        return result;
     }
 
     function renderTable(data) {
@@ -128,19 +189,24 @@
         }
 
         data.forEach((member, index) => {
-            const statusClass = member.status === 'Active' ? 'success' : 'secondary';
-            const statusText = member.status === 'Active' ? 'ใช้งาน' : 'ไม่ใช้งาน';
-            
+            const memberCode = member.dlCode || member.DLCode || member.membercode || member.Membercode || 'N/A';
+            const memberName = member.dlName || member.DLName || member.membername || member.Membername || 'N/A';
+            const memberPV = member.personalpv ?? member.personalPV ?? member.PersonalPV ?? member.pv ?? member.PV ?? 0;
+            const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
+            const isActive = statusRaw.includes('active') || statusRaw.includes('yes') || statusRaw.includes('1');
+            const statusClass = isActive ? 'success' : 'secondary';
+            //const statusText = isActive ? 'ใช้งาน' : 'ไม่ใช้งาน';
+            const statusText = '';
             tbody.append(`
                 <tr>
                     <td>${index + 1}</td>
-                    <td><strong>${member.membercode || 'N/A'}</strong></td>
-                    <td>${member.idcardname || 'N/A'}</td>
-                    <td>${formatDate(member.registerdate)}</td>
-                    <td><span class="badge bg-info">${member.personalpv || 0}</span></td>
+                    <td><strong>${memberCode}</strong></td>
+                    <td>${memberName}</td>
+                    <td>${formatDate(member.registerdate || member.registerDate || member.RegisterDate || member.createdDate)}</td>
+                    <td><span class="badge bg-info">${Number(memberPV || 0).toLocaleString()}</span></td>
                     <td><span class="badge bg-${statusClass}">${statusText}</span></td>
                     <td>
-                        <button class="btn btn-sm btn-primary" onclick="viewDetail('${member.membercode}')">
+                        <button class="btn btn-sm btn-primary" onclick="viewDetail('${memberCode}')">
                             <i class="ri-eye-line"></i>
                         </button>
                     </td>
@@ -150,19 +216,29 @@
     }
 
     function searchTeam() {
-        const keyword = $('#searchInput').val().toLowerCase().trim();
+        const keyword = normalizeSearchText($('#searchInput').val());
         
         if (!keyword) {
             renderTable(teamData);
             return;
         }
 
-        const filtered = teamData.filter(m => 
-            (m.membercode && m.membercode.toLowerCase().includes(keyword)) ||
-            (m.idcardname && m.idcardname.toLowerCase().includes(keyword))
-        );
+        const filtered = teamData.filter(m => {
+            const codeText = normalizeSearchText(m.membercode ?? m.memberCode ?? m.Membercode ?? m.dlCode ?? m.DLCode ?? m.dlcode ?? '');
+            const nameText = normalizeSearchText(m.idcardname ?? m.membername ?? m.memberName ?? m.Membername ?? m.dlName ?? m.DLName ?? m.dlname ?? '');
+            const fullText = normalizeSearchText(JSON.stringify(m));
+            return codeText.includes(keyword) || nameText.includes(keyword) || fullText.includes(keyword);
+        });
 
         renderTable(filtered);
+    }
+
+    function normalizeSearchText(value) {
+        return (value ?? '')
+            .toString()
+            .toLowerCase()
+            .replace(/\s+/g, '')
+            .replace(/[^a-z0-9ก-๙]/g, '');
     }
 
     function viewDetail(memberCode) {
@@ -170,13 +246,121 @@
     }
 
     function exportToExcel() {
-        alert('ฟีเจอร์ Export กำลังพัฒนา');
+        const rows = getFilteredTeamData();
+
+        if (!rows || rows.length === 0) {
+            alert('ไม่พบข้อมูลสำหรับ Export');
+            return;
+        }
+
+        const headers = ['ลำดับ', 'รหัสสมาชิก', 'ชื่อ-นามสกุล', 'วันที่สมัคร', 'PV', 'สถานะ'];
+        const csvRows = [headers];
+
+        rows.forEach((member, index) => {
+            const memberCode = member.dlCode || member.DLCode || member.membercode || member.Membercode || '';
+            const memberName = member.dlName || member.DLName || member.membername || member.Membername || '';
+            const memberPV = member.personalpv ?? member.personalPV ?? member.PersonalPV ?? member.pv ?? member.PV ?? 0;
+            const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
+            const isActive = statusRaw.includes('active') || statusRaw.includes('yes') || statusRaw.includes('1');
+            const statusText = isActive ? 'Active' : 'Inactive';
+
+            csvRows.push([
+                index + 1,
+                memberCode,
+                memberName,
+                formatDate(member.registerdate || member.registerDate || member.RegisterDate || member.createdDate),
+                Number(memberPV || 0).toLocaleString(),
+                statusText
+            ]);
+        });
+
+        downloadCsv(csvRows, `sponsor-team-${formatDateStamp(new Date())}.csv`);
+    }
+
+    function getFilteredTeamData() {
+        const keyword = normalizeSearchText($('#searchInput').val());
+
+        if (!keyword) {
+            return Array.isArray(teamData) ? [...teamData] : [];
+        }
+
+        return teamData.filter(m => {
+            const codeText = normalizeSearchText(m.membercode ?? m.memberCode ?? m.Membercode ?? m.dlCode ?? m.DLCode ?? m.dlcode ?? '');
+            const nameText = normalizeSearchText(m.idcardname ?? m.membername ?? m.memberName ?? m.Membername ?? m.dlName ?? m.DLName ?? m.dlname ?? '');
+            const fullText = normalizeSearchText(JSON.stringify(m));
+            return codeText.includes(keyword) || nameText.includes(keyword) || fullText.includes(keyword);
+        });
+    }
+
+    function downloadCsv(rows, filename) {
+        const csvText = rows
+            .map(row => row.map(csvEscape).join(','))
+            .join('\r\n');
+
+        const bom = '\uFEFF'; // Keep Thai text readable in Excel
+        const blob = new Blob([bom + csvText], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    }
+
+    function csvEscape(value) {
+        const text = (value ?? '').toString();
+        if (text.includes(',') || text.includes('"') || text.includes('\n')) {
+            return `"${text.replace(/"/g, '""')}"`;
+        }
+        return text;
+    }
+
+    function formatDateStamp(date) {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
+        return `${yyyy}${mm}${dd}`;
     }
 
     function formatDate(dateStr) {
         if (!dateStr) return 'N/A';
         const date = new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return 'N/A';
         return date.toLocaleDateString('th-TH');
+    }
+
+    function extractRows(payload) {
+        // ถ้าเป็น array ตรงๆ ให้คืนค่าเลย
+        if (Array.isArray(payload)) return payload;
+
+        // ถ้าไม่ใช่ object หรือ null
+        if (!payload || typeof payload !== 'object') return [];
+
+        // ตรวจสอบ properties ต่างๆ (เผื่อ API มีการเปลี่ยนแปลงในอนาคต)
+        const candidates = [
+            payload.data,
+            payload.result,
+            payload.items,
+            payload.memberInfo,
+            payload.rows,
+            payload.members
+        ];
+
+        for (const c of candidates) {
+            if (Array.isArray(c)) return c;
+        }
+
+        // ถ้าไม่มี property ที่ตรงเลย แต่ payload เป็น object ให้ห่อใน array
+        if (Object.keys(payload).length > 0) {
+            console.warn('Unexpected payload structure:', payload);
+            return [payload]; // หรือ return [] ก็ได้
+        }
+
+        return [];
     }
 
     function showError(message) {

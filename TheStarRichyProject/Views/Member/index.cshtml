@@ -17,7 +17,7 @@
             <div class="card-body p-4">
                 <div class="text-center">
                     <div class="profile-user position-relative d-inline-block mx-auto  mb-4">
-                        <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow mt-2" alt="user-profile-image">
+                        <img id="user-profile-image" src="" class="rounded-circle img-thumbnail user-profile-image material-shadow mt-2" alt="user-profile-image" style="width: 250px; height: 250px; object-fit: cover;">
                         <div class="avatar-xs p-0 rounded-circle profile-photo-edit">
                             <input id="profile-img-file-input" type="file" class="profile-img-file-input" accept="image/*">
                             <label for="profile-img-file-input" class="profile-photo-edit avatar-sm">
@@ -601,11 +601,87 @@
     }
 
     function bindUploadPreview() {
-        $('#profile-img-file-input').on('change', function (event) {
+        $('#profile-img-file-input').on('change', async function (event) {
             const file = event.target.files?.[0];
             if (!file) return;
+
+            const previousProfileImage = $('#user-profile-image').attr('src') || '';
             uploadState.profileImage = file;
             previewImage(file, '#user-profile-image');
+
+            const confirmResult = await Swal.fire({
+                title: "ยืนยันเปลี่ยนรูปโปรไฟล์",
+                text: "ต้องการอัปโหลดรูปโปรไฟล์นี้ใช่หรือไม่",
+                icon: "question",
+                showCancelButton: true,
+                customClass: {
+                    confirmButton: "btn btn-primary w-xs me-2 mt-2",
+                    cancelButton: "btn btn-danger w-xs mt-2"
+                },
+                confirmButtonText: "ยืนยัน",
+                cancelButtonText: "ยกเลิก",
+                buttonsStyling: false,
+                showCloseButton: true
+            });
+
+            if (!confirmResult.isConfirmed) {
+                uploadState.profileImage = null;
+                $('#profile-img-file-input').val('');
+                $('#user-profile-image').attr('src', previousProfileImage);
+                return;
+            }
+
+            try {
+                const formData = new FormData();
+                if (memberinfo?.membercode) {
+                    formData.append('memberCode', memberinfo.membercode);
+                }
+                formData.append('profileImage', file);
+
+                const response = await fetch('/Member/UploadMemberDocuments', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'include'
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result?.success) {
+                    throw new Error(result?.message || 'Upload failed');
+                }
+
+                if (result.urls?.profileImage) {
+                    $('#user-profile-image').attr('src', result.urls.profileImage);
+                }
+
+                await submitMemberProfileUpdate('document');
+
+                uploadState.profileImage = null;
+                $('#profile-img-file-input').val('');
+
+                Swal.fire({
+                    title: "สำเร็จ",
+                    text: "อัปโหลดรูปโปรไฟล์และบันทึกข้อมูลเรียบร้อยแล้ว",
+                    icon: "success",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            } catch (error) {
+                uploadState.profileImage = null;
+                $('#profile-img-file-input').val('');
+                $('#user-profile-image').attr('src', previousProfileImage);
+
+                Swal.fire({
+                    title: "เกิดข้อผิดพลาด",
+                    text: error?.message || "ไม่สามารถอัปโหลดรูปโปรไฟล์ได้",
+                    icon: "error",
+                    customClass: {
+                        confirmButton: "btn btn-primary w-xs mt-2"
+                    },
+                    buttonsStyling: !1
+                });
+            }
         });
 
         $('#info-uploadcopyidcard').on('change', function (event) {
@@ -1387,6 +1463,8 @@
                     $('#info-registerfrombranch').prop('checked', true);
                 }
 
+                await submitMemberProfileUpdate('document');
+
                 uploadState.profileImage = null;
                 uploadState.copyIdCard = null;
                 uploadState.copyBankBook = null;
@@ -1398,7 +1476,7 @@
 
                 Swal.fire({
                     title: "สำเร็จ",
-                    text: "อัปโหลดเอกสารเรียบร้อยแล้ว",
+                    text: "อัปโหลดเอกสารและบันทึกข้อมูลเรียบร้อยแล้ว",
                     icon: "success",
                     customClass: {
                         confirmButton: "btn btn-primary w-xs mt-2"

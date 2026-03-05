@@ -143,10 +143,7 @@ namespace TheStarRichyApi.Services
                     //string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
 
-                    string query = "SELECT  Membercode , ContacNickname , Contactperson , Contact_HouseNumber , Contact_Alley  ";
-                        query += " , Contact_Road , Contact_Building , Contact_Floor , Contact_Other , Contact_Zipcode";
-                        query += " , Contact_TAMBON_ID , Contact_Phone , Contact_Province ,M32_X2 as Provincename, Contact_Primary";
-                    query += " From [000_Member_Favorite_Address] ";
+                    string query = "SELECT * From [000_Member_Favorite_Address] ";
                     query += " where Membercode = @Membercode  ";
 
                     //Contact_Primary 0-ที่อยู่หลัก มีได้อันเดียว  1-ที่อยู่อื่นๆ

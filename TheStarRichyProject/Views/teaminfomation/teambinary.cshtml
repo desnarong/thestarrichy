@@ -10,7 +10,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="row g-3">
-                    <div class="col-md-4">
+                    <div class="col-12 col-lg-4 teambinary-search">
                         <div class="input-group">
                             <input type="text" id="memberCodeSearch" class="form-control" 
                                    placeholder="ค้นหารหัสสมาชิก...">
@@ -19,7 +19,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="col-md-8 text-end">
+                    <div class="col-12 col-lg-8 text-lg-end teambinary-actions">
                         <button class="btn btn-info" onclick="loadCurrentMember()">
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
@@ -53,19 +53,189 @@
     </div>
 </div>
 
-@section Scripts {
+<div class="modal fade" id="nodeInfoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div id="nodeInfoModalContent" class="modal-content tree-node node-preview-card gradient-center card-red">
+            <div class="modal-header node-main">
+                <div class="node-avatar">
+                    <img id="nodeInfoMemberPicture" src="/images/1_Black1_40x40.gif" alt="Member" class="member-picture">
+                    <div id="nodeInfoMemberThaiName" class="member-thainame">ไม่มีตำแหน่ง</div>
+                </div>
+                <div class="node-details">
+                    <div id="nodeInfoMemberName" class="member-name">-</div>
+                    <div id="nodeInfoMemberCode" class="member-code">-</div>
+                    <div id="nodeInfoMemberPosition" class="member-position">-</div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="nodeInfoStats" class="node-stats"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentMemberCode = '';
     let parentMemberCode = '';
     let treeData = null;
     let currentViewedMemberCode = '';
     let navigationHistory = [];
+    let nodeInfoDataMap = {};
+    let nodeInfoSeq = 0;
+
+    function isMobileTreeView() {
+        return window.matchMedia('(max-width: 768px)').matches;
+    }
+
+    function formatNumber(value) {
+        const num = Number(value || 0);
+        return Number.isFinite(num) ? num.toLocaleString() : '0';
+    }
+
+    function escapeHtml(value) {
+        return (value ?? '').toString()
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function pickGradientClass(value) {
+        const allowed = ['gradient-center', 'gradient-left', 'gradient-right', 'gradient-silver', 'gradient-gold', 'gradient-diamond'];
+        return allowed.includes(value) ? value : 'gradient-center';
+    }
+
+    function pickCardColorClass(value) {
+        return value === 'card-green' ? 'card-green' : 'card-red';
+    }
+
+    function buildNodeInfoStatsHtml(modalData) {
+        const currentMonth1 = escapeHtml(modalData.currentMonth1 || '-');
+        const lastCMonth = escapeHtml(modalData.lastCMonth || '-');
+
+        return `
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value left-card">[L:${formatNumber(modalData.currentLeftPV)}]</div>
+                    <div class="middle-text">คะแนน</div>
+                    <div class="stat-value right-card">[R:${formatNumber(modalData.currentRightPV)}]</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value left-card">[L:${formatNumber(modalData.newLeft)}]</div>
+                    <div class="middle-text">คะแนนมาใหม่</div>
+                    <div class="stat-value right-card">[R:${formatNumber(modalData.newRight)}]</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value left-card">[L:${formatNumber(modalData.leftCountActive)}]</div>
+                    <div class="middle-text">Active</div>
+                    <div class="stat-value right-card">[R:${formatNumber(modalData.rightCountActive)}]</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value left-card">[L:${formatNumber(modalData.totalLeftBalance)}]</div>
+                    <div class="middle-text">Balance</div>
+                    <div class="stat-value right-card">[R:${formatNumber(modalData.totalRightBalance)}]</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item keep-text">
+                    <div class="middle-text">รักษายอด - ${currentMonth1} - ${formatNumber(modalData.currentMonthQualifyPV)}</div>
+                </div>
+            </div>
+            <div class="stats-row">
+                <div class="stat-item keep-text">
+                    <div class="middle-text">รักษายอด - ${lastCMonth} - ${formatNumber(modalData.lastmonthQualifyPV)}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    function openNodeInfoModal(modalKey, event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+        }
+
+        const modalData = nodeInfoDataMap[modalKey];
+        if (!modalData) return false;
+
+        const gradientClass = pickGradientClass(modalData.gradientClass);
+        const cardColorClass = pickCardColorClass(modalData.cardColorClass);
+        $('#nodeInfoModalContent')
+            .removeClass('gradient-center gradient-left gradient-right gradient-silver gradient-gold gradient-diamond card-green card-red')
+            .addClass(`${gradientClass} ${cardColorClass}`);
+
+        $('#nodeInfoMemberPicture').attr('src', modalData.memberPicture || '/images/1_Black1_40x40.gif');
+        $('#nodeInfoMemberPicture').attr('alt', modalData.membername || 'Member');
+        $('#nodeInfoMemberThaiName').text(modalData.memberthaiName || 'ไม่มีตำแหน่ง');
+        $('#nodeInfoMemberName').text(modalData.membername || 'N/A');
+        $('#nodeInfoMemberCode').text(modalData.membercode || '-');
+        $('#nodeInfoMemberPosition').text(modalData.memberposition || '-');
+        $('#nodeInfoStats').html(buildNodeInfoStatsHtml(modalData));
+
+        const modalEl = document.getElementById('nodeInfoModal');
+        if (modalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        } else if (typeof $.fn.modal === 'function') {
+            $('#nodeInfoModal').modal('show');
+        }
+
+        return false;
+    }
 
     $(document).ready(function() {
-        loadCurrentMember();
+        loadCurrentMember(getMemberCodeFromUrl());
+
+        const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
+        const rerenderForViewport = function () {
+            if (treeData) {
+                renderBinaryTree(treeData, currentViewedMemberCode || currentMemberCode || '');
+            }
+        };
+
+        if (typeof mobileMediaQuery.addEventListener === 'function') {
+            mobileMediaQuery.addEventListener('change', rerenderForViewport);
+        } else if (typeof mobileMediaQuery.addListener === 'function') {
+            mobileMediaQuery.addListener(rerenderForViewport);
+        }
+
+        $(document).on('click', '.node-info-btn', function (e) {
+            const modalKey = $(this).data('modalKey');
+            return openNodeInfoModal(modalKey, e);
+        });
     });
 
-    async function loadCurrentMember() {
+    function getMemberCodeFromUrl() {
+        const params = new URLSearchParams(window.location.search || '');
+        return (params.get('code') || '').toString().trim();
+    }
+
+    function setMemberCodeToUrl(memberCode) {
+        if (!window.history || typeof window.history.replaceState !== 'function') return;
+
+        const params = new URLSearchParams(window.location.search || '');
+        const code = (memberCode || '').toString().trim();
+
+        if (code) {
+            params.set('code', code);
+        } else {
+            params.delete('code');
+        }
+
+        const query = params.toString();
+        const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash || ''}`;
+        window.history.replaceState({}, '', nextUrl);
+    }
+
+    async function loadCurrentMember(preferredCode = '') {
         try {
             const response = await fetch('/home/GetMemberInfo');
             
@@ -86,14 +256,18 @@
             // Response is flat object with membercode directly, not memberInfo[0]
             if (memberInfo && memberInfo.membercode) {
                 currentMemberCode = memberInfo.membercode;
-                loadBinaryTeam(currentMemberCode, { resetHistory: true });
             } else if (memberInfo && memberInfo.memberInfo && memberInfo.memberInfo.length > 0) {
                 // Fallback for nested format
                 currentMemberCode = memberInfo.memberInfo[0].membercode;
-                loadBinaryTeam(currentMemberCode, { resetHistory: true });
             } else {
                 showAlert('warning', 'ไม่พบข้อมูลสมาชิก');
+                return;
             }
+
+            const urlCode = (preferredCode || getMemberCodeFromUrl() || '').toString().trim();
+            const targetCode = urlCode || currentMemberCode;
+            $('#memberCodeSearch').val(targetCode || '');
+            loadBinaryTeam(targetCode, { resetHistory: true });
         } catch (error) {
             console.error('Error:', error);
             showAlert('danger', 'ไม่สามารถโหลดข้อมูลสมาชิกได้: ' + error.message);
@@ -165,6 +339,8 @@
 
             if (resolvedCode) {
                 currentViewedMemberCode = resolvedCode;
+                $('#memberCodeSearch').val(currentViewedMemberCode);
+                setMemberCodeToUrl(currentViewedMemberCode);
             }
 
             renderBinaryTree(result, resolvedCode || (Array.isArray(result) ? (result[0]?.Membercode || '') : ''));
@@ -269,9 +445,63 @@
         return { leftChild, rightChild };
     }
 
+    function getTreeDepth(node) {
+        if (!node) {
+            return 0;
+        }
+
+        const children = getNodeChildren(node);
+        if (children.length === 0) {
+            return 1;
+        }
+
+        const childDepths = children.map(child => getTreeDepth(child));
+        const maxChildDepth = childDepths.length > 0 ? Math.max(...childDepths) : 0;
+        return 1 + maxChildDepth;
+    }
+
+    function buildEmptyNodeHtml(cssClass, registerBaseCode, disabled = false) {
+        const disabledClass = disabled ? ' disabled' : '';
+        const onclickAttr = disabled ? '' : ` onclick="registerTeam('${registerBaseCode}')"`;
+
+        return `
+            <div class="${cssClass}${disabledClass}"${onclickAttr}>
+                <i class="ri-add-circle-line"></i>
+                <span>ว่าง</span>
+            </div>
+        `;
+    }
+
+    function renderEmptyBranch(level, targetDepth, registerBaseCode, hasEmptyAncestor = false) {
+        const isMobileView = isMobileTreeView();
+        const isLastLevel = level >= targetDepth - 1;
+        const emptyNodeClass = (isMobileView && isLastLevel)
+            ? 'empty-node small'
+            : (level <= 2 ? 'empty-node tree-size' : 'empty-node small');
+        const isDisabled = !!hasEmptyAncestor;
+
+        let html = `<div class="tree-node-wrapper" data-level="${level}">`;
+        html += buildEmptyNodeHtml(emptyNodeClass, registerBaseCode, isDisabled);
+
+        if (!isLastLevel) {
+            html += `<div class="tree-children">`;
+            html += `<div class="tree-connector"></div>`;
+            html += `<div class="children-container children-container-level-${level + 1}">`;
+            html += `<div class="child-branch left">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}L`, true)}</div>`;
+            html += `<div class="child-branch right">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}R`, true)}</div>`;
+            html += `</div>`;
+            html += `</div>`;
+        }
+
+        html += `</div>`;
+        return html;
+    }
+
     function renderBinaryTree(data, centerCode) {
         const container = $('#binaryTreeContainer');
         container.empty();
+        nodeInfoDataMap = {};
+        nodeInfoSeq = 0;
 
         if (!data) {
             container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
@@ -296,15 +526,20 @@
             return;
         }
 
+        const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
+        const isMobileView = window.matchMedia('(max-width: 768px)').matches;
+        // Mobile: show only root, level 1 and level 2.
+        const targetDepth = isMobileView ? Math.min(3, maxTreeDepth) : maxTreeDepth;
+
         let html = `<div class="binary-tree-container">`;
         rootNodes.forEach((rootNode) => {
-            html += renderTreeNode(rootNode, 0);
+            html += renderTreeNode(rootNode, 0, targetDepth, false);
         });
         html += `</div>`;
         container.html(html);
     }
 
-    function renderTreeNode(node, level) {
+    function renderTreeNode(node, level, targetDepth, hasEmptyAncestor = false) {
         if (!node) return '';
 
         const membercode = getFirstNonEmptyValue(node, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
@@ -314,6 +549,8 @@
         const memberpositionName = getNodeValue(node, ['MemberpositionName', 'memberpositionName'], '');
         const memberthaiName = getNodeValue(node, ['MemberpositionRankingName', 'memberpositionRankingName', 'MemberpositionRanking', 'memberpositionRanking'], 'ไม่มีตำแหน่ง');
         const currentMonth1 = getNodeValue(node, ['currentMonth1', 'CurrentMonth1'], '');
+        const currentMonthQualifyPV = getNodeValue(node, ['currentMonthQualifyPV', 'CurrentMonthQualifyPV'], 0);
+        const lastCMonth = getNodeValue(node, ['lastCMonth', 'LastCMonth'], '');
         const lastmonthQualifyPV = getNodeValue(node, ['lastmonthQualifyPV', 'LastmonthQualifyPV', 'lastMonthQualifyPV', 'LastMonthQualifyPV'], 0);
         const positionLevel = (getNodeValue(node, ['PositionLevel', 'positionLevel'], '') || '').toString();
 
@@ -328,7 +565,7 @@
 
         const lastMonthQualifyStatus = (getNodeValue(node, ['LastMonthQualifyStatus', 'lastMonthQualifyStatus'], 'No') || 'No').toString();
         const cardColorClass = lastMonthQualifyStatus === 'Yes' ? 'card-green' : 'card-red';
-        const memberPicture = getNodeValue(node, ['MemberPostionPicture', 'memberPostionPicture', 'MemberPositionPicture', 'memberPositionPicture'], '/images/1_Black1_40x40.gif');
+        const memberPicture = getNodeValue(node, ['MemberPositionPicture', 'MemberPositionPicture', 'MemberPositionPicture', 'memberPositionPicture'], '/images/1_Black1_40x40.gif');
 
         const children = getNodeChildren(node);
         const { leftChild, rightChild } = pickBinaryChildren(children);
@@ -355,23 +592,49 @@
         }
 
         const isEmpty = isTreeEmptyNode(node);
-        const isLastLevel = children.length === 0;
+        const isMobileView = isMobileTreeView();
+        const isLastLevel = level >= targetDepth - 1;
+        const useCompactCard = isLastLevel && (level > 2 || (isMobileView && level >= 2));
+        const emptyNodeClass = (isMobileView && isLastLevel)
+            ? 'empty-node small'
+            : (level <= 2 ? 'empty-node tree-size' : 'empty-node small');
         const safeMemberCode = (membercode || nodeMemberCode).replace(/'/g, "\\'");
         const registerBaseCodeRaw = nodeMemberCode || membercode || 'root';
         const registerBaseCode = registerBaseCodeRaw.replace(/'/g, "\\'");
+        const infoModalKey = `node_${++nodeInfoSeq}`;
+
+        nodeInfoDataMap[infoModalKey] = {
+            membername: membername,
+            membercode: membercode || nodeMemberCode,
+            memberposition: memberpositionName || memberposition,
+            memberthaiName: memberthaiName,
+            memberPicture: memberPicture,
+            gradientClass: gradientClass,
+            cardColorClass: cardColorClass,
+            currentMonth1: currentMonth1,
+            currentMonthQualifyPV: currentMonthQualifyPV,
+            lastCMonth: lastCMonth,
+            lastmonthQualifyPV: lastmonthQualifyPV,
+            currentLeftPV: currentLeftPV,
+            currentRightPV: currentRightPV,
+            newLeft: newLeft,
+            newRight: newRight,
+            leftCountActive: leftCountActive,
+            rightCountActive: rightCountActive,
+            totalLeftBalance: totalLeftBalance,
+            totalRightBalance: totalRightBalance
+        };
 
         let html = `<div class="tree-node-wrapper" data-level="${level}">`;
 
         if (isEmpty) {
-            html += `
-                <div class="empty-node" onclick="registerTeam('${registerBaseCode}')">
-                    <i class="ri-add-circle-line ri-2x"></i>
-                    <span>ว่าง</span>
-                </div>
-            `;
+            html += buildEmptyNodeHtml(emptyNodeClass, registerBaseCode, hasEmptyAncestor);
         } else {
             html += `
-                <div class="tree-node ${gradientClass} ${cardColorClass} ${isLastLevel ? 'level-last' : ''}" onclick="loadBinaryTeam('${safeMemberCode}')" title="คลิกเพื่อดูทีม">
+                <div class="tree-node ${gradientClass} ${cardColorClass} ${useCompactCard ? 'level-last' : ''}" onclick="loadBinaryTeam('${safeMemberCode}')" title="คลิกเพื่อดูทีม">
+                    <button type="button" class="btn btn-light btn-sm node-info-btn" data-modal-key="${infoModalKey}" title="ดูรายละเอียด" onclick="return openNodeInfoModal('${infoModalKey}', event);">
+                        <i class="ri-search-line"></i>
+                    </button>
                     <div class="node-main">
                         <div class="node-avatar">
                             <img src="${memberPicture}" alt="${membername}" class="member-picture">
@@ -388,30 +651,30 @@
                     <div class="node-stats">
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card">[L:${currentLeftPV}]</div>
+                                <div class="stat-value left-card">[L:${currentLeftPV.toLocaleString()}]</div>
                                 <div class="middle-text">คะแนน</div>
-                                <div class="stat-value right-card">[R:${currentRightPV}]</div>
+                                <div class="stat-value right-card">[R:${currentRightPV.toLocaleString()}]</div>
                             </div>
                         </div>
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card">[L:${newLeft}]</div>
+                                <div class="stat-value left-card">[L:${newLeft.toLocaleString()}]</div>
                                 <div class="middle-text">คะแนนมาใหม่</div>
-                                <div class="stat-value right-card">[R:${newRight}]</div>
+                                <div class="stat-value right-card">[R:${newRight.toLocaleString()}]</div>
                             </div>
                         </div>
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card">[L:${leftCountActive}]</div>
+                                <div class="stat-value left-card">[L:${leftCountActive.toLocaleString()}]</div>
                                 <div class="middle-text">Active</div>
-                                <div class="stat-value right-card">[R:${rightCountActive}]</div>
+                                <div class="stat-value right-card">[R:${rightCountActive.toLocaleString()}]</div>
                             </div>
                         </div>
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card">[L:${totalLeftBalance}]</div>
+                                <div class="stat-value left-card">[L:${totalLeftBalance.toLocaleString()}]</div>
                                 <div class="middle-text">Balance</div>
-                                <div class="stat-value right-card">[R:${totalRightBalance}]</div>
+                                <div class="stat-value right-card">[R:${totalRightBalance.toLocaleString()}]</div>
                             </div>
                         </div>
                     </div>
@@ -423,21 +686,19 @@
         if (!isLastLevel) {
             html += `<div class="tree-children">`;
             html += `<div class="tree-connector"></div>`;
-            const leftIsLast = !hasRealLeft || getNodeChildren(leftChild).length === 0;
-            const rightIsLast = !hasRealRight || getNodeChildren(rightChild).length === 0;
-            const childrenContainerClass = (leftIsLast && rightIsLast)
-                ? `children-container children-container-last`
-                : `children-container children-container-level-${level + 1}`;
+            const nextLevelIsVisualLast = (level + 1) >= (targetDepth - 1);
+            const leftIsLast = nextLevelIsVisualLast || !hasRealLeft || getNodeChildren(leftChild).length === 0;
+            const rightIsLast = nextLevelIsVisualLast || !hasRealRight || getNodeChildren(rightChild).length === 0;
+            const forceLevel2ContainerClass = !isMobileView && (level + 1 === 2 && leftIsLast && rightIsLast);
+            const childrenContainerClass = forceLevel2ContainerClass
+                ? `children-container children-container-level-2`
+                : (leftIsLast && rightIsLast)
+                    ? `children-container children-container-last`
+                    : `children-container children-container-level-${level + 1}`;
             const leftIsEmpty = !hasRealLeft;
             const rightIsEmpty = !hasRealRight;
             const level1LeftEmptyClass = (level + 1 === 1 && leftIsEmpty)
                 ? ' children-container-level-1-left-empty'
-                : '';
-            const level1NoEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty)
-                ? ' children-container-level-1-no-empty'
-                : '';
-            const level1RightEmptyClass = (level + 1 === 1 && rightIsEmpty)
-                ? ' children-container-level-1-right-empty'
                 : '';
             const leftGrandChildren = getNodeChildren(leftChild);
             const leftGrandChildrenPicked = pickBinaryChildren(leftGrandChildren);
@@ -453,54 +714,19 @@
             const level1RightLevel2AllEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty && rightLevel2AllEmpty)
                 ? ' children-container-level-1-right-level2-all-empty'
                 : '';
-            const level2RightEmptyClass = (level + 1 === 2 && rightIsEmpty)
-                ? ' children-container-level-2-right-empty'
-                : '';
 
-            html += `<div class="${childrenContainerClass}${level1LeftEmptyClass}${level1NoEmptyClass}${level1RightEmptyClass}${level1NoEmptyLeftLevel2RightEmptyClass}${level1LeftEmptyRightLevel2AllEmptyClass}${level1RightLevel2AllEmptyClass}${level2RightEmptyClass}">`;
+            html += `<div class="${childrenContainerClass}${level1LeftEmptyClass}${level1NoEmptyLeftLevel2RightEmptyClass}${level1LeftEmptyRightLevel2AllEmptyClass}${level1RightLevel2AllEmptyClass}">`;
 
-            if (hasRealLeft) {
-                html += `<div class="child-branch left">${renderTreeNode(leftChild, level + 1)}</div>`;
-            } else if (hasLeftChild) {
-                html += `
-                    <div class="child-branch left">
-                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}L')">
-                            <i class="ri-add-circle-line"></i>
-                            <span>ว่าง</span>
-                        </div>
-                    </div>
-                `;
+            if (hasLeftChild) {
+                html += `<div class="child-branch left">${renderTreeNode(leftChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty)}</div>`;
             } else {
-                html += `
-                    <div class="child-branch left">
-                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}L')">
-                            <i class="ri-add-circle-line"></i>
-                            <span>ว่าง</span>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="child-branch left">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}L`, hasEmptyAncestor || isEmpty)}</div>`;
             }
 
-            if (hasRealRight) {
-                html += `<div class="child-branch right">${renderTreeNode(rightChild, level + 1)}</div>`;
-            } else if (hasRightChild) {
-                html += `
-                    <div class="child-branch right">
-                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}R')">
-                            <i class="ri-add-circle-line"></i>
-                            <span>ว่าง</span>
-                        </div>
-                    </div>
-                `;
+            if (hasRightChild) {
+                html += `<div class="child-branch right">${renderTreeNode(rightChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty)}</div>`;
             } else {
-                html += `
-                    <div class="child-branch right">
-                        <div class="empty-node small" onclick="registerTeam('${registerBaseCode}R')">
-                            <i class="ri-add-circle-line"></i>
-                            <span>ว่าง</span>
-                        </div>
-                    </div>
-                `;
+                html += `<div class="child-branch right">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}R`, hasEmptyAncestor || isEmpty)}</div>`;
             }
 
             html += `</div>`;
@@ -681,6 +907,126 @@
     box-shadow: 0 4px 15px rgba(0,0,0,0.2);
     min-width: 200px;
     position: relative;
+}
+
+.tree-node .node-info-btn {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#nodeInfoModal .modal-dialog {
+    max-width: 1120px;
+    width: min(96vw, 1120px);
+    display: grid;
+    place-content: center;
+}
+
+#nodeInfoModal .modal-content.tree-node {
+    margin: 0;
+    min-width: 400px;
+    width: 100%;
+    max-height: 92vh;
+    cursor: default;
+    overflow: hidden;
+}
+
+#nodeInfoModal .modal-content.tree-node:hover {
+    transform: none;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
+
+#nodeInfoModal .modal-header.node-main {
+    border-bottom: 0;
+    gap: 24px;
+    padding: 20px 24px 10px;
+}
+
+#nodeInfoModal .modal-body {
+    padding-top: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+    padding-bottom: 20px;
+    max-height: calc(92vh - 170px);
+    overflow-y: auto;
+}
+
+#nodeInfoModal .modal-header .btn-close {
+    margin-left: auto;
+    align-self: flex-start;
+}
+
+#nodeInfoModal.show {
+    display: grid !important;
+    place-content: center;
+    padding: 14px;
+}
+
+#nodeInfoModal .modal-header.node-main .node-avatar {
+    width: 74px;
+    height: 74px;
+    margin: 2px 10px 24px 10px;
+}
+
+#nodeInfoModal .modal-header.node-main .member-name {
+    font-size: 1.18rem;
+}
+
+#nodeInfoModal .modal-header.node-main .member-code,
+#nodeInfoModal .modal-header.node-main .member-position,
+#nodeInfoModal .modal-header.node-main .member-position-ranking {
+    font-size: 0.98rem;
+}
+
+#nodeInfoModal .modal-body .stat-item {
+    padding: 10px 14px;
+}
+
+#nodeInfoModal .modal-body .stat-item.keep-text {
+    justify-content: center;
+}
+
+#nodeInfoModal .modal-body .stat-item.keep-text .middle-text {
+    flex: 1;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+@@media (max-width: 768px) {
+    #nodeInfoModal .modal-dialog {
+        width: min(98vw, 98vw);
+        max-width: 98vw;
+    }
+
+    #nodeInfoModal .modal-content.tree-node {
+        max-height: 94vh;
+    }
+
+    #nodeInfoModal .modal-body {
+        max-height: calc(94vh - 155px);
+        padding-left: 14px;
+        padding-right: 14px;
+        padding-bottom: 14px;
+    }
+
+    #nodeInfoModal .modal-header.node-main {
+        padding: 14px 14px 8px;
+        gap: 14px;
+    }
+
+    #nodeInfoModal .modal-header.node-main .node-avatar {
+        width: 62px;
+        height: 62px;
+        margin: 1px 6px 18px 6px;
+    }
 }
 
 .tree-node:hover {
@@ -916,18 +1262,18 @@
 }
 
 .children-container.children-container-last::before {
-    left: calc(24%);
-    right: calc(24%);
+    left: calc(24% + 2px);
+    right: calc(24% + 2px);
 }
 
 .children-container.children-container-level-2::before {
-    left: calc(25% - 1px);
-    right: calc(25% - 2px);
+    left: calc(24% + 5px);
+    right: calc(24% + 5px);
 }
 
 .children-container.children-container-level-1::before {
-    left: calc(33% + 1px);
-    right: calc(16% + 2px);
+    left: calc(24% + 11px);
+    right: calc(24% + 11px);
 }
 
 .children-container.children-container-level-1.children-container-level-1-left-empty::before {
@@ -940,29 +1286,14 @@
     right: calc(33% + 1px);
 }
 
-.children-container.children-container-level-1.children-container-level-1-no-empty::before {
-    left: calc(24% + 11px);
-    right: calc(24% + 11px);
-}
-
 .children-container.children-container-level-1.children-container-level-1-no-empty.children-container-level-1-no-empty-left-level2-right-empty::before {
     left: calc(16% + 5px);
     right: calc(32% + 11px);
 }
 
-.children-container.children-container-level-1.children-container-level-1-right-empty::before {
-    left: calc(37% + 2px);
-    right: calc(12% - 2px);
-}
-
 .children-container.children-container-level-1.children-container-level-1-right-level2-all-empty::before {
     left: calc(32% + 12px);
     right: calc(15% + 13px);
-}
-
-.children-container.children-container-level-2.children-container-level-2-right-empty::before {
-    left: calc(33% + 1px);
-    right: calc(16% + 1px);
 }
 
 .tree-node.level-last .member-code,
@@ -1082,6 +1413,17 @@
     box-sizing: border-box;
 }
 
+.empty-node.tree-size {
+    width: 200px;
+    height: 175px;
+    min-width: 200px;
+    max-width: 200px;
+    min-height: 175px;
+    max-height: 175px;
+    border-radius: 16px;
+    box-sizing: border-box;
+}
+
 .empty-node:hover {
     border-color: #667eea;
     color: #667eea;
@@ -1104,6 +1446,12 @@
 
 .empty-node.small span {
     font-size: 10px;
+}
+
+.empty-node.disabled {
+    pointer-events: none;
+    cursor: not-allowed;
+    opacity: 0.65;
 }
 
 /* สไตล์เดิมยังคงใช้งานได้ */
@@ -1172,17 +1520,91 @@
     margin-bottom: 5px;
 }
 
+.teambinary-actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
 /* Responsive */
 @@media (max-width: 768px) {
-    .children-container {
-        flex-direction: column;
-        gap: 15px;
+    #binaryTreeContainer {
+        text-align: left !important;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
     }
-    
+
+    .binary-tree-container {
+        display: inline-block;
+        min-width: max-content;
+        padding: 10px 6px;
+        overflow-x: auto;
+    }
+
+    .teambinary-search .input-group .form-control {
+        min-width: 0;
+    }
+
+    .teambinary-search .input-group .btn {
+        white-space: nowrap;
+    }
+
+    .teambinary-actions {
+        justify-content: stretch;
+    }
+
+    .teambinary-actions .btn {
+        flex: 1 1 calc(50% - 8px);
+        min-height: 40px;
+    }
+
     .tree-node {
-        min-width: 150px;
-        padding: 10px 15px;
+        min-width: 160px;
+        max-width: 160px;
+        min-height: 145px;
+        max-height: 145px;
+    }
+
+    .tree-node .node-main {
+        gap: 8px;
+    }
+
+    .tree-node .node-avatar {
+        width: 44px;
+        height: 44px;
+        margin: 1px 4px 12px 4px;
+    }
+
+    .tree-node .member-name {
+        font-size: 11px;
+        width: 88px;
+    }
+
+    .children-container {
+        gap: 8px;
+    }
+
+    .tree-node .stat-value,
+    .tree-node .middle-text {
+        font-size: 8px;
+    }
+
+    .children-container.children-container-level-1::before {
+        left: calc(24% + 5px);
+        right: calc(24% + 5px);
+    }
+
+    .children-container.children-container-level-2::before {
+        left: calc(20% + 6px);
+        right: calc(27% + 1px);
     }
 }
 </style>
+
+
+@section scripts {
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
 }

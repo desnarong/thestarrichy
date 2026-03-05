@@ -49,6 +49,30 @@
 
     @Html.Partial("~/Views/Shared/_vendor_scripts.cshtml")
 
+    <script>
+        (async function () {
+            try {
+                const response = await fetch('/Auth/SystemStatus', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    return;
+                }
+
+                const status = await response.json();
+                const closeSystemFlag = status?.CloseSystemflag ?? status?.closeSystemflag;
+
+                if (String(closeSystemFlag) === '1') {
+                    window.location.replace('/Auth/Login?systemClosed=1');
+                }
+            } catch (e) {
+                console.warn('System status check failed:', e);
+            }
+        })();
+    </script>
+
     @RenderSection("scripts", required: false)
 </body>
 </html>

@@ -300,37 +300,37 @@
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">ที่อยู่ตามบัตรฯ</label>
+                                                <label class="col-md-5 col-form-label required">ที่อยู่ตามบัตรฯ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน"></textarea>
+                                                    <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน" required></textarea>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">รหัสไปรษณีย์</label>
+                                                <label class="col-md-5 col-form-label required">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="simplePostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" />
+                                                    <input type="text" class="form-control" id="simplePostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">จังหวัด</label>
+                                                <label class="col-md-5 col-form-label required">จังหวัด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <select class="form-control" id="simpleProvince" disabled>
+                                                    <select class="form-control" id="simpleProvince" required disabled>
                                                         <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">เขต/อำเภอ</label>
+                                                <label class="col-md-5 col-form-label required">เขต/อำเภอ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <select class="form-control" id="simpleDistrict" disabled>
+                                                    <select class="form-control" id="simpleDistrict" required disabled>
                                                         <option value="">-- เลือกอำเภอ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">แขวง/ตำบล</label>
+                                                <label class="col-md-5 col-form-label required">แขวง/ตำบล <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <select class="form-control" id="simpleSubdistrict" disabled>
+                                                    <select class="form-control" id="simpleSubdistrict" required disabled>
                                                         <option value="">-- เลือกตำบล --</option>
                                                     </select>
                                                 </div>
@@ -1725,32 +1725,23 @@
             }
 
             // ==========================================
-            // 3. Validate Address (ถ้ากรอก ต้องกรอกให้ครบ)
+            // 3. Validate Address (บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง)
             // ==========================================
             const addressFields = ['#simpleAddressIdCard', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
-            let hasAddressData = false;
             let addressComplete = true;
 
             addressFields.forEach(fieldId => {
-                if ($.trim($(fieldId).val())) {
-                    hasAddressData = true;
+                if (!$.trim($(fieldId).val())) {
+                    $(fieldId).addClass('is-invalid');
+                    addressComplete = false;
+                } else {
+                    $(fieldId).removeClass('is-invalid');
                 }
             });
 
-            if (hasAddressData) {
-                addressFields.forEach(fieldId => {
-                    if (!$.trim($(fieldId).val())) {
-                        $(fieldId).addClass('is-invalid');
-                        addressComplete = false;
-                    } else {
-                        $(fieldId).removeClass('is-invalid');
-                    }
-                });
-
-                if (!addressComplete) {
-                    toastr.error('หากกรอกข้อมูลที่อยู่ กรุณากรอกให้ครบถ้วน');
-                    isValid = false;
-                }
+            if (!addressComplete) {
+                toastr.error('กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน');
+                isValid = false;
             }
 
             // ==========================================
@@ -1804,14 +1795,14 @@
                         checkDuplicateIDCard(formData.documentNumber),
                         checkDuplicateTelephone(formData.mobile),
                         checkDuplicateEmail(formData.email),
-                        checkDuplicateIDCardName(formData.fullName),
+                        checkDuplicateIDCardName(formData.idCardName),
                         checkDuplicateBusinessName(formData.businessName)
                     ];
 
                     const results = await Promise.all(checks);
                     const failed = results.find(r => r && r.success === false);
                     if (failed) {
-                        Swal.fire('ไม่สามารถสมัครได้', failed.message, 'error');
+                        Swal.fire('ไม่สามารถสมัครได้', failed.message || 'พบข้อมูลซ้ำในระบบ', 'error');
                         return;
                     }
 
@@ -1985,14 +1976,14 @@
                     checkDuplicateIDCard(formData.documentNumber),
                     checkDuplicateTelephone(formData.mobile),
                     checkDuplicateEmail(formData.email),
-                    checkDuplicateIDCardName(formData.nameOnCard),
+                    checkDuplicateIDCardName(formData.idCardName),
                     checkDuplicateBusinessName(formData.businessName)
                 ];
 
                 const results = await Promise.all(checks);
                 const failed = results.find(r => r && r.success === false);
                 if (failed) {
-                    Swal.fire('ไม่สามารถสมัครได้', failed.message, 'error');
+                    Swal.fire('ไม่สามารถสมัครได้', failed.message || 'พบข้อมูลซ้ำในระบบ', 'error');
                     return;
                 }
 
@@ -2252,11 +2243,42 @@
             resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
         }
 
+        function normalizeDuplicateResult(response, defaultMessage) {
+            const parsed = (typeof response === 'string') ? JSON.parse(response) : response;
+
+            if (!parsed || typeof parsed !== 'object') {
+                return { success: true, message: '' };
+            }
+
+            if (typeof parsed.success === 'boolean') {
+                return {
+                    success: parsed.success,
+                    message: parsed.message || (parsed.success ? '' : defaultMessage)
+                };
+            }
+
+            if (typeof parsed.isDuplicate === 'boolean') {
+                return {
+                    success: !parsed.isDuplicate,
+                    message: parsed.isDuplicate ? (parsed.message || defaultMessage) : ''
+                };
+            }
+
+            if (typeof parsed.exists === 'boolean') {
+                return {
+                    success: !parsed.exists,
+                    message: parsed.exists ? (parsed.message || defaultMessage) : ''
+                };
+            }
+
+            return { success: true, message: '' };
+        }
+
         // --- Duplicate checks ---
         async function checkDuplicateIDCard(id) {
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
-                return (typeof response === 'string') ? JSON.parse(response) : response;
+                return normalizeDuplicateResult(response, 'เลขบัตรประชาชนนี้มีในระบบแล้ว');
             } catch (error) {
                 console.error('Error checking duplicate ID card:', error);
                 return { success: true };
@@ -2266,7 +2288,7 @@
         async function checkDuplicateTelephone(phone) {
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
-                return (typeof response === 'string') ? JSON.parse(response) : response;
+                return normalizeDuplicateResult(response, 'เบอร์โทรศัพท์มือถือมีในระบบแล้ว');
             } catch (error) {
                 console.error('Error checking duplicate telephone:', error);
                 return { success: true };
@@ -2277,7 +2299,7 @@
             if (!email) return { success: true, message: '' };
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
-                return (typeof response === 'string') ? JSON.parse(response) : response;
+                return normalizeDuplicateResult(response, 'อีเมลนี้มีในระบบแล้ว');
             } catch (error) {
                 console.error('Error checking duplicate email:', error);
                 return { success: true };
@@ -2287,7 +2309,7 @@
         async function checkDuplicateIDCardName(name) {
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
-                return (typeof response === 'string') ? JSON.parse(response) : response;
+                return normalizeDuplicateResult(response, 'ชื่อตามบัตรนี้มีในระบบแล้ว');
             } catch (error) {
                 console.error('Error checking duplicate ID card name:', error);
                 return { success: true };
@@ -2297,7 +2319,7 @@
         async function checkDuplicateBusinessName(name) {
             try {
                 const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
-                return (typeof response === 'string') ? JSON.parse(response) : response;
+                return normalizeDuplicateResult(response, 'ชื่อธุรกิจนี้มีในระบบแล้ว');
             } catch (error) {
                 console.error('Error checking duplicate business name:', error);
                 return { success: true };

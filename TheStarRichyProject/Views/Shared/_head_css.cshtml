@@ -24,6 +24,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <style>
+    @@media (max-width: 767.98px) {
+        .page-title-box .breadcrumb {
+            display: none !important;
+        }
+    }
+
     div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
         background-color: rgba(var(--vz-link-color-rgb),var(--vz-link-opacity,1)) !important
     }

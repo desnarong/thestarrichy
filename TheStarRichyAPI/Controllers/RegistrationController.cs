@@ -31,6 +31,22 @@ namespace TheStarRichyApi.Controllers
         {
             try
             {
+                var missingAddressFields = new List<string>();
+                if (string.IsNullOrWhiteSpace(request.AddressIdCard)) missingAddressFields.Add("ที่อยู่ตามบัตร");
+                if (string.IsNullOrWhiteSpace(request.Postcode)) missingAddressFields.Add("รหัสไปรษณีย์");
+                if (string.IsNullOrWhiteSpace(request.ProvinceCode)) missingAddressFields.Add("จังหวัด");
+                if (string.IsNullOrWhiteSpace(request.DistrictCode)) missingAddressFields.Add("เขต/อำเภอ");
+                if (string.IsNullOrWhiteSpace(request.SubdistrictCode)) missingAddressFields.Add("แขวง/ตำบล");
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new RegistrationResponse
+                    {
+                        Success = false,
+                        Message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new RegistrationResponse
@@ -92,6 +108,22 @@ namespace TheStarRichyApi.Controllers
         {
             try
             {
+                var missingAddressFields = new List<string>();
+                if (string.IsNullOrWhiteSpace(request.AddressIdCard)) missingAddressFields.Add("ที่อยู่ตามบัตร");
+                if (string.IsNullOrWhiteSpace(request.Postcode)) missingAddressFields.Add("รหัสไปรษณีย์");
+                if (string.IsNullOrWhiteSpace(request.ProvinceCode)) missingAddressFields.Add("จังหวัด");
+                if (string.IsNullOrWhiteSpace(request.DistrictCode)) missingAddressFields.Add("เขต/อำเภอ");
+                if (string.IsNullOrWhiteSpace(request.SubdistrictCode)) missingAddressFields.Add("แขวง/ตำบล");
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new RegistrationResponse
+                    {
+                        Success = false,
+                        Message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new RegistrationResponse
@@ -781,6 +813,23 @@ namespace TheStarRichyApi.Controllers
         {
             try
             {
+                // บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง
+                var missingAddressFields = new List<string>();
+                if (string.IsNullOrWhiteSpace(request.AddressIdCard)) missingAddressFields.Add("ที่อยู่ตามบัตร");
+                if (string.IsNullOrWhiteSpace(request.Postcode)) missingAddressFields.Add("รหัสไปรษณีย์");
+                if (string.IsNullOrWhiteSpace(request.ProvinceCode)) missingAddressFields.Add("จังหวัด");
+                if (string.IsNullOrWhiteSpace(request.DistrictCode)) missingAddressFields.Add("เขต/อำเภอ");
+                if (string.IsNullOrWhiteSpace(request.SubdistrictCode)) missingAddressFields.Add("แขวง/ตำบล");
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new RegistrationResponse
+                    {
+                        Success = false,
+                        Message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
+
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new RegistrationResponse

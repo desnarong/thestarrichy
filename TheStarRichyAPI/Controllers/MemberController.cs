@@ -454,11 +454,11 @@ namespace TheStarRichyApi.Controllers
 
         /*==================== UPDATE 2025-09-07 ====================*/
         [HttpGet("memberbinaryteam")]
-        public async Task<IActionResult> GetMemberBinaryTeam([FromQuery] string? membercode = null)
+        public async Task<IActionResult> GetMemberBinaryTeam([FromQuery] string? binarycode = null)
         {
             try
             {
-                var result = await _memberBinaryTeamService.GetDisplayAsync(membercode);
+                var result = await _memberBinaryTeamService.GetDisplayAsync(binarycode);
 
                 var options = new JsonSerializerOptions
                 {

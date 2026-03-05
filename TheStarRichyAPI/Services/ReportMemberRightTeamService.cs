@@ -141,7 +141,7 @@ namespace TheStarRichyApi.Services
                         query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.MemberRightCode  ";
                     }
                     query += " where aa.Membercode = @Membercode";
-                    query += " ORDER BY aa.Item,aa.MemberRightCode ";
+                    query += " ORDER BY aa.MemberRightCode ";
 
                     using (var command = new SqlCommand(query, con))
                     {

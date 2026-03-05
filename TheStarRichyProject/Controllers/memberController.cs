@@ -314,7 +314,7 @@ namespace TheStarRichyProject.Controllers
                     ? "unknown"
                     : Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
 
-                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "MemberUploads", safeMemberCode);
+                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", safeMemberCode);
                 if (!Directory.Exists(rootPath))
                 {
                     Directory.CreateDirectory(rootPath);
@@ -413,6 +413,30 @@ namespace TheStarRichyProject.Controllers
                 // 2. แปลง string ให้เป็น JsonObject (เพื่อให้เพิ่ม/แก้ไขข้อมูลได้)
                 var jsonObject = JsonNode.Parse(rawJsonString).AsObject();
 
+                // บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง
+                var requiredAddressFields = new Dictionary<string, string>
+                {
+                    { "addressIdCard", "ที่อยู่ตามบัตร" },
+                    { "postcode", "รหัสไปรษณีย์" },
+                    { "provinceCode", "จังหวัด" },
+                    { "districtCode", "เขต/อำเภอ" },
+                    { "subdistrictCode", "แขวง/ตำบล" }
+                };
+
+                var missingAddressFields = requiredAddressFields
+                    .Where(field => string.IsNullOrWhiteSpace(jsonObject[field.Key]?.ToString()))
+                    .Select(field => field.Value)
+                    .ToList();
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
+
                 // ==========================================
                 // 🌟 เพิ่มบล็อกจัดการบันทึกรูปภาพ (ถ้ามีส่งมา)
                 // ==========================================
@@ -482,16 +506,18 @@ namespace TheStarRichyProject.Controllers
                         }
                     }
 
-                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
-                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
-                    if (!hasValidFiles)
+                    // รูปภาพไม่บังคับ: ส่งเฉพาะไฟล์ที่บันทึกสำเร็จเท่านั้น
+                    var validPaths = new JsonArray();
+                    foreach (var path in newPathsArray.Where(path => path != null && !string.IsNullOrWhiteSpace(path.ToString())))
                     {
-                        _logger.LogWarning("No valid image files were saved for easy registration");
-                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
+                        validPaths.Add(path!.ToString());
                     }
 
-                    // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่า
-                    jsonObject["memberpic"] = newPathsArray;
+                    jsonObject["memberpic"] = validPaths;
+                }
+                else
+                {
+                    jsonObject["memberpic"] = new JsonArray();
                 }
                 // ==========================================
 
@@ -553,6 +579,30 @@ namespace TheStarRichyProject.Controllers
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string และแปลงเป็น JsonObject
                 string rawJsonString = request.GetRawText();
                 var jsonObject = JsonNode.Parse(rawJsonString).AsObject();
+
+                // บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง
+                var requiredAddressFields = new Dictionary<string, string>
+                {
+                    { "addressIdCard", "ที่อยู่ตามบัตร" },
+                    { "postcode", "รหัสไปรษณีย์" },
+                    { "provinceCode", "จังหวัด" },
+                    { "districtCode", "เขต/อำเภอ" },
+                    { "subdistrictCode", "แขวง/ตำบล" }
+                };
+
+                var missingAddressFields = requiredAddressFields
+                    .Where(field => string.IsNullOrWhiteSpace(jsonObject[field.Key]?.ToString()))
+                    .Select(field => field.Value)
+                    .ToList();
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
 
                 // 2. กำหนดโฟลเดอร์ที่จะเก็บรูป
                 string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "Memberpicture");
@@ -629,16 +679,18 @@ namespace TheStarRichyProject.Controllers
                         }
                     }
 
-                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
-                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
-                    if (!hasValidFiles)
+                    // รูปภาพไม่บังคับ: ส่งเฉพาะไฟล์ที่บันทึกสำเร็จเท่านั้น
+                    var validPaths = new JsonArray();
+                    foreach (var path in newPathsArray.Where(path => path != null && !string.IsNullOrWhiteSpace(path.ToString())))
                     {
-                        _logger.LogWarning("No valid image files were saved for full registration");
-                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
+                        validPaths.Add(path!.ToString());
                     }
 
-                    // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่าใน jsonObject
-                    jsonObject["memberpic"] = newPathsArray;
+                    jsonObject["memberpic"] = validPaths;
+                }
+                else
+                {
+                    jsonObject["memberpic"] = new JsonArray();
                 }
 
                 // 4. แทรก IpAddress (ใช้ ipAddress ที่ได้จาก function)

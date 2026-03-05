@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Services;
 
@@ -35,7 +37,7 @@ namespace TheStarRichyProject.Controllers
             try
             {
                 var result = await _apiService.GetAsync<dynamic>(
-                    $"/Member/memberbinaryteam?membercode={memberCode}"
+                    $"/Member/memberbinaryteam?binarycode={memberCode}"
                 );
                 return Ok(result);
             }
@@ -52,7 +54,7 @@ namespace TheStarRichyProject.Controllers
             try
             {
                 var result = await _apiService.GetAsync<dynamic>(
-                    $"/Member/findleftbinary?membercode={memberCode}"
+                    $"/Member/findleftbinary?binarycode={memberCode}"
                 );
                 return Ok(result);
             }
@@ -69,7 +71,7 @@ namespace TheStarRichyProject.Controllers
             try
             {
                 var result = await _apiService.GetAsync<dynamic>(
-                    $"/Member/findrightbinary?membercode={memberCode}"
+                    $"/Member/findrightbinary?binarycode={memberCode}"
                 );
                 return Ok(result);
             }
@@ -96,10 +98,11 @@ namespace TheStarRichyProject.Controllers
         {
             try
             {
-                var result = await _apiService.GetAsync<dynamic>(
+                var result = await _apiService.GetAsync<JArray>(
                     $"/Member/reportmembersponserteam?membercode={memberCode}"
                 );
-                return Ok(result);
+
+                return Ok(JsonConvert.SerializeObject(result));
             }
             catch (Exception ex)
             {
@@ -127,7 +130,7 @@ namespace TheStarRichyProject.Controllers
                 var result = await _apiService.GetAsync<dynamic>(
                     $"/Member/reportmemberleftteam?membercode={memberCode}"
                 );
-                return Ok(result);
+                return Ok(JsonConvert.SerializeObject(result));
             }
             catch (Exception ex)
             {
@@ -177,7 +180,7 @@ namespace TheStarRichyProject.Controllers
                 var result = await _apiService.GetAsync<dynamic>(
                     $"/Member/reportmemberrightteam?membercode={memberCode}"
                 );
-                return Ok(result);
+                return Ok(JsonConvert.SerializeObject(result));
             }
             catch (Exception ex)
             {

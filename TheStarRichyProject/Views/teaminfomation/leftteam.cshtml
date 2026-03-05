@@ -65,11 +65,16 @@
         try {
             const response = await fetch('/home/GetMemberInfo');
             const data = await response.json();
-            const memberInfo = JSON.parse(data);
-            const memberCode = memberInfo.memberInfo[0].membercode;
+            const memberInfo = typeof data === 'string' ? JSON.parse(data) : data;
+            const memberCode = (memberInfo?.membercode || memberInfo?.memberInfo?.[0]?.membercode || '').toString().trim();
+
+            if (!memberCode) {
+                throw new Error('ไม่พบรหัสสมาชิก');
+            }
 
             const teamResponse = await fetch(`/teaminfomation/GetLeftTeam?memberCode=${memberCode}`);
-            const teamData = await teamResponse.json();
+            const teamResult = await teamResponse.json();
+            const teamData = extractRows(typeof teamResult === 'string' ? JSON.parse(teamResult) : teamResult);
 
             renderTable(teamData);
             updateSummary(teamData);
@@ -89,13 +94,17 @@
         }
 
         data.forEach((member, index) => {
+            const memberCode = member.MemberLeftCode || member.memberLeftCode || '-';
+            const memberName = member.MemberLeftName || member.memberLeftName || '-';
+            const pv = Number(member.personalpv ?? member.personalPV ?? member.pv ?? 0);
+
             tbody.append(`
                 <tr>
                     <td>${index + 1}</td>
-                    <td><strong>${member.membercode}</strong></td>
-                    <td>${member.idcardname}</td>
-                    <td>${formatDate(member.registerdate)}</td>
-                    <td><span class="badge bg-success">${member.personalpv || 0}</span></td>
+                    <td><strong>${memberCode}</strong></td>
+                    <td>${memberName}</td>
+                    <td>${formatDate(member.registerdate || member.registerDate || member.RegisterDate)}</td>
+                    <td><span class="badge bg-success">${pv.toLocaleString()}</span></td>
                     <td><span class="badge bg-success">Active</span></td>
                 </tr>
             `);
@@ -106,13 +115,26 @@
         if (!data || !Array.isArray(data)) return;
         
         $('#totalMembers').text(data.length);
-        const totalPV = data.reduce((sum, m) => sum + (parseFloat(m.personalpv) || 0), 0);
+        const totalPV = data.reduce((sum, m) => sum + (parseFloat(m.personalpv ?? m.personalPV ?? m.pv) || 0), 0);
         $('#totalPV').text(totalPV.toFixed(0));
     }
 
     function formatDate(dateStr) {
         if (!dateStr) return 'N/A';
-        return new Date(dateStr).toLocaleDateString('th-TH');
+        const date = new Date(dateStr);
+        if (Number.isNaN(date.getTime())) return 'N/A';
+        return date.toLocaleDateString('th-TH');
+    }
+
+    function extractRows(payload) {
+        if (Array.isArray(payload)) return payload;
+        if (!payload || typeof payload !== 'object') return [];
+
+        const candidates = [payload.data, payload.result, payload.items, payload.rows, payload.members];
+        for (const c of candidates) {
+            if (Array.isArray(c)) return c;
+        }
+        return [];
     }
 </script>
 

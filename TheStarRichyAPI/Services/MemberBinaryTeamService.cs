@@ -11,7 +11,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IMemberBinaryTeamService
     {
-        Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? memberCode = null);
+        Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null);
     }
 
     public class MemberBinaryTeamService : IMemberBinaryTeamService
@@ -102,7 +102,7 @@ namespace TheStarRichyApi.Services
             return password;
         }
 
-        public async Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? memberCode = null)
+        public async Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null)
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -121,15 +121,14 @@ namespace TheStarRichyApi.Services
             }
 
             // Use provided memberCode or get from JWT
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            }
+            var memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(memberCode))
             {
                 return new MemberBinaryTeamResponseDto { Membercode = "" };
             }
+
+            
 
             MemberBinaryTeamResponseDto result = null;
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
@@ -140,18 +139,83 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
+                    // ===== STEP 1: SELECT * FROM MemberLevel WHERE MemberCode = @memberCode =====
+                    var memberLevelList = new List<dynamic>();
+
+                    string memberLevelQuery = "SELECT * FROM [dbo].[MemberLevel] WHERE MemberCode = @MemberCode";
+
+                    using (var cmd = new SqlCommand(memberLevelQuery, con))
+                    {
+                        cmd.Parameters.AddWithValue("@MemberCode", memberCode);
+
+                        using (var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                dynamic row = new ExpandoObject();
+                                var rowDict = (IDictionary<string, object>)row;
+
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string columnName = reader.GetName(i);
+                                    object columnValue = reader.GetValue(i);
+                                    rowDict[columnName] = columnValue == DBNull.Value ? null : columnValue;
+                                }
+
+                                memberLevelList.Add(row);
+                            }
+                        }
+                    }
+
+                    // ===== STEP 2: ถ้ามี binaryCode ให้เช็คว่ามีอยู่ใน memberLevelList หรือไม่ =====
+                    bool binaryCodeExists = false;
+
+                    if (!string.IsNullOrEmpty(binaryCode) && memberLevelList.Count > 0)
+                    {
+                        // เอาเฉพาะแถวแรก (ปกติ MemberCode น่าจะมีแค่ record เดียว)
+                        var firstRow = memberLevelList.FirstOrDefault();
+
+                        if (firstRow != null)
+                        {
+                            var dict = (IDictionary<string, object>)firstRow;
+
+                            // Loop ผ่านทุกคอลัมน์ที่ขึ้นต้นด้วย "Member_" เพื่อหา binaryCode
+                            foreach (var kvp in dict)
+                            {
+                                if (kvp.Key.StartsWith("Member_") && kvp.Value?.ToString() == binaryCode)
+                                {
+                                    binaryCodeExists = true;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
+                    // ===== STEP 3: ถ้า binaryCode ไม่มีอยู่ ให้ return ค่าเปล่า =====
+                    if (binaryCode == memberCode) binaryCode = null;
+                    if (!string.IsNullOrEmpty(binaryCode) && !binaryCodeExists)
+                    {
+                        return new MemberBinaryTeamResponseDto
+                        {
+                            Membercode = memberCode,
+                            BinaryTree = new List<MemberBinaryNodeDto>()
+                        };
+                    }
+                    // ============================================================
+                    
+                    // Query ขอมูลหลักจาก [000_Member_Binary_Team]
                     string query = "SELECT TOP 1 Membercode, PositionLevel, ChildCode, Membername, Sponsername, Memberposition, MemberpositionName, MemberpositionRanking";
                     query += ", MemberpositionRankingName, PersonalPV, LeftCountActive, RightCountActive, LeftBal, Rightbal, TotalBalance, CurrentLeftPV, CurrentRightPV";
                     query += ", BWDLeftPV, BWDRightPV, NewLeft, NewRight, Maxto2, TName1, TName2, EName1, EName2, Travelpoint1, travelpoint2";
                     query += ", CurrentMonthQualifyPV, LastMonthQualifyPV, LastMonthQualifyStatus, CurrentMonthQualifyStatus, FirstQdate";
-                    query += ", CurrentMonth, NextCMonth, CurrentMonth1, LastCMonth, MemberPostionPicture";
+                    query += ", CurrentMonth, NextCMonth, CurrentMonth1, LastCMonth, MemberPositionPicture";
                     query += ", TotalLeftBalance, TotalRightBalance, NextPosition, NextPosaddLeftBalance, NextPosaddRightBalance";
                     query += " FROM [000_Member_Binary_Team] (nolock) ";
                     query += " WHERE Membercode = @Membercode";
 
                     using (var command = new SqlCommand(query, con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
+                        command.Parameters.AddWithValue("@Membercode", binaryCode ?? memberCode);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
@@ -165,19 +229,19 @@ namespace TheStarRichyApi.Services
                     if (result != null)
                     {
                         // เรียก Stored Procedure เพื่อดึงข้อมูล团队成员ทั้งหมด
-                        string spName = "[dbo].[sp_GetMemberBinaryTree]";
+                        string spName = "[dbo].[SP_GetMemberBinaryTree]";
 
                         using (var downlineCommand = new SqlCommand(spName, con))
                         {
                             downlineCommand.CommandType = CommandType.StoredProcedure;
-                            downlineCommand.Parameters.AddWithValue("@Membercode", memberCode);
+                            downlineCommand.Parameters.AddWithValue("@Membercode", binaryCode ?? memberCode);
 
                             var allMembers = new List<dynamic>();
 
                             using (var downlineReader = await downlineCommand.ExecuteReaderAsync())
                             {
                                 int rowCount = 0;
-                                while (await downlineReader.ReadAsync() && rowCount < 50) // จำกัดแค่ 100 รายการ
+                                while (await downlineReader.ReadAsync())
                                 {
                                     dynamic row = new ExpandoObject();
                                     var rowDict = (IDictionary<string, object>)row;
@@ -197,7 +261,22 @@ namespace TheStarRichyApi.Services
                             // สร้าง Binary Tree ที่สมบูรณ์
                             if (allMembers.Count > 0)
                             {
-                                var completeTree = BuildCompleteTree(allMembers, 3); // จำกัด depth = 3
+                                // ค้นหาสมาชิกที่มี Membercode ตรงกับ mainMemberCode
+                                var mainMember = allMembers.FirstOrDefault(m =>
+                                {
+                                    var dict = (IDictionary<string, object>)m;
+                                    return dict["Membercode"]?.ToString() == memberCode;
+                                });
+
+                                // ถ้าพบ ให้ตั้งค่า ParentCode = null
+                                if (mainMember != null)
+                                {
+                                    var mainMemberDict = (IDictionary<string, object>)mainMember;
+                                    mainMemberDict["ParentCode"] = null;
+                                }
+
+                                // สร้าง Binary Tree
+                                var completeTree = BuildCompleteTree(allMembers, 3);
                                 result.BinaryTree = ConvertTreeToDto(completeTree);
                             }
                             else
@@ -260,7 +339,7 @@ namespace TheStarRichyApi.Services
                 NextCMonth = GetString(reader, "NextCMonth"),
                 CurrentMonth1 = GetString(reader, "CurrentMonth1"),
                 LastCMonth = GetString(reader, "LastCMonth"),
-                MemberPostionPicture = GetString(reader, "MemberPostionPicture"),
+                MemberPositionPicture = GetString(reader, "MemberPositionPicture"),
                 TotalLeftBalance = GetDecimal(reader, "TotalLeftBalance"),
                 TotalRightBalance = GetDecimal(reader, "TotalRightBalance"),
                 NextPosition = GetString(reader, "NextPosition"),
@@ -384,7 +463,7 @@ namespace TheStarRichyApi.Services
                 NextCMonth = GetStringValue(dict, "NextCMonth"),
                 CurrentMonth1 = GetStringValue(dict, "CurrentMonth1"),
                 LastCMonth = GetStringValue(dict, "LastCMonth"),
-                MemberPostionPicture = GetStringValue(dict, "MemberPostionPicture"),
+                MemberPositionPicture = GetStringValue(dict, "MemberPositionPicture"),
 
                 // Balance fields
                 TotalLeftBalance = GetDecimalValue(dict, "TotalLeftBalance"),
@@ -869,7 +948,7 @@ namespace TheStarRichyApi.Services
         public string NextCMonth { get; set; }
         public string CurrentMonth1 { get; set; }
         public string LastCMonth { get; set; }
-        public string MemberPostionPicture { get; set; }
+        public string MemberPositionPicture { get; set; }
         public decimal? TotalLeftBalance { get; set; }
         public decimal? TotalRightBalance { get; set; }
         public string NextPosition { get; set; }
@@ -921,7 +1000,7 @@ namespace TheStarRichyApi.Services
         public string NextCMonth { get; set; }
         public string CurrentMonth1 { get; set; }
         public string LastCMonth { get; set; }
-        public string MemberPostionPicture { get; set; }
+        public string MemberPositionPicture { get; set; }
         public decimal? TotalLeftBalance { get; set; }
         public decimal? TotalRightBalance { get; set; }
         public string NextPosition { get; set; }

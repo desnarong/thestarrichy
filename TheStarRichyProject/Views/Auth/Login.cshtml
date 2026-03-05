@@ -146,7 +146,7 @@
                                     <h5 class="text-primary" data-key="t-welcomeback">ยินดีต้อนรับ !</h5>
                                     <p class="text-muted" data-key="t-signintocontinuto">ลงชื่อเข้าใช้งานเพื่อไปยัง Star Richy</p>
                                 </div>
-                                <div class="p-2 mt-4">
+                                <div class="p-2 mt-4" id="loginFormContainer">
                                     <form action="@Url.Action("Index", "Dashboard")">
                                         <div class="mb-3">
                                             <label for="login__username" class="form-label" data-key="t-membercode">รหัสผู้ใช้</label>
@@ -179,6 +179,11 @@
                                         </a>
                                     </div>
                                 </div>
+                                <div class="p-2 mt-4 d-none" id="systemClosedMessage">
+                                    <div class="alert alert-warning text-center mb-0 fs-5 fw-semibold" role="alert">
+                                        ขออภัย ขณะนี้ระบบปิดให้บริการชั่วคราว
+                                    </div>
+                                </div>
                             </div>
                             <!-- end card body -->
                         </div>
@@ -195,7 +200,7 @@
         <!-- end Footer -->
     </div>
     <!-- end auth-page-wrapper -->
-    <div class="modal fade show" id="countdownModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="true" aria-modal="true" style="padding-right: 15px; display: block;">
+    <div class="modal fade" id="countdownModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="true" aria-modal="true">
         <div class="modal-dialog modal-lg py-5" role="document">
             <div class="modal-content" style="background-color: #0000;-webkit-box-shadow: none;">
                 <div class="modal-header p-0 border-0">
@@ -219,9 +224,21 @@
 
     <script>
         let countdownInterval = null;
+        let isSystemClosed = false;
+
         $(document).ready(function () {
-            $('#loginmodal').modal({ show: true, backdrop: 'static', keyboard: false });
-            $('#countdownModal').modal('show');
+            (async () => {
+                await imageslidebar();
+                await imagepopupslidebar();
+
+                isSystemClosed = await checkSystemStatusAndHandleClosed();
+                if (isSystemClosed) {
+                    return;
+                }
+
+                $('#loginmodal').modal({ show: true, backdrop: 'static', keyboard: false });
+                showModalWithCountdown();
+            })();
 
             $('#login__username').keydown(function (event) {
                 if (event.which == 13) {
@@ -238,6 +255,10 @@
             });
 
             $('#signin_submit').click(function (e) {
+                if (isSystemClosed) {
+                    return;
+                }
+
                 Swal.fire({
                     html: '<div><img src="/assets/images/login/loginlogo.png" class="swalimg" /></div>',
                     showCancelButton: false,
@@ -290,14 +311,47 @@
                     $('#kt_login_signin_submit').click();
                 }
             });
-
-            showModalWithCountdown();
-            
-            (async () => {
-                await imageslidebar();
-                await imagepopupslidebar();
-            })();
         });
+
+        async function checkSystemStatusAndHandleClosed() {
+            try {
+                const response = await fetch('/Auth/SystemStatus', {
+                    method: 'GET',
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    return false;
+                }
+
+                const status = await response.json();
+                const closeSystemFlag = status?.CloseSystemflag ?? status?.closeSystemflag;
+
+                if (String(closeSystemFlag) === '1') {
+                    $('#countdownModal').modal('hide');
+                    $('#loginFormContainer').hide();
+                    $('#systemClosedMessage').removeClass('d-none');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ปิดให้บริการชั่วคราว',
+                        text: 'ขออภัยในความไม่สะดวก ขณะนี้ระบบปิดให้บริการชั่วคราว กรุณาเข้าใช้งานอีกครั้งภายหลัง',
+                        customClass: {
+                            title: 'fs-4',
+                            htmlContainer: 'fs-5'
+                        },
+                        allowOutsideClick: false,
+                        confirmButtonText: 'รับทราบ'
+                    });
+
+                    return true;
+                }
+            } catch (error) {
+                console.warn('System status check failed:', error);
+            }
+
+            return false;
+        }
 
         async function imageslidebar() {
             const response = await fetch('/home/GetSlideImages', {

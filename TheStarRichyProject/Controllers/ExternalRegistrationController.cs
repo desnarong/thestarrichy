@@ -620,6 +620,30 @@ namespace TheStarRichyProject.Controllers
                 // 2. แปลง string ให้เป็น JsonObject (เพื่อให้เพิ่ม/แก้ไขข้อมูลได้)
                 var jsonObject = System.Text.Json.Nodes.JsonNode.Parse(rawJsonString).AsObject();
 
+                // บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง
+                var requiredAddressFields = new Dictionary<string, string>
+                {
+                    { "addressIdCard", "ที่อยู่ตามบัตร" },
+                    { "postcode", "รหัสไปรษณีย์" },
+                    { "provinceCode", "จังหวัด" },
+                    { "districtCode", "เขต/อำเภอ" },
+                    { "subdistrictCode", "แขวง/ตำบล" }
+                };
+
+                var missingAddressFields = requiredAddressFields
+                    .Where(field => string.IsNullOrWhiteSpace(jsonObject[field.Key]?.ToString()))
+                    .Select(field => field.Value)
+                    .ToList();
+
+                if (missingAddressFields.Any())
+                {
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = $"กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน: {string.Join(", ", missingAddressFields)}"
+                    });
+                }
+
                 // ==========================================
                 // 🌟 เพิ่มบล็อกจัดการบันทึกรูปภาพ (แปลง Base64 -> ไฟล์รูป)
                 // ==========================================
@@ -697,25 +721,23 @@ namespace TheStarRichyProject.Controllers
                         }
                     }
 
-                    // ✅ ตรวจสอบว่ามีไฟล์ที่บันทึกสำเร็จอย่างน้อย 1 ไฟล์
-                    bool hasValidFiles = newPathsArray.Any(path => path != null && !string.IsNullOrEmpty(path.ToString()));
-                    if (!hasValidFiles)
+                    // รูปภาพไม่บังคับ: ส่งเฉพาะไฟล์ที่บันทึกสำเร็จเท่านั้น
+                    var validPaths = new System.Text.Json.Nodes.JsonArray();
+                    foreach (var path in newPathsArray.Where(path => path != null && !string.IsNullOrWhiteSpace(path.ToString())))
                     {
-                        _logger.LogWarning("No valid image files were saved for registration");
-                        return BadRequest(new { success = false, message = "ไม่สามารถบันทึกรูปภาพได้ กรุณาตรวจสอบไฟล์รูปภาพอีกครั้ง" });
+                        validPaths.Add(path!.ToString());
                     }
 
-                    // นำ Array Path ใหม่ ไปแทนที่ "memberpic" อันเก่าที่เป็น Base64
                     // ใช้ "Memberpic" (ตัวใหญ่ M) เพื่อให้ตรงกับ property ใน FinalizeRegistrationRequest
-                    jsonObject["Memberpic"] = newPathsArray;
-                    
-                    // Log สำหรับ debugging
-                    _logger.LogInformation("Converted memberpic from Base64 to paths: {Paths}", 
-                        string.Join(", ", newPathsArray.Where(p => p != null).Select(p => p.ToString())));
+                    jsonObject["Memberpic"] = validPaths;
+
+                    _logger.LogInformation("Converted memberpic from Base64 to {Count} saved path(s)", validPaths.Count);
                 }
                 else
                 {
-                    _logger.LogWarning("No memberpic array found in request");
+                    // รองรับกรณีไม่แนบรูป: ส่งเป็น array ว่าง
+                    jsonObject["Memberpic"] = new System.Text.Json.Nodes.JsonArray();
+                    _logger.LogInformation("No member pictures uploaded; proceeding without images");
                 }
                 // ==========================================
 

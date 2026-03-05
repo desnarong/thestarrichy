@@ -493,7 +493,7 @@ namespace TheStarRichyProject.Controllers
             var apiUrl = "/Member/memberbinaryteam";
             if (!string.IsNullOrEmpty(membercode))
             {
-                apiUrl += $"?membercode={membercode}";
+                apiUrl += $"?binarycode={membercode}";
             }
 
             try

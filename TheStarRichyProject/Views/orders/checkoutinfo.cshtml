@@ -584,11 +584,13 @@
                         favoriteAddresses = res.data;
                         let html = '';
                         res.data.forEach((addr, i) => {
+                            let addressLine = `${addr.contact_Other || ''} ${addr.tambon || ''} ${addr.amphoe || ''} ${addr.province || ''} ${addr.zipcode || ''}`;
                             html += `
                                 <div class="col-md-6 mb-2">
                                     <div class="address-card favorite-address-card" data-index="${i}">
                                         <div class="fw-bold fs-13"><i class="fa-solid fa-star"></i> ${addr.contacNickname || 'ที่อยู่เดิม'}</div>
                                         <small class="d-block text-muted mt-1 text-truncate-2">${addr.contactperson}</small>
+                                        <small class="text-muted">${addressLine}</small>
                                         <small class="text-muted">โทร: ${addr.contact_Phone}</small>
                                     </div>
                                 </div>`;

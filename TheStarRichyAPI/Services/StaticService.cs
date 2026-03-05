@@ -11,6 +11,7 @@ namespace TheStarRichyApi.Services
         Task<List<dynamic>> GetDistrictAsync();
         Task<List<dynamic>> GetTitlenameAsync();
         Task<List<dynamic>> GetAddressMasterAsync();
+        Task<List<dynamic>> GetSystemAsync();
     }
     public class StaticService : IStaticService
     {
@@ -386,6 +387,66 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
                     string query = "SELECT * FROM [TBL_TAMBONS]";
+
+                    using (var command = new SqlCommand(query, con))
+                    {
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                // Create a dynamic object (ExpandoObject) to store row data
+                                dynamic row = new System.Dynamic.ExpandoObject();
+                                var rowDict = (IDictionary<string, object>)row;
+
+                                // Read each column dynamically
+                                for (int i = 0; i < reader.FieldCount; i++)
+                                {
+                                    string columnName = reader.GetName(i);
+                                    object columnValue = reader.GetValue(i);
+                                    rowDict[columnName] = columnValue;
+                                }
+
+                                result.Add(row);
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log exception
+                return new List<dynamic> { new { Membercode = "", Error = "An error occurred while fetching data" } };
+            }
+
+            return result.Count > 0 ? result : new List<dynamic>();
+        }
+        public async Task<List<dynamic>> GetSystemAsync()
+        {
+            // Get Passkey from header
+            string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
+            if (string.IsNullOrEmpty(passkey))
+            {
+                return new List<dynamic>();
+            }
+
+            string passwordEncode1 = await GetPasskeyAsync("Passkey1");
+            string passwordEncode2 = await GetPasskeyAsync("Passkey2");
+
+            // Verify Passkey
+            if (passkey != passwordEncode1 && passkey != passwordEncode2)
+            {
+                return new List<dynamic>();
+            }
+
+            var result = new List<dynamic>();
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    await con.OpenAsync();
+                    string query = "SELECT S02_X99 AS Ewalletflag, S02_X115 AS SaleFlag, S02_X117 AS Registerflag, S02_X118 AS PaymentFlag, S02_X40 AS CloseSystemflag FROM S02";
 
                     using (var command = new SqlCommand(query, con))
                     {

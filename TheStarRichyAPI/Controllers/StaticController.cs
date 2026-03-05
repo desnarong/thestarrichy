@@ -114,5 +114,20 @@ namespace TheStarRichyApi.Controllers
                 return StatusCode(500, new { message = "Internal server error" });
             }
         }
+        [HttpGet("system")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSystemAsync()
+        {
+            try
+            {
+                var result = await _staticService.GetSystemAsync();
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+        //GetSystemAsync
     }
 }

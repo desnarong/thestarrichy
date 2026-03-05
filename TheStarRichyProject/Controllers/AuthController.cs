@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Localization;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Net;
 using System.Net.Http.Headers;
@@ -27,6 +28,70 @@ namespace TheStarRichyProject.Controllers
         public IActionResult Login(bool Timeout = false)
         {
             return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> SystemStatus()
+        {
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var options = new RestClientOptions(_config["Api:Url"])
+                {
+                    ThrowOnAnyError = true,
+                    ConfigureMessageHandler = handler =>
+                    {
+                        var httpClientHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        };
+                        return httpClientHandler;
+                    }
+                };
+
+                var client = new RestClient(options);
+                var request = new RestRequest("/Static/system", Method.Get);
+                request.AddHeader("Accept", "application/json");
+
+                var passkey = _config["Api:Passkey"];
+                if (!string.IsNullOrWhiteSpace(passkey))
+                {
+                    request.AddHeader("X-Passkey", passkey);
+                }
+
+                var response = await client.ExecuteAsync(request);
+
+                if (!response.IsSuccessful || string.IsNullOrWhiteSpace(response.Content))
+                {
+                    return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.InternalServerError : response.StatusCode), new
+                    {
+                        message = "Unable to get system status"
+                    });
+                }
+
+                var parsed = JToken.Parse(response.Content);
+                JToken? systemToken = parsed;
+
+                if (parsed.Type == JTokenType.Array)
+                {
+                    systemToken = parsed.First;
+                }
+
+                string closeSystemFlag = systemToken?["CloseSystemflag"]?.ToString()
+                    ?? systemToken?["closeSystemflag"]?.ToString()
+                    ?? "0";
+
+                return Ok(new
+                {
+                    closeSystemflag = closeSystemFlag
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while getting system status");
+                return StatusCode(500, new { message = "Unable to get system status" });
+            }
         }
         
         [HttpPost]

@@ -339,47 +339,14 @@ namespace TheStarRichyApi.Services
                                     memberInfo.Status = status;
 
                                     // Set MemberPositionPicture
-                                    string pictureBase = memberTypeCode == "00" ? "images/Buyer_40x40.gif" : "";
-                                    if (string.IsNullOrEmpty(pictureBase))
-                                    {
-                                        switch (position)
-                                        {
-                                            case "0": pictureBase = "images/1_Black1_40x40"; break;
-                                            case "S": pictureBase = "images/1_Silver_40x40"; break;
-                                            case "SS": pictureBase = "images/1_Diamond_40x40"; break;
-                                            case "GS": pictureBase = "images/1_Bronze_40x40"; break;
-                                        }
 
-                                        switch (prestigeRanking)
-                                        {
-                                            case "SUP": pictureBase = "images/1_SUP_40x40"; break;
-                                            case "DGS": pictureBase = "images/1_DGS_40x40"; break;
-                                            case "TGS": pictureBase = "images/1_TGS_40x40"; break;
-                                            case "PS": pictureBase = "images/1_PS_40x40"; break;
-                                            case "PES": pictureBase = "images/1_PES_40x40"; break;
-                                            case "RUS": pictureBase = "images/1_RUS_40x40"; break;
-                                            case "SAS": pictureBase = "images/1_SAS_40x40"; break;
-                                            case "EMS": pictureBase = "images/1_EMS_40x40"; break;
-                                            case "DS": pictureBase = "images/1_DS_40x40"; break;
-                                            case "EDS": pictureBase = "images/1_EDS_40x40"; break;
-                                            case "DDS": pictureBase = "images/1_DDS_40x40"; break;
-                                            case "TDS": pictureBase = "images/1_TDS_40x40"; break;
-                                            case "CDS": pictureBase = "images/1_CDS_40x40"; break;
-                                        }
-                                        string suffix = ".gif";
-                                        if (ssex == "FeMale") suffix = "_F.gif";
-                                        if (m06X9 == "0" || m06X65 == "0") suffix = "_o_g" + suffix;
-                                        /*else if (m06X96 == "9") suffix = "_xx.gif";
-                                        else if (m06X50 == "1") suffix = "_Block.gif";
-                                        else if (m06X50 == "9") suffix = "_x.gif";
-                                        else if (m06X96 == "X") suffix = "_Terminate.gif";*/
-
-                                        memberInfo.MemberPositionPicture = $"{pictureBase}{suffix}";
-                                    }
-                                    else
+                                    string pictureBase = "";
+                                    if (reader["MemberPositionPicture"] != null)
                                     {
+                                        pictureBase = reader["MemberPositionPicture"]?.ToString() ?? "";
                                         memberInfo.MemberPositionPicture = pictureBase;
                                     }
+
                                     string mpic = reader["Pic4"]?.ToString() ?? "";
                                     if (mpic != "")
                                     {
