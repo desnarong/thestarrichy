@@ -572,8 +572,9 @@
         }
         
         const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
-        // Always render at least 3 levels by filling missing branches with empty nodes.
-        const targetDepth = Math.max(3, maxTreeDepth);
+        const isMobileView = window.matchMedia('(max-width: 768px)').matches;
+        // Keep mobile capped at 3 levels, while still ensuring at least 3 levels when data is shallow.
+        const targetDepth = isMobileView ? 3 : Math.max(3, maxTreeDepth);
 
         let html = `<div class="binary-tree-container">`;
         rootNodes.forEach((rootNode) => {
