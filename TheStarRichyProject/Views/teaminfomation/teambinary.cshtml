@@ -27,7 +27,7 @@
                         <button class="btn btn-outline-primary" onclick="goToLeftLevel()">
                             <i class="ri-arrow-left-line"></i> ซ้ายสุด
                         </button>
-                        <button class="btn btn-outline-primary" onclick="scrollTreeToRight()">
+                        <button class="btn btn-outline-primary" onclick="goToRightLevel()">
                             <i class="ri-arrow-right-line"></i> ขวาสุด
                         </button>
                         <button class="btn btn-outline-dark" onclick="goToParent()">
@@ -980,6 +980,47 @@
         const el = getTreeScrollElement();
         if (!el) return;
         el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
+    }
+
+    function goToRightLevel() {
+        if (!treeData) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
+        if (!payload) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
+        const rootNodes = Array.isArray(binaryTree)
+            ? binaryTree
+            : (binaryTree ? [binaryTree] : []);
+
+        if (rootNodes.length === 0) {
+            showAlert('info', 'ไม่พบสายงานฝั่งขวา');
+            return;
+        }
+
+        const currentNode = findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0];
+        const children = getNodeChildren(currentNode);
+        const { rightChild } = pickBinaryChildren(children);
+
+        if (!rightChild || isTreeEmptyNode(rightChild)) {
+            showAlert('info', 'ไม่พบสมาชิกฝั่งขวา');
+            return;
+        }
+
+        const rightCode = getFirstNonEmptyValue(rightChild, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
+        if (!rightCode) {
+            showAlert('info', 'ไม่พบรหัสสมาชิกฝั่งขวา');
+            return;
+        }
+
+        // Keep behavior aligned with clicking a tree node card.
+        loadBinaryTeam(rightCode);
     }
 
     function scrollPageToTop() {
