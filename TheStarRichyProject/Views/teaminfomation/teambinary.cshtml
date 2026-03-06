@@ -348,7 +348,9 @@
                 url += `?membercode=${requestedCode}`;
             }
 
-            const response = await fetch(url);
+            const response = await fetch(url, {
+                cache: 'no-store'
+            });
 
             if (!response.ok) {
                 throw new Error('Failed to load binary team');
@@ -478,7 +480,7 @@
         const rightReal = rightCandidates.find(c => !isTreeEmptyNode(c));
         const neutralReal = neutralCandidates.find(c => !isTreeEmptyNode(c));
 
-        let leftChild = leftReal || leftCandidates[0] || neutralReal || neutralCandidates[0] || rightReal || rightCandidates[0] || null;
+        let leftChild = leftReal || leftCandidates[0] || neutralReal || neutralCandidates[0] || null;
         let rightChild = rightReal || rightCandidates.find(c => c !== leftChild) || neutralReal || neutralCandidates.find(c => c !== leftChild) || leftReal || leftCandidates.find(c => c !== leftChild) || null;
 
         if (leftChild && rightChild && leftChild === rightChild) {
@@ -562,13 +564,13 @@
             renderOldStyle(Array.isArray(data) ? data : [data], centerCode);
             return;
         }
-
+       
         const rootNodes = Array.isArray(binaryTree) ? binaryTree : [binaryTree];
         if (rootNodes.length === 0) {
             container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
             return;
         }
-
+        
         const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
         const isMobileView = window.matchMedia('(max-width: 768px)').matches;
         // Mobile: show only root, level 1 and level 2.
@@ -617,7 +619,7 @@
 
         const children = getNodeChildren(node);
         const { leftChild, rightChild } = pickBinaryChildren(children);
-
+        
         const hasLeftChild = !!leftChild;
         const hasRightChild = !!rightChild;
         const hasRealLeft = hasLeftChild && !isTreeEmptyNode(leftChild);
@@ -787,6 +789,7 @@
         }
 
         html += `</div>`;
+        
         return html;
     }
 
