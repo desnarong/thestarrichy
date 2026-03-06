@@ -75,7 +75,7 @@ $(document).ready(function () {
                 // Update UI with member data
                 $('#user-profile-image').attr('src', member.memberPositionPicture || 'N/A');
                 $('#membercode').text(member.membercode || 'N/A');
-                $('#idcardname').text(member.idcardname || 'N/A');
+                $('#bussinessName').text(member.bussinessName || 'N/A');
                 $('#personalPV').text(formatNumberWithComma(member.personalPV || '0'));
                 $('#positionName').text(member.positionName || 'N/A');//position1
                 $('#thaiName').text(member.thaiName || 'N/A');//thaiName

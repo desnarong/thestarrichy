@@ -26,19 +26,21 @@
         animation: scaleIn 0.5s ease-out;
     }
 
-    .success-icon i {
-        font-size: 60px;
-        color: white;
-    }
+        .success-icon i {
+            font-size: 60px;
+            color: white;
+        }
 
     @@keyframes scaleIn {
         0% {
             transform: scale(0);
             opacity: 0;
         }
+
         50% {
             transform: scale(1.1);
         }
+
         100% {
             transform: scale(1);
             opacity: 1;
@@ -60,19 +62,19 @@
         border-left: 4px solid #198754;
     }
 
-    .order-id-box h5 {
-        margin: 0;
-        color: #6c757d;
-        font-size: 14px;
-        text-transform: uppercase;
-    }
+        .order-id-box h5 {
+            margin: 0;
+            color: #6c757d;
+            font-size: 14px;
+            text-transform: uppercase;
+        }
 
-    .order-id-box .order-number {
-        font-size: 24px;
-        font-weight: bold;
-        color: #405189;
-        margin-top: 10px;
-    }
+        .order-id-box .order-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #405189;
+            margin-top: 10px;
+        }
 
     .order-summary-section {
         background: white;
@@ -90,14 +92,14 @@
         border-bottom: 1px solid #e0e0e0;
     }
 
-    .summary-row:last-child {
-        border-bottom: none;
-        padding-top: 20px;
-        margin-top: 10px;
-        border-top: 2px solid #405189;
-        font-size: 18px;
-        font-weight: bold;
-    }
+        .summary-row:last-child {
+            border-bottom: none;
+            padding-top: 20px;
+            margin-top: 10px;
+            border-top: 2px solid #405189;
+            font-size: 18px;
+            font-weight: bold;
+        }
 
     .product-list {
         max-height: 400px;
@@ -113,9 +115,9 @@
         border-bottom: 1px solid #e0e0e0;
     }
 
-    .product-item:last-child {
-        border-bottom: none;
-    }
+        .product-item:last-child {
+            border-bottom: none;
+        }
 
     .product-info {
         flex: 1;
@@ -160,20 +162,20 @@
         text-align: left;
     }
 
-    .info-section h6 {
-        color: #405189;
-        margin-bottom: 15px;
-    }
+        .info-section h6 {
+            color: #405189;
+            margin-bottom: 15px;
+        }
 
-    .info-section ul {
-        margin: 0;
-        padding-left: 20px;
-    }
+        .info-section ul {
+            margin: 0;
+            padding-left: 20px;
+        }
 
-    .info-section li {
-        margin-bottom: 8px;
-        color: #495057;
-    }
+        .info-section li {
+            margin-bottom: 8px;
+            color: #495057;
+        }
 
     .delivery-info {
         background: #fff3cd;
@@ -202,7 +204,7 @@
             <hr />
             <h5>เลขที่บิล</h5>
             <div class="order-number">@billNo</div>
-            
+
             <small class="text-muted">กรุณาเก็บเลขที่คำสั่งซื้อนี้ไว้สำหรับการติดตาม</small>
         </div>
 
@@ -294,7 +296,7 @@
                         <strong>วิธีชำระเงิน:</strong> @summary.PaymentMethod
                     </div>
                     <div>
-                        <strong>สถานะ:</strong> 
+                        <strong>สถานะ:</strong>
                         <span class="badge bg-success">@(summary.PaymentMethod == "BankTransfer" ? "ตรวจสอบยอดภายใน 5-15 นาที" : "ชำระเงินสำเร็จ")</span>
                     </div>
                 </div>
@@ -354,21 +356,24 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            // แสดง confetti animation (optional)
-            showConfetti();
+<script>
+    $(document).ready(function() {
+        // แสดง confetti animation (optional)
+        showConfetti();
 
-            function showConfetti() {
-                // TODO: Add confetti library or animation
-                console.log('Order completed successfully!');
-            }
+        function showConfetti() {
+            // TODO: Add confetti library or animation
+            console.log('Order completed successfully!');
+        }
 
-            // Print Order
-            window.printOrder = function() {
-                window.print();
-            };
-        });
-    </script>
+        // Print Order
+        window.printOrder = function() {
+            window.print();
+        };
+    });
+</script>
+
+@section scripts {
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
 }

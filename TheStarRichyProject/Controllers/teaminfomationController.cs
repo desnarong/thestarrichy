@@ -28,7 +28,29 @@ namespace TheStarRichyProject.Controllers
         {
             var cookieCheck = CheckCookie();
             if (cookieCheck != null) return cookieCheck;
+
+            var preferredCode = HttpContext.Session.GetString("TeamBinaryPreferredCode");
+            if (!string.IsNullOrWhiteSpace(preferredCode))
+            {
+                ViewBag.PreferredBinaryCode = preferredCode;
+                HttpContext.Session.Remove("TeamBinaryPreferredCode");
+            }
+
             return View();
+        }
+
+        [HttpPost]
+        public IActionResult OpenBinaryTeamFromSponsor([FromForm] string memberCode)
+        {
+            var cookieCheck = CheckCookie();
+            if (cookieCheck != null) return cookieCheck;
+
+            if (!string.IsNullOrWhiteSpace(memberCode))
+            {
+                HttpContext.Session.SetString("TeamBinaryPreferredCode", memberCode.Trim());
+            }
+
+            return RedirectToAction("teambinary");
         }
 
         [HttpGet]

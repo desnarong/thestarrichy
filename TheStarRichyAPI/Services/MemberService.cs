@@ -14,6 +14,7 @@ namespace TheStarRichyApi.Services
         Task<string> GetPasskeyAsync(string column);
         Task<List<GetInfoMember2>> GetMember2DisplayAsync(string baseUrl);
         Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(UpdateMemberProfileRequest request);
+        Task<UpdateMemberProfileResult> UpdateMemberProfilePic4Async(string profileImageUrl);
     }
     public class MemberService : IMemberService
     {
@@ -353,15 +354,15 @@ namespace TheStarRichyApi.Services
                                         memberInfo.MemberPicture = reader["Pic4"]?.ToString() ?? "";
                                     }
 
-                                    else
-                                    {
-                                        string suffix1 = ".gif";
-                                        if (ssex == "FeMale") suffix1 = "_F.gif";
-                                        if (m06X9 == "0" || m06X65 == "0") suffix1 = "_o_g" + suffix1;
+                                    //else
+                                    //{
+                                    //    string suffix1 = ".gif";
+                                    //    if (ssex == "FeMale") suffix1 = "_F.gif";
+                                    //    if (m06X9 == "0" || m06X65 == "0") suffix1 = "_o_g" + suffix1;
 
 
-                                        memberInfo.MemberPicture = $"{pictureBase}{suffix1}";
-                                    }
+                                    //    memberInfo.MemberPicture = $"{pictureBase}{suffix1}";
+                                    //}
                                     // Set LeftURL and RightURL
                                     string url = "";
                                     if (reader["webappPath"] != null)
@@ -426,6 +427,71 @@ namespace TheStarRichyApi.Services
             }
 
             return UpdateMemberProfileInternalAsync(memberCode, request);
+        }
+
+        public async Task<UpdateMemberProfileResult> UpdateMemberProfilePic4Async(string profileImageUrl)
+        {
+            string memberCode = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+
+            if (string.IsNullOrWhiteSpace(memberCode))
+            {
+                return new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = "ไม่พบข้อมูลสมาชิกจาก Token"
+                };
+            }
+
+            if (string.IsNullOrWhiteSpace(profileImageUrl))
+            {
+                return new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = "ไม่พบ URL รูปโปรไฟล์สำหรับอัปเดต"
+                };
+            }
+
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+
+            try
+            {
+                using var con = new SqlConnection(connectionString);
+                await con.OpenAsync();
+
+                const string sql = @"
+UPDATE M06
+SET PIC4 = @Pic4
+WHERE M06_PX1 = @Membercode
+  AND M06_X47 = N'0';";
+
+                using var command = new SqlCommand(sql, con);
+                command.Parameters.AddWithValue("@Membercode", memberCode);
+                command.Parameters.AddWithValue("@Pic4", ToDbValue(profileImageUrl));
+
+                int rows = await command.ExecuteNonQueryAsync();
+                if (rows <= 0)
+                {
+                    return new UpdateMemberProfileResult
+                    {
+                        Success = false,
+                        Message = "ไม่พบข้อมูลสมาชิกสำหรับอัปเดตรูปโปรไฟล์"
+                    };
+                }
+
+                return new UpdateMemberProfileResult
+                {
+                    Success = true,
+                    Message = "อัปเดตรูปโปรไฟล์เรียบร้อย"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new UpdateMemberProfileResult
+                {
+                    Success = false,
+                    Message = $"เกิดข้อผิดพลาดในการอัปเดตรูปโปรไฟล์: {ex.Message}"
+                };
+            }
         }
 
         private async Task<UpdateMemberProfileResult> UpdateMemberProfileInternalAsync(string memberCode, UpdateMemberProfileRequest request)

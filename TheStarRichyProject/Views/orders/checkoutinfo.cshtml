@@ -106,6 +106,7 @@
         margin-bottom: 10px;
         cursor: pointer;
         transition: all 0.2s ease;
+        position: relative;
     }
 
         .address-card:hover {
@@ -113,10 +114,26 @@
         }
 
         .address-card.selected {
-            border-color: #405189;
-            background: #f6f8ff;
-            box-shadow: 0 2px 8px rgba(64, 81, 137, 0.1);
+            border-color: #0d6efd;
+            background: #e7f1ff;
+            box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.25);
         }
+
+            .address-card.selected::after {
+                content: '\2713';
+                position: absolute;
+                top: 8px;
+                right: 10px;
+                width: 22px;
+                height: 22px;
+                border-radius: 50%;
+                background: #0d6efd;
+                color: #fff;
+                font-size: 13px;
+                font-weight: 700;
+                line-height: 22px;
+                text-align: center;
+            }
 
     /* Invoice Card Styles */
     .invoice-card {
@@ -190,9 +207,10 @@
     .cursor-pointer {
         cursor: pointer;
     }
+
 </style>
 
-<div class="container-fluid py-4">
+<div class="checkoutinfo-wrapper">
     <div class="row justify-content-center mb-4">
         <div class="col-lg-8">
             <div class="step-indicator">
@@ -300,7 +318,7 @@
                                             <strong class="d-block">ให้จัดส่งตามที่อยู่</strong>
                                             <small class="text-muted">ส่งด่วนถึงบ้าน 1-3 วัน</small>
                                         </div>
-                                        <span class="badge bg-soft-primary text-primary">฿ @(cart?.ShippingFee ?? 0)</span>
+                                        <span class="badge bg-soft-primary text-primary" id="deliveryFeeBadge">฿ @((cart?.ShippingFee ?? 0).ToString("N2"))</span>
                                     </label>
                                 </div>
                             </div>
@@ -491,333 +509,378 @@
     </div>
 </div>
 
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            let memberAddresses = [];
-            let favoriteAddresses = [];
-            let selectedMemberAddress = null;
-            let selectedFavoriteAddress = null;
-            var masterData = [];
 
-            loadMasterAddresses();
+<script>
+    $(document).ready(function () {
+        let memberAddresses = [];
+        let favoriteAddresses = [];
+        let selectedMemberAddress = null;
+        let selectedFavoriteAddress = null;
+        var masterData = [];
+        const summaryTotalAmount = Number(@Html.Raw(JsonConvert.SerializeObject(cart?.TotalAmount ?? 0m)));
+        const summaryShippingFee = Number(@Html.Raw(JsonConvert.SerializeObject(cart?.ShippingFee ?? 0m)));
 
-            // Delivery Method Logic
-            $('.delivery-card').click(function () {
-                const method = $(this).find('input').val();
-                if (method === 'Delivery') {
-                    $('#shippingAddressSection').slideDown();
-                    $('#branchSection').slideUp();
-                    updateSummary(false);
+        loadMasterAddresses();
+
+        // Delivery Method Logic (single source to avoid duplicate slide animations)
+        function applyDeliveryMethodUI(isPickup, animated = true) {
+            const $shipping = $('#shippingAddressSection');
+            const $branch = $('#branchSection');
+
+            $shipping.stop(true, true);
+            $branch.stop(true, true);
+
+            if (isPickup) {
+                if (animated) {
+                    $shipping.slideUp(150);
+                    $branch.slideDown(150);
                 } else {
-                    $('#shippingAddressSection').slideUp();
-                    $('#branchSection').slideDown();
-                    updateSummary(true);
+                    $shipping.hide();
+                    $branch.show();
                 }
-            });
-
-            // Address Type Selection
-            $('#addressTypeSelect').change(function () {
-                const type = $(this).val();
-                $('#memberAddressesSection, #favoriteAddressesSection, #customAddressForm').hide();
-
-                if (type === 'MemberAddress') {
-                    loadMemberAddresses();
-                    $('#memberAddressesSection').fadeIn();
-                } else if (type === 'FavoriteAddress') {
-                    loadFavoriteAddresses();
-                    $('#favoriteAddressesSection').fadeIn();
-                } else if (type === 'Other') {
-                    $('#customAddressForm').fadeIn();
-                }
-            });
-
-            function loadMemberAddresses() {
-                $.get('/orders/GetAddresses', function(res) {
-                    if(res.success) {
-                        memberAddresses = res.data;
-                        let html = '';
-                        res.data.forEach((addr, i) => {
-                            let phone = addr.phone == null ? '' : addr.phone;
-                            html += `
-                                <div class="col-md-6 mb-2">
-                                    <div class="address-card member-address-card" data-index="${i}">
-                                        <div class="fw-bold text-primary fs-13"><i class="fas fa-home me-1"></i>@cart.DLName</div>
-                                        <small class="d-block text-muted mt-1 text-truncate-2">${addr.fullAddress}</small>
-                                        <div class="col-md-12"><label class="form-label">โทร <span style="color: red;">*</span> : ${phone}</label><input type="text" class="form-control" id="memberphone" value="${phone}"></div>
-                                    </div>
-                                </div>`;
-                        });
-                        $('#memberAddressesList').html(html);
-                        $('.member-address-card').click(function() {
-                            $('.member-address-card').removeClass('selected');
-                            $(this).addClass('selected');
-                            selectedMemberAddress = memberAddresses[$(this).data('index')];
-                        });
-                    }
-                });
-            }
-
-            function loadMasterAddresses() {
-                $.get('/orders/GetMasterAddress', function(res) {
-                    // --- ส่วนแก้ปัญหา filter is not a function ---
-                    if (typeof res === 'string') {
-                        try { res = JSON.parse(res); } catch (e) { console.error("JSON Error", e); return; }
-                    }
-                    if (!Array.isArray(res)) {
-                        // ถ้าข้อมูลซ้อนอยู่ใน .data หรือ .result ให้แก้ตรงนี้
-                        if (res.data && Array.isArray(res.data)) masterData = res.data;
-                        else masterData = [];
-                    } else {
-                        masterData = res;
-                    }
-                    // ----------------------------------------
-
-                    console.log("Loaded " + masterData.length + " rows");
-                    $('#zipcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
-                });
-            }
-
-            function loadFavoriteAddresses() {
-                $.get('/orders/GetFavoriteAddresses', function(res) {
-                    if(res.success) {
-                        favoriteAddresses = res.data;
-                        let html = '';
-                        res.data.forEach((addr, i) => {
-                            let addressLine = `${addr.contact_Other || ''} ${addr.tambon || ''} ${addr.amphoe || ''} ${addr.province || ''} ${addr.zipcode || ''}`;
-                            html += `
-                                <div class="col-md-6 mb-2">
-                                    <div class="address-card favorite-address-card" data-index="${i}">
-                                        <div class="fw-bold fs-13"><i class="fa-solid fa-star"></i> ${addr.contacNickname || 'ที่อยู่เดิม'}</div>
-                                        <small class="d-block text-muted mt-1 text-truncate-2">${addr.contactperson}</small>
-                                        <small class="text-muted">${addressLine}</small>
-                                        <small class="text-muted">โทร: ${addr.contact_Phone}</small>
-                                    </div>
-                                </div>`;
-                        });
-                        $('#favoriteAddressesList').html(html);
-                        $('.favorite-address-card').click(function() {
-                            $('.favorite-address-card').removeClass('selected');
-                            $(this).addClass('selected');
-                            selectedFavoriteAddress = favoriteAddresses[$(this).data('index')];
-                        });
-                    }
-                });
-            }
-
-            function updateSummary(isPickup) {
-                const total = @(cart?.TotalAmount ?? 0);
-                const fee = isPickup ? 0 : @(cart?.ShippingFee ?? 0);
-                const grand = total + fee;
-                $('#shippingFeeDisplay').html(isPickup ? '<span class="text-success fw-bold">ฟรี</span>' : '฿' + fee.toLocaleString(undefined, {minimumFractionDigits: 2}));
-                $('#grandTotalDisplay').text('฿' + grand.toLocaleString(undefined, {minimumFractionDigits: 2}));
-            }
-
-            $('#btnProceedPayment').click(function () {
-                const btn = $(this);
-                const paymentMethod = $('input[name="paymentMethod"]:checked').val();
-                const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
-                const sendInvoice = $('input[name="sendInvoice"]:checked').val();
-
-                if (!paymentMethod || !deliveryMethod) {
-                    Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิธีชำระเงินและวิธีจัดส่ง', 'warning');
-                    return;
-                }
-
-                btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...');
-
-                const request = {
-                    paymentMethod: paymentMethod,
-                    deliveryMethod: deliveryMethod,
-                    sendInvoice: sendInvoice
-                };
-
-                if (deliveryMethod === 'Delivery') {
-                    const addressType = $('#addressTypeSelect').val();
-                    if (!addressType) {
-                        Swal.fire('แจ้งเตือน', 'กรุณาเลือกที่อยู่จัดส่ง', 'warning');
-                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
-                        return;
-                    }
-                    request.deliveryAddressType = addressType;
-
-                    if (addressType === 'MemberAddress' && selectedMemberAddress) {
-
-                        if(!$('#memberphone').val()){
-                            Swal.fire({
-                                title: 'แจ้งเตือน',
-                                text: 'กรุณาระบุเบอร์โทรศัพท์',
-                                icon: 'warning',
-                                confirmButtonText: 'ตกลง'
-                            }).then((result) => {
-                                // เมื่อผู้ใช้กดปุ่ม "ตกลง" หรือปิดหน้าต่างแจ้งเตือน
-                                setTimeout(function() {
-                                    $('#memberphone').focus();
-                                }, 300); // หน่วงเวลาเล็กน้อยเพื่อให้ SweetAlert ปิดสนิทก่อน (บางเคสอาจไม่ต้องใช้)
-                            });
-                            return; // หยุดการทำงานส่วนอื่นต่อ
-                        }
-
-                        request.memberAddress = selectedMemberAddress;
-                        request.memberAddress.phone = $('#memberphone').val();
-                    } else if (addressType === 'FavoriteAddress' && selectedFavoriteAddress) {
-                        request.favoriteAddress = selectedFavoriteAddress;
-                    } else if (addressType === 'Other') {
-                        var favoriteaddress = +$('#favoriteaddress').prop('checked');
-                        request.customAddress = {
-                            addressLine: $('#addressLine').val(),
-
-                            // 1. รหัสไปรษณีย์ (เปลี่ยน ID เป็น #zipcode)
-                            postalCode: $('#zipcode').val(),
-
-                            // 2. จังหวัด (ดึง Text เพราะ Value เป็นรหัส 81)
-                            province: $('#province').val(),
-
-                            // 3. อำเภอ (เปลี่ยน ID เป็น #amphoe และดึง Text)
-                            district: $('#amphoe').val(),
-
-                            // 4. ตำบล (เปลี่ยน ID เป็น #tambon และดึง Text)
-                            subDistrict: $('#tambon').val(),
-
-                            // ถ้าต้องการส่ง "รหัส" ไปด้วย ให้เพิ่ม field แบบนี้ครับ (ถ้าหลังบ้านไม่ได้ใช้ ลบออกได้)
-                            // provinceCode: $('#province').val(),
-                            // districtCode: $('#amphoe').val(),
-                            // subDistrictCode: $('#tambon').val(),
-
-                            phone: $('#phone').val(),
-                            favoriteAddress: favoriteaddress, // เช็คค่า checkbox ว่าติ๊กหรือไม่
-                            recipientName: $('#recipientName').val(),
-                            initials: $('#initials').val()
-                        };
-                    }
+            } else {
+                if (animated) {
+                    $shipping.slideDown(150);
+                    $branch.slideUp(150);
                 } else {
-                    request.branchCode = $('#branchSelect').val();
-                    request.deliveryAddressType = "Branch";
+                    $shipping.show();
+                    $branch.hide();
                 }
-
-                $.ajax({
-                    url: '/orders/SaveCheckoutInfo',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(request),
-                    success: function (response) {
-                        if (response.success) {
-                            window.location.href = '/orders/payment?orderID=' + response.orderID;
-                        } else {
-                            Swal.fire('ผิดพลาด', response.message, 'error');
-                            btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
-                        }
-                    },
-                    error: function () {
-                        Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
-                    }
-                });
-            });
-
-            // 1. เมื่อพิมพ์ Zipcode
-            $('#zipcode').on('input', function() {
-                var selectedZip = $(this).val();
-
-                resetDropdown('#province', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#amphoe', '-- เลือกอำเภอ --');
-                resetDropdown('#tambon', '-- เลือกตำบล --');
-
-                if (selectedZip.length === 5) {
-                    // กรองข้อมูลตาม Zipcode
-                    var filteredData = masterData.filter(item => item.zipcode === selectedZip);
-
-                    if (filteredData.length > 0) {
-                        // หาจังหวัดที่ไม่ซ้ำ (เช็คจาก province_code)
-                        var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
-
-                        // สร้าง Option (Value = Code, Text = Name)
-                        $('#province').empty().append('<option value="">-- เลือกจังหวัด --</option>');
-                        $.each(uniqueProvinces, function(index, item) {
-                            $('#province').append('<option value="' + item.province_code + '">' + item.province + '</option>');
-                        });
-                        $('#province').prop('disabled', false);
-
-                        // Auto Select ถ้ามีจังหวัดเดียว
-                        if (uniqueProvinces.length === 1) {
-                            $('#province').val(uniqueProvinces[0].province_code).trigger('change');
-                        }
-                    }
-                }
-            });
-
-            // 2. เมื่อเลือก Province (Value คือ province_code แล้ว)
-            $('#province').change(function() {
-                var selectedZip = $('#zipcode').val();
-                var selectedProvCode = $(this).val(); // ได้ค่าเป็น code เช่น 81
-
-                resetDropdown('#amphoe', '-- เลือกอำเภอ --');
-                resetDropdown('#tambon', '-- เลือกตำบล --');
-
-                if (selectedProvCode) {
-                    // กรอง: Zipcode ตรงกัน AND province_code ตรงกัน
-                    var filteredData = masterData.filter(item =>
-                        item.zipcode === selectedZip &&
-                        item.province_code == selectedProvCode
-                    );
-
-                    // หาอำเภอที่ไม่ซ้ำ (เช็คจาก amphoe_code)
-                    var uniqueAmphoes = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
-
-                    $.each(uniqueAmphoes, function(index, item) {
-                        $('#amphoe').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
-                    });
-                    $('#amphoe').prop('disabled', false);
-
-                    if (uniqueAmphoes.length === 1) {
-                        $('#amphoe').val(uniqueAmphoes[0].amphoe_code).trigger('change');
-                    }
-                }
-            });
-
-            // 3. เมื่อเลือก Amphoe (Value คือ amphoe_code แล้ว)
-            $('#amphoe').change(function() {
-                var selectedZip = $('#zipcode').val();
-                var selectedProvCode = $('#province').val();
-                var selectedAmpCode = $(this).val(); // ได้ค่าเป็น code เช่น 8104
-
-                resetDropdown('#tambon', '-- เลือกตำบล --');
-
-                if (selectedAmpCode) {
-                    // กรอง: Zipcode + ProvCode + AmpCode
-                    var filteredData = masterData.filter(item =>
-                        item.zipcode === selectedZip &&
-                        item.province_code == selectedProvCode &&
-                        item.amphoe_code == selectedAmpCode
-                    );
-
-                    // ตำบล แสดงทั้งหมดที่เจอได้เลย (Value = tambon_code)
-                    $.each(filteredData, function(index, item) {
-                        $('#tambon').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
-                    });
-                    $('#tambon').prop('disabled', false);
-                }
-            });
-
-            // --- Helper Function ช่วยตัดตัวซ้ำโดยอิงจาก Code ---
-            function getUniqueList(data, codeKey, nameKey) {
-                var seen = new Set();
-                return data.filter(item => {
-                    var k = item[codeKey];
-                    return seen.has(k) ? false : seen.add(k);
-                }).sort((a, b) => a[nameKey].localeCompare(b[nameKey])); // เรียงตามชื่อ ก-ฮ
             }
 
-            function resetDropdown(selector, defaultText) {
-                $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+            updateSummary(isPickup);
+        }
+
+        $('input[name="deliveryMethod"]').on('change', function () {
+            const isPickup = $(this).val() === 'Pickup';
+            applyDeliveryMethodUI(isPickup, true);
+        });
+
+        // Address Type Selection
+        $('#addressTypeSelect').change(function () {
+            const type = $(this).val();
+            $('#memberAddressesSection, #favoriteAddressesSection, #customAddressForm').hide();
+
+            if (type === 'MemberAddress') {
+                loadMemberAddresses();
+                $('#memberAddressesSection').fadeIn();
+            } else if (type === 'FavoriteAddress') {
+                loadFavoriteAddresses();
+                $('#favoriteAddressesSection').fadeIn();
+            } else if (type === 'Other') {
+                $('#customAddressForm').fadeIn();
             }
         });
 
-        function copyAccNumber() {
-            var accNo = "@paymentbank.AccountNumber";
-            navigator.clipboard.writeText(accNo).then(() => {
-                Swal.fire({ title: 'คัดลอกแล้ว', icon: 'success', timer: 1000, showConfirmButton: false });
+        function loadMemberAddresses() {
+            $.get('/orders/GetAddresses', function(res) {
+                if(res.success) {
+                    memberAddresses = res.data;
+                    let html = '';
+                    res.data.forEach((addr, i) => {
+                        let phone = addr.phone == null ? '' : addr.phone;
+                        html += `
+                            <div class="col-md-6 mb-2">
+                                <div class="address-card member-address-card" data-index="${i}">
+                                    <div class="fw-bold text-primary fs-13"><i class="fas fa-home me-1"></i>@cart.DLName</div>
+                                    <small class="d-block text-muted mt-1 text-truncate-2">${addr.fullAddress}</small>
+                                    <div class="col-md-12"><label class="form-label">โทร <span style="color: red;">*</span> : ${phone}</label><input type="text" class="form-control" id="memberphone" value="${phone}"></div>
+                                </div>
+                            </div>`;
+                    });
+                    $('#memberAddressesList').html(html);
+                    $('.member-address-card').click(function() {
+                        $('.member-address-card').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedMemberAddress = memberAddresses[$(this).data('index')];
+                    });
+                }
             });
         }
-    </script>
+
+        function loadMasterAddresses() {
+            $.get('/orders/GetMasterAddress', function(res) {
+                // --- ส่วนแก้ปัญหา filter is not a function ---
+                if (typeof res === 'string') {
+                    try { res = JSON.parse(res); } catch (e) { console.error("JSON Error", e); return; }
+                }
+                if (!Array.isArray(res)) {
+                    // ถ้าข้อมูลซ้อนอยู่ใน .data หรือ .result ให้แก้ตรงนี้
+                    if (res.data && Array.isArray(res.data)) masterData = res.data;
+                    else masterData = [];
+                } else {
+                    masterData = res;
+                }
+                // ----------------------------------------
+
+                console.log("Loaded " + masterData.length + " rows");
+                $('#zipcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
+            });
+        }
+
+        function loadFavoriteAddresses() {
+            $.get('/orders/GetFavoriteAddresses', function(res) {
+                if(res.success) {
+                    favoriteAddresses = res.data;
+                    let html = '';
+                    res.data.forEach((addr, i) => {
+                        let addressLine = `${addr.contact_Other || ''} ${addr.tambon || ''} ${addr.amphoe || ''} ${addr.province || ''} ${addr.zipcode || ''}`;
+                        html += `
+                            <div class="col-md-6 mb-2">
+                                <div class="address-card favorite-address-card" data-index="${i}">
+                                    <div class="fw-bold fs-13"><i class="fa-solid fa-star"></i> ${addr.contacNickname || 'ที่อยู่เดิม'}</div>
+                                    <small class="d-block text-muted mt-1 text-truncate-2">${addr.contactperson}</small>
+                                    <small class="text-muted">${addressLine}</small>
+                                    <small class="text-muted">โทร: ${addr.contact_Phone}</small>
+                                </div>
+                            </div>`;
+                    });
+                    $('#favoriteAddressesList').html(html);
+                    $('.favorite-address-card').click(function() {
+                        $('.favorite-address-card').removeClass('selected');
+                        $(this).addClass('selected');
+                        selectedFavoriteAddress = favoriteAddresses[$(this).data('index')];
+                    });
+                }
+            });
+        }
+
+        function updateSummary(isPickup) {
+            const total = Number.isFinite(summaryTotalAmount) ? summaryTotalAmount : 0;
+            const feeBase = Number.isFinite(summaryShippingFee) ? summaryShippingFee : 0;
+            const fee = isPickup ? 0 : feeBase;
+            const grand = total + fee;
+
+            const deliveryBadge = isPickup
+                ? '<span class="badge bg-soft-success text-success">ฟรี</span>'
+                : '฿ ' + fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            $('#deliveryFeeBadge').html(deliveryBadge);
+            $('#shippingFeeDisplay').html(isPickup
+                ? '<span class="text-success fw-bold">ฟรี</span>'
+                : '฿' + fee.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+            $('#grandTotalDisplay').text('฿' + grand.toLocaleString(undefined, {minimumFractionDigits: 2}));
+        }
+
+        applyDeliveryMethodUI($('input[name="deliveryMethod"]:checked').val() === 'Pickup', false);
+
+        $('#btnProceedPayment').click(function () {
+            const btn = $(this);
+            const paymentMethod = $('input[name="paymentMethod"]:checked').val();
+            const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
+            const sendInvoice = $('input[name="sendInvoice"]:checked').val();
+
+            if (!paymentMethod || !deliveryMethod) {
+                Swal.fire('แจ้งเตือน', 'กรุณาเลือกวิธีชำระเงินและวิธีจัดส่ง', 'warning');
+                return;
+            }
+
+            btn.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...');
+
+            const request = {
+                paymentMethod: paymentMethod,
+                deliveryMethod: deliveryMethod,
+                sendInvoice: sendInvoice
+            };
+
+            if (deliveryMethod === 'Delivery') {
+                const addressType = $('#addressTypeSelect').val();
+                if (!addressType) {
+                    Swal.fire('แจ้งเตือน', 'กรุณาเลือกที่อยู่จัดส่ง', 'warning');
+                    btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
+                    return;
+                }
+                request.deliveryAddressType = addressType;
+
+                if (addressType === 'MemberAddress' && selectedMemberAddress) {
+
+                    if(!$('#memberphone').val()){
+                        Swal.fire({
+                            title: 'แจ้งเตือน',
+                            text: 'กรุณาระบุเบอร์โทรศัพท์',
+                            icon: 'warning',
+                            confirmButtonText: 'ตกลง'
+                        }).then((result) => {
+                            // เมื่อผู้ใช้กดปุ่ม "ตกลง" หรือปิดหน้าต่างแจ้งเตือน
+                            setTimeout(function() {
+                                $('#memberphone').focus();
+                            }, 300); // หน่วงเวลาเล็กน้อยเพื่อให้ SweetAlert ปิดสนิทก่อน (บางเคสอาจไม่ต้องใช้)
+                        });
+                        return; // หยุดการทำงานส่วนอื่นต่อ
+                    }
+
+                    request.memberAddress = selectedMemberAddress;
+                    request.memberAddress.phone = $('#memberphone').val();
+                } else if (addressType === 'FavoriteAddress') {
+                    if (!selectedFavoriteAddress) {
+                        Swal.fire('แจ้งเตือน', 'กรุณาเลือกที่อยู่ที่เคยจัดส่ง', 'warning');
+                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
+                        return;
+                    }
+
+                    // IMPORTANT: backend model expects MemberFavorite (not favoriteAddress)
+                    request.memberFavorite = selectedFavoriteAddress;
+                } else if (addressType === 'Other') {
+                    var favoriteaddress = +$('#favoriteaddress').prop('checked');
+                    request.customAddress = {
+                        addressLine: $('#addressLine').val(),
+
+                        // 1. รหัสไปรษณีย์ (เปลี่ยน ID เป็น #zipcode)
+                        postalCode: $('#zipcode').val(),
+
+                        // 2. จังหวัด (ดึง Text เพราะ Value เป็นรหัส 81)
+                        province: $('#province').val(),
+
+                        // 3. อำเภอ (เปลี่ยน ID เป็น #amphoe และดึง Text)
+                        district: $('#amphoe').val(),
+
+                        // 4. ตำบล (เปลี่ยน ID เป็น #tambon และดึง Text)
+                        subDistrict: $('#tambon').val(),
+
+                        // ถ้าต้องการส่ง "รหัส" ไปด้วย ให้เพิ่ม field แบบนี้ครับ (ถ้าหลังบ้านไม่ได้ใช้ ลบออกได้)
+                        // provinceCode: $('#province').val(),
+                        // districtCode: $('#amphoe').val(),
+                        // subDistrictCode: $('#tambon').val(),
+
+                        phone: $('#phone').val(),
+                        favoriteAddress: favoriteaddress, // เช็คค่า checkbox ว่าติ๊กหรือไม่
+                        recipientName: $('#recipientName').val(),
+                        initials: $('#initials').val()
+                    };
+                }
+            } else {
+                request.branchCode = $('#branchSelect').val();
+                request.deliveryAddressType = "Branch";
+            }
+
+            $.ajax({
+                url: '/orders/SaveCheckoutInfo',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(request),
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = '/orders/payment?orderID=' + response.orderID;
+                    } else {
+                        Swal.fire('ผิดพลาด', response.message, 'error');
+                        btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
+                    }
+                },
+                error: function () {
+                    Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                    btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
+                }
+            });
+        });
+
+        // 1. เมื่อพิมพ์ Zipcode
+        $('#zipcode').on('input', function() {
+            var selectedZip = $(this).val();
+
+            resetDropdown('#province', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#amphoe', '-- เลือกอำเภอ --');
+            resetDropdown('#tambon', '-- เลือกตำบล --');
+
+            if (selectedZip.length === 5) {
+                // กรองข้อมูลตาม Zipcode
+                var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+
+                if (filteredData.length > 0) {
+                    // หาจังหวัดที่ไม่ซ้ำ (เช็คจาก province_code)
+                    var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+
+                    // สร้าง Option (Value = Code, Text = Name)
+                    $('#province').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    $.each(uniqueProvinces, function(index, item) {
+                        $('#province').append('<option value="' + item.province_code + '">' + item.province + '</option>');
+                    });
+                    $('#province').prop('disabled', false);
+
+                    // Auto Select ถ้ามีจังหวัดเดียว
+                    if (uniqueProvinces.length === 1) {
+                        $('#province').val(uniqueProvinces[0].province_code).trigger('change');
+                    }
+                }
+            }
+        });
+
+        // 2. เมื่อเลือก Province (Value คือ province_code แล้ว)
+        $('#province').change(function() {
+            var selectedZip = $('#zipcode').val();
+            var selectedProvCode = $(this).val(); // ได้ค่าเป็น code เช่น 81
+
+            resetDropdown('#amphoe', '-- เลือกอำเภอ --');
+            resetDropdown('#tambon', '-- เลือกตำบล --');
+
+            if (selectedProvCode) {
+                // กรอง: Zipcode ตรงกัน AND province_code ตรงกัน
+                var filteredData = masterData.filter(item =>
+                    item.zipcode === selectedZip &&
+                    item.province_code == selectedProvCode
+                );
+
+                // หาอำเภอที่ไม่ซ้ำ (เช็คจาก amphoe_code)
+                var uniqueAmphoes = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
+
+                $.each(uniqueAmphoes, function(index, item) {
+                    $('#amphoe').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                });
+                $('#amphoe').prop('disabled', false);
+
+                if (uniqueAmphoes.length === 1) {
+                    $('#amphoe').val(uniqueAmphoes[0].amphoe_code).trigger('change');
+                }
+            }
+        });
+
+        // 3. เมื่อเลือก Amphoe (Value คือ amphoe_code แล้ว)
+        $('#amphoe').change(function() {
+            var selectedZip = $('#zipcode').val();
+            var selectedProvCode = $('#province').val();
+            var selectedAmpCode = $(this).val(); // ได้ค่าเป็น code เช่น 8104
+
+            resetDropdown('#tambon', '-- เลือกตำบล --');
+
+            if (selectedAmpCode) {
+                // กรอง: Zipcode + ProvCode + AmpCode
+                var filteredData = masterData.filter(item =>
+                    item.zipcode === selectedZip &&
+                    item.province_code == selectedProvCode &&
+                    item.amphoe_code == selectedAmpCode
+                );
+
+                // ตำบล แสดงทั้งหมดที่เจอได้เลย (Value = tambon_code)
+                $.each(filteredData, function(index, item) {
+                    $('#tambon').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
+                });
+                $('#tambon').prop('disabled', false);
+            }
+        });
+
+        // --- Helper Function ช่วยตัดตัวซ้ำโดยอิงจาก Code ---
+        function getUniqueList(data, codeKey, nameKey) {
+            var seen = new Set();
+            return data.filter(item => {
+                var k = item[codeKey];
+                return seen.has(k) ? false : seen.add(k);
+            }).sort((a, b) => a[nameKey].localeCompare(b[nameKey])); // เรียงตามชื่อ ก-ฮ
+        }
+
+        function resetDropdown(selector, defaultText) {
+            $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+        }
+    });
+
+    function copyAccNumber() {
+        var accNo = "@paymentbank.AccountNumber";
+        navigator.clipboard.writeText(accNo).then(() => {
+            Swal.fire({ title: 'คัดลอกแล้ว', icon: 'success', timer: 1000, showConfirmButton: false });
+        });
+    }
+</script>
+
+
+@section scripts {
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
 }

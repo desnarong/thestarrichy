@@ -12,7 +12,7 @@
                 <div class="row g-3">
                     <div class="col-12 col-lg-4 teambinary-search">
                         <div class="input-group">
-                            <input type="text" id="memberCodeSearch" class="form-control" 
+                            <input type="text" id="memberCodeSearch" class="form-control"
                                    placeholder="ค้นหารหัสสมาชิก...">
                             <button class="btn btn-primary" onclick="searchMember()">
                                 <i class="ri-search-line"></i> ค้นหา
@@ -20,11 +20,21 @@
                         </div>
                     </div>
                     <div class="col-12 col-lg-8 text-lg-end teambinary-actions">
-                        <button class="btn btn-info" onclick="loadCurrentMember()">
+                        <button class="btn btn-info" onclick="refreshCurrentMember()">
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
-                        <button class="btn btn-secondary" onclick="goToParent()">
-                            <i class="ri-arrow-up-line"></i> สายงานบน
+                        
+                        <button class="btn btn-outline-primary" onclick="scrollTreeToLeft()">
+                            <i class="ri-arrow-left-line"></i> ซ้ายสุด
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="scrollTreeToRight()">
+                            <i class="ri-arrow-right-line"></i> ขวาสุด
+                        </button>
+                        <button class="btn btn-outline-dark" onclick="scrollPageToTop()">
+                            <i class="ri-arrow-up-double-line"></i> เลื่อนขึ้น
+                        </button>
+                        <button class="btn btn-secondary" onclick="goToTop()">
+                            <i class="ri-skip-up-line"></i> บนสุด
                         </button>
                         <button class="btn btn-success" onclick="expandAll()">
                             <i class="ri-arrow-down-line"></i> ขยายทั้งหมด
@@ -76,10 +86,12 @@
 </div>
 
 <script>
+    const preferredBinaryCodeFromServer = '@((ViewBag.PreferredBinaryCode as string) ?? "")';
     let currentMemberCode = '';
     let parentMemberCode = '';
     let treeData = null;
     let currentViewedMemberCode = '';
+    let rootViewedMemberCode = '';
     let navigationHistory = [];
     let nodeInfoDataMap = {};
     let nodeInfoSeq = 0;
@@ -111,10 +123,15 @@
         return value === 'card-green' ? 'card-green' : 'card-red';
     }
 
-    function buildNodeInfoStatsHtml(modalData) {
-        const currentMonth1 = escapeHtml(modalData.currentMonth1 || '-');
-        const lastCMonth = escapeHtml(modalData.lastCMonth || '-');
+    function isYesStatus(value) {
+        return (value || '').toString().trim().toUpperCase() === 'YES';
+    }
 
+    function normalizeYesNoStatus(value) {
+        return isYesStatus(value) ? 'Yes' : 'No';
+    }
+
+    function buildNodeInfoStatsHtml(modalData) {
         return `
             <div class="stats-row">
                 <div class="stat-item">
@@ -146,12 +163,12 @@
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${currentMonth1} - ${formatNumber(modalData.currentMonthQualifyPV)}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.nextCMonth} ${formatNumber(modalData.currentMonthQualifyPV)} PV - ${modalData.currentMonthQualifyStatus}</div>
                 </div>
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${lastCMonth} - ${formatNumber(modalData.lastmonthQualifyPV)}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.currentMonth} ${formatNumber(modalData.lastMonthQualifyPV)} PV - ${modalData.lastMonthQualifyStatus}</div>
                 </div>
             </div>
         `;
@@ -192,7 +209,9 @@
     }
 
     $(document).ready(function() {
-        loadCurrentMember(getMemberCodeFromUrl());
+        const initialCode = (preferredBinaryCodeFromServer || '').toString().trim();
+        setMemberCodeToUrl('');
+        loadCurrentMember(initialCode);
 
         const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
         const rerenderForViewport = function () {
@@ -213,11 +232,6 @@
         });
     });
 
-    function getMemberCodeFromUrl() {
-        const params = new URLSearchParams(window.location.search || '');
-        return (params.get('code') || '').toString().trim();
-    }
-
     function setMemberCodeToUrl(memberCode) {
         if (!window.history || typeof window.history.replaceState !== 'function') return;
 
@@ -235,16 +249,22 @@
         window.history.replaceState({}, '', nextUrl);
     }
 
-    async function loadCurrentMember(preferredCode = '') {
+    function refreshCurrentMember() {
+        $('#memberCodeSearch').val('');
+        setMemberCodeToUrl('');
+        loadCurrentMember('', { forceCurrentMember: true });
+    }
+
+    async function loadCurrentMember(preferredCode = '', options = {}) {
         try {
             const response = await fetch('/home/GetMemberInfo');
-            
+
             if (!response.ok) {
                 throw new Error('Failed to load member info');
             }
-            
+
             const data = await response.json();
-            
+
             // Handle both string (JSON) and object response
             let memberInfo;
             if (typeof data === 'string') {
@@ -252,7 +272,7 @@
             } else {
                 memberInfo = data;
             }
-            
+
             // Response is flat object with membercode directly, not memberInfo[0]
             if (memberInfo && memberInfo.membercode) {
                 currentMemberCode = memberInfo.membercode;
@@ -264,10 +284,23 @@
                 return;
             }
 
-            const urlCode = (preferredCode || getMemberCodeFromUrl() || '').toString().trim();
+            const forceCurrentMember = !!options.forceCurrentMember;
+            const urlCode = forceCurrentMember
+                ? ''
+                : (preferredCode || '').toString().trim();
             const targetCode = urlCode || currentMemberCode;
-            $('#memberCodeSearch').val(targetCode || '');
-            loadBinaryTeam(targetCode, { resetHistory: true });
+
+            // if (forceCurrentMember) {
+            //     $('#memberCodeSearch').val('');
+            // } else {
+            //     //$('#memberCodeSearch').val(targetCode || '');
+            // }
+
+            loadBinaryTeam(targetCode, {
+                resetHistory: true,
+                syncSearchInput: !forceCurrentMember,
+                syncUrlCode: false
+            });
         } catch (error) {
             console.error('Error:', error);
             showAlert('danger', 'ไม่สามารถโหลดข้อมูลสมาชิกได้: ' + error.message);
@@ -288,11 +321,14 @@
 
             const isBackNavigation = !!options.isBackNavigation;
             const shouldResetHistory = !!options.resetHistory;
+            const shouldSyncSearchInput = options.syncSearchInput !== false;
+            const shouldSyncUrlCode = options.syncUrlCode === true;
             const requestedCode = (memberCode || '').toString().trim();
 
             if (shouldResetHistory) {
                 navigationHistory = [];
                 currentViewedMemberCode = '';
+                rootViewedMemberCode = '';
             }
 
             if (requestedCode) {
@@ -304,22 +340,22 @@
                     navigationHistory.pop();
                 }
             }
-            
+
             // สร้าง URL - ถ้ามี memberCode ให้ส่งไปด้วย (สำหรับค้นหา/คลิกดูทีมคนอื่น)
             // ถ้าไม่มี จะดึงจาก JWT อัตโนมัติ
             let url = '/home/GetMemberBinaryTeam';
             if (requestedCode) {
                 url += `?membercode=${requestedCode}`;
             }
-            
+
             const response = await fetch(url);
-            
+
             if (!response.ok) {
                 throw new Error('Failed to load binary team');
             }
-            
+
             const data = await response.json();
-            
+
             // Handle both string (JSON) and object response
             let result;
             if (typeof data === 'string') {
@@ -327,7 +363,7 @@
             } else {
                 result = data;
             }
-            
+
             treeData = result;
 
             const payload = Array.isArray(result) ? (result[0] || null) : result;
@@ -339,8 +375,15 @@
 
             if (resolvedCode) {
                 currentViewedMemberCode = resolvedCode;
-                $('#memberCodeSearch').val(currentViewedMemberCode);
-                setMemberCodeToUrl(currentViewedMemberCode);
+                if (shouldResetHistory || !rootViewedMemberCode) {
+                    rootViewedMemberCode = resolvedCode;
+                }
+                // if (shouldSyncSearchInput) {
+                //     $('#memberCodeSearch').val(currentViewedMemberCode);
+                // }
+                if (shouldSyncUrlCode) {
+                    setMemberCodeToUrl(currentViewedMemberCode);
+                }
             }
 
             renderBinaryTree(result, resolvedCode || (Array.isArray(result) ? (result[0]?.Membercode || '') : ''));
@@ -549,7 +592,11 @@
         const memberpositionName = getNodeValue(node, ['MemberpositionName', 'memberpositionName'], '');
         const memberthaiName = getNodeValue(node, ['MemberpositionRankingName', 'memberpositionRankingName', 'MemberpositionRanking', 'memberpositionRanking'], 'ไม่มีตำแหน่ง');
         const currentMonth1 = getNodeValue(node, ['currentMonth1', 'CurrentMonth1'], '');
+        const currentMonth = getNodeValue(node, ['currentMonth', 'CurrentMonth'], '');
+        const nextCMonth = getNodeValue(node, ['nextCMonth', 'NextCMonth'], '');
         const currentMonthQualifyPV = getNodeValue(node, ['currentMonthQualifyPV', 'CurrentMonthQualifyPV'], 0);
+        const currentMonthQualifyStatusRaw = getNodeValue(node, ['CurrentMonthQualifyStatus', 'currentMonthQualifyStatus'], 'No');
+        const currentMonthQualifyStatus = normalizeYesNoStatus(currentMonthQualifyStatusRaw);
         const lastCMonth = getNodeValue(node, ['lastCMonth', 'LastCMonth'], '');
         const lastmonthQualifyPV = getNodeValue(node, ['lastmonthQualifyPV', 'LastmonthQualifyPV', 'lastMonthQualifyPV', 'LastMonthQualifyPV'], 0);
         const positionLevel = (getNodeValue(node, ['PositionLevel', 'positionLevel'], '') || '').toString();
@@ -563,8 +610,9 @@
         const totalLeftBalance = getNodeValue(node, ['TotalLeftBalance', 'totalLeftBalance'], 0);
         const totalRightBalance = getNodeValue(node, ['TotalRightBalance', 'totalRightBalance'], 0);
 
-        const lastMonthQualifyStatus = (getNodeValue(node, ['LastMonthQualifyStatus', 'lastMonthQualifyStatus'], 'No') || 'No').toString();
-        const cardColorClass = lastMonthQualifyStatus === 'Yes' ? 'card-green' : 'card-red';
+        const lastMonthQualifyStatusRaw = (getNodeValue(node, ['LastMonthQualifyStatus', 'lastMonthQualifyStatus'], 'No') || 'No').toString();
+        const lastMonthQualifyStatus = normalizeYesNoStatus(lastMonthQualifyStatusRaw);
+        const cardColorClass = isYesStatus(currentMonthQualifyStatusRaw) ? 'card-green' : 'card-red';
         const memberPicture = getNodeValue(node, ['MemberPositionPicture', 'MemberPositionPicture', 'MemberPositionPicture', 'memberPositionPicture'], '/images/1_Black1_40x40.gif');
 
         const children = getNodeChildren(node);
@@ -611,10 +659,15 @@
             memberPicture: memberPicture,
             gradientClass: gradientClass,
             cardColorClass: cardColorClass,
+            currentMonth: currentMonth,
+            nextCMonth: nextCMonth,
             currentMonth1: currentMonth1,
             currentMonthQualifyPV: currentMonthQualifyPV,
+            currentMonthQualifyStatus: currentMonthQualifyStatus,
             lastCMonth: lastCMonth,
             lastmonthQualifyPV: lastmonthQualifyPV,
+            lastMonthQualifyPV: lastmonthQualifyPV,
+            lastMonthQualifyStatus: lastMonthQualifyStatus,
             currentLeftPV: currentLeftPV,
             currentRightPV: currentRightPV,
             newLeft: newLeft,
@@ -740,9 +793,9 @@
     // สำหรับกรณีไม่มี BinaryTree (ใช้ข้อมูลเดิม)
     function renderOldStyle(data, centerCode) {
         const container = $('#binaryTreeContainer');
-        
+
         const center = data.find(m => m.membercode === centerCode) || data[0];
-        
+
         let html = `
             <div class="binary-tree">
                 <div class="tree-level">
@@ -756,7 +809,7 @@
                 </div>
             </div>
         `;
-        
+
         container.html(html);
     }
 
@@ -773,13 +826,13 @@
         }
 
         const positionColor = position === 'left' ? 'success' : position === 'right' ? 'warning' : 'info';
-        
+
         return `
             <div class="node-card ${positionColor}" onclick="loadBinaryTeam('${member.membercode}')">
                 <div class="position-badge badge bg-${positionColor}">
                     ${position === 'left' ? 'ซ้าย' : position === 'right' ? 'ขวา' : 'ศูนย์กลาง'}
                 </div>
-                <img src="${member.profileImage || '/assets/images/users/avatar-1.jpg'}" 
+                <img src="${member.profileImage || '/assets/images/users/avatar-1.jpg'}"
                      class="node-avatar" alt="${member.idcardname}">
                 <div class="node-info">
                     <h6 class="mb-1">${member.idcardname || 'N/A'}</h6>
@@ -796,7 +849,12 @@
             showAlert('warning', 'กรุณากรอกรหัสสมาชิก');
             return;
         }
-        loadBinaryTeam(memberCode, { resetHistory: true });
+        $('#memberCodeSearch').val('');
+        loadBinaryTeam(memberCode, {
+            resetHistory: true,
+            syncSearchInput: false,
+            syncUrlCode: false
+        });
     }
 
     function goToParent() {
@@ -842,7 +900,49 @@
             return;
         }
 
-        showAlert('info', 'ไม่มีสายงานบนแล้ว');
+        showAlert('info', 'รหัสนี้อยู่สายงานบนสุดแล้ว');
+    }
+
+    function goToTop() {
+        if (rootViewedMemberCode) {
+            loadBinaryTeam(rootViewedMemberCode, { resetHistory: true });
+            return;
+        }
+
+        if (currentMemberCode) {
+            loadBinaryTeam(currentMemberCode, { resetHistory: true });
+            return;
+        }
+
+        refreshCurrentMember();
+    }
+
+    function getTreeScrollElement() {
+        const container = document.getElementById('binaryTreeContainer');
+        if (!container) return null;
+
+        const innerScrollable = container.querySelector('.binary-tree-container');
+        if (innerScrollable && innerScrollable.scrollWidth > innerScrollable.clientWidth) {
+            return innerScrollable;
+        }
+
+        return container;
+    }
+
+    function scrollTreeToLeft() {
+        const el = getTreeScrollElement();
+        if (!el) return;
+        el.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    function scrollTreeToRight() {
+        const el = getTreeScrollElement();
+        if (!el) return;
+        el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
+    }
+
+    function scrollPageToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function expandAll() {
@@ -876,7 +976,7 @@
 
         const alertContainer = $('#binaryTreeContainer').parent();
         alertContainer.prepend(alert);
-        
+
         setTimeout(() => {
             $('.alert').alert('close');
         }, 3000);
@@ -884,723 +984,731 @@
 </script>
 
 <style>
-.binary-tree-container {
-    padding: 20px;
-    overflow-x: auto;
-    background: unset;
-}
-
-.tree-node-wrapper {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.tree-node {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: 2px solid #fff;
-    border-radius: 16px;
-    padding: 15px 25px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    min-width: 200px;
-    position: relative;
-}
-
-.tree-node .node-info-btn {
-    position: absolute;
-    top: 6px;
-    right: 6px;
-    z-index: 2;
-    width: 28px;
-    height: 28px;
-    padding: 0;
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-}
-
-#nodeInfoModal .modal-dialog {
-    max-width: 1120px;
-    width: min(96vw, 1120px);
-    display: grid;
-    place-content: center;
-}
-
-#nodeInfoModal .modal-content.tree-node {
-    margin: 0;
-    min-width: 400px;
-    width: 100%;
-    max-height: 92vh;
-    cursor: default;
-    overflow: hidden;
-}
-
-#nodeInfoModal .modal-content.tree-node:hover {
-    transform: none;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-}
-
-#nodeInfoModal .modal-header.node-main {
-    border-bottom: 0;
-    gap: 24px;
-    padding: 20px 24px 10px;
-}
-
-#nodeInfoModal .modal-body {
-    padding-top: 0;
-    padding-left: 24px;
-    padding-right: 24px;
-    padding-bottom: 20px;
-    max-height: calc(92vh - 170px);
-    overflow-y: auto;
-}
-
-#nodeInfoModal .modal-header .btn-close {
-    margin-left: auto;
-    align-self: flex-start;
-}
-
-#nodeInfoModal.show {
-    display: grid !important;
-    place-content: center;
-    padding: 14px;
-}
-
-#nodeInfoModal .modal-header.node-main .node-avatar {
-    width: 74px;
-    height: 74px;
-    margin: 2px 10px 24px 10px;
-}
-
-#nodeInfoModal .modal-header.node-main .member-name {
-    font-size: 1.18rem;
-}
-
-#nodeInfoModal .modal-header.node-main .member-code,
-#nodeInfoModal .modal-header.node-main .member-position,
-#nodeInfoModal .modal-header.node-main .member-position-ranking {
-    font-size: 0.98rem;
-}
-
-#nodeInfoModal .modal-body .stat-item {
-    padding: 10px 14px;
-}
-
-#nodeInfoModal .modal-body .stat-item.keep-text {
-    justify-content: center;
-}
-
-#nodeInfoModal .modal-body .stat-item.keep-text .middle-text {
-    flex: 1;
-    font-size: 11px;
-    line-height: 1.6;
-}
-
-@@media (max-width: 768px) {
-    #nodeInfoModal .modal-dialog {
-        width: min(98vw, 98vw);
-        max-width: 98vw;
-    }
-
-    #nodeInfoModal .modal-content.tree-node {
-        max-height: 94vh;
-    }
-
-    #nodeInfoModal .modal-body {
-        max-height: calc(94vh - 155px);
-        padding-left: 14px;
-        padding-right: 14px;
-        padding-bottom: 14px;
-    }
-
-    #nodeInfoModal .modal-header.node-main {
-        padding: 14px 14px 8px;
-        gap: 14px;
-    }
-
-    #nodeInfoModal .modal-header.node-main .node-avatar {
-        width: 62px;
-        height: 62px;
-        margin: 1px 6px 18px 6px;
-    }
-}
-
-.tree-node:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-}
-
-/* Gradient ตามตำแหน่ง */
-.tree-node.gradient-center {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.tree-node.gradient-left {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-}
-
-.tree-node.gradient-right {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.tree-node.gradient-silver {
-    background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
-}
-
-.tree-node.gradient-gold {
-    background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
-    color: #333;
-}
-
-.tree-node.gradient-diamond {
-    background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-    color: #333;
-}
-
-.tree-node .node-main {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 5px;
-}
-
-.tree-node .node-avatar {
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid rgba(255,255,255,0.5);
-    flex-direction: column;
-    padding: 0;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    position: relative;
-    margin-left: 12px;
-    margin: 1px 8px 15px 8px;
-}
-
-.tree-node .node-avatar img.member-picture {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.tree-node .member-thainame {
-    font-size: 9px;
-    font-weight: 600;
-    color: white;
-    text-align: center;
-    line-height: 1.2;
-    max-width: 100%;
-    position: absolute;
-    bottom: -25px;
-    left: 0;
-    right: 0;
-    padding: 2px 0;
-    z-index: 1;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow: visible;
-    min-height: 20px;
-}
-
-.tree-node .node-details {
-    text-align: left;
-    flex: 1;
-    min-width: 0;
-}
-
-.tree-node .member-name {
-    font-weight: 600;
-    font-size: 13px;
-    margin-bottom: 1px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 110px;
-}
-
-.tree-node .member-code {
-    font-size: 11px;
-    opacity: 0.9;
-    font-family: monospace;
-}
-
-.tree-node .member-position {
-    font-size: 10px;
-    opacity: 0.8;
-    margin-top: 1px;
-    font-weight: 500;
-}
-
-.tree-node .member-position-ranking {
-    font-size: 8px;
-    opacity: 0.9;
-    margin-top: 2px;
-    font-weight: 600;
-    color: #ffd700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-/* สีการ์ดตามสถานะรักษายอดเดือนที่แล้ว */
-.tree-node.card-green {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    border-color: #11998e;
-}
-
-.tree-node.card-red {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-    border-color: #f5576c;
-}
-
-/* สไตล์ใหม่สำหรับสถิติ */
-.tree-node .node-stats {
-    padding-top: 3px;
-    border-top: 1px solid rgba(255, 255, 255, 0.3);
-    margin-top: 2px;
-}
-
-.tree-node .stats-row {
-    display: flex;
-    justify-content: space-between;
-}
-
-.tree-node .stat-item {
-    flex: 1;
-    border-radius: 6px;
-    padding: 1px 2px;
-    margin: 0 2px;
-    text-align: center;
-    background-color: transparent;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.tree-node .stat-value {
-    font-size: 9px;
-    font-weight: 600;
-    line-height: 2;
-    white-space: nowrap;
-    flex: 1;
-    text-align: center;
-    border-radius: 4px;
-    padding: 1px 2px;
-    color: white;
-}
-
-.tree-node .stat-value.left-card {
-    background-color: #198754; /* เขียวเข้ม */
-}
-
-.tree-node .stat-value.right-card {
-    background-color: #ffc107; /* เหลือง */
-    color: #333; /* ตัวหนังสือสีเข้มสำหรับพื้นหลังเหลือง */
-}
-
-.stat-item .stat-value {
-    margin-bottom: unset;
-}
-
-.tree-node .middle-text {
-    color: white;
-    font-size: 9px;
-    font-weight: 600;
-    flex: 1;
-    text-align: center;
-    background-color: transparent;
-}
-
-/* ปรับขนาดการ์ดตามที่ร้องขอ */
-.tree-node {
-    min-width: 200px;
-    max-width: 200px;
-    min-height: 175px;
-    max-height: 175px;
-    padding: 2px 2px;
-    box-sizing: border-box;
-    overflow: hidden;
-}
-
-.tree-node.level-last {
-    min-width: 170px;
-    max-width: 170px;
-    min-height: 75px;
-    max-height: 75px;
-    padding: 2px 6px;
-}
-
-.tree-node.level-last .node-main {
-    gap: 8px;
-    margin-bottom: 0;
-}
-
-.tree-node.level-last .node-avatar {
-    width: 46px;
-    height: 46px;
-    margin: 1px 4px 10px 4px;
-}
-
-.tree-node.level-last .node-avatar img.member-picture {
-    width: 100%;
-    height: 100%;
-}
-
-.tree-node.level-last .member-name {
-    font-size: 11px;
-    width: 95px;
-}
-
-.children-container.children-container-last::before {
-    left: calc(24% + 2px);
-    right: calc(24% + 2px);
-}
-
-.children-container.children-container-level-2::before {
-    left: calc(24% + 5px);
-    right: calc(24% + 5px);
-}
-
-.children-container.children-container-level-1::before {
-    left: calc(24% + 11px);
-    right: calc(24% + 11px);
-}
-
-.children-container.children-container-level-1.children-container-level-1-left-empty::before {
-    left: calc(12% + 1px);
-    right: calc(37% + 1px);
-}
-
-.children-container.children-container-level-1.children-container-level-1-left-empty.children-container-level-1-left-empty-right-level2-all-empty::before {
-    left: calc(16% + 1px);
-    right: calc(33% + 1px);
-}
-
-.children-container.children-container-level-1.children-container-level-1-no-empty.children-container-level-1-no-empty-left-level2-right-empty::before {
-    left: calc(16% + 5px);
-    right: calc(32% + 11px);
-}
-
-.children-container.children-container-level-1.children-container-level-1-right-level2-all-empty::before {
-    left: calc(32% + 12px);
-    right: calc(15% + 13px);
-}
-
-.tree-node.level-last .member-code,
-.tree-node.level-last .member-position,
-.tree-node.level-last .member-position {
-    font-size: 9px;
-}
-
-.tree-node.level-last .member-position-ranking {
-    font-size: 8px;
-}
-
-.tree-node.level-last .member-thainame {
-    font-size: 8px;
-}
-
-.tree-node .node-main {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 3px;
-}
-
-.tree-children {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    margin-top: 18px;
-    position: relative;
-}
-
-.tree-connector {
-    position: absolute;
-    top: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 18px;
-    background: #667eea;
-}
-
-.children-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    position: relative;
-    padding-top: 18px;
-}
-
-.children-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: calc(25% + 2px);
-    right: calc(25% + 2px);
-    height: 2px;
-    background: #667eea;
-}
-
-.member-code {
-    font-family: 'Courier New', monospace;
-    font-weight: 600;
-            color: var(--vz-white);
-    font-size: 0.9rem;
-}
-
-.child-branch {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-}
-
-.child-branch::before {
-    content: '';
-    position: absolute;
-    top: -18px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 2px;
-    height: 18px;
-    background: #667eea;
-}
-
-.empty-node {
-    width: 150px;
-    height: 80px;
-    border: 2px dashed #ccc;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #999;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: #f9f9f9;
-}
-
-.empty-node.small {
-    width: 170px;
-    height: 75px;
-    min-width: 170px;
-    max-width: 170px;
-    min-height: 75px;
-    max-height: 75px;
-    border: 2px dashed #ccc;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #999;
-    cursor: pointer;
-    transition: all 0.3s;
-    background: #f9f9f9;
-    box-sizing: border-box;
-}
-
-.empty-node.tree-size {
-    width: 200px;
-    height: 175px;
-    min-width: 200px;
-    max-width: 200px;
-    min-height: 175px;
-    max-height: 175px;
-    border-radius: 16px;
-    box-sizing: border-box;
-}
-
-.empty-node:hover {
-    border-color: #667eea;
-    color: #667eea;
-    background: rgba(102, 126, 234, 0.1);
-}
-
-.empty-node i {
-    font-size: 24px;
-    margin-bottom: 5px;
-}
-
-.empty-node.small i {
-    font-size: 18px;
-    margin-bottom: 2px;
-}
-
-.empty-node span {
-    font-size: 12px;
-}
-
-.empty-node.small span {
-    font-size: 10px;
-}
-
-.empty-node.disabled {
-    pointer-events: none;
-    cursor: not-allowed;
-    opacity: 0.65;
-}
-
-/* สไตล์เดิมยังคงใช้งานได้ */
-.binary-tree {
-    padding: 20px;
-}
-
-.tree-level {
-    margin: 20px 0;
-}
-
-.node-card {
-    background: #fff;
-    border: 2px solid #e3e6f0;
-    border-radius: 12px;
-    padding: 20px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    position: relative;
-    min-height: 220px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-.node-card:not(.empty):hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-}
-
-.node-card.success { border-color: #28a745; }
-.node-card.warning { border-color: #ffc107; }
-.node-card.info { border-color: #17a2b8; }
-
-.node-card.empty {
-    border-style: dashed;
-    opacity: 0.5;
-}
-
-.position-badge {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 0.75rem;
-}
-
-.node-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    margin-bottom: 15px;
-    object-fit: cover;
-    border: 4px solid #fff;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-}
-
-.node-info h6 {
-    font-weight: 600;
-    color: #333;
-}
-
-.node-info p {
-    margin-bottom: 5px;
-}
-
-.teambinary-actions {
-    display: flex;
-    justify-content: flex-end;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-/* Responsive */
-@@media (max-width: 768px) {
-    #binaryTreeContainer {
-        text-align: left !important;
-        overflow-x: auto;
-        overflow-y: hidden;
-        -webkit-overflow-scrolling: touch;
-    }
-
     .binary-tree-container {
-        display: inline-block;
-        min-width: max-content;
-        padding: 10px 6px;
+        padding: 20px;
         overflow-x: auto;
+        background: unset;
     }
 
-    .teambinary-search .input-group .form-control {
-        min-width: 0;
-    }
-
-    .teambinary-search .input-group .btn {
-        white-space: nowrap;
-    }
-
-    .teambinary-actions {
-        justify-content: stretch;
-    }
-
-    .teambinary-actions .btn {
-        flex: 1 1 calc(50% - 8px);
-        min-height: 40px;
+    .tree-node-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .tree-node {
-        min-width: 160px;
-        max-width: 160px;
-        min-height: 145px;
-        max-height: 145px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: 2px solid #fff;
+        border-radius: 16px;
+        padding: 15px 25px;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        min-width: 200px;
+        position: relative;
+    }
+
+        .tree-node .node-info-btn {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            z-index: 2;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+    #nodeInfoModal .modal-dialog {
+        max-width: 1120px;
+        width: min(96vw, 1120px);
+        display: grid;
+        place-content: center;
+    }
+
+    #nodeInfoModal .modal-content.tree-node {
+        margin: 0;
+        min-width: 400px;
+        width: 100%;
+        max-height: 92vh;
+        cursor: default;
+        overflow: hidden;
+    }
+
+        #nodeInfoModal .modal-content.tree-node:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+    #nodeInfoModal .modal-header.node-main {
+        border-bottom: 0;
+        gap: 24px;
+        padding: 20px 24px 10px;
+    }
+
+    #nodeInfoModal .modal-body {
+        padding-top: 0;
+        padding-left: 24px;
+        padding-right: 24px;
+        padding-bottom: 20px;
+        max-height: calc(92vh - 170px);
+        overflow-y: auto;
+    }
+
+    #nodeInfoModal .modal-header .btn-close {
+        margin-left: auto;
+        align-self: flex-start;
+    }
+
+    #nodeInfoModal.show {
+        display: grid !important;
+        place-content: center;
+        padding: 14px;
+    }
+
+    #nodeInfoModal .modal-header.node-main .node-avatar {
+        width: 74px;
+        height: 74px;
+        margin: 2px 10px 24px 10px;
+    }
+
+    #nodeInfoModal .modal-header.node-main .member-name {
+        font-size: 1.18rem;
+    }
+
+    #nodeInfoModal .modal-header.node-main .member-code,
+    #nodeInfoModal .modal-header.node-main .member-position,
+    #nodeInfoModal .modal-header.node-main .member-position-ranking {
+        font-size: 0.98rem;
+    }
+
+    #nodeInfoModal .modal-body .stat-item {
+        padding: 10px 14px;
+    }
+
+        #nodeInfoModal .modal-body .stat-item.keep-text {
+            justify-content: center;
+        }
+
+            #nodeInfoModal .modal-body .stat-item.keep-text .middle-text {
+                flex: 1;
+                font-size: 11px;
+                line-height: 1.6;
+            }
+
+    @@media (max-width: 768px) {
+        #nodeInfoModal .modal-dialog {
+            width: min(98vw, 98vw);
+            max-width: 98vw;
+        }
+
+        #nodeInfoModal .modal-content.tree-node {
+            max-height: 94vh;
+        }
+
+        #nodeInfoModal .modal-body {
+            max-height: calc(94vh - 155px);
+            padding-left: 14px;
+            padding-right: 14px;
+            padding-bottom: 14px;
+        }
+
+        #nodeInfoModal .modal-header.node-main {
+            padding: 14px 14px 8px;
+            gap: 14px;
+        }
+
+            #nodeInfoModal .modal-header.node-main .node-avatar {
+                width: 62px;
+                height: 62px;
+                margin: 1px 6px 18px 6px;
+            }
+    }
+
+    .tree-node:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    }
+
+    /* Gradient ตามตำแหน่ง */
+    .tree-node.gradient-center {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .tree-node.gradient-left {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    }
+
+    .tree-node.gradient-right {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    .tree-node.gradient-silver {
+        background: linear-gradient(135deg, #bdc3c7 0%, #2c3e50 100%);
+    }
+
+    .tree-node.gradient-gold {
+        background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        color: #333;
+    }
+
+    .tree-node.gradient-diamond {
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        color: #333;
     }
 
     .tree-node .node-main {
-        gap: 8px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        margin-bottom: 5px;
     }
 
     .tree-node .node-avatar {
-        width: 44px;
-        height: 44px;
-        margin: 1px 4px 12px 4px;
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid rgba(255,255,255,0.5);
+        flex-direction: column;
+        padding: 0;
+        box-sizing: border-box;
+        flex-shrink: 0;
+        position: relative;
+        margin-left: 12px;
+        margin: 1px 8px 15px 8px;
+    }
+
+        .tree-node .node-avatar img.member-picture {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+    .tree-node .member-thainame {
+        font-size: 9px;
+        font-weight: 600;
+        color: white;
+        text-align: center;
+        line-height: 1.2;
+        max-width: 100%;
+        position: absolute;
+        bottom: -25px;
+        left: 0;
+        right: 0;
+        padding: 2px 0;
+        z-index: 1;
+        white-space: normal;
+        word-wrap: break-word;
+        overflow: visible;
+        min-height: 20px;
+    }
+
+    .tree-node .node-details {
+        text-align: left;
+        flex: 1;
+        min-width: 0;
     }
 
     .tree-node .member-name {
+        font-weight: 600;
+        font-size: 13px;
+        margin-bottom: 1px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 110px;
+    }
+
+    .tree-node .member-code {
         font-size: 11px;
-        width: 88px;
+        opacity: 0.9;
+        font-family: monospace;
     }
 
-    .children-container {
-        gap: 8px;
+    .tree-node .member-position {
+        font-size: 10px;
+        opacity: 0.8;
+        margin-top: 1px;
+        font-weight: 500;
     }
 
-    .tree-node .stat-value,
-    .tree-node .middle-text {
+    .tree-node .member-position-ranking {
         font-size: 8px;
+        opacity: 0.9;
+        margin-top: 2px;
+        font-weight: 600;
+        color: #ffd700;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
-    .children-container.children-container-level-1::before {
+    /* สีการ์ดตามสถานะรักษายอดเดือนที่แล้ว */
+    .tree-node.card-green {
+        background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        border-color: #11998e;
+    }
+
+    .tree-node.card-red {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        border-color: #f5576c;
+    }
+
+    /* สไตล์ใหม่สำหรับสถิติ */
+    .tree-node .node-stats {
+        padding-top: 3px;
+        border-top: 1px solid rgba(255, 255, 255, 0.3);
+        margin-top: 2px;
+    }
+
+    .tree-node .stats-row {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .tree-node .stat-item {
+        flex: 1;
+        border-radius: 6px;
+        padding: 1px 2px;
+        margin: 0 2px;
+        text-align: center;
+        background-color: transparent;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tree-node .stat-value {
+        font-size: 9px;
+        font-weight: 600;
+        line-height: 2;
+        white-space: nowrap;
+        flex: 1;
+        text-align: center;
+        border-radius: 4px;
+        padding: 1px 2px;
+        color: white;
+    }
+
+        .tree-node .stat-value.left-card {
+            background-color: #198754; /* เขียวเข้ม */
+        }
+
+        .tree-node .stat-value.right-card {
+            background-color: #ffc107; /* เหลือง */
+            color: #333; /* ตัวหนังสือสีเข้มสำหรับพื้นหลังเหลือง */
+        }
+
+    .stat-item .stat-value {
+        margin-bottom: unset;
+    }
+
+    .tree-node .middle-text {
+        color: white;
+        font-size: 9px;
+        font-weight: 600;
+        flex: 1;
+        text-align: center;
+        background-color: transparent;
+    }
+
+    /* ปรับขนาดการ์ดตามที่ร้องขอ */
+    .tree-node {
+        min-width: 200px;
+        max-width: 200px;
+        min-height: 175px;
+        max-height: 175px;
+        padding: 2px 2px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+        .tree-node.level-last {
+            min-width: 170px;
+            max-width: 170px;
+            min-height: 75px;
+            max-height: 75px;
+            padding: 2px 6px;
+        }
+
+            .tree-node.level-last .node-main {
+                gap: 8px;
+                margin-bottom: 0;
+            }
+
+            .tree-node.level-last .node-avatar {
+                width: 46px;
+                height: 46px;
+                margin: 1px 4px 10px 4px;
+            }
+
+                .tree-node.level-last .node-avatar img.member-picture {
+                    width: 100%;
+                    height: 100%;
+                }
+
+            .tree-node.level-last .member-name {
+                font-size: 11px;
+                width: 95px;
+            }
+
+    .children-container.children-container-last::before {
+        left: calc(24% + 2px);
+        right: calc(24% + 2px);
+    }
+
+    .children-container.children-container-level-2::before {
         left: calc(24% + 5px);
         right: calc(24% + 5px);
     }
 
-    .children-container.children-container-level-2::before {
-        left: calc(20% + 6px);
-        right: calc(27% + 1px);
+    .children-container.children-container-level-1::before {
+        left: calc(24% + 11px);
+        right: calc(24% + 11px);
     }
-}
+
+    .children-container.children-container-level-1.children-container-level-1-left-empty::before {
+        left: calc(12% + 1px);
+        right: calc(37% + 1px);
+    }
+
+    .children-container.children-container-level-1.children-container-level-1-left-empty.children-container-level-1-left-empty-right-level2-all-empty::before {
+        left: calc(16% + 1px);
+        right: calc(33% + 1px);
+    }
+
+    .children-container.children-container-level-1.children-container-level-1-no-empty.children-container-level-1-no-empty-left-level2-right-empty::before {
+        left: calc(16% + 5px);
+        right: calc(32% + 11px);
+    }
+
+    .children-container.children-container-level-1.children-container-level-1-right-level2-all-empty::before {
+        left: calc(32% + 12px);
+        right: calc(15% + 13px);
+    }
+
+    .tree-node.level-last .member-code,
+    .tree-node.level-last .member-position,
+    .tree-node.level-last .member-position {
+        font-size: 9px;
+    }
+
+    .tree-node.level-last .member-position-ranking {
+        font-size: 8px;
+    }
+
+    .tree-node.level-last .member-thainame {
+        font-size: 8px;
+    }
+
+    .tree-node .node-main {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 3px;
+    }
+
+    .tree-children {
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        margin-top: 18px;
+        position: relative;
+    }
+
+    .tree-connector {
+        position: absolute;
+        top: -18px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 18px;
+        background: #667eea;
+    }
+
+    .children-container {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        position: relative;
+        padding-top: 18px;
+    }
+
+        .children-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: calc(25% + 2px);
+            right: calc(25% + 2px);
+            height: 2px;
+            background: #667eea;
+        }
+
+    .member-code {
+        font-family: 'Courier New', monospace;
+        font-weight: 600;
+        color: var(--vz-white);
+        font-size: 0.9rem;
+    }
+
+    .child-branch {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+    }
+
+        .child-branch::before {
+            content: '';
+            position: absolute;
+            top: -18px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 18px;
+            background: #667eea;
+        }
+
+    .empty-node {
+        width: 150px;
+        height: 80px;
+        border: 2px dashed #ccc;
+        border-radius: 12px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.3s;
+        background: #f9f9f9;
+    }
+
+        .empty-node.small {
+            width: 170px;
+            height: 75px;
+            min-width: 170px;
+            max-width: 170px;
+            min-height: 75px;
+            max-height: 75px;
+            border: 2px dashed #ccc;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: #f9f9f9;
+            box-sizing: border-box;
+        }
+
+        .empty-node.tree-size {
+            width: 200px;
+            height: 175px;
+            min-width: 200px;
+            max-width: 200px;
+            min-height: 175px;
+            max-height: 175px;
+            border-radius: 16px;
+            box-sizing: border-box;
+        }
+
+        .empty-node:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .empty-node i {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .empty-node.small i {
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+
+        .empty-node span {
+            font-size: 12px;
+        }
+
+        .empty-node.small span {
+            font-size: 10px;
+        }
+
+        .empty-node.disabled {
+            pointer-events: none;
+            cursor: not-allowed;
+            opacity: 0.65;
+        }
+
+    /* สไตล์เดิมยังคงใช้งานได้ */
+    .binary-tree {
+        padding: 20px;
+    }
+
+    .tree-level {
+        margin: 20px 0;
+    }
+
+    .node-card {
+        background: #fff;
+        border: 2px solid #e3e6f0;
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        position: relative;
+        min-height: 220px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .node-card:not(.empty):hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .node-card.success {
+            border-color: #28a745;
+        }
+
+        .node-card.warning {
+            border-color: #ffc107;
+        }
+
+        .node-card.info {
+            border-color: #17a2b8;
+        }
+
+        .node-card.empty {
+            border-style: dashed;
+            opacity: 0.5;
+        }
+
+    .position-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.75rem;
+    }
+
+    .node-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        margin-bottom: 15px;
+        object-fit: cover;
+        border: 4px solid #fff;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .node-info h6 {
+        font-weight: 600;
+        color: #333;
+    }
+
+    .node-info p {
+        margin-bottom: 5px;
+    }
+
+    .teambinary-actions {
+        display: flex;
+        justify-content: flex-end;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        #binaryTreeContainer {
+            text-align: left !important;
+            overflow-x: auto;
+            overflow-y: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .binary-tree-container {
+            display: inline-block;
+            min-width: max-content;
+            padding: 10px 6px;
+            overflow-x: auto;
+        }
+
+        .teambinary-search .input-group .form-control {
+            min-width: 0;
+        }
+
+        .teambinary-search .input-group .btn {
+            white-space: nowrap;
+        }
+
+        .teambinary-actions {
+            justify-content: stretch;
+        }
+
+            .teambinary-actions .btn {
+                flex: 1 1 calc(50% - 8px);
+                min-height: 40px;
+            }
+
+        .tree-node {
+            min-width: 160px;
+            max-width: 160px;
+            min-height: 145px;
+            max-height: 145px;
+        }
+
+            .tree-node .node-main {
+                gap: 8px;
+            }
+
+            .tree-node .node-avatar {
+                width: 44px;
+                height: 44px;
+                margin: 1px 4px 12px 4px;
+            }
+
+            .tree-node .member-name {
+                font-size: 11px;
+                width: 88px;
+            }
+
+        .children-container {
+            gap: 8px;
+        }
+
+        .tree-node .stat-value,
+        .tree-node .middle-text {
+            font-size: 8px;
+        }
+
+        .children-container.children-container-level-1::before {
+            left: calc(24% + 5px);
+            right: calc(24% + 5px);
+        }
+
+        .children-container.children-container-level-2::before {
+            left: calc(20% + 6px);
+            right: calc(27% + 1px);
+        }
+    }
 </style>
 
 

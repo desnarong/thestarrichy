@@ -534,7 +534,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <input type="file" id="info-uploadcopyidcard" class="form-control" accept="image/*" />
-                                        <img id="info-copyidcard" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/d9a142f8-a869-474e-a505-45274b7521ff/Mockup+Thai+card-01.jpg" alt="" class="mt-2" style="max-height: 210px;max-width: auto;">
+                                        <img id="info-copyidcard" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/d9a142f8-a869-474e-a505-45274b7521ff/Mockup+Thai+card-01.jpg" alt="" class="mt-2 member-doc-preview">
                                     </div>
                                 </div>
                             </div>
@@ -545,7 +545,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <input type="file" id="info-uploadcopybankaccountbook" class="form-control" accept="image/*" />
-                                        <img id="info-copybankaccountbook" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/6f022280-7881-4495-8dd4-bd864dcff7aa/Mockup+Thai+card-12.jpg" alt="" class="mt-2" style="max-height: 410px; max-width: auto;">
+                                        <img id="info-copybankaccountbook" src="https://images.squarespace-cdn.com/content/v1/58c0c62bd2b8574cf9ae84f9/6f022280-7881-4495-8dd4-bd864dcff7aa/Mockup+Thai+card-12.jpg" alt="" class="mt-2 member-doc-preview">
                                     </div>
                                 </div>
                             </div>
@@ -556,7 +556,7 @@
                                     </div>
                                     <div class="col-sm-12">
                                         <input type="file" id="info-uploadapplicationsubmitte" class="form-control" accept="image/*" />
-                                        <img id="info-applicationsubmitte" src="" alt="" class="mt-2" style="max-height: 510px; max-width: auto;">
+                                        <img id="info-applicationsubmitte" src="" alt="" class="mt-2 member-doc-preview">
                                     </div>
                                 </div>
                             </div>
@@ -580,6 +580,20 @@
     <!-- end col -->
 </div>
 
+<style>
+    .member-doc-preview {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        max-height: 260px;
+        height: auto;
+        object-fit: contain;
+        border: 1px solid #e9ebec;
+        border-radius: 0.5rem;
+        background: #f8f9fa;
+    }
+</style>
+
 <script>
     const language = localStorage.getItem("language");
     let memberinfo = null;
@@ -598,6 +612,14 @@
             $(targetSelector).attr('src', e.target.result);
         };
         reader.readAsDataURL(file);
+    }
+
+    function sanitizeImageUrlForApi(url) {
+        const value = (url || '').trim();
+        if (!value || value.toUpperCase() === 'N/A' || value.startsWith('data:')) {
+            return null;
+        }
+        return value;
     }
 
     function bindUploadPreview() {
@@ -638,7 +660,7 @@
                 }
                 formData.append('profileImage', file);
 
-                const response = await fetch('/Member/UploadMemberDocuments', {
+                const response = await fetch('/Member/UploadProfilePic4', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include'
@@ -649,11 +671,9 @@
                     throw new Error(result?.message || 'Upload failed');
                 }
 
-                if (result.urls?.profileImage) {
-                    $('#user-profile-image').attr('src', result.urls.profileImage);
+                if (result.url) {
+                    $('#user-profile-image').attr('src', result.url);
                 }
-
-                await submitMemberProfileUpdate('document');
 
                 uploadState.profileImage = null;
                 $('#profile-img-file-input').val('');
@@ -1273,10 +1293,10 @@
                 beneficiaryIdCard: $('#info-beneficiaryidcard').val() || null
             },
             documentInfo: {
-                profileImageUrl: $('#user-profile-image').attr('src') || null,
-                idCardImageUrl: $('#info-copyidcard').attr('src') || null,
-                bankBookImageUrl: $('#info-copybankaccountbook').attr('src') || null,
-                applicationFormImageUrl: $('#info-applicationsubmitte').attr('src') || null
+                profileImageUrl: sanitizeImageUrlForApi($('#user-profile-image').attr('src')),
+                idCardImageUrl: sanitizeImageUrlForApi($('#info-copyidcard').attr('src')),
+                bankBookImageUrl: sanitizeImageUrlForApi($('#info-copybankaccountbook').attr('src')),
+                applicationFormImageUrl: sanitizeImageUrlForApi($('#info-applicationsubmitte').attr('src'))
             },
             updateScope
         };

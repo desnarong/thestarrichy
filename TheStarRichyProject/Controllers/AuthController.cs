@@ -173,7 +173,7 @@ namespace TheStarRichyProject.Controllers
                         string runMessage = memberinfo.runMessage != null ? (string)memberinfo.runMessage : "";
                         string systemName = memberinfo.systemname != null ? (string)memberinfo.systemname : "";
                         string language = memberinfo.lang != null ? (string)memberinfo.lang : "th";
-                        string memberPicture = memberinfo.memberPositionPicture != null ? (string)memberinfo.memberPicture : "";
+                        string memberPicture = memberinfo.memberPositionPicture != null ? (string)memberinfo.memberPositionPicture : "";
                         string memberCode = memberinfo.membercode != null ? (string)memberinfo.membercode : "";
 
                         ///Member/memberpermission

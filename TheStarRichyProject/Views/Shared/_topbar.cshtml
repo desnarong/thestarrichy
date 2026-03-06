@@ -84,6 +84,27 @@
         background: #fff;
     }
 
+    #globalCartItemsContainer .cart-item-main {
+        display: flex;
+        gap: 12px;
+        align-items: flex-start;
+    }
+
+    #globalCartItemsContainer .cart-item-image {
+        width: 64px;
+        height: 64px;
+        border-radius: 8px;
+        object-fit: cover;
+        border: 1px solid #e9ecef;
+        background: #f8f9fa;
+        flex-shrink: 0;
+    }
+
+    #globalCartItemsContainer .cart-item-content {
+        flex: 1;
+        min-width: 0;
+    }
+
     #globalCartItemsContainer .cart-item-top {
         display: flex;
         justify-content: space-between;
@@ -223,6 +244,11 @@
 
         #globalCartItemsContainer .cart-item {
             padding: 10px;
+        }
+
+        #globalCartItemsContainer .cart-item-image {
+            width: 56px;
+            height: 56px;
         }
 
         #globalCartItemsContainer .cart-item-body {
@@ -652,41 +678,47 @@
 
                 items.forEach(item => {
                     const productId = item.productID || item.productId;
+                    const imageUrl = item.productImage || item.imageUrl || '/assets/images/products/no-image.png';
                     const total = (item.price * item.quantity).toFixed(2);
                     html += `
                         <div class="cart-item">
-                            <div class="cart-item-top">
-                                <div>
-                                    <div class="cart-item-name">${item.productName}</div>
-                                    <div class="cart-item-code">${item.productCode || productId}</div>
-                                </div>
-                                <button class="btn btn-danger btn-sm btn-remove-item" data-product-id="${productId}" title="ลบสินค้า">
-                                    <i class="bx bx-trash"></i>
-                                </button>
-                            </div>
-
-                            <div class="cart-item-body">
-                                <div class="cart-meta">
-                                    <div class="cart-meta-row">
-                                        <span class="cart-meta-label">ราคา</span>
-                                        <span class="cart-meta-value">฿${item.price.toFixed(2)}</span>
-                                    </div>
-                                    <div class="cart-meta-row">
-                                        <span class="cart-meta-label">รวม</span>
-                                        <span class="cart-meta-value text-success">฿${total}</span>
-                                    </div>
-                                </div>
-
-                                <div class="cart-qty-wrap">
-                                    <span class="cart-qty-label">จำนวน</span>
-                                    <div class="cart-qty-control">
-                                        <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-decrease" data-product-id="${productId}" aria-label="ลดจำนวน">
-                                            <i class="bx bx-minus"></i>
+                            <div class="cart-item-main">
+                                <img src="${imageUrl}" class="cart-item-image" alt="${item.productName || 'Product'}" onerror="this.src='/assets/images/products/no-image.png'">
+                                <div class="cart-item-content">
+                                    <div class="cart-item-top">
+                                        <div>
+                                            <div class="cart-item-name">${item.productName}</div>
+                                            <div class="cart-item-code">${item.productCode || productId}</div>
+                                        </div>
+                                        <button class="btn btn-danger btn-sm btn-remove-item" data-product-id="${productId}" title="ลบสินค้า">
+                                            <i class="bx bx-trash"></i>
                                         </button>
-                                        <input type="text" class="form-control form-control-sm cart-item-quantity" value="${item.quantity}" readonly data-product-id="${productId}">
-                                        <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-increase" data-product-id="${productId}" aria-label="เพิ่มจำนวน">
-                                            <i class="bx bx-plus"></i>
-                                        </button>
+                                    </div>
+
+                                    <div class="cart-item-body">
+                                        <div class="cart-meta">
+                                            <div class="cart-meta-row">
+                                                <span class="cart-meta-label">ราคา</span>
+                                                <span class="cart-meta-value">฿${item.price.toFixed(2)}</span>
+                                            </div>
+                                            <div class="cart-meta-row">
+                                                <span class="cart-meta-label">รวม</span>
+                                                <span class="cart-meta-value text-success">฿${total}</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="cart-qty-wrap">
+                                            <span class="cart-qty-label">จำนวน</span>
+                                            <div class="cart-qty-control">
+                                                <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-decrease" data-product-id="${productId}" aria-label="ลดจำนวน">
+                                                    <i class="bx bx-minus"></i>
+                                                </button>
+                                                <input type="text" class="form-control form-control-sm cart-item-quantity" value="${item.quantity}" readonly data-product-id="${productId}">
+                                                <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-increase" data-product-id="${productId}" aria-label="เพิ่มจำนวน">
+                                                    <i class="bx bx-plus"></i>
+                                                </button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

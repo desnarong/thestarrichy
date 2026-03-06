@@ -216,6 +216,30 @@ namespace TheStarRichyApi.Controllers
             }
         }
 
+        [HttpPut("profile/pic4")]
+        public async Task<IActionResult> UpdateMemberProfilePic4([FromBody] UpdateMemberProfilePic4Request request)
+        {
+            try
+            {
+                if (request == null || string.IsNullOrWhiteSpace(request.ProfileImageUrl))
+                {
+                    return BadRequest(new { success = false, message = "ProfileImageUrl is required" });
+                }
+
+                var result = await _memberService.UpdateMemberProfilePic4Async(request.ProfileImageUrl);
+                if (result.Success)
+                {
+                    return Ok(new { success = true, message = result.Message });
+                }
+
+                return StatusCode(501, new { success = false, message = result.Message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
         [HttpGet("incomebyperiod")]
         public async Task<IActionResult> GetMemberIncomeByPeriod()
         {

@@ -296,6 +296,80 @@ namespace TheStarRichyProject.Controllers
 
         [HttpPost]
         [RequestSizeLimit(25_000_000)]
+        public async Task<IActionResult> UploadProfilePic4(
+            [FromForm] string? memberCode,
+            [FromForm] IFormFile? profileImage)
+        {
+            try
+            {
+                if (profileImage == null)
+                {
+                    return BadRequest(new { success = false, message = "กรุณาเลือกรูปโปรไฟล์" });
+                }
+
+                string safeMemberCode = string.IsNullOrWhiteSpace(memberCode)
+                    ? "unknown"
+                    : Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
+
+                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", safeMemberCode);
+                if (!Directory.Exists(rootPath))
+                {
+                    Directory.CreateDirectory(rootPath);
+                }
+
+                string? profileImageUrl = await SaveUploadFileAsync(profileImage, rootPath, "profile");
+                if (string.IsNullOrWhiteSpace(profileImageUrl))
+                {
+                    return StatusCode(500, new { success = false, message = "ไม่สามารถบันทึกรูปโปรไฟล์ได้" });
+                }
+
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var options = new RestClientOptions(_config["Api:Url"]!)
+                {
+                    ThrowOnAnyError = false,
+                    ConfigureMessageHandler = handler =>
+                    {
+                        var httpClientHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        };
+                        return httpClientHandler;
+                    }
+                };
+
+                var passkey = _config["Api:Passkey"]!;
+                var token = Request.Cookies[CookieHelper.UserKey];
+                var client = new RestClient(options);
+                var apiRequest = new RestRequest("/Member/profile/pic4", Method.Put);
+                apiRequest.AddHeader("X-Passkey", passkey);
+                apiRequest.AddHeader("Authorization", $"Bearer {token}");
+                apiRequest.AddHeader("Accept", "application/json");
+                apiRequest.AddStringBody(JsonConvert.SerializeObject(new { profileImageUrl }), "application/json");
+
+                var response = await client.ExecuteAsync(apiRequest);
+
+                if (!response.IsSuccessful)
+                {
+                    return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode),
+                        new { success = false, message = response.Content ?? "ไม่สามารถอัปเดตรูปโปรไฟล์ที่ระบบหลักได้" });
+                }
+
+                return Ok(new
+                {
+                    success = true,
+                    url = profileImageUrl,
+                    apiResponse = response.Content
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading member profile image and updating PIC4");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการอัปโหลดรูปโปรไฟล์" });
+            }
+        }
+
+        [HttpPost]
+        [RequestSizeLimit(25_000_000)]
         public async Task<IActionResult> UploadMemberDocuments(
             [FromForm] string? memberCode,
             [FromForm] IFormFile? profileImage,
