@@ -193,10 +193,10 @@
             const memberName = member.dlName || member.DLName || member.membername || member.Membername || 'N/A';
             const memberPV = member.personalpv ?? member.personalPV ?? member.PersonalPV ?? member.pv ?? member.PV ?? 0;
             const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
-            const isActive = statusRaw.includes('active') || statusRaw.includes('yes') || statusRaw.includes('1');
+            const isActive = statusRaw.includes('active') || statusRaw.includes('Yes') || statusRaw.includes('1');
             const statusClass = isActive ? 'success' : 'secondary';
-            //const statusText = isActive ? 'ใช้งาน' : 'ไม่ใช้งาน';
-            const statusText = '';
+            const statusText = isActive ? 'ใช้งาน' : 'ไม่ใช้งาน';
+            //const statusText = '';
             tbody.append(`
                 <tr>
                     <td>${index + 1}</td>

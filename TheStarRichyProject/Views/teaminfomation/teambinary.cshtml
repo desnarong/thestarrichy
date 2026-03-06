@@ -348,9 +348,7 @@
                 url += `?membercode=${requestedCode}`;
             }
 
-            const response = await fetch(url, {
-                cache: 'no-store'
-            });
+            const response = await fetch(url);
 
             if (!response.ok) {
                 throw new Error('Failed to load binary team');
@@ -573,8 +571,8 @@
         
         const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
         const isMobileView = window.matchMedia('(max-width: 768px)').matches;
-        // Keep mobile capped at 3 levels, while still ensuring at least 3 levels when data is shallow.
-        const targetDepth = isMobileView ? 3 : Math.max(3, maxTreeDepth);
+        // Mobile: show only root, level 1 and level 2.
+        const targetDepth = isMobileView ? Math.min(3, maxTreeDepth) : maxTreeDepth;
 
         let html = `<div class="binary-tree-container">`;
         rootNodes.forEach((rootNode) => {

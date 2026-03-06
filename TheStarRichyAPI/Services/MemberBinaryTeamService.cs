@@ -777,11 +777,17 @@ namespace TheStarRichyApi.Services
                 return isLeft ? "Leftcode1" : "Rightcode1";
             }
 
-            string numPart = parentPosition.Replace("Leftcode", "").Replace("Rightcode", "");
+            string prefix = parentPosition.StartsWith("Leftcode") ? "Leftcode" : "Rightcode";
+            string numPart = parentPosition.Substring(prefix.Length);
+
             if (int.TryParse(numPart, out int parentNum))
             {
-                int childNum = parentNum * 10 + (isLeft ? 1 : 2);
-                string prefix = parentPosition.StartsWith("Leftcode") ? "Leftcode" : "Rightcode";
+                int parentDepth = numPart.Length;
+                int childDepth = parentDepth + 1;
+
+                // คำนวณ offset จาก parent position
+                int baseOffset = (int)Math.Pow(2, childDepth - 1) - 1;
+                int childNum = childDepth * 10 + baseOffset + (parentNum % 10) * 2 + (isLeft ? 0 : 1);
 
                 return $"{prefix}{childNum}";
             }
