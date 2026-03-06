@@ -572,9 +572,8 @@
         }
         
         const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
-        const isMobileView = window.matchMedia('(max-width: 768px)').matches;
-        // Mobile: show only root, level 1 and level 2.
-        const targetDepth = isMobileView ? Math.min(3, maxTreeDepth) : maxTreeDepth;
+        // Always render at least 3 levels by filling missing branches with empty nodes.
+        const targetDepth = Math.max(3, maxTreeDepth);
 
         let html = `<div class="binary-tree-container">`;
         rootNodes.forEach((rootNode) => {
