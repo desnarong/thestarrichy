@@ -24,16 +24,16 @@
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
                         
-                        <button class="btn btn-outline-primary" onclick="scrollTreeToLeft()">
+                        <button class="btn btn-outline-primary" onclick="goToLeftLevel()">
                             <i class="ri-arrow-left-line"></i> ซ้ายสุด
                         </button>
                         <button class="btn btn-outline-primary" onclick="scrollTreeToRight()">
                             <i class="ri-arrow-right-line"></i> ขวาสุด
                         </button>
-                        <button class="btn btn-outline-dark" onclick="scrollPageToTop()">
+                        <button class="btn btn-outline-dark" onclick="goToParent()">
                             <i class="ri-arrow-up-double-line"></i> เลื่อนขึ้น
                         </button>
-                        <button class="btn btn-secondary" onclick="goToTop()">
+                        <button class="btn btn-secondary" onclick="refreshCurrentMember()">
                             <i class="ri-skip-up-line"></i> บนสุด
                         </button>
                         <button class="btn btn-success" onclick="expandAll()">
@@ -933,6 +933,47 @@
         const el = getTreeScrollElement();
         if (!el) return;
         el.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+
+    function goToLeftLevel() {
+        if (!treeData) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
+        if (!payload) {
+            showAlert('info', 'ไม่พบข้อมูลทีม');
+            return;
+        }
+
+        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
+        const rootNodes = Array.isArray(binaryTree)
+            ? binaryTree
+            : (binaryTree ? [binaryTree] : []);
+
+        if (rootNodes.length === 0) {
+            showAlert('info', 'ไม่พบสายงานฝั่งซ้าย');
+            return;
+        }
+
+        const currentNode = findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0];
+        const children = getNodeChildren(currentNode);
+        const { leftChild } = pickBinaryChildren(children);
+
+        if (!leftChild || isTreeEmptyNode(leftChild)) {
+            showAlert('info', 'ไม่พบสมาชิกฝั่งซ้าย');
+            return;
+        }
+
+        const leftCode = getFirstNonEmptyValue(leftChild, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
+        if (!leftCode) {
+            showAlert('info', 'ไม่พบรหัสสมาชิกฝั่งซ้าย');
+            return;
+        }
+
+        // Keep behavior aligned with clicking a tree node card.
+        loadBinaryTeam(leftCode);
     }
 
     function scrollTreeToRight() {
