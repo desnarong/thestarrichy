@@ -23,7 +23,7 @@
                         <button class="btn btn-info" onclick="refreshCurrentMember()">
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
-                        
+
                         <button class="btn btn-outline-primary" onclick="goToLeftLevel()">
                             <i class="ri-arrow-left-line"></i> ซ้ายสุด
                         </button>
@@ -75,6 +75,7 @@
                     <div id="nodeInfoMemberName" class="member-name">-</div>
                     <div id="nodeInfoMemberCode" class="member-code">-</div>
                     <div id="nodeInfoMemberPosition" class="member-position">-</div>
+                    <div id="nodeInfoMemberSponsername" class="member-position">-</div>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -88,8 +89,7 @@
 <script>
     const preferredBinaryCodeFromServer = '@((ViewBag.PreferredBinaryCode as string) ?? "")';
     let currentMemberCode = '';
-    let parentMemberCode = '';
-    let treeData = null;
+    let treeDataRoot = null;
     let currentViewedMemberCode = '';
     let rootViewedMemberCode = '';
     let navigationHistory = [];
@@ -105,15 +105,6 @@
         return Number.isFinite(num) ? num.toLocaleString() : '0';
     }
 
-    function escapeHtml(value) {
-        return (value ?? '').toString()
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
-    }
-
     function pickGradientClass(value) {
         const allowed = ['gradient-center', 'gradient-left', 'gradient-right', 'gradient-silver', 'gradient-gold', 'gradient-diamond'];
         return allowed.includes(value) ? value : 'gradient-center';
@@ -124,7 +115,7 @@
     }
 
     function isYesStatus(value) {
-        return (value || '').toString().trim().toUpperCase() === 'YES';
+        return (value || '').toString().trim().toLowerCase().includes('yes');
     }
 
     function normalizeYesNoStatus(value) {
@@ -162,6 +153,13 @@
                 </div>
             </div>
             <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-value left-card">[L:${formatNumber(modalData.nextPosaddLeftBalance)}]</div>
+                    <div class="middle-text">ทำเพิ่ม</div>
+                    <div class="stat-value right-card">[R:${formatNumber(modalData.nextPosaddRightBalance)}]</div>
+                </div>
+            </div>
+            <div class="stats-row">
                 <div class="stat-item keep-text">
                     <div class="middle-text">รักษายอด - ${modalData.nextCMonth} ${formatNumber(modalData.currentMonthQualifyPV)} PV - ${modalData.currentMonthQualifyStatus}</div>
                 </div>
@@ -196,6 +194,7 @@
         $('#nodeInfoMemberName').text(modalData.membername || 'N/A');
         $('#nodeInfoMemberCode').text(modalData.membercode || '-');
         $('#nodeInfoMemberPosition').text(modalData.memberposition || '-');
+        $('#nodeInfoMemberSponsername').text("ชื่อผู้แนะนำ : " + (modalData.sponsername || '-'));
         $('#nodeInfoStats').html(buildNodeInfoStatsHtml(modalData));
 
         const modalEl = document.getElementById('nodeInfoModal');
@@ -215,8 +214,8 @@
 
         const mobileMediaQuery = window.matchMedia('(max-width: 768px)');
         const rerenderForViewport = function () {
-            if (treeData) {
-                renderBinaryTree(treeData, currentViewedMemberCode || currentMemberCode || '');
+            if (treeDataRoot) {
+                renderBinaryTree(treeDataRoot, currentViewedMemberCode || currentMemberCode || '');
             }
         };
 
@@ -264,20 +263,11 @@
             }
 
             const data = await response.json();
+            let memberInfo = typeof data === 'string' ? JSON.parse(data) : data;
 
-            // Handle both string (JSON) and object response
-            let memberInfo;
-            if (typeof data === 'string') {
-                memberInfo = JSON.parse(data);
-            } else {
-                memberInfo = data;
-            }
-
-            // Response is flat object with membercode directly, not memberInfo[0]
             if (memberInfo && memberInfo.membercode) {
                 currentMemberCode = memberInfo.membercode;
             } else if (memberInfo && memberInfo.memberInfo && memberInfo.memberInfo.length > 0) {
-                // Fallback for nested format
                 currentMemberCode = memberInfo.memberInfo[0].membercode;
             } else {
                 showAlert('warning', 'ไม่พบข้อมูลสมาชิก');
@@ -285,16 +275,8 @@
             }
 
             const forceCurrentMember = !!options.forceCurrentMember;
-            const urlCode = forceCurrentMember
-                ? ''
-                : (preferredCode || '').toString().trim();
+            const urlCode = forceCurrentMember ? '' : (preferredCode || '').toString().trim();
             const targetCode = urlCode || currentMemberCode;
-
-            // if (forceCurrentMember) {
-            //     $('#memberCodeSearch').val('');
-            // } else {
-            //     //$('#memberCodeSearch').val(targetCode || '');
-            // }
 
             loadBinaryTeam(targetCode, {
                 resetHistory: true,
@@ -312,18 +294,61 @@
         if (memberCode) {
             url += `?id=${memberCode}`;
         }
-            window.location.href=url;
+        window.location.href=url;
     }
 
-    async function loadBinaryTeam(memberCode, options = {}) {
+    function getIndexFromPositionLevel(level) {
+        if (!level) return -1;
+        const l = level.toLowerCase();
+        if (l === 'membercode') return 1;
+        if (l === 'leftcode1') return 2;
+        if (l === 'rightcode1') return 3;
+        if (l === 'leftcode21') return 4;
+        if (l === 'rightcode22') return 5;
+        if (l === 'leftcode23') return 6;
+        if (l === 'rightcode24') return 7;
+        if (l === 'leftcode31') return 8;
+        if (l === 'rightcode32') return 9;
+        if (l === 'leftcode33') return 10;
+        if (l === 'rightcode34') return 11;
+        if (l === 'leftcode35') return 12;
+        if (l === 'rightcode36') return 13;
+        if (l === 'leftcode37') return 14;
+        if (l === 'rightcode38') return 15;
+        return -1;
+    }
+
+    function buildTreeFromFlatArray(flatArray) {
+        const nodeMap = {};
+        // 1. นำข้อมูลใส่ Map ตาม Index ตำแหน่ง
+        flatArray.forEach(node => {
+            const idx = getIndexFromPositionLevel(node.positionLevel);
+            if (idx !== -1) {
+                nodeMap[idx] = { ...node, children: [null, null] }; // [Left, Right]
+            }
+        });
+
+        // 2. เชื่อมความสัมพันธ์แบบ Binary Tree Array (Left = 2i, Right = 2i + 1)
+        for (let i = 1; i <= 7; i++) {
+            if (nodeMap[i]) {
+                nodeMap[i].children[0] = nodeMap[2 * i] || null;     // Left Child
+                nodeMap[i].children[1] = nodeMap[2 * i + 1] || null; // Right Child
+            }
+        }
+        return nodeMap[1] || null; // คืนค่า Root Node กลับไป
+    }
+
+        async function loadBinaryTeam(memberCode, options = {}) {
         try {
             showLoading(true);
 
             const isBackNavigation = !!options.isBackNavigation;
             const shouldResetHistory = !!options.resetHistory;
-            const shouldSyncSearchInput = options.syncSearchInput !== false;
             const shouldSyncUrlCode = options.syncUrlCode === true;
             const requestedCode = (memberCode || '').toString().trim();
+
+            // 1. รับค่า direction จาก options (ถ้าไม่มีให้เป็นค่าว่าง)
+            const direction = options.direction || '';
 
             if (shouldResetHistory) {
                 navigationHistory = [];
@@ -341,12 +366,15 @@
                 }
             }
 
-            // สร้าง URL - ถ้ามี memberCode ให้ส่งไปด้วย (สำหรับค้นหา/คลิกดูทีมคนอื่น)
-            // ถ้าไม่มี จะดึงจาก JWT อัตโนมัติ
-            let url = '/home/GetMemberBinaryTeam';
-            if (requestedCode) {
-                url += `?membercode=${requestedCode}`;
-            }
+            // 2. จัดการ URL และแนบ Parameter (รวมถึง direction)
+            let url = '/home/GetMemberBinaryTeam'; // (หรือถ้าคุณสร้าง Action ใหม่ ให้เช็ค if(direction) url = '/home/...'; ตรงนี้ได้เลย)
+
+            const urlParams = new URLSearchParams();
+            if (requestedCode) urlParams.append('membercode', requestedCode);
+            if (direction) urlParams.append('direction', direction); // แนบ direction ท้าย URL
+
+            const queryString = urlParams.toString();
+            if (queryString) url += `?${queryString}`;
 
             const response = await fetch(url);
 
@@ -355,38 +383,28 @@
             }
 
             const data = await response.json();
+            let result = typeof data === 'string' ? JSON.parse(data) : data;
 
-            // Handle both string (JSON) and object response
-            let result;
-            if (typeof data === 'string') {
-                result = JSON.parse(data);
-            } else {
-                result = data;
-            }
-
-            treeData = result;
-
+            // แปลง Flat Array JSON ให้กลายเป็น Tree Structure
             const payload = Array.isArray(result) ? (result[0] || null) : result;
-            const binaryTree = payload ? getNodeValue(payload, ['BinaryTree', 'binaryTree'], null) : null;
-            const currentNode = Array.isArray(binaryTree)
-                ? (binaryTree[0] || null)
-                : (binaryTree || payload);
-            const resolvedCode = requestedCode || getFirstNonEmptyValue(currentNode, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
+            let binaryTreeFlat = (payload && payload.binaryTree) ? payload.binaryTree : [];
+            if (!Array.isArray(binaryTreeFlat)) binaryTreeFlat = [binaryTreeFlat];
+
+            treeDataRoot = buildTreeFromFlatArray(binaryTreeFlat);
+
+            const resolvedCode = requestedCode || (treeDataRoot ? treeDataRoot.childCode : '');
 
             if (resolvedCode) {
                 currentViewedMemberCode = resolvedCode;
                 if (shouldResetHistory || !rootViewedMemberCode) {
                     rootViewedMemberCode = resolvedCode;
                 }
-                // if (shouldSyncSearchInput) {
-                //     $('#memberCodeSearch').val(currentViewedMemberCode);
-                // }
                 if (shouldSyncUrlCode) {
                     setMemberCodeToUrl(currentViewedMemberCode);
                 }
             }
 
-            renderBinaryTree(result, resolvedCode || (Array.isArray(result) ? (result[0]?.Membercode || '') : ''));
+            renderBinaryTree(treeDataRoot, resolvedCode);
         } catch (error) {
             console.error('Error:', error);
             showAlert('danger', 'เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message);
@@ -395,112 +413,16 @@
         }
     }
 
-    function getNodeValue(node, keys, fallback = null) {
-        if (!node || !Array.isArray(keys)) return fallback;
-        for (const key of keys) {
-            if (node[key] !== undefined && node[key] !== null) {
-                return node[key];
-            }
-        }
-        return fallback;
-    }
-
-    function getNodeChildren(node) {
-        const children = getNodeValue(node, ['Children', 'children'], []);
-        return Array.isArray(children) ? children : [];
-    }
-
-    function findNodeInTree(nodes, targetCode) {
-        if (!Array.isArray(nodes) || nodes.length === 0 || !targetCode) {
-            return null;
-        }
-
-        const normalizedTarget = targetCode.toString().trim().toUpperCase();
-
-        for (const node of nodes) {
-            const memberCode = getFirstNonEmptyValue(node, ['Membercode', 'membercode'], '').toUpperCase();
-            const childCode = getFirstNonEmptyValue(node, ['ChildCode', 'childCode'], '').toUpperCase();
-
-            if (memberCode === normalizedTarget || childCode === normalizedTarget) {
-                return node;
-            }
-
-            const foundInChildren = findNodeInTree(getNodeChildren(node), normalizedTarget);
-            if (foundInChildren) {
-                return foundInChildren;
-            }
-        }
-
-        return null;
-    }
-
-    function getFirstNonEmptyValue(node, keys, fallback = '') {
-        if (!node || !Array.isArray(keys)) return fallback;
-        for (const key of keys) {
-            const value = node[key];
-            if (value !== undefined && value !== null && value.toString().trim() !== '') {
-                return value.toString().trim();
-            }
-        }
-        return fallback;
-    }
-
     function isTreeEmptyNode(node) {
         if (!node) return true;
-        const isEmptyFlag = !!getNodeValue(node, ['IsEmptyNode', 'isEmptyNode'], false);
-        const membercode = (getNodeValue(node, ['Membercode', 'membercode'], '') || '').toString();
-        const childCode = (getNodeValue(node, ['ChildCode', 'childCode'], '') || '').toString();
-        const membername = (getNodeValue(node, ['Membername', 'membername'], '') || '').toString();
-        return isEmptyFlag || membercode.startsWith('EMPTY_') || membername === '(ว่าง)' || (!membercode && !childCode);
-    }
-
-    function pickBinaryChildren(children) {
-        if (!Array.isArray(children) || children.length === 0) {
-            return { leftChild: null, rightChild: null };
-        }
-
-        const leftCandidates = [];
-        const rightCandidates = [];
-        const neutralCandidates = [];
-
-        children.forEach((child) => {
-            const level = (getNodeValue(child, ['PositionLevel', 'positionLevel'], '') || '').toString().toLowerCase();
-            if (level.includes('left')) {
-                leftCandidates.push(child);
-            } else if (level.includes('right')) {
-                rightCandidates.push(child);
-            } else {
-                neutralCandidates.push(child);
-            }
-        });
-
-        const leftReal = leftCandidates.find(c => !isTreeEmptyNode(c));
-        const rightReal = rightCandidates.find(c => !isTreeEmptyNode(c));
-        const neutralReal = neutralCandidates.find(c => !isTreeEmptyNode(c));
-
-        let leftChild = leftReal || leftCandidates[0] || neutralReal || neutralCandidates[0] || null;
-        let rightChild = rightReal || rightCandidates.find(c => c !== leftChild) || neutralReal || neutralCandidates.find(c => c !== leftChild) || leftReal || leftCandidates.find(c => c !== leftChild) || null;
-
-        if (leftChild && rightChild && leftChild === rightChild) {
-            rightChild = children.find(c => c !== leftChild) || null;
-        }
-
-        return { leftChild, rightChild };
+        return node.childCode === 'ว่าง/Empty' || !node.childCode;
     }
 
     function getTreeDepth(node) {
-        if (!node) {
-            return 0;
-        }
-
-        const children = getNodeChildren(node);
-        if (children.length === 0) {
-            return 1;
-        }
-
-        const childDepths = children.map(child => getTreeDepth(child));
-        const maxChildDepth = childDepths.length > 0 ? Math.max(...childDepths) : 0;
-        return 1 + maxChildDepth;
+        if (!node || isTreeEmptyNode(node)) return 0;
+        const leftDepth = node.children && node.children[0] ? getTreeDepth(node.children[0]) : 0;
+        const rightDepth = node.children && node.children[1] ? getTreeDepth(node.children[1]) : 0;
+        return 1 + Math.max(leftDepth, rightDepth);
     }
 
     function buildEmptyNodeHtml(cssClass, registerBaseCode, disabled = false) {
@@ -540,151 +462,114 @@
         return html;
     }
 
-    function renderBinaryTree(data, centerCode) {
+    function renderBinaryTree(rootNode, centerCode) {
         const container = $('#binaryTreeContainer');
         container.empty();
         nodeInfoDataMap = {};
         nodeInfoSeq = 0;
 
-        if (!data) {
+        if (!rootNode) {
             container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
             return;
         }
 
-        const payload = Array.isArray(data) ? (data[0] || null) : data;
-        if (!payload) {
-            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
-            return;
-        }
-
-        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
-        if (!binaryTree) {
-            renderOldStyle(Array.isArray(data) ? data : [data], centerCode);
-            return;
-        }
-       
-        const rootNodes = Array.isArray(binaryTree) ? binaryTree : [binaryTree];
-        if (rootNodes.length === 0) {
-            container.html('<p class="text-muted py-5">ไม่พบข้อมูลทีม</p>');
-            return;
-        }
-        
-        const maxTreeDepth = Math.max(1, ...rootNodes.map(node => getTreeDepth(node)));
         const isMobileView = window.matchMedia('(max-width: 768px)').matches;
-        // Mobile: show only root, level 1 and level 2.
-        const targetDepth = isMobileView ? Math.min(3, maxTreeDepth) : maxTreeDepth;
+        const targetDepth = isMobileView ? 3 : 4; // มือถือวาด 3 ชั้น, คอมพิวเตอร์วาด 4 ชั้น (ตามขนาด JSON)
 
         let html = `<div class="binary-tree-container">`;
-        rootNodes.forEach((rootNode) => {
-            html += renderTreeNode(rootNode, 0, targetDepth, false);
-        });
+        html += renderTreeNode(rootNode, 0, targetDepth, false, 'root');
         html += `</div>`;
+
         container.html(html);
     }
 
-    function renderTreeNode(node, level, targetDepth, hasEmptyAncestor = false) {
+    function renderTreeNode(node, level, targetDepth, hasEmptyAncestor = false, parentRegisterCode = '') {
         if (!node) return '';
 
-        const membercode = getFirstNonEmptyValue(node, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
-        const nodeMemberCode = getFirstNonEmptyValue(node, ['Membercode', 'membercode'], '');
-        const membername = getNodeValue(node, ['Membername', 'membername', 'Idcardname', 'idcardname'], 'N/A');
-        const memberposition = getNodeValue(node, ['Memberposition', 'memberposition'], '');
-        const memberpositionName = getNodeValue(node, ['MemberpositionName', 'memberpositionName'], '');
-        const memberthaiName = getNodeValue(node, ['MemberpositionRankingName', 'memberpositionRankingName', 'MemberpositionRanking', 'memberpositionRanking'], 'ไม่มีตำแหน่ง');
-        const currentMonth1 = getNodeValue(node, ['currentMonth1', 'CurrentMonth1'], '');
-        const currentMonth = getNodeValue(node, ['currentMonth', 'CurrentMonth'], '');
-        const nextCMonth = getNodeValue(node, ['nextCMonth', 'NextCMonth'], '');
-        const currentMonthQualifyPV = getNodeValue(node, ['currentMonthQualifyPV', 'CurrentMonthQualifyPV'], 0);
-        const currentMonthQualifyStatusRaw = getNodeValue(node, ['CurrentMonthQualifyStatus', 'currentMonthQualifyStatus'], 'No');
-        const currentMonthQualifyStatus = normalizeYesNoStatus(currentMonthQualifyStatusRaw);
-        const lastCMonth = getNodeValue(node, ['lastCMonth', 'LastCMonth'], '');
-        const lastmonthQualifyPV = getNodeValue(node, ['lastmonthQualifyPV', 'LastmonthQualifyPV', 'lastMonthQualifyPV', 'LastMonthQualifyPV'], 0);
-        const positionLevel = (getNodeValue(node, ['PositionLevel', 'positionLevel'], '') || '').toString();
-
-        const currentLeftPV = getNodeValue(node, ['CurrentLeftPV', 'currentLeftPV'], 0);
-        const currentRightPV = getNodeValue(node, ['CurrentRightPV', 'currentRightPV'], 0);
-        const newLeft = getNodeValue(node, ['NewLeft', 'newLeft'], 0);
-        const newRight = getNodeValue(node, ['NewRight', 'newRight'], 0);
-        const leftCountActive = getNodeValue(node, ['LeftCountActive', 'leftCountActive'], 0);
-        const rightCountActive = getNodeValue(node, ['RightCountActive', 'rightCountActive'], 0);
-        const totalLeftBalance = getNodeValue(node, ['TotalLeftBalance', 'totalLeftBalance'], 0);
-        const totalRightBalance = getNodeValue(node, ['TotalRightBalance', 'totalRightBalance'], 0);
-
-        const lastMonthQualifyStatusRaw = (getNodeValue(node, ['LastMonthQualifyStatus', 'lastMonthQualifyStatus'], 'No') || 'No').toString();
-        const lastMonthQualifyStatus = normalizeYesNoStatus(lastMonthQualifyStatusRaw);
-        const cardColorClass = isYesStatus(currentMonthQualifyStatusRaw) ? 'card-green' : 'card-red';
-        const memberPicture = getNodeValue(node, ['MemberPositionPicture', 'MemberPositionPicture', 'MemberPositionPicture', 'memberPositionPicture'], '/images/1_Black1_40x40.gif');
-
-        const children = getNodeChildren(node);
-        const { leftChild, rightChild } = pickBinaryChildren(children);
-        
-        const hasLeftChild = !!leftChild;
-        const hasRightChild = !!rightChild;
-        const hasRealLeft = hasLeftChild && !isTreeEmptyNode(leftChild);
-        const hasRealRight = hasRightChild && !isTreeEmptyNode(rightChild);
-
-        const isLeft = positionLevel.toLowerCase().includes('left');
-        const isRight = positionLevel.toLowerCase().includes('right');
-
-        let gradientClass = 'gradient-center';
-        if (memberposition === 'SS' || memberposition === 'Silver Star') {
-            gradientClass = 'gradient-silver';
-        } else if (memberposition === 'GS' || memberposition === 'Gold Star') {
-            gradientClass = 'gradient-gold';
-        } else if (memberposition === 'DGS' || memberposition === 'Double Gold Star') {
-            gradientClass = 'gradient-diamond';
-        } else if (isLeft) {
-            gradientClass = 'gradient-left';
-        } else if (isRight) {
-            gradientClass = 'gradient-right';
-        }
-
         const isEmpty = isTreeEmptyNode(node);
+        const childCode = node.childCode || '';
+        const registerBaseCode = isEmpty ? parentRegisterCode : childCode.replace(/'/g, "\\'");
+
         const isMobileView = isMobileTreeView();
         const isLastLevel = level >= targetDepth - 1;
         const useCompactCard = isLastLevel && (level > 2 || (isMobileView && level >= 2));
         const emptyNodeClass = (isMobileView && isLastLevel)
             ? 'empty-node small'
             : (level <= 2 ? 'empty-node tree-size' : 'empty-node small');
-        const safeMemberCode = (membercode || nodeMemberCode).replace(/'/g, "\\'");
-        const registerBaseCodeRaw = nodeMemberCode || membercode || 'root';
-        const registerBaseCode = registerBaseCodeRaw.replace(/'/g, "\\'");
-        const infoModalKey = `node_${++nodeInfoSeq}`;
-
-        nodeInfoDataMap[infoModalKey] = {
-            membername: membername,
-            membercode: membercode || nodeMemberCode,
-            memberposition: memberpositionName || memberposition,
-            memberthaiName: memberthaiName,
-            memberPicture: memberPicture,
-            gradientClass: gradientClass,
-            cardColorClass: cardColorClass,
-            currentMonth: currentMonth,
-            nextCMonth: nextCMonth,
-            currentMonth1: currentMonth1,
-            currentMonthQualifyPV: currentMonthQualifyPV,
-            currentMonthQualifyStatus: currentMonthQualifyStatus,
-            lastCMonth: lastCMonth,
-            lastmonthQualifyPV: lastmonthQualifyPV,
-            lastMonthQualifyPV: lastmonthQualifyPV,
-            lastMonthQualifyStatus: lastMonthQualifyStatus,
-            currentLeftPV: currentLeftPV,
-            currentRightPV: currentRightPV,
-            newLeft: newLeft,
-            newRight: newRight,
-            leftCountActive: leftCountActive,
-            rightCountActive: rightCountActive,
-            totalLeftBalance: totalLeftBalance,
-            totalRightBalance: totalRightBalance
-        };
 
         let html = `<div class="tree-node-wrapper" data-level="${level}">`;
 
         if (isEmpty) {
             html += buildEmptyNodeHtml(emptyNodeClass, registerBaseCode, hasEmptyAncestor);
         } else {
+            const membername = node.membername || 'N/A';
+            const memberpositionName = node.memberpositionName || '';
+            const memberthaiName = node.memberpositionRankingName || 'ไม่มีตำแหน่ง';
+            const sponsername = node.sponsername || '-';
+            const currentMonth1 = node.currentMonth1 || '';
+            const currentMonth = node.currentMonth || '';
+            const nextCMonth = node.nextCMonth || '';
+            const currentMonthQualifyPV = node.currentMonthQualifyPV || 0;
+            const currentMonthQualifyStatus = normalizeYesNoStatus(node.currentMonthQualifyStatus);
+            const lastCMonth = node.lastCMonth || '';
+            const lastMonthQualifyPV = node.lastMonthQualifyPV || 0;
+            const lastMonthQualifyStatus = normalizeYesNoStatus(node.lastMonthQualifyStatus);
+            const positionLevel = node.positionLevel || '';
+
+            const currentLeftPV = node.currentLeftPV || 0;
+            const currentRightPV = node.currentRightPV || 0;
+            const newLeft = node.newLeft || 0;
+            const newRight = node.newRight || 0;
+            const leftCountActive = node.leftCountActive || 0;
+            const rightCountActive = node.rightCountActive || 0;
+            const totalLeftBalance = node.totalLeftBalance || 0;
+            const totalRightBalance = node.totalRightBalance || 0;
+            const nextPosaddLeftBalance = node.nextPosaddLeftBalance || 0;
+            const nextPosaddRightBalance = node.nextPosaddRightBalance || 0;
+
+            const cardColorClass = isYesStatus(node.currentMonthQualifyStatus) ? 'card-green' : 'card-red';
+            const memberPicture = node.memberPositionPicture || '/images/1_Black1_40x40.gif';
+
+            const isLeft = positionLevel.toLowerCase().includes('left');
+            const isRight = positionLevel.toLowerCase().includes('right');
+
+            let gradientClass = 'gradient-center';
+            if (isLeft) gradientClass = 'gradient-left';
+            else if (isRight) gradientClass = 'gradient-right';
+
+            const infoModalKey = `node_${++nodeInfoSeq}`;
+
+            nodeInfoDataMap[infoModalKey] = {
+                membername: membername,
+                membercode: childCode,
+                memberposition: memberpositionName,
+                memberthaiName: memberthaiName,
+                memberPicture: memberPicture,
+                sponsername: sponsername,
+                gradientClass: gradientClass,
+                cardColorClass: cardColorClass,
+                currentMonth: currentMonth,
+                nextCMonth: nextCMonth,
+                currentMonth1: currentMonth1,
+                currentMonthQualifyPV: currentMonthQualifyPV,
+                currentMonthQualifyStatus: currentMonthQualifyStatus,
+                lastCMonth: lastCMonth,
+                lastMonthQualifyPV: lastMonthQualifyPV,
+                lastMonthQualifyStatus: lastMonthQualifyStatus,
+                currentLeftPV: currentLeftPV,
+                currentRightPV: currentRightPV,
+                newLeft: newLeft,
+                newRight: newRight,
+                nextPosaddLeftBalance: nextPosaddLeftBalance,
+                nextPosaddRightBalance: nextPosaddRightBalance,
+                leftCountActive: leftCountActive,
+                rightCountActive: rightCountActive,
+                totalLeftBalance: totalLeftBalance,
+                totalRightBalance: totalRightBalance
+            };
+
             html += `
-                <div class="tree-node ${gradientClass} ${cardColorClass} ${useCompactCard ? 'level-last' : ''}" onclick="loadBinaryTeam('${safeMemberCode}')" title="คลิกเพื่อดูทีม">
+                <div class="tree-node ${gradientClass} ${cardColorClass} ${useCompactCard ? 'level-last' : ''}" onclick="loadBinaryTeam('${childCode.replace(/'/g, "\\'")}')" title="คลิกเพื่อดูทีม">
                     <button type="button" class="btn btn-light btn-sm node-info-btn" data-modal-key="${infoModalKey}" title="ดูรายละเอียด" onclick="return openNodeInfoModal('${infoModalKey}', event);">
                         <i class="ri-search-line"></i>
                     </button>
@@ -695,9 +580,9 @@
                         </div>
                         <div class="node-details">
                             <div class="member-name">${membername}</div>
-                            <div class="member-code">${membercode}</div>
-                            <div class="member-position">${memberpositionName || memberposition}</div>
-                            <div class="member-position-ranking">รักษายอด ${currentMonth1} - ${lastmonthQualifyPV}</div>
+                            <div class="member-code">${childCode}</div>
+                            <div class="member-position">${memberpositionName}</div>
+                            <div class="member-position-ranking">รักษายอด ${currentMonth1} - ${lastMonthQualifyPV}</div>
                         </div>
                     </div>
                     ${!isLastLevel ? `
@@ -737,47 +622,39 @@
         }
 
         if (!isLastLevel) {
+            const leftChild = (node.children && node.children.length > 0) ? node.children[0] : null;
+            const rightChild = (node.children && node.children.length > 1) ? node.children[1] : null;
+
+            const hasRealLeft = leftChild && !isTreeEmptyNode(leftChild);
+            const hasRealRight = rightChild && !isTreeEmptyNode(rightChild);
+            const leftIsEmpty = !hasRealLeft;
+            const rightIsEmpty = !hasRealRight;
+
             html += `<div class="tree-children">`;
             html += `<div class="tree-connector"></div>`;
+
             const nextLevelIsVisualLast = (level + 1) >= (targetDepth - 1);
-            const leftIsLast = nextLevelIsVisualLast || !hasRealLeft || getNodeChildren(leftChild).length === 0;
-            const rightIsLast = nextLevelIsVisualLast || !hasRealRight || getNodeChildren(rightChild).length === 0;
+            const leftIsLast = nextLevelIsVisualLast || !hasRealLeft || (leftChild && !leftChild.children);
+            const rightIsLast = nextLevelIsVisualLast || !hasRealRight || (rightChild && !rightChild.children);
+
             const forceLevel2ContainerClass = !isMobileView && (level + 1 === 2 && leftIsLast && rightIsLast);
             const childrenContainerClass = forceLevel2ContainerClass
                 ? `children-container children-container-level-2`
                 : (leftIsLast && rightIsLast)
                     ? `children-container children-container-last`
                     : `children-container children-container-level-${level + 1}`;
-            const leftIsEmpty = !hasRealLeft;
-            const rightIsEmpty = !hasRealRight;
-            const level1LeftEmptyClass = (level + 1 === 1 && leftIsEmpty)
-                ? ' children-container-level-1-left-empty'
-                : '';
-            const leftGrandChildren = getNodeChildren(leftChild);
-            const leftGrandChildrenPicked = pickBinaryChildren(leftGrandChildren);
-            const leftLevel2RightEmpty = !leftGrandChildrenPicked.rightChild || isTreeEmptyNode(leftGrandChildrenPicked.rightChild);
-            const level1NoEmptyLeftLevel2RightEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty && leftLevel2RightEmpty)
-                ? ' children-container-level-1-no-empty-left-level2-right-empty'
-                : '';
-            const rightGrandChildren = getNodeChildren(rightChild);
-            const rightLevel2AllEmpty = rightGrandChildren.length >= 2 && rightGrandChildren.every(child => isTreeEmptyNode(child));
-            const level1LeftEmptyRightLevel2AllEmptyClass = (level + 1 === 1 && leftIsEmpty && rightLevel2AllEmpty)
-                ? ' children-container-level-1-left-empty-right-level2-all-empty'
-                : '';
-            const level1RightLevel2AllEmptyClass = (level + 1 === 1 && !leftIsEmpty && !rightIsEmpty && rightLevel2AllEmpty)
-                ? ' children-container-level-1-right-level2-all-empty'
-                : '';
 
-            html += `<div class="${childrenContainerClass}${level1LeftEmptyClass}${level1NoEmptyLeftLevel2RightEmptyClass}${level1LeftEmptyRightLevel2AllEmptyClass}${level1RightLevel2AllEmptyClass}">`;
+ 
+            html += `<div class="${childrenContainerClass}">`;
 
-            if (hasLeftChild) {
-                html += `<div class="child-branch left">${renderTreeNode(leftChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty)}</div>`;
+            if (leftChild) {
+                html += `<div class="child-branch left">${renderTreeNode(leftChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty, `${registerBaseCode}L`)}</div>`;
             } else {
                 html += `<div class="child-branch left">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}L`, hasEmptyAncestor || isEmpty)}</div>`;
             }
 
-            if (hasRightChild) {
-                html += `<div class="child-branch right">${renderTreeNode(rightChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty)}</div>`;
+            if (rightChild) {
+                html += `<div class="child-branch right">${renderTreeNode(rightChild, level + 1, targetDepth, hasEmptyAncestor || isEmpty, `${registerBaseCode}R`)}</div>`;
             } else {
                 html += `<div class="child-branch right">${renderEmptyBranch(level + 1, targetDepth, `${registerBaseCode}R`, hasEmptyAncestor || isEmpty)}</div>`;
             }
@@ -787,61 +664,7 @@
         }
 
         html += `</div>`;
-        
         return html;
-    }
-
-    // สำหรับกรณีไม่มี BinaryTree (ใช้ข้อมูลเดิม)
-    function renderOldStyle(data, centerCode) {
-        const container = $('#binaryTreeContainer');
-
-        const center = data.find(m => m.membercode === centerCode) || data[0];
-
-        let html = `
-            <div class="binary-tree">
-                <div class="tree-level">
-                    ${renderNode(center, 'center')}
-                </div>
-                <div class="tree-level mt-4">
-                    <div class="row justify-content-center">
-                        <div class="col-md-6">${renderNode(null, 'left')}</div>
-                        <div class="col-md-6">${renderNode(null, 'right')}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        container.html(html);
-    }
-
-    function renderNode(member, position) {
-        if (!member) {
-            return `
-                <div class="node-card empty">
-                    <div class="text-muted">
-                        <i class="ri-user-add-line ri-3x mb-2"></i>
-                        <p>ว่าง</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        const positionColor = position === 'left' ? 'success' : position === 'right' ? 'warning' : 'info';
-
-        return `
-            <div class="node-card ${positionColor}" onclick="loadBinaryTeam('${member.membercode}')">
-                <div class="position-badge badge bg-${positionColor}">
-                    ${position === 'left' ? 'ซ้าย' : position === 'right' ? 'ขวา' : 'ศูนย์กลาง'}
-                </div>
-                <img src="${member.profileImage || '/assets/images/users/avatar-1.jpg'}"
-                     class="node-avatar" alt="${member.idcardname}">
-                <div class="node-info">
-                    <h6 class="mb-1">${member.idcardname || 'N/A'}</h6>
-                    <p class="text-muted mb-1 small">${member.membercode}</p>
-                    <p class="text-${positionColor} mb-0"><strong>PV: ${member.personalpv || 0}</strong></p>
-                </div>
-            </div>
-        `;
     }
 
     function searchMember() {
@@ -859,36 +682,8 @@
     }
 
     function goToParent() {
-        if (!treeData) {
+        if (!treeDataRoot) {
             showAlert('info', 'ไม่พบข้อมูลทีม');
-            return;
-        }
-
-        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
-        if (!payload) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
-            return;
-        }
-
-        console.log('Payload for goToParent:', payload);
-
-        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
-        const rootNodes = Array.isArray(binaryTree)
-            ? binaryTree
-            : (binaryTree ? [binaryTree] : []);
-
-        const currentNode = rootNodes.length > 0
-            ? (findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0])
-            : payload;
-
-        if (!currentNode) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
-            return;
-        }
-
-        const parentCode = getFirstNonEmptyValue(currentNode, ['ParentCode', 'parentCode'], '');
-        if (parentCode && !parentCode.startsWith('EMPTY_')) {
-            loadBinaryTeam(parentCode, { isBackNavigation: true });
             return;
         }
 
@@ -901,131 +696,25 @@
             return;
         }
 
-        showAlert('info', 'รหัสนี้อยู่สายงานบนสุดแล้ว');
-    }
-
-    function goToTop() {
-        if (rootViewedMemberCode) {
-            loadBinaryTeam(rootViewedMemberCode, { resetHistory: true });
-            return;
-        }
-
-        if (currentMemberCode) {
-            loadBinaryTeam(currentMemberCode, { resetHistory: true });
-            return;
-        }
-
-        refreshCurrentMember();
-    }
-
-    function getTreeScrollElement() {
-        const container = document.getElementById('binaryTreeContainer');
-        if (!container) return null;
-
-        const innerScrollable = container.querySelector('.binary-tree-container');
-        if (innerScrollable && innerScrollable.scrollWidth > innerScrollable.clientWidth) {
-            return innerScrollable;
-        }
-
-        return container;
-    }
-
-    function scrollTreeToLeft() {
-        const el = getTreeScrollElement();
-        if (!el) return;
-        el.scrollTo({ left: 0, behavior: 'smooth' });
+        showAlert('info', 'รหัสนี้อยู่สายงานบนสุดแล้ว หรือไม่สามารถย้อนกลับได้');
     }
 
     function goToLeftLevel() {
-        if (!treeData) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
+        if (!currentViewedMemberCode) {
+            showAlert('info', 'ไม่พบรหัสอ้างอิง');
             return;
         }
-
-        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
-        if (!payload) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
-            return;
-        }
-
-        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
-        const rootNodes = Array.isArray(binaryTree)
-            ? binaryTree
-            : (binaryTree ? [binaryTree] : []);
-
-        if (rootNodes.length === 0) {
-            showAlert('info', 'ไม่พบสายงานฝั่งซ้าย');
-            return;
-        }
-
-        const currentNode = findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0];
-        const children = getNodeChildren(currentNode);
-        const { leftChild } = pickBinaryChildren(children);
-
-        if (!leftChild || isTreeEmptyNode(leftChild)) {
-            showAlert('info', 'ไม่พบสมาชิกฝั่งซ้าย');
-            return;
-        }
-
-        const leftCode = getFirstNonEmptyValue(leftChild, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
-        if (!leftCode) {
-            showAlert('info', 'ไม่พบรหัสสมาชิกฝั่งซ้าย');
-            return;
-        }
-
-        // Keep behavior aligned with clicking a tree node card.
-        loadBinaryTeam(leftCode);
-    }
-
-    function scrollTreeToRight() {
-        const el = getTreeScrollElement();
-        if (!el) return;
-        el.scrollTo({ left: el.scrollWidth, behavior: 'smooth' });
+        // ส่งรหัสปัจจุบัน พร้อมแนบ direction ว่าไปทาง 'left'
+        loadBinaryTeam(currentViewedMemberCode, { direction: 'left' });
     }
 
     function goToRightLevel() {
-        if (!treeData) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
+        if (!currentViewedMemberCode) {
+            showAlert('info', 'ไม่พบรหัสอ้างอิง');
             return;
         }
-
-        const payload = Array.isArray(treeData) ? (treeData[0] || null) : treeData;
-        if (!payload) {
-            showAlert('info', 'ไม่พบข้อมูลทีม');
-            return;
-        }
-
-        const binaryTree = getNodeValue(payload, ['BinaryTree', 'binaryTree'], null);
-        const rootNodes = Array.isArray(binaryTree)
-            ? binaryTree
-            : (binaryTree ? [binaryTree] : []);
-
-        if (rootNodes.length === 0) {
-            showAlert('info', 'ไม่พบสายงานฝั่งขวา');
-            return;
-        }
-
-        const currentNode = findNodeInTree(rootNodes, currentViewedMemberCode) || rootNodes[0];
-        const children = getNodeChildren(currentNode);
-        const { rightChild } = pickBinaryChildren(children);
-
-        if (!rightChild || isTreeEmptyNode(rightChild)) {
-            showAlert('info', 'ไม่พบสมาชิกฝั่งขวา');
-            return;
-        }
-
-        const rightCode = getFirstNonEmptyValue(rightChild, ['ChildCode', 'childCode', 'Membercode', 'membercode'], '');
-        if (!rightCode) {
-            showAlert('info', 'ไม่พบรหัสสมาชิกฝั่งขวา');
-            return;
-        }
-
-        // Keep behavior aligned with clicking a tree node card.
-        loadBinaryTeam(rightCode);
-    }
-
-    function scrollPageToTop() {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // ส่งรหัสปัจจุบัน พร้อมแนบ direction ว่าไปทาง 'right'
+        loadBinaryTeam(currentViewedMemberCode, { direction: 'right' });
     }
 
     function expandAll() {
@@ -1056,13 +745,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         `;
-
         const alertContainer = $('#binaryTreeContainer').parent();
         alertContainer.prepend(alert);
-
-        setTimeout(() => {
-            $('.alert').alert('close');
-        }, 3000);
+        setTimeout(() => { $('.alert').alert('close'); }, 3000);
     }
 </script>
 
@@ -1083,13 +768,18 @@
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         border: 2px solid #fff;
         border-radius: 16px;
-        padding: 15px 25px;
+        padding: 2px 2px;
         color: white;
         cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         min-width: 200px;
+        max-width: 200px;
+        min-height: 175px;
+        max-height: 175px;
         position: relative;
+        box-sizing: border-box;
+        overflow: hidden;
     }
 
         .tree-node .node-info-btn {
@@ -1129,15 +819,10 @@
 
     #nodeInfoModal .modal-header.node-main {
         border-bottom: 0;
-        gap: 24px;
-        padding: 20px 24px 10px;
     }
 
     #nodeInfoModal .modal-body {
         padding-top: 0;
-        padding-left: 24px;
-        padding-right: 24px;
-        padding-bottom: 20px;
         max-height: calc(92vh - 170px);
         overflow-y: auto;
     }
@@ -1160,13 +845,13 @@
     }
 
     #nodeInfoModal .modal-header.node-main .member-name {
-        font-size: 1.18rem;
+        font-size: 1.0rem;
     }
 
     #nodeInfoModal .modal-header.node-main .member-code,
     #nodeInfoModal .modal-header.node-main .member-position,
     #nodeInfoModal .modal-header.node-main .member-position-ranking {
-        font-size: 0.98rem;
+        font-size: 0.80rem;
     }
 
     #nodeInfoModal .modal-body .stat-item {
@@ -1195,9 +880,7 @@
 
         #nodeInfoModal .modal-body {
             max-height: calc(94vh - 155px);
-            padding-left: 14px;
-            padding-right: 14px;
-            padding-bottom: 14px;
+            padding: 0 14px 14px;
         }
 
         #nodeInfoModal .modal-header.node-main {
@@ -1217,7 +900,6 @@
         box-shadow: 0 8px 25px rgba(0,0,0,0.3);
     }
 
-    /* Gradient ตามตำแหน่ง */
     .tree-node.gradient-center {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     }
@@ -1265,7 +947,6 @@
         box-sizing: border-box;
         flex-shrink: 0;
         position: relative;
-        margin-left: 12px;
         margin: 1px 8px 15px 8px;
     }
 
@@ -1335,7 +1016,6 @@
         text-overflow: ellipsis;
     }
 
-    /* สีการ์ดตามสถานะรักษายอดเดือนที่แล้ว */
     .tree-node.card-green {
         background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
         border-color: #11998e;
@@ -1346,7 +1026,6 @@
         border-color: #f5576c;
     }
 
-    /* สไตล์ใหม่สำหรับสถิติ */
     .tree-node .node-stats {
         padding-top: 3px;
         border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -1375,20 +1054,23 @@
         font-weight: 600;
         line-height: 2;
         white-space: nowrap;
-        flex: 1;
+        width: 65px; /* ฟิกซ์ความกว้างกรอบซ้าย-ขวาให้เท่ากันเป๊ะ */
+        flex: none; /* ปิดการยืดหดอัตโนมัติ */
         text-align: center;
         border-radius: 4px;
         padding: 1px 2px;
         color: white;
+        overflow: hidden; /* ถ้าตัวเลขยาวเกินกรอบ ให้ซ่อนส่วนที่ล้น */
+        text-overflow: ellipsis; /* ใส่ ... ให้ตัวเลขที่ล้น */
     }
 
         .tree-node .stat-value.left-card {
-            background-color: #198754; /* เขียวเข้ม */
+            background-color: #198754;
         }
 
         .tree-node .stat-value.right-card {
-            background-color: #ffc107; /* เหลือง */
-            color: #333; /* ตัวหนังสือสีเข้มสำหรับพื้นหลังเหลือง */
+            background-color: #ffc107;
+            color: #333;
         }
 
     .stat-item .stat-value {
@@ -1399,50 +1081,48 @@
         color: white;
         font-size: 9px;
         font-weight: 600;
-        flex: 1;
+        flex: 1; /* ย้าย flex: 1 มาไว้ตรงกลาง เพื่อให้มันดันกรอบซ้าย-ขวาไปชิดขอบ */
         text-align: center;
         background-color: transparent;
+        white-space: nowrap;
     }
 
-    /* ปรับขนาดการ์ดตามที่ร้องขอ */
-    .tree-node {
-        min-width: 200px;
-        max-width: 200px;
-        min-height: 175px;
-        max-height: 175px;
-        padding: 2px 2px;
-        box-sizing: border-box;
-        overflow: hidden;
+    .tree-node.level-last {
+        min-width: 170px;
+        max-width: 170px;
+        min-height: 75px;
+        max-height: 75px;
+        padding: 2px 6px;
     }
 
-        .tree-node.level-last {
-            min-width: 170px;
-            max-width: 170px;
-            min-height: 75px;
-            max-height: 75px;
-            padding: 2px 6px;
+        .tree-node.level-last .node-main {
+            gap: 8px;
+            margin-bottom: 0;
         }
 
-            .tree-node.level-last .node-main {
-                gap: 8px;
-                margin-bottom: 0;
+        .tree-node.level-last .node-avatar {
+            width: 46px;
+            height: 46px;
+            margin: 1px 4px 10px 4px;
+        }
+
+            .tree-node.level-last .node-avatar img.member-picture {
+                width: 100%;
+                height: 100%;
             }
 
-            .tree-node.level-last .node-avatar {
-                width: 46px;
-                height: 46px;
-                margin: 1px 4px 10px 4px;
-            }
+        .tree-node.level-last .member-name {
+            font-size: 11px;
+            width: 95px;
+        }
 
-                .tree-node.level-last .node-avatar img.member-picture {
-                    width: 100%;
-                    height: 100%;
-                }
+        .tree-node.level-last .member-code, .tree-node.level-last .member-position {
+            font-size: 9px;
+        }
 
-            .tree-node.level-last .member-name {
-                font-size: 11px;
-                width: 95px;
-            }
+        .tree-node.level-last .member-position-ranking, .tree-node.level-last .member-thainame {
+            font-size: 8px;
+        }
 
     .children-container.children-container-last::before {
         left: calc(24% + 2px);
@@ -1457,40 +1137,6 @@
     .children-container.children-container-level-1::before {
         left: calc(24% + 11px);
         right: calc(24% + 11px);
-    }
-
-    .children-container.children-container-level-1.children-container-level-1-left-empty::before {
-        left: calc(12% + 1px);
-        right: calc(37% + 1px);
-    }
-
-    .children-container.children-container-level-1.children-container-level-1-left-empty.children-container-level-1-left-empty-right-level2-all-empty::before {
-        left: calc(16% + 1px);
-        right: calc(33% + 1px);
-    }
-
-    .children-container.children-container-level-1.children-container-level-1-no-empty.children-container-level-1-no-empty-left-level2-right-empty::before {
-        left: calc(16% + 5px);
-        right: calc(32% + 11px);
-    }
-
-    .children-container.children-container-level-1.children-container-level-1-right-level2-all-empty::before {
-        left: calc(32% + 12px);
-        right: calc(15% + 13px);
-    }
-
-    .tree-node.level-last .member-code,
-    .tree-node.level-last .member-position,
-    .tree-node.level-last .member-position {
-        font-size: 9px;
-    }
-
-    .tree-node.level-last .member-position-ranking {
-        font-size: 8px;
-    }
-
-    .tree-node.level-last .member-thainame {
-        font-size: 8px;
     }
 
     .tree-node .node-main {
@@ -1583,16 +1229,7 @@
             max-width: 170px;
             min-height: 75px;
             max-height: 75px;
-            border: 2px dashed #ccc;
             border-radius: 16px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #f9f9f9;
             box-sizing: border-box;
         }
 
@@ -1637,80 +1274,6 @@
             opacity: 0.65;
         }
 
-    /* สไตล์เดิมยังคงใช้งานได้ */
-    .binary-tree {
-        padding: 20px;
-    }
-
-    .tree-level {
-        margin: 20px 0;
-    }
-
-    .node-card {
-        background: #fff;
-        border: 2px solid #e3e6f0;
-        border-radius: 12px;
-        padding: 20px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        position: relative;
-        min-height: 220px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-        .node-card:not(.empty):hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-        }
-
-        .node-card.success {
-            border-color: #28a745;
-        }
-
-        .node-card.warning {
-            border-color: #ffc107;
-        }
-
-        .node-card.info {
-            border-color: #17a2b8;
-        }
-
-        .node-card.empty {
-            border-style: dashed;
-            opacity: 0.5;
-        }
-
-    .position-badge {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 0.75rem;
-    }
-
-    .node-avatar {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-bottom: 15px;
-        object-fit: cover;
-        border: 4px solid #fff;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-    }
-
-    .node-info h6 {
-        font-weight: 600;
-        color: #333;
-    }
-
-    .node-info p {
-        margin-bottom: 5px;
-    }
-
     .teambinary-actions {
         display: flex;
         justify-content: flex-end;
@@ -1718,7 +1281,6 @@
         gap: 8px;
     }
 
-    /* Responsive */
     @@media (max-width: 768px) {
         #binaryTreeContainer {
             text-align: left !important;
@@ -1777,8 +1339,7 @@
             gap: 8px;
         }
 
-        .tree-node .stat-value,
-        .tree-node .middle-text {
+        .tree-node .stat-value, .tree-node .middle-text {
             font-size: 8px;
         }
 
@@ -1792,10 +1353,47 @@
             right: calc(27% + 1px);
         }
     }
+    /* --- ขยายเฉพาะ State ด้านใน Modal (ขนาด Modal เท่าเดิม) --- */
+
+    #nodeInfoModal .tree-node .member-name {
+        width: unset !important;
+    }
+
+    /* เพิ่มช่องว่างระหว่างบรรทัดให้ดูสบายตาขึ้น */
+    #nodeInfoModal .modal-body .stat-item {
+        padding: 8px 10px;
+    }
+
+    /* ขยายกล่อง [L] และ [R] ใน Modal ให้กว้างขึ้น */
+    #nodeInfoModal .modal-body .stat-value {
+        font-size: 13px !important;
+        width: 120px !important; /* ⬅️ ปรับให้กว้างขึ้นแบบจุใจ (จากเดิม 85px เปลี่ยนเป็น 120px หรือเพิ่มลดได้ตามต้องการ) */
+        padding: 4px 6px !important;
+        border-radius: 6px !important;
+    }
+
+    /* ขยายข้อความตรงกลาง (คะแนน, Active, Balance) */
+    #nodeInfoModal .modal-body .middle-text {
+        font-size: 13px !important; /* ⬅️ ตัวหนังสือใหญ่ขึ้น */
+    }
+
+    /* ขยายข้อความบรรทัด "รักษายอด" */
+    #nodeInfoModal .modal-body .stat-item.keep-text .middle-text {
+        font-size: 12px !important;
+        line-height: 1.8 !important;
+        white-space: normal; /* อนุญาตให้ตัดขึ้นบรรทัดใหม่ได้ถ้าข้อความยาวเกินไป */
+    }
+
+    /* --- ปรับความกว้างสำหรับหน้าจอมือถือเผื่อไว้ด้วย (ป้องกันกล่องชนกัน) --- */
+    @@media (max-width: 768px) {
+        #nodeInfoModal .modal-body .stat-value {
+            font-size: 11px !important;
+            width: 95px !important; /* ⬅️ กว้างขึ้นสำหรับมือถือ (จากเดิม 75px เป็น 95px) */
+            padding: 3px 4px !important;
+        }
+    }
 </style>
 
-
 @section scripts {
-    <!-- App js -->
     <script src="~/assets/js/app.js"></script>
 }

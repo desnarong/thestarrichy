@@ -348,8 +348,15 @@ namespace TheStarRichyProject.Models
         public int? Contact_TAMBON_ID { get; set; }
         public string? Contact_Phone { get; set; }
         public string? Contact_Province { get; set; }
+        public string? Contact_District { get; set; }
+        public string? Contact_SubDistrict { get; set; }
+
         public string? Provincename { get; set; }   // M32_X2 as Provincename
         public string? Contact_Primary { get; set; }
+        public string? tambon { get; set; }
+        public string? amphoe { get; set; }
+        public string? province { get; set; }
+        public string? zipcode { get; set; }
     }
 
 

@@ -1,17 +1,21 @@
-﻿using BCrypt.Net;
-using Microsoft.AspNetCore.SignalR.Protocol;
+﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Security.Claims;
-using System.Dynamic;
-using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace TheStarRichyApi.Services
 {
     public interface IMemberBinaryTeamService
     {
-        Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null);
+        Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null, string direction = null);
+
+        // แก้ไข Return Type จาก Task<string> เป็น Task<MemberBinaryTeamResponseDto>
+        Task<MemberBinaryTeamResponseDto> GetExtremeBinaryPathAsync(string rootCode, string direction);
     }
 
     public class MemberBinaryTeamService : IMemberBinaryTeamService
@@ -102,10 +106,10 @@ namespace TheStarRichyApi.Services
             return password;
         }
 
-        public async Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null)
+        public async Task<MemberBinaryTeamResponseDto> GetDisplayAsync(string? binaryCode = null, string direction = null)
         {
             // Get Passkey from header
-            string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
+            string passkey = _httpContextAccessor.HttpContext?.Request.Headers["X-Passkey"];
             if (string.IsNullOrEmpty(passkey))
             {
                 return new MemberBinaryTeamResponseDto { Membercode = "" };
@@ -121,79 +125,74 @@ namespace TheStarRichyApi.Services
             }
 
             // Use provided memberCode or get from JWT
-            var memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var memberCode = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(memberCode))
             {
                 return new MemberBinaryTeamResponseDto { Membercode = "" };
             }
 
-            
-
             MemberBinaryTeamResponseDto result = null;
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
             try
             {
+                
                 using (var con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-
-                    // ===== STEP 1: SELECT * FROM MemberLevel WHERE MemberCode = @memberCode =====
-                    var memberLevelList = new List<dynamic>();
-
-                    string memberLevelQuery = "SELECT * FROM [dbo].[MemberLevel] WHERE MemberCode = @MemberCode";
-
-                    using (var cmd = new SqlCommand(memberLevelQuery, con))
+                    bool isUnderDownline = false;
+                    if (direction == null)
                     {
-                        cmd.Parameters.AddWithValue("@MemberCode", memberCode);
+                        // เช็คว่า binaryCode อยู่ใต้ memberCode (JWT) หรือไม่
+                        string checkDownlineQuery = @"
+                        WITH PureTree AS (
+                            SELECT MemberCode AS UplineCode, Member_1_1_L AS DownlineCode 
+                            FROM [dbo].[MemberLevel] 
+                            WHERE Member_1_1_L IS NOT NULL AND Member_1_1_L <> ''
+        
+                            UNION ALL
+        
+                            SELECT MemberCode AS UplineCode, Member_1_2_R AS DownlineCode 
+                            FROM [dbo].[MemberLevel] 
+                            WHERE Member_1_2_R IS NOT NULL AND Member_1_2_R <> ''
+                        ),
+                        UplineCTE AS (
+                            SELECT UplineCode
+                            FROM PureTree
+                            WHERE DownlineCode = @DownlineCode
+        
+                            UNION ALL
+        
+                            SELECT t.UplineCode
+                            FROM PureTree t
+                            INNER JOIN UplineCTE c ON t.DownlineCode = c.UplineCode
+                            WHERE c.UplineCode <> @UplineCode 
+                        )
+                        SELECT CASE WHEN EXISTS (SELECT 1 FROM UplineCTE WHERE UplineCode = @UplineCode) 
+                               THEN 1 ELSE 0 END 
+                        OPTION (MAXRECURSION 0);";
 
-                        using (var reader = await cmd.ExecuteReaderAsync())
+                        using (var cmd = new SqlCommand(checkDownlineQuery, con))
                         {
-                            while (await reader.ReadAsync())
+                            cmd.Parameters.AddWithValue("@UplineCode", memberCode);
+                            cmd.Parameters.AddWithValue("@DownlineCode", binaryCode ?? memberCode);
+
+                            var _result = await cmd.ExecuteScalarAsync();
+
+                            if (_result != null && _result != DBNull.Value)
                             {
-                                dynamic row = new ExpandoObject();
-                                var rowDict = (IDictionary<string, object>)row;
-
-                                for (int i = 0; i < reader.FieldCount; i++)
-                                {
-                                    string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
-                                    rowDict[columnName] = columnValue == DBNull.Value ? null : columnValue;
-                                }
-
-                                memberLevelList.Add(row);
+                                isUnderDownline = Convert.ToInt32(_result) == 1;
                             }
                         }
                     }
-
-                    // ===== STEP 2: ถ้ามี binaryCode ให้เช็คว่ามีอยู่ใน memberLevelList หรือไม่ =====
-                    bool binaryCodeExists = false;
-
-                    if (!string.IsNullOrEmpty(binaryCode) && memberLevelList.Count > 0)
+                    else
                     {
-                        // เอาเฉพาะแถวแรก (ปกติ MemberCode น่าจะมีแค่ record เดียว)
-                        var firstRow = memberLevelList.FirstOrDefault();
-
-                        if (firstRow != null)
-                        {
-                            var dict = (IDictionary<string, object>)firstRow;
-
-                            // Loop ผ่านทุกคอลัมน์ที่ขึ้นต้นด้วย "Member_" เพื่อหา binaryCode
-                            foreach (var kvp in dict)
-                            {
-                                if (kvp.Key.StartsWith("Member_") && kvp.Value?.ToString() == binaryCode)
-                                {
-                                    binaryCodeExists = true;
-                                    break;
-                                }
-                            }
-                        }
+                        isUnderDownline = true;
                     }
-
-                    // ===== STEP 3: ถ้า binaryCode ไม่มีอยู่ ให้ return ค่าเปล่า =====
+                    
                     if (binaryCode == memberCode) binaryCode = null;
-                    if (!string.IsNullOrEmpty(binaryCode) && !binaryCodeExists)
+                    if (!string.IsNullOrEmpty(binaryCode) && !isUnderDownline)
                     {
                         return new MemberBinaryTeamResponseDto
                         {
@@ -201,10 +200,9 @@ namespace TheStarRichyApi.Services
                             BinaryTree = new List<MemberBinaryNodeDto>()
                         };
                     }
-                    // ============================================================
-                    
-                    // Query ขอมูลหลักจาก [000_Member_Binary_Team]
-                    string query = "SELECT TOP 1 Membercode, PositionLevel, ChildCode, Membername, Sponsername, Memberposition, MemberpositionName, MemberpositionRanking";
+
+                    // Query ข้อมูลหลัก
+                    string query = "SELECT Membercode, PositionLevel, ChildCode, Membername, Sponsername, Memberposition, MemberpositionName, MemberpositionRanking";
                     query += ", MemberpositionRankingName, PersonalPV, LeftCountActive, RightCountActive, LeftBal, Rightbal, TotalBalance, CurrentLeftPV, CurrentRightPV";
                     query += ", BWDLeftPV, BWDRightPV, NewLeft, NewRight, Maxto2, TName1, TName2, EName1, EName2, Travelpoint1, travelpoint2";
                     query += ", CurrentMonthQualifyPV, LastMonthQualifyPV, LastMonthQualifyStatus, CurrentMonthQualifyStatus, FirstQdate";
@@ -213,75 +211,18 @@ namespace TheStarRichyApi.Services
                     query += " FROM [000_Member_Binary_Team] (nolock) ";
                     query += " WHERE Membercode = @Membercode";
 
+                    result = new MemberBinaryTeamResponseDto();
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", binaryCode ?? memberCode);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
-                            if (await reader.ReadAsync())
+                            result.BinaryTree = new List<MemberBinaryNodeDto>();
+                            while (await reader.ReadAsync())
                             {
-                                result = MapToResponseDto(reader);
-                            }
-                        }
-                    }
-
-                    if (result != null)
-                    {
-                        // เรียก Stored Procedure เพื่อดึงข้อมูล团队成员ทั้งหมด
-                        string spName = "[dbo].[SP_GetMemberBinaryTree]";
-
-                        using (var downlineCommand = new SqlCommand(spName, con))
-                        {
-                            downlineCommand.CommandType = CommandType.StoredProcedure;
-                            downlineCommand.Parameters.AddWithValue("@Membercode", binaryCode ?? memberCode);
-
-                            var allMembers = new List<dynamic>();
-
-                            using (var downlineReader = await downlineCommand.ExecuteReaderAsync())
-                            {
-                                int rowCount = 0;
-                                while (await downlineReader.ReadAsync())
-                                {
-                                    dynamic row = new ExpandoObject();
-                                    var rowDict = (IDictionary<string, object>)row;
-
-                                    for (int i = 0; i < downlineReader.FieldCount; i++)
-                                    {
-                                        string columnName = downlineReader.GetName(i);
-                                        object columnValue = downlineReader.GetValue(i);
-                                        rowDict[columnName] = columnValue == DBNull.Value ? null : columnValue;
-                                    }
-
-                                    allMembers.Add(row);
-                                    rowCount++;
-                                }
-                            }
-
-                            // สร้าง Binary Tree ที่สมบูรณ์
-                            if (allMembers.Count > 0)
-                            {
-                                // ค้นหาสมาชิกที่มี Membercode ตรงกับ mainMemberCode
-                                var mainMember = allMembers.FirstOrDefault(m =>
-                                {
-                                    var dict = (IDictionary<string, object>)m;
-                                    return dict["Membercode"]?.ToString() == memberCode;
-                                });
-
-                                // ถ้าพบ ให้ตั้งค่า ParentCode = null
-                                if (mainMember != null)
-                                {
-                                    var mainMemberDict = (IDictionary<string, object>)mainMember;
-                                    mainMemberDict["ParentCode"] = null;
-                                }
-
-                                // สร้าง Binary Tree
-                                var completeTree = BuildCompleteTree(allMembers, 3);
-                                result.BinaryTree = ConvertTreeToDto(completeTree);
-                            }
-                            else
-                            {
-                                result.BinaryTree = new List<MemberBinaryNodeDto>();
+                                var item = MapToResponseDto(reader);
+                                result.BinaryTree.Add(item);
                             }
                         }
                     }
@@ -289,18 +230,93 @@ namespace TheStarRichyApi.Services
             }
             catch (Exception ex)
             {
-                // Log exception
                 return new MemberBinaryTeamResponseDto { Membercode = "", Error = ex.Message };
             }
 
             return result ?? new MemberBinaryTeamResponseDto { Membercode = "" };
         }
 
+        // ==========================================
+        // ฟังก์ชันหา ซ้ายสุด / ขวาสุด และคืนค่าเป็น DTO โครงสร้าง Tree
+        // ==========================================
+        public async Task<MemberBinaryTeamResponseDto> GetExtremeBinaryPathAsync(string rootCode, string direction)
+        {
+            // ถ้ารหัสต้นทางว่าง ให้พยายามดึงจาก JWT Token ปัจจุบัน
+            if (string.IsNullOrEmpty(rootCode))
+            {
+                rootCode = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(rootCode))
+                {
+                    return new MemberBinaryTeamResponseDto { Membercode = "" };
+                }
+            }
+
+            string targetField = direction.ToLower() == "left" ? "Member_1_1_L" : "Member_1_2_R";
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+            string extremeNodeCode = string.Empty;
+
+            // Query หาสุดสายงาน
+            string query = $@"
+                WITH ExtremeCTE AS (
+                    SELECT 
+                        MemberCode AS CurrentMember, 
+                        {targetField} AS NextCode, 
+                        1 AS DepthLevel
+                    FROM [dbo].[MemberLevel]
+                    WHERE MemberCode = @RootCode
+
+                    UNION ALL
+
+                    SELECT 
+                        t.MemberCode AS CurrentMember, 
+                        t.{targetField} AS NextCode, 
+                        c.DepthLevel + 1
+                    FROM [dbo].[MemberLevel] t
+                    INNER JOIN ExtremeCTE c ON t.MemberCode = c.NextCode
+                    WHERE c.NextCode IS NOT NULL AND c.NextCode <> ''
+                )
+                SELECT TOP 1 CurrentMember 
+                FROM ExtremeCTE
+                ORDER BY DepthLevel DESC
+                OPTION (MAXRECURSION 0);";
+
+            try
+            {
+                using (SqlConnection con = new SqlConnection(connectionString))
+                {
+                    await con.OpenAsync();
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@RootCode", rootCode);
+                        var result = await cmd.ExecuteScalarAsync();
+
+                        if (result != null && result != DBNull.Value)
+                        {
+                            extremeNodeCode = result.ToString();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new MemberBinaryTeamResponseDto { Membercode = "", Error = ex.Message };
+            }
+
+            // ถ้าหาไม่เจอ หรือเกิดข้อผิดพลาด
+            if (string.IsNullOrEmpty(extremeNodeCode))
+            {
+                return new MemberBinaryTeamResponseDto { Membercode = "" };
+            }
+
+            // นำรหัสซ้ายสุด/ขวาสุดที่หาได้ ไปดึง Tree Data โดยใช้ GetDisplayAsync ตัวเดิม
+            return await GetDisplayAsync(extremeNodeCode, direction);
+        }
+
         #region DataReader Mapping Methods
 
-        private MemberBinaryTeamResponseDto MapToResponseDto(SqlDataReader reader)
+        private MemberBinaryNodeDto MapToResponseDto(SqlDataReader reader)
         {
-            return new MemberBinaryTeamResponseDto
+            return new MemberBinaryNodeDto
             {
                 Membercode = GetString(reader, "Membercode"),
                 PositionLevel = GetString(reader, "PositionLevel"),
@@ -366,11 +382,8 @@ namespace TheStarRichyApi.Services
             try
             {
                 int ordinal = reader.GetOrdinal(columnName);
-                if (reader.IsDBNull(ordinal))
-                    return null;
-
-                object value = reader.GetValue(ordinal);
-                return Convert.ToDecimal(value);
+                if (reader.IsDBNull(ordinal)) return null;
+                return Convert.ToDecimal(reader.GetValue(ordinal));
             }
             catch
             {
@@ -383,11 +396,8 @@ namespace TheStarRichyApi.Services
             try
             {
                 int ordinal = reader.GetOrdinal(columnName);
-                if (reader.IsDBNull(ordinal))
-                    return null;
-
-                object value = reader.GetValue(ordinal);
-                return Convert.ToInt32(value);
+                if (reader.IsDBNull(ordinal)) return null;
+                return Convert.ToInt32(reader.GetValue(ordinal));
             }
             catch
             {
@@ -396,527 +406,11 @@ namespace TheStarRichyApi.Services
         }
 
         #endregion
-
-        #region Tree Conversion Methods
-
-        private List<MemberBinaryNodeDto> ConvertTreeToDto(List<dynamic> tree)
-        {
-            var result = new List<MemberBinaryNodeDto>();
-            foreach (var node in tree)
-            {
-                result.Add(ConvertNodeToDto(node));
-            }
-            return result;
-        }
-
-        private MemberBinaryNodeDto ConvertNodeToDto(dynamic node)
-        {
-            var dict = (IDictionary<string, object>)node;
-
-            var dto = new MemberBinaryNodeDto
-            {
-                // Properties พื้นฐาน
-                Membercode = GetStringValue(dict, "Membercode"),
-                PositionLevel = GetStringValue(dict, "PositionLevel"),
-                ChildCode = GetStringValue(dict, "ChildCode"),
-                Membername = GetStringValue(dict, "Membername"),
-                Sponsername = GetStringValue(dict, "Sponsername"),
-                Memberposition = GetStringValue(dict, "Memberposition"),
-                MemberpositionName = GetStringValue(dict, "MemberpositionName"),
-                MemberpositionRanking = GetStringValue(dict, "MemberpositionRanking"),
-                MemberpositionRankingName = GetStringValue(dict, "MemberpositionRankingName"),
-
-                // ค่าตัวเลข
-                PersonalPV = GetDecimalValue(dict, "PersonalPV"),
-                LeftCountActive = GetIntValue(dict, "LeftCountActive"),
-                RightCountActive = GetIntValue(dict, "RightCountActive"),
-                LeftBal = GetDecimalValue(dict, "LeftBal"),
-                Rightbal = GetDecimalValue(dict, "Rightbal"),
-                TotalBalance = GetDecimalValue(dict, "TotalBalance"),
-                CurrentLeftPV = GetDecimalValue(dict, "CurrentLeftPV"),
-                CurrentRightPV = GetDecimalValue(dict, "CurrentRightPV"),
-                BWDLeftPV = GetDecimalValue(dict, "BWDLeftPV"),
-                BWDRightPV = GetDecimalValue(dict, "BWDRightPV"),
-                NewLeft = GetDecimalValue(dict, "NewLeft"),
-                NewRight = GetDecimalValue(dict, "NewRight"),
-                Maxto2 = GetDecimalValue(dict, "Maxto2"),
-
-                // Text fields
-                TName1 = GetStringValue(dict, "TName1"),
-                TName2 = GetStringValue(dict, "TName2"),
-                EName1 = GetStringValue(dict, "EName1"),
-                EName2 = GetStringValue(dict, "EName2"),
-
-                // Travel points
-                Travelpoint1 = GetDecimalValue(dict, "Travelpoint1"),
-                Travelpoint2 = GetDecimalValue(dict, "Travelpoint2"),
-
-                // Qualify PV
-                CurrentMonthQualifyPV = GetDecimalValue(dict, "CurrentMonthQualifyPV"),
-                LastMonthQualifyPV = GetDecimalValue(dict, "LastMonthQualifyPV"),
-                LastMonthQualifyStatus = GetStringValue(dict, "LastMonthQualifyStatus"),
-                CurrentMonthQualifyStatus = GetStringValue(dict, "CurrentMonthQualifyStatus"),
-                FirstQdate = GetStringValue(dict, "FirstQdate"),
-
-                // Month fields
-                CurrentMonth = GetStringValue(dict, "CurrentMonth"),
-                NextCMonth = GetStringValue(dict, "NextCMonth"),
-                CurrentMonth1 = GetStringValue(dict, "CurrentMonth1"),
-                LastCMonth = GetStringValue(dict, "LastCMonth"),
-                MemberPositionPicture = GetStringValue(dict, "MemberPositionPicture"),
-
-                // Balance fields
-                TotalLeftBalance = GetDecimalValue(dict, "TotalLeftBalance"),
-                TotalRightBalance = GetDecimalValue(dict, "TotalRightBalance"),
-                NextPosition = GetStringValue(dict, "NextPosition"),
-                NextPosaddLeftBalance = GetDecimalValue(dict, "NextPosaddLeftBalance"),
-                NextPosaddRightBalance = GetDecimalValue(dict, "NextPosaddRightBalance"),
-
-                // Properties เฉพาะ Node
-                ParentCode = GetStringValue(dict, "ParentCode"),
-                IsEmptyNode = dict.ContainsKey("IsEmptyNode") && GetBooleanValue(dict, "IsEmptyNode"),
-                Children = new List<MemberBinaryNodeDto>()
-            };
-
-            if (dict.ContainsKey("Children") && dict["Children"] != null)
-            {
-                var children = dict["Children"] as List<dynamic>;
-                if (children != null)
-                {
-                    foreach (var child in children)
-                    {
-                        dto.Children.Add(ConvertNodeToDto(child));
-                    }
-                }
-            }
-
-            return dto;
-        }
-
-        private string GetStringValue(IDictionary<string, object> dict, string key)
-        {
-            return dict.ContainsKey(key) ? dict[key]?.ToString() : null;
-        }
-
-        private decimal? GetDecimalValue(IDictionary<string, object> dict, string key)
-        {
-            if (dict.ContainsKey(key) && dict[key] != null)
-            {
-                try
-                {
-                    return Convert.ToDecimal(dict[key]);
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        private int? GetIntValue(IDictionary<string, object> dict, string key)
-        {
-            if (dict.ContainsKey(key) && dict[key] != null)
-            {
-                try
-                {
-                    return Convert.ToInt32(dict[key]);
-                }
-                catch
-                {
-                    return null;
-                }
-            }
-            return null;
-        }
-
-        private bool GetBooleanValue(IDictionary<string, object> dict, string key)
-        {
-            if (dict.ContainsKey(key) && dict[key] != null)
-            {
-                try
-                {
-                    return Convert.ToBoolean(dict[key]);
-                }
-                catch
-                {
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        #endregion
-
-        #region Tree Building Methods
-
-        /// <summary>
-        /// สร้าง hierarchical tree structure ที่สมบูรณ์
-        /// </summary>
-        private List<dynamic> BuildCompleteTree(List<dynamic> members, int maxDepth = 3)
-        {
-            var tree = new List<dynamic>();
-
-            if (members == null || members.Count == 0)
-                return tree;
-
-            // สร้าง Dictionary สำหรับค้นหาสมาชิกด้วย Membercode
-            var memberDict = new Dictionary<string, dynamic>();
-            foreach (var m in members)
-            {
-                var dict = (IDictionary<string, object>)m;
-                string memberCode = dict["Membercode"]?.ToString() ?? "";
-
-                if (!string.IsNullOrEmpty(memberCode))
-                {
-                    dict["Children"] = new List<dynamic>();
-                    memberDict[memberCode] = m;
-                }
-            }
-
-            // หา Root node (ParentCode = "NULL" หรือไม่มี parent)
-            dynamic rootNode = null;
-            foreach (var m in members)
-            {
-                var dict = (IDictionary<string, object>)m;
-                string parentCode = dict["ParentCode"]?.ToString() ?? "";
-                string memberCode = dict["Membercode"]?.ToString() ?? "";
-
-                if (parentCode == "NULL" || string.IsNullOrEmpty(parentCode) ||
-                    parentCode == memberCode || !memberDict.ContainsKey(parentCode))
-                {
-                    rootNode = m;
-                    break;
-                }
-            }
-
-            if (rootNode == null && members.Count > 0)
-            {
-                rootNode = members[0];
-            }
-
-            if (rootNode == null) return tree;
-
-            // สร้างโครงสร้าง tree โดยใช้ ParentCode
-            foreach (var m in members)
-            {
-                var dict = (IDictionary<string, object>)m;
-                string memberCode = dict["Membercode"]?.ToString() ?? "";
-                string parentCode = dict["ParentCode"]?.ToString() ?? "";
-
-                if (memberCode == parentCode || parentCode == "NULL" || string.IsNullOrEmpty(parentCode))
-                    continue;
-
-                if (memberDict.ContainsKey(parentCode))
-                {
-                    var parent = memberDict[parentCode];
-                    var parentDict = (IDictionary<string, object>)parent;
-                    var children = (List<dynamic>)parentDict["Children"];
-
-                    bool exists = children.Any(c => {
-                        var cDict = (IDictionary<string, object>)c;
-                        return cDict["Membercode"]?.ToString() == memberCode;
-                    });
-
-                    if (!exists)
-                    {
-                        children.Add(m);
-                    }
-                }
-            }
-
-            // ทำให้ tree สมบูรณ์ (เพิ่ม empty nodes) จำกัด depth
-            EnsureCompleteBinaryTree(rootNode, 1, maxDepth);
-
-            // คำนวณ PV และ Balance
-            CalculatePVAndBalance(rootNode);
-
-            // เรียงลำดับลูกทั้งหมด
-            SortTreeRecursively(rootNode);
-
-            tree.Add(rootNode);
-            return tree;
-        }
-
-        /// <summary>
-        /// ทำให้โครงสร้าง tree สมบูรณ์ด้วย empty nodes (จำกัด depth)
-        /// </summary>
-        private void EnsureCompleteBinaryTree(dynamic node, int currentDepth, int maxDepth)
-        {
-            if (currentDepth > maxDepth)
-                return;
-
-            var dict = (IDictionary<string, object>)node;
-            string positionLevel = dict["PositionLevel"]?.ToString() ?? "";
-
-            var children = (List<dynamic>)dict["Children"];
-
-            if (children.Count == 0)
-            {
-                if (ShouldHaveChildren(positionLevel, currentDepth, maxDepth))
-                {
-                    AddEmptyChildren(node);
-                }
-            }
-            else
-            {
-                SortChildrenByPosition(children);
-
-                bool hasLeft = children.Any(c => {
-                    var cDict = (IDictionary<string, object>)c;
-                    string pos = cDict["PositionLevel"]?.ToString() ?? "";
-                    return pos.StartsWith("Leftcode");
-                });
-
-                bool hasRight = children.Any(c => {
-                    var cDict = (IDictionary<string, object>)c;
-                    string pos = cDict["PositionLevel"]?.ToString() ?? "";
-                    return pos.StartsWith("Rightcode");
-                });
-
-                if (!hasLeft && currentDepth < maxDepth)
-                {
-                    AddEmptyChild(node, true);
-                }
-                if (!hasRight && currentDepth < maxDepth)
-                {
-                    AddEmptyChild(node, false);
-                }
-
-                SortChildrenByPosition(children);
-
-                foreach (var child in children)
-                {
-                    EnsureCompleteBinaryTree(child, currentDepth + 1, maxDepth);
-                }
-            }
-        }
-
-        /// <summary>
-        /// ตรวจสอบว่าตำแหน่งนี้ควรมีลูกหรือไม่
-        /// </summary>
-        private bool ShouldHaveChildren(string positionLevel, int currentDepth, int maxDepth)
-        {
-            if (currentDepth >= maxDepth)
-                return false;
-
-            if (string.IsNullOrEmpty(positionLevel)) return false;
-            if (positionLevel == "Root") return true;
-
-            string numPart = positionLevel.Replace("Leftcode", "").Replace("Rightcode", "");
-            if (int.TryParse(numPart, out int num))
-            {
-                return num < 38;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// เพิ่ม empty node ให้กับ parent
-        /// </summary>
-        private void AddEmptyChild(dynamic parent, bool isLeft)
-        {
-            var parentDict = (IDictionary<string, object>)parent;
-            string parentPos = parentDict["PositionLevel"]?.ToString() ?? "";
-            string parentCode = parentDict["Membercode"]?.ToString() ?? "";
-
-            // สร้าง PositionLevel สำหรับลูก
-            string childPos = GenerateChildPosition(parentPos, isLeft);
-
-            // สร้าง empty node
-            dynamic emptyNode = CreateEmptyNode(childPos, parentCode);
-
-            var children = (List<dynamic>)parentDict["Children"];
-            children.Add(emptyNode);
-        }
-
-        /// <summary>
-        /// เพิ่ม empty node ทั้งสองข้าง
-        /// </summary>
-        private void AddEmptyChildren(dynamic node)
-        {
-            AddEmptyChild(node, true);
-            AddEmptyChild(node, false);
-        }
-
-        /// <summary>
-        /// สร้าง empty node
-        /// </summary>
-        private dynamic CreateEmptyNode(string positionLevel, string parentCode)
-        {
-            dynamic empty = new ExpandoObject();
-            var dict = (IDictionary<string, object>)empty;
-
-            dict["Membercode"] = $"EMPTY_{Guid.NewGuid().ToString().Substring(0, 8)}";
-            dict["Membername"] = "(ว่าง)";
-            dict["ChildCode"] = "";
-            dict["PositionLevel"] = positionLevel;
-            dict["ParentCode"] = parentCode;
-            dict["Memberposition"] = "";
-            dict["MemberpositionName"] = "";
-            dict["PersonalPV"] = 0;
-            dict["LeftCountActive"] = 0;
-            dict["RightCountActive"] = 0;
-            dict["CurrentLeftPV"] = 0;
-            dict["CurrentRightPV"] = 0;
-            dict["TotalBalance"] = 0;
-            dict["Children"] = new List<dynamic>();
-            dict["IsEmptyNode"] = true;
-
-            return empty;
-        }
-
-        /// <summary>
-        /// สร้าง PositionLevel สำหรับลูก
-        /// </summary>
-        private string GenerateChildPosition(string parentPosition, bool isLeft)
-        {
-            if (string.IsNullOrEmpty(parentPosition) || parentPosition == "Root")
-            {
-                return isLeft ? "Leftcode1" : "Rightcode1";
-            }
-
-            string prefix = parentPosition.StartsWith("Leftcode") ? "Leftcode" : "Rightcode";
-            string numPart = parentPosition.Substring(prefix.Length);
-
-            if (int.TryParse(numPart, out int parentNum))
-            {
-                int parentDepth = numPart.Length;
-                int childDepth = parentDepth + 1;
-
-                // คำนวณ offset จาก parent position
-                int baseOffset = (int)Math.Pow(2, childDepth - 1) - 1;
-                int childNum = childDepth * 10 + baseOffset + (parentNum % 10) * 2 + (isLeft ? 0 : 1);
-
-                return $"{prefix}{childNum}";
-            }
-
-            return isLeft ? "Leftcode1" : "Rightcode1";
-        }
-
-        /// <summary>
-        /// เรียงลำดับลูกตามตำแหน่ง Left/Right
-        /// </summary>
-        private void SortChildrenByPosition(List<dynamic> children)
-        {
-            children.Sort((a, b) => {
-                var dictA = (IDictionary<string, object>)a;
-                var dictB = (IDictionary<string, object>)b;
-
-                string posA = dictA["PositionLevel"]?.ToString() ?? "";
-                string posB = dictB["PositionLevel"]?.ToString() ?? "";
-
-                return ComparePositionLevel(posA, posB);
-            });
-        }
-
-        /// <summary>
-        /// เปรียบเทียบตำแหน่ง
-        /// </summary>
-        private int ComparePositionLevel(string posA, string posB)
-        {
-            if (posA == posB) return 0;
-
-            if (posA == "Root") return -1;
-            if (posB == "Root") return 1;
-
-            bool aIsLeft = posA.StartsWith("Leftcode");
-            bool bIsLeft = posB.StartsWith("Leftcode");
-
-            string aNumStr = posA.Replace("Leftcode", "").Replace("Rightcode", "");
-            string bNumStr = posB.Replace("Leftcode", "").Replace("Rightcode", "");
-
-            if (!int.TryParse(aNumStr, out int aNum)) aNum = 0;
-            if (!int.TryParse(bNumStr, out int bNum)) bNum = 0;
-
-            if (aNum != bNum)
-            {
-                return aNum.CompareTo(bNum);
-            }
-
-            if (aIsLeft && !bIsLeft) return -1;
-            if (!aIsLeft && bIsLeft) return 1;
-
-            return 0;
-        }
-
-        /// <summary>
-        /// เรียงลำดับ tree ทั้งหมด
-        /// </summary>
-        private void SortTreeRecursively(dynamic node)
-        {
-            var dict = (IDictionary<string, object>)node;
-            var children = (List<dynamic>)dict["Children"];
-
-            SortChildrenByPosition(children);
-
-            foreach (var child in children)
-            {
-                SortTreeRecursively(child);
-            }
-        }
-
-        /// <summary>
-        /// คำนวณ PV และ Balance
-        /// </summary>
-        private void CalculatePVAndBalance(dynamic node)
-        {
-            var dict = (IDictionary<string, object>)node;
-            var children = (List<dynamic>)dict["Children"];
-
-            double leftPV = 0;
-            double rightPV = 0;
-            int leftCount = 0;
-            int rightCount = 0;
-
-            foreach (var child in children)
-            {
-                var childDict = (IDictionary<string, object>)child;
-                string childPos = childDict["PositionLevel"]?.ToString() ?? "";
-                bool isLeft = childPos.StartsWith("Leftcode");
-
-                CalculatePVAndBalance(child);
-
-                double childPV = Convert.ToDouble(childDict["CurrentLeftPV"] ?? 0) +
-                                Convert.ToDouble(childDict["CurrentRightPV"] ?? 0) +
-                                Convert.ToDouble(childDict["PersonalPV"] ?? 0);
-
-                bool isActive = Convert.ToInt32(childDict["LeftCountActive"] ?? 0) > 0 ||
-                               Convert.ToInt32(childDict["RightCountActive"] ?? 0) > 0;
-
-                if (isLeft)
-                {
-                    leftPV += childPV;
-                    leftCount += isActive ? 1 : 0;
-                }
-                else
-                {
-                    rightPV += childPV;
-                    rightCount += isActive ? 1 : 0;
-                }
-            }
-
-            bool isEmptyNode = dict.ContainsKey("IsEmptyNode") && Convert.ToBoolean(dict["IsEmptyNode"] ?? false);
-
-            if (!isEmptyNode)
-            {
-                dict["CurrentLeftPV"] = leftPV;
-                dict["CurrentRightPV"] = rightPV;
-                dict["LeftCountActive"] = leftCount;
-                dict["RightCountActive"] = rightCount;
-                dict["TotalBalance"] = Math.Min(leftPV, rightPV);
-            }
-        }
-
-        #endregion
     }
 
     // DTO Classes
-    // DTO Classes
     public class MemberBinaryNodeDto
     {
-        // Properties จาก MemberBinaryTeamResponseDto ทั้งหมด
         public string Membercode { get; set; }
         public string PositionLevel { get; set; }
         public string ChildCode { get; set; }
@@ -961,7 +455,6 @@ namespace TheStarRichyApi.Services
         public decimal? NextPosaddLeftBalance { get; set; }
         public decimal? NextPosaddRightBalance { get; set; }
 
-        // Properties เฉพาะสำหรับ Node
         public string ParentCode { get; set; }
         public bool IsEmptyNode { get; set; }
         public List<MemberBinaryNodeDto> Children { get; set; }
@@ -1013,7 +506,6 @@ namespace TheStarRichyApi.Services
         public decimal? NextPosaddLeftBalance { get; set; }
         public decimal? NextPosaddRightBalance { get; set; }
 
-        // Property สำหรับ Tree
         public List<MemberBinaryNodeDto> BinaryTree { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]

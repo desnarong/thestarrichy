@@ -1,18 +1,23 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using RestSharp;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Formats.Webp;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text.RegularExpressions;
 using System.Text;
 using System.Text.Json.Nodes;
+using System.Text.RegularExpressions;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Models;
 
@@ -439,14 +444,58 @@ namespace TheStarRichyProject.Controllers
             string filename = $"{filePrefix}_{DateTime.Now:yyyyMMddHHmmssfff}{extension}";
             string fullPath = Path.Combine(destinationFolder, filename);
 
+            // กำหนดขนาดสูงสุดที่ยอมรับได้ (300 KB)
+            long maxFileSize = 300 * 1024;
+
             await using (var stream = new FileStream(fullPath, FileMode.Create))
             {
-                await file.CopyToAsync(stream);
+                if (file.Length > maxFileSize)
+                {
+                    // โหลดรูปภาพด้วย ImageSharp ถ้าขนาดเกิน 300KB
+                    using var image = await Image.LoadAsync(file.OpenReadStream());
+
+                    // 1. (ทางเลือก) ลดขนาดความกว้าง/สูง หากภาพใหญ่เกินไป 
+                    // เพราะการลด Quality อย่างเดียวอาจจะไม่ทำให้ไฟล์เล็กลงถึง 300KB ได้ถ้ารูปมีขนาดใหญ่มาก (เช่น 4K)
+                    int maxWidth = 1200; // กำหนดความกว้างสูงสุดที่ต้องการ
+                    if (image.Width > maxWidth)
+                    {
+                        image.Mutate(x => x.Resize(new ResizeOptions
+                        {
+                            Size = new Size(maxWidth, 0), // 0 คือให้คำนวณ Height อัตโนมัติตามสัดส่วน
+                            Mode = ResizeMode.Max
+                        }));
+                    }
+
+                    // 2. ปรับลด Quality ตามประเภทของไฟล์ภาพ
+                    if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                        extension.Equals(".jpeg", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var encoder = new JpegEncoder { Quality = 75 }; // ปรับค่า 1-100 (แนะนำ 70-80)
+                        await image.SaveAsync(stream, encoder);
+                    }
+                    else if (extension.Equals(".webp", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var encoder = new WebpEncoder { Quality = 75 };
+                        await image.SaveAsync(stream, encoder);
+                    }
+                    else
+                    {
+                        // สำหรับ PNG เป็น Lossless (ไม่สูญเสียความละเอียด) การลดขนาดไฟล์โดยไม่ลด Dimension ทำได้ยาก
+                        // โค้ดนี้จะใช้ไฟล์ที่ถูกลด Dimension (ถ้ามี) แล้วเซฟทับไปเป็น format เดิม
+                        await image.SaveAsync(stream, image.Metadata.DecodedImageFormat);
+                    }
+                }
+                else
+                {
+                    // ถ้าขนาดไม่เกิน 300KB บันทึกไฟล์ต้นฉบับได้เลย ไม่ต้องผ่านกระบวนการแปลงภาพ
+                    await file.CopyToAsync(stream);
+                }
             }
 
             string relativeFolder = destinationFolder
                 .Replace(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "")
-                .Replace("\\", "/");
+                .Replace("\\", "/")
+                .TrimStart('/');
 
             return $"{relativeFolder}/{filename}";
         }

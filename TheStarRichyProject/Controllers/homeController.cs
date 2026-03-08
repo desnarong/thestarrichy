@@ -459,41 +459,47 @@ namespace TheStarRichyProject.Controllers
 
         [HttpGet]
         [Route("home/GetMemberBinaryTeam")]
-        public async Task<IActionResult> GetMemberBinaryTeam(string? membercode = null)
+        public async Task<IActionResult> GetMemberBinaryTeam(string? membercode = null, string? direction = null)
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
-
-            var options = new RestClientOptions(_config["Api:Url"])
-            {
-                ThrowOnAnyError = true,
-                MaxTimeout = 300000, // 5 นาที (เป็น milliseconds)
-                ConfigureMessageHandler = handler =>
-                {
-                    var httpClientHandler = new HttpClientHandler
-                    {
-                        // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
-                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
-                        MaxResponseHeadersLength = 256, // เพิ่มขนาด headers
-                        AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
-                    };
-                    return httpClientHandler;
-                }
-            };
 
             var passkey = _config["Api:Passkey"];
             var token = Request.Cookies[CookieHelper.UserKey];
 
-            // ใช้ HttpClient โดยตรงแทน RestClient เพื่อควบคุมได้มากขึ้น
-            using var httpClient = new HttpClient();
+            // 1. นำ Handler มาแยกไว้ข้างนอก เพื่อให้ HttpClient นำไปใช้ได้จริง
+            var httpClientHandler = new HttpClientHandler
+            {
+                // ข้ามการตรวจสอบใบรับรอง (สำหรับทดสอบเท่านั้น)
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true,
+                MaxResponseHeadersLength = 256,
+                AutomaticDecompression = System.Net.DecompressionMethods.GZip | System.Net.DecompressionMethods.Deflate
+            };
+
+            // 2. โยน Handler เข้าไปตอนสร้าง HttpClient
+            using var httpClient = new HttpClient(httpClientHandler);
             httpClient.BaseAddress = new Uri(_config["Api:Url"]);
             httpClient.Timeout = TimeSpan.FromMinutes(5);
             httpClient.DefaultRequestHeaders.Add("X-Passkey", passkey);
             httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-            var apiUrl = "/Member/memberbinaryteam";
+            // 3. จัดการต่อ Query String ให้รองรับทั้ง membercode และ direction
+            var queryParams = new List<string>();
+
             if (!string.IsNullOrEmpty(membercode))
             {
-                apiUrl += $"?binarycode={membercode}";
+                queryParams.Add($"binarycode={membercode}");
+            }
+
+            if (!string.IsNullOrEmpty(direction))
+            {
+                queryParams.Add($"direction={direction}");
+            }
+
+            var apiUrl = "/Member/memberbinaryteam";
+            if (queryParams.Any())
+            {
+                // ผลลัพธ์จะได้เช่น: /Member/memberbinaryteam?binarycode=S0001&direction=left
+                apiUrl += "?" + string.Join("&", queryParams);
             }
 
             try

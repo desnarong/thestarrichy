@@ -353,6 +353,10 @@ namespace TheStarRichyApi.Services
                                     {
                                         memberInfo.MemberPicture = reader["Pic4"]?.ToString() ?? "";
                                     }
+                                    else
+                                    {
+                                        memberInfo.MemberPicture = pictureBase;
+                                    }
 
                                     //else
                                     //{

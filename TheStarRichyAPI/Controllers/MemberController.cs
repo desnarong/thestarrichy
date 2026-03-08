@@ -478,11 +478,22 @@ namespace TheStarRichyApi.Controllers
 
         /*==================== UPDATE 2025-09-07 ====================*/
         [HttpGet("memberbinaryteam")]
-        public async Task<IActionResult> GetMemberBinaryTeam([FromQuery] string? binarycode = null)
+        public async Task<IActionResult> GetMemberBinaryTeam([FromQuery] string? binarycode = null, [FromQuery] string? direction = null)
         {
             try
             {
-                var result = await _memberBinaryTeamService.GetDisplayAsync(binarycode);
+                MemberBinaryTeamResponseDto result;
+
+                // 1. ตรวจสอบว่ามีการส่งทิศทางมาหรือไม่ (กดปุ่มซ้ายสุด/ขวาสุด)
+                if (!string.IsNullOrEmpty(direction))
+                {
+                    result = await _memberBinaryTeamService.GetExtremeBinaryPathAsync(binarycode, direction);
+                }
+                else
+                {
+                    // 2. ถ้าไม่มี direction แปลว่าเป็นการโหลดดูสายงานตามปกติ
+                    result = await _memberBinaryTeamService.GetDisplayAsync(binarycode);
+                }
 
                 var options = new JsonSerializerOptions
                 {
@@ -492,6 +503,8 @@ namespace TheStarRichyApi.Controllers
                     MaxDepth = 64
                 };
 
+                // *หมายเหตุ: หากต้องการให้ options ด้านบนทำงาน ต้องใช้ return new JsonResult(result, options); 
+                // แต่ถ้า API ของคุณตั้งค่า JSON CamelCase ไว้เป็น Default อยู่แล้ว ใช้ return Ok(result); ได้เลยครับ
                 return Ok(result);
             }
             catch (Exception ex)

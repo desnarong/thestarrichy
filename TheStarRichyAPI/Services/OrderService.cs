@@ -155,7 +155,6 @@ namespace TheStarRichyApi.Services
                             phone = request.CustomAddress.Phone;
                             recipient = request.CustomAddress.RecipientName;
                             initials = request.CustomAddress.Initials;
-
                             // แปลง Bool เป็น Int
                             freqAddr = request.CustomAddress.FavoriteAddress ?? 0;
                         }
@@ -172,18 +171,12 @@ namespace TheStarRichyApi.Services
                         else if (request.MemberFavorite != null)
                         {
                             // ** ระวัง Mapping ตรงนี้ **
-                            deliveryAddr = request.MemberFavorite.Contact_HouseNumber; // หรือ Contact_Other
-
-                            // ต้องมั่นใจว่าส่ง "Code" หรือ "ID" ตามที่ SP คาดหวัง
-                            province = request.MemberFavorite.Contact_Province;
-
-                            // Contact_Alley ไม่น่าใช่ District (Amphoe) เช็ค Field นี้ดีๆ
-                            // ปกติ District คือ Contact_District (ถ้ามี) หรือต้อง Lookup เอา
-                            district = request.MemberFavorite.Contact_Alley;
-
-                            subDistrict = request.MemberFavorite.Contact_TAMBON_ID; // อันนี้มักเป็น INT
-                            postalCode = request.MemberFavorite.Contact_Zipcode;
-                            phone = request.MemberFavorite.Contact_Phone;
+                            deliveryAddr = request.MemberFavorite.Contact_Other ?? ""; // หรือ Contact_Other
+                            subDistrict = request.MemberFavorite.tambon ?? request.MemberFavorite.Contact_SubDistrict ?? ""; // อันนี้มักเป็น INT
+                            district = request.MemberFavorite.amphoe ?? request.MemberFavorite.Contact_District ?? "";
+                            province = request.MemberFavorite.province ?? request.MemberFavorite.Contact_Province ?? "";
+                            postalCode = request.MemberFavorite.zipcode ?? request.MemberFavorite.Contact_Zipcode ?? "";
+                            phone = request.MemberFavorite.Contact_Phone ?? "";
                         }
 
                         // 3. Add Parameters ที่อยู่
@@ -651,6 +644,7 @@ namespace TheStarRichyApi.Services
 
     public class MemberFavoriteAddressData
     {
+        public int? FavoriteID { get; set; }
         public string? Membercode { get; set; }
         public string? ContacNickname { get; set; }
         public string? Contactperson { get; set; }
@@ -663,9 +657,15 @@ namespace TheStarRichyApi.Services
         public string? Contact_Zipcode { get; set; }
         public int? Contact_TAMBON_ID { get; set; }
         public string? Contact_Phone { get; set; }
+        public string? Contact_District { get; set; }
+        public string? Contact_SubDistrict { get; set; }
         public string? Contact_Province { get; set; }
         public string? Provincename { get; set; }   // M32_X2 as Provincename
         public string? Contact_Primary { get; set; }
+        public string? tambon { get; set; }
+        public string? amphoe { get; set; }
+        public string? province { get; set; }
+        public string? zipcode { get; set; }
     }
 
     public class CustomAddressInfo

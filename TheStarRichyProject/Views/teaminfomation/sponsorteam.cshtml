@@ -20,9 +20,6 @@
                         </div>
                     </div>
                     <div class="col-md-6 text-end">
-                        <button class="btn btn-success" onclick="exportToExcel()">
-                            <i class="ri-file-excel-line"></i> Export
-                        </button>
                         <button class="btn btn-info" onclick="loadTeam()">
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
@@ -193,9 +190,9 @@
             const memberName = member.dlName || member.DLName || member.membername || member.Membername || 'N/A';
             const memberPV = member.personalpv ?? member.personalPV ?? member.PersonalPV ?? member.pv ?? member.PV ?? 0;
             const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
-            const isActive = statusRaw.includes('active') || statusRaw.includes('Yes') || statusRaw.includes('1');
-            const statusClass = isActive ? 'success' : 'secondary';
-            const statusText = isActive ? 'ใช้งาน' : 'ไม่ใช้งาน';
+            const isActive = statusRaw.includes('active') || statusRaw.includes('Yes') || statusRaw.includes('yes') || statusRaw.includes('1');
+            const statusClass = isActive ? 'success' : 'danger';
+            const statusText = isActive ? 'Active' : 'Inactive';
             //const statusText = '';
             tbody.append(`
                 <tr>
