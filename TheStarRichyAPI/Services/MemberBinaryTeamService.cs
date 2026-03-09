@@ -226,6 +226,51 @@ namespace TheStarRichyApi.Services
                             }
                         }
                     }
+                    // ParentCode
+                    if (result.BinaryTree.Count > 0 && binaryCode != null)
+                    {
+                        string parentCode = "";
+                        string checkDownlineQuery = @"
+                            WITH PureTree AS (
+                                SELECT MemberCode AS UplineCode, Member_1_1_L AS DownlineCode 
+                                FROM [dbo].[MemberLevel] 
+                                WHERE Member_1_1_L IS NOT NULL AND Member_1_1_L <> ''
+        
+                                UNION ALL
+        
+                                SELECT MemberCode AS UplineCode, Member_1_2_R AS DownlineCode 
+                                FROM [dbo].[MemberLevel] 
+                                WHERE Member_1_2_R IS NOT NULL AND Member_1_2_R <> ''
+                            ),
+                            UplineCTE AS (
+                                SELECT UplineCode
+                                FROM PureTree
+                                WHERE DownlineCode = @DownlineCode
+        
+                                UNION ALL
+        
+                                SELECT t.UplineCode
+                                FROM PureTree t
+                                INNER JOIN UplineCTE c ON t.DownlineCode = c.UplineCode
+                                WHERE c.UplineCode <> @UplineCode 
+                            )
+                            SELECT TOP 1 * FROM UplineCTE 
+                            OPTION (MAXRECURSION 0);";
+
+                        using (var cmd = new SqlCommand(checkDownlineQuery, con))
+                        {
+                            cmd.Parameters.AddWithValue("@UplineCode", memberCode);
+                            cmd.Parameters.AddWithValue("@DownlineCode", binaryCode ?? memberCode);
+
+                            var _result = await cmd.ExecuteScalarAsync();
+
+                            if (_result != null && _result != DBNull.Value)
+                            {
+                                parentCode = Convert.ToString(_result ?? "");
+                            }
+                        }
+                        result.BinaryTree[0].ParentCode = parentCode;
+                    }
                 }
             }
             catch (Exception ex)

@@ -24,10 +24,10 @@
                             <i class="ri-refresh-line"></i> รีเฟรช
                         </button>
 
-                        <button class="btn btn-outline-primary" onclick="goToLeftLevel()">
+                        <button class="btn btn-primary" onclick="goToLeftLevel()">
                             <i class="ri-arrow-left-line"></i> ซ้ายสุด
                         </button>
-                        <button class="btn btn-outline-primary" onclick="goToRightLevel()">
+                        <button class="btn btn-primary" onclick="goToRightLevel()">
                             <i class="ri-arrow-right-line"></i> ขวาสุด
                         </button>
                         <button class="btn btn-outline-dark" onclick="goToParent()">
@@ -338,7 +338,7 @@
         return nodeMap[1] || null; // คืนค่า Root Node กลับไป
     }
 
-        async function loadBinaryTeam(memberCode, options = {}) {
+    async function loadBinaryTeam(memberCode, options = {}) {
         try {
             showLoading(true);
 
@@ -354,16 +354,6 @@
                 navigationHistory = [];
                 currentViewedMemberCode = '';
                 rootViewedMemberCode = '';
-            }
-
-            if (requestedCode) {
-                if (!isBackNavigation && currentViewedMemberCode && currentViewedMemberCode !== requestedCode) {
-                    navigationHistory.push(currentViewedMemberCode);
-                }
-
-                if (isBackNavigation && navigationHistory.length > 0 && navigationHistory[navigationHistory.length - 1] === requestedCode) {
-                    navigationHistory.pop();
-                }
             }
 
             // 2. จัดการ URL และแนบ Parameter (รวมถึง direction)
@@ -392,10 +382,18 @@
 
             treeDataRoot = buildTreeFromFlatArray(binaryTreeFlat);
 
-            const resolvedCode = requestedCode || (treeDataRoot ? treeDataRoot.childCode : '');
+            // ให้ความสำคัญกับรหัส Root ตัวใหม่ที่ได้จาก API ก่อนเสมอ
+            const actualApiCode = treeDataRoot ? treeDataRoot.childCode : '';
+            const resolvedCode = actualApiCode || requestedCode;
 
             if (resolvedCode) {
+                // เช็คว่าถ้าเป็นการกระโดด (รหัสเปลี่ยน) ต้องบันทึกตัวเก่าลง History ก่อน
+                if (!isBackNavigation && currentViewedMemberCode && currentViewedMemberCode !== resolvedCode) {
+                    navigationHistory.push(currentViewedMemberCode);
+                }
+
                 currentViewedMemberCode = resolvedCode;
+
                 if (shouldResetHistory || !rootViewedMemberCode) {
                     rootViewedMemberCode = resolvedCode;
                 }
@@ -687,6 +685,16 @@
             return;
         }
 
+        // 1. ใช้ parentCode จาก API (รองรับทั้งตัวพิมพ์เล็กและใหญ่)
+        const parentCode = treeDataRoot.parentCode || treeDataRoot.ParentCode;
+
+        if (parentCode && parentCode !== '0' && parentCode !== '') {
+            // โหลดข้อมูล parent โดยตรง
+            loadBinaryTeam(parentCode, { isBackNavigation: true });
+            return;
+        }
+
+        // 2. Fallback: ถ้า API ไม่ส่ง parentCode มา ให้ถอยกลับด้วย History
         const fallbackParentCode = navigationHistory.length > 0
             ? navigationHistory[navigationHistory.length - 1]
             : '';
@@ -696,7 +704,7 @@
             return;
         }
 
-        showAlert('info', 'รหัสนี้อยู่สายงานบนสุดแล้ว หรือไม่สามารถย้อนกลับได้');
+        showAlert('info', 'รหัสนี้อยู่สายงานบนสุดแล้ว (หรือไม่มีรหัสผู้แนะนำ)');
     }
 
     function goToLeftLevel() {
