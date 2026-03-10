@@ -30,7 +30,7 @@
                         <button class="btn btn-primary" onclick="goToRightLevel()">
                             <i class="ri-arrow-right-line"></i> ขวาสุด
                         </button>
-                        <button class="btn btn-outline-dark" onclick="goToParent()">
+                        <button class="btn btn-dark" onclick="goToParent()">
                             <i class="ri-arrow-up-double-line"></i> เลื่อนขึ้น
                         </button>
                         <button class="btn btn-secondary" onclick="refreshCurrentMember()">
@@ -580,7 +580,7 @@
                             <div class="member-name">${membername}</div>
                             <div class="member-code">${childCode}</div>
                             <div class="member-position">${memberpositionName}</div>
-                            <div class="member-position-ranking">รักษายอด ${currentMonth1} - ${lastMonthQualifyPV}</div>
+                            <div class="member-position-ranking">รักษายอด ${currentMonth} - ${lastMonthQualifyPV} PV</div>
                         </div>
                     </div>
                     ${!isLastLevel ? `
@@ -1018,7 +1018,7 @@
         opacity: 0.9;
         margin-top: 2px;
         font-weight: 600;
-        color: #ffd700;
+        color: #ffe900;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;

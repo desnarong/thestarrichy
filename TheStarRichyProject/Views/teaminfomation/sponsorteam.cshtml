@@ -189,7 +189,7 @@
             const memberCode = member.dlCode || member.DLCode || member.membercode || member.Membercode || 'N/A';
             const memberName = member.dlName || member.DLName || member.membername || member.Membername || 'N/A';
             const memberPV = member.personalpv ?? member.personalPV ?? member.PersonalPV ?? member.pv ?? member.PV ?? 0;
-            const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
+            const statusRaw = ((member.lastMonthQualifyStatus || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
             const isActive = statusRaw.includes('active') || statusRaw.includes('Yes') || statusRaw.includes('yes') || statusRaw.includes('1');
             const statusClass = isActive ? 'success' : 'danger';
             const statusText = isActive ? 'Active' : 'Inactive';

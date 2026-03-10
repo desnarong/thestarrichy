@@ -97,7 +97,7 @@
             const memberCode = member.MemberLeftCode || member.memberLeftCode || '-';
             const memberName = member.MemberLeftName || member.memberLeftName || '-';
             const pv = Number(member.personalpv ?? member.personalPV ?? member.pv ?? 0);
-            const statusRaw = ((member.status || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
+            const statusRaw = ((member.lastMonthQualifyStatus || member.memberstatus || member.activeStatus || member.Qualify || member.qualify || '') + '').toLowerCase();
             const isActive = statusRaw.includes('active') || statusRaw.includes('Yes') || statusRaw.includes('yes') || statusRaw.includes('1');
             const statusClass = isActive ? 'success' : 'danger';
             const statusText = isActive ? 'Active' : 'Inactive';
