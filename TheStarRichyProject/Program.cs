@@ -19,6 +19,7 @@ builder.Configuration
 // Localization
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
 builder.Services.AddControllersWithViews()
+.AddNewtonsoftJson()
 .AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
 
 // ��駤������
