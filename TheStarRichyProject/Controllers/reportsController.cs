@@ -147,5 +147,49 @@ namespace TheStarRichyProject.Controllers
                 return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลใบสมัครได้" });
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBonusReport(string reportType = "daily")
+        {
+            try
+            {
+                var endpoint = reportType switch
+                {
+                    "monthly" => "/Member/reportbonusbymonth",
+                    "period"  => "/Member/reportbonusbypaymentperiod",
+                    _         => "/Member/reportbonusbydate"
+                };
+                var result = await _apiService.GetAsync<dynamic>(endpoint);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting bonus report data. reportType={ReportType}", reportType);
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลรายงานโบนัสได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBonusDetail(string detailType = "sponser")
+        {
+            try
+            {
+                var endpoint = detailType switch
+                {
+                    "rebate"   => "/Member/reportbonusbydatedetailrebate",
+                    "binary"   => "/Member/reportbonusbydatedetailbinary",
+                    "matching" => "/Member/reportbonusbydatedetailmatching",
+                    "mobile"   => "/Member/reportbonusbydatedetailmobile",
+                    _          => "/Member/reportbonusbydatedetailsponser"
+                };
+                var result = await _apiService.GetAsync<dynamic>(endpoint);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting bonus detail data. detailType={DetailType}", detailType);
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลรายละเอียดโบนัสได้" });
+            }
+        }
     }
 }

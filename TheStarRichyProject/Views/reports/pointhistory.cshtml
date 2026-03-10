@@ -1,76 +1,97 @@
 ﻿@{
-    ViewData["Title"] = "ประวัติคะแนน";
+    ViewData["Title"] = "รายงานโบนัสสมาชิก";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- ส่วนที่ 1: เงื่อนไขการค้นหา -->
 <div class="row">
-    <div class="col-md-12 col-lg-12">
+    <div class="col-12">
         <div class="card">
-            <div class="card-header">
-                <h4 data-key="t-daily-points-report">รายงานคะแนนรายวันสำหรับสมาชิก</h4>
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bx bx-bar-chart-alt-2 text-primary fs-4"></i>
+                <h4 class="mb-0">รายงานโบนัสสมาชิก</h4>
             </div>
-            <div class="card-block p-3">
-                <!-- ข้อมูลทั่วไป -->
-                <div class="mb-4">
-                    <h5 data-key="t-general-info">ข้อมูลทั่วไป</h5>
-                    <div class="form-group row mb-3">
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-purchase-type">ประเภทการสั่งซื้อ :</label>
-                        <div class="col-lg-10 col-md-6">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="daily_points" value="daily" checked>
-                                <label class="form-check-label" for="daily_points" data-key="t-daily-points">คะแนนรายวัน</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_type" id="point_deduction" value="deduction">
-                                <label class="form-check-label" for="point_deduction" data-key="t-point-deduction-history">ประวัติการหักคะแนน</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-3">
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-report-type">ประเภทรายงาน :</label>
-                        <div class="col-lg-10 col-md-6">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_format" id="report_daily" value="daily" checked>
-                                <label class="form-check-label" for="report_daily" data-key="t-daily">รายวัน</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_format" id="report_weekly" value="weekly">
-                                <label class="form-check-label" for="report_weekly" data-key="t-weekly">รายสัปดาห์</label>
-                            </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="report_format" id="report_monthly" value="monthly">
-                                <label class="form-check-label" for="report_monthly" data-key="t-monthly">รายเดือน</label>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-3">
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-from-date">จากวันที่ :</label>
-                        <div class="col-lg-3 col-md-6">
-                            <input type="date" class="form-control" id="fromDate" value="" />
-                        </div>
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-to-date">ถึงวันที่ :</label>
-                        <div class="col-lg-3 col-md-6">
-                            <input type="date" class="form-control" id="toDate" value="" />
-                        </div>
-                        <div class="col-md-2">
-                            <div class="d-flex gap-2 justify-content-end">
-                                <button class="btn btn-light" id="btnResetPoint" type="button">รีเซ็ต</button>
-                                <button class="btn btn-primary" id="btnSearchPoint" type="button" data-key="t-search">ค้นหา</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-2">
-                        <div class="col-12">
-                            <div class="alert alert-secondary py-2 mb-0" id="pointMessage">กำลังโหลดข้อมูลคะแนน...</div>
+            <div class="card-body pb-2">
+                <!-- โบนัสสะสม (Display only) -->
+                <div class="row mb-3 align-items-center">
+                    <label class="col-lg-2 col-md-3 col-form-label fw-semibold">โบนัสสะสม :</label>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="totalAccumBonus" class="form-control bg-light fw-bold text-success text-end" readonly value="-">
+                            <span class="input-group-text">บาท</span>
                         </div>
                     </div>
                 </div>
+                <!-- ประเภทรายงาน -->
+                <div class="row mb-3 align-items-center">
+                    <label class="col-lg-2 col-md-3 col-form-label fw-semibold">ประเภทรายงาน :</label>
+                    <div class="col-lg-10 col-md-9 d-flex align-items-center flex-wrap gap-3 pt-1">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="rpt_daily" value="daily" checked>
+                            <label class="form-check-label" for="rpt_daily">รายวัน</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="rpt_monthly" value="monthly">
+                            <label class="form-check-label" for="rpt_monthly">รายเดือน</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="report_type" id="rpt_period" value="period">
+                            <label class="form-check-label" for="rpt_period">รอบการจ่าย</label>
+                        </div>
+                    </div>
+                </div>
+                <!-- ช่วงเวลา -->
+                <div class="row mb-2 align-items-end">
+                    <div class="col-lg-2 col-md-3 mb-2">
+                        <label class="form-label fw-semibold mb-1">จากวันที่ :</label>
+                        <input type="date" class="form-control" id="fromDate">
+                    </div>
+                    <div class="col-lg-2 col-md-3 mb-2">
+                        <label class="form-label fw-semibold mb-1">ถึงวันที่ :</label>
+                        <input type="date" class="form-control" id="toDate">
+                    </div>
+                    <div class="col-lg-3 col-md-3 mb-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-light" id="btnReset" type="button"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+                            <button class="btn btn-primary" id="btnSearch" type="button"><i class="bx bx-search me-1"></i>ค้นหา</button>
+                        </div>
+                    </div>
+                </div>
+                <small class="text-muted d-block mt-1 mb-1"><i class="bx bx-info-circle me-1"></i>ถ้าไม่ได้ระบุวันที่ จะแสดงข้อมูลทั้งหมด</small>
+            </div>
+        </div>
+    </div>
+</div>
 
-                <!-- รายงาน -->
-                <div>
-                    <h5 data-key="t-report">รายงาน</h5>
-                    <div class="table-responsive mt-3">
-                        <table id="data-table-responsive" class="table table-striped table-bordered"></table>
+<!-- ส่วนที่ 2: ตารางสรุปรายงานหลัก -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background-color:#fffde7; border-bottom:2px solid #ffc107;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0"><i class="bx bx-table me-2 text-warning"></i>สรุปรายงานโบนัส</h5>
+                    <span id="reportTypeLabel" class="badge bg-primary">รายวัน</span>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary py-2 mb-3" id="mainMessage">กำลังโหลดข้อมูล...</div>
+                <div class="table-responsive">
+                    <table id="mainBonusTable" class="table table-striped table-bordered table-hover nowrap w-100"></table>
+                </div>
+                <!-- สรุปยอดหักค่าใช้จ่าย (เฉพาะรอบการจ่าย) -->
+                <div id="periodSummarySection" style="display:none;" class="mt-4 border-top pt-3">
+                    <h6 class="fw-bold mb-3"><i class="bx bx-receipt me-1"></i>สรุปยอดหักค่าใช้จ่าย</h6>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-sm" style="max-width:520px;">
+                            <tbody>
+                                <tr><td class="text-muted">ค่าธรรมเนียมดำเนินการ</td><td class="text-end" id="sum_ServicePrice">-</td></tr>
+                                <tr><td class="text-muted">ยอดหลังหักค่าดำเนินการ</td><td class="text-end" id="sum_TotalBonusAfterExpense">-</td></tr>
+                                <tr><td class="text-muted">ภาษี</td><td class="text-end" id="sum_Tax">-</td></tr>
+                                <tr><td class="text-muted">โบนัสรวมภาษี</td><td class="text-end" id="sum_TotalBonusIncudeTax">-</td></tr>
+                                <tr><td class="text-muted">ภาษีหัก ณ ที่จ่าย</td><td class="text-end" id="sum_WithHoldingTax">-</td></tr>
+                                <tr class="table-success fw-bold"><td>โบนัสสุทธิ (NetBonus)</td><td class="text-end text-success" id="sum_NetBonus">-</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -78,234 +99,350 @@
     </div>
 </div>
 
+<!-- ส่วนที่ 3: ตารางเจาะลึกรายได้ (Drill-down) -->
+<div class="row mt-3" id="detailSection" style="display:none;">
+    <div class="col-12">
+        <div class="card border-success">
+            <div class="card-header" style="background-color:#e8f5e9; border-bottom:2px solid #4caf50;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0"><i class="bx bx-zoom-in me-2 text-success"></i>ที่มารายได้: <span id="detailTitle" class="text-success">-</span></h5>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="btnCloseDetail"><i class="bx bx-x me-1"></i>ปิด</button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary py-2 mb-3" id="detailMessage">กำลังโหลดรายละเอียด...</div>
+                <div class="table-responsive">
+                    <table id="detailBonusTable" class="table table-striped table-bordered table-hover nowrap w-100"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    $(document).ready(function () {
-        let pointTable = null;
+$(document).ready(function () {
+    let mainTable  = null;
+    let detailTable = null;
+    let allDetailData = {}; // cache keyed by detailType
 
-        function pick(obj, keys, defaultValue = '') {
-            for (const key of keys) {
-                if (obj && obj[key] !== undefined && obj[key] !== null) {
-                    return obj[key];
+    // ---- Helpers ----
+    function pick(obj, keys, def) {
+        if (def === undefined) def = '';
+        for (var i = 0; i < keys.length; i++) {
+            if (obj != null && obj[keys[i]] !== undefined && obj[keys[i]] !== null)
+                return obj[keys[i]];
+        }
+        return def;
+    }
+
+    function normalizeRows(payload) {
+        var d = payload;
+        if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e) { return []; } }
+        if (d && Array.isArray(d.data)) d = d.data;
+        return Array.isArray(d) ? d : [];
+    }
+
+    function toNum(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+    function fmtNum(v) {
+        return toNum(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(v) {
+        if (!v) return '-';
+        var d = new Date(v);
+        return isNaN(d.getTime()) ? String(v) : d.toLocaleDateString('th-TH');
+    }
+
+    function parseRowDate(v) {
+        if (!v) return null;
+        // mm/yyyy format (monthly)
+        if (/^\d{2}\/\d{4}$/.test(String(v))) {
+            var p = v.split('/');
+            return new Date(parseInt(p[1]), parseInt(p[0]) - 1, 1);
+        }
+        var d = new Date(v);
+        return isNaN(d.getTime()) ? null : d;
+    }
+
+    function filterByDate(rows, dateKeys, fromDate, toDate) {
+        if (!fromDate && !toDate) return rows;
+        var from = fromDate ? new Date(fromDate) : null;
+        var to   = toDate   ? new Date(toDate + 'T23:59:59') : null;
+        return rows.filter(function (row) {
+            var raw = pick(row, dateKeys);
+            var d   = parseRowDate(raw);
+            if (!d) return true;
+            if (from && d < from) return false;
+            if (to   && d > to)   return false;
+            return true;
+        });
+    }
+
+    // ---- Bonus column definitions ----
+    var BONUS_TYPES = [
+        { key: 'SponserBonus',  label: 'ค่าแนะนำ',    detail: 'sponser'  },
+        { key: 'RebateBonus',   label: 'ส่วนตัว',      detail: 'rebate'   },
+        { key: 'WeakBonus',     label: 'TMB/จับคู่',   detail: 'binary'   },
+        { key: 'MatchingBonus', label: 'แมทชิ่ง',      detail: 'matching' },
+        { key: 'MobileBonus',   label: 'แจงยอด',       detail: 'mobile'   },
+        { key: 'SpecialBonus',  label: 'พิเศษ',         detail: null       },
+        { key: 'TotalBonus',    label: 'รวม',           detail: null       },
+    ];
+
+    function makeBonusCol(bt) {
+        return {
+            title: bt.label,
+            data: null,
+            render: function (data) {
+                var keys = [bt.key, bt.key.toLowerCase()];
+                var val  = pick(data, keys, 0);
+                var num  = fmtNum(val);
+                var dateRaw = pick(data, ['FromDate','fromDate','CalcMonth','calcMonth','PaymentDate','paymentDate']);
+                if (bt.detail && toNum(val) !== 0) {
+                    return '<span class="bonus-link text-primary fw-bold" style="cursor:pointer;text-decoration:underline;" ' +
+                           'data-detail="' + bt.detail + '" data-date="' + dateRaw + '">' + num + '</span>';
                 }
+                return '<span>' + num + '</span>';
             }
-            return defaultValue;
+        };
+    }
+
+    function getMainColumns(reportType) {
+        var bonusCols = BONUS_TYPES.map(makeBonusCol);
+        if (reportType === 'monthly') {
+            return [
+                { title: 'เดือน', data: null, render: function(d) { return pick(d, ['CalcMonth','calcMonth','Calcmonth']) || '-'; } }
+            ].concat(bonusCols);
         }
+        return [
+            { title: 'จากวันที่',   data: null, render: function(d) { return fmtDate(pick(d, ['FromDate','fromDate'])); } },
+            { title: 'ถึงวันที่',   data: null, render: function(d) { return fmtDate(pick(d, ['ToDate','toDate'])); } },
+            { title: 'รอบการจ่าย', data: null, render: function(d) { return fmtDate(pick(d, ['PaymentDate','paymentDate'])); } }
+        ].concat(bonusCols);
+    }
 
-        function normalizeRows(payload) {
-            let data = payload;
+    // ---- Load main report ----
+    function loadMain() {
+        var reportType = $('input[name="report_type"]:checked').val() || 'daily';
+        var fromDate   = $('#fromDate').val();
+        var toDate     = $('#toDate').val();
+        var labels     = { daily: 'รายวัน', monthly: 'รายเดือน', period: 'รอบการจ่าย' };
 
-            if (typeof data === 'string') {
-                try {
-                    data = JSON.parse(data);
-                } catch (e) {
-                    data = [];
+        $('#reportTypeLabel').text(labels[reportType] || reportType);
+        $('#mainMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...');
+        $('#periodSummarySection').hide();
+        $('#detailSection').hide();
+        allDetailData = {};
+
+        $.ajax({
+            url: '@Url.Action("GetBonusReport", "reports")',
+            type: 'GET',
+            data: { reportType: reportType },
+            success: function (json) {
+                var rows = normalizeRows(json);
+
+                // client-side date filter
+                var dateKeys = reportType === 'monthly'
+                    ? ['CalcMonth','calcMonth','Calcmonth']
+                    : ['FromDate','fromDate'];
+                rows = filterByDate(rows, dateKeys, fromDate, toDate);
+
+                // โบนัสสะสม - sum NetBonus or TotalBonus
+                var accumTotal = rows.reduce(function(s, r) {
+                    return s + toNum(pick(r, ['NetBonus','netBonus','TotalBonus','totalBonus'], 0));
+                }, 0);
+                $('#totalAccumBonus').val(fmtNum(accumTotal));
+
+                // payment period summary section
+                if (reportType === 'period') {
+                    var summaryFields = [
+                        ['sum_ServicePrice',          ['ServicePrice','servicePrice']],
+                        ['sum_TotalBonusAfterExpense', ['TotalBonusAfterExpense','totalBonusAfterExpense']],
+                        ['sum_Tax',                   ['Tax','tax']],
+                        ['sum_TotalBonusIncudeTax',   ['TotalBonusIncudeTax','totalBonusIncudeTax']],
+                        ['sum_WithHoldingTax',        ['WithHoldingTax','withHoldingTax']],
+                        ['sum_NetBonus',              ['NetBonus','netBonus']],
+                    ];
+                    summaryFields.forEach(function (pair) {
+                        var total = rows.reduce(function(s, r) { return s + toNum(pick(r, pair[1], 0)); }, 0);
+                        $('#' + pair[0]).text(fmtNum(total) + ' บาท');
+                    });
+                    if (rows.length > 0) $('#periodSummarySection').slideDown(200);
                 }
+
+                if (mainTable) { mainTable.destroy(); }
+                $('#mainBonusTable').empty();
+                mainTable = $('#mainBonusTable').DataTable({
+                    data: rows,
+                    columns: getMainColumns(reportType),
+                    responsive: true,
+                    ordering: true,
+                    searching: false,
+                    pageLength: 25,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'ทั้งหมด']],
+                    language: { emptyTable: 'ไม่พบข้อมูล', zeroRecords: 'ไม่พบข้อมูล' }
+                });
+
+                $('#mainMessage').removeClass('alert-secondary').addClass('alert-success')
+                    .text('พบข้อมูล ' + rows.length + ' รายการ');
+            },
+            error: function () {
+                $('#mainMessage').removeClass('alert-secondary').addClass('alert-danger')
+                    .text('เกิดข้อผิดพลาดในการดึงข้อมูล');
             }
+        });
+    }
 
-            if (data && Array.isArray(data.data)) {
-                data = data.data;
+    // ---- Detail column definitions ----
+    var DETAIL_COLS = {
+        sponser: [
+            { title: 'ระดับ',         data: null, render: function(d){ return pick(d,['Levelcode','levelcode','LevelCode']); } },
+            { title: 'รหัสลูกทีม',    data: null, render: function(d){ return pick(d,['DLCode','dlCode','Dlcode']); } },
+            { title: 'ชื่อลูกทีม',    data: null, render: function(d){ return pick(d,['DLName','dlName','Dlname']); } },
+            { title: 'PV',            data: null, render: function(d){ return fmtNum(pick(d,['PV','pv'],0)); } },
+            { title: '% จ่าย',        data: null, render: function(d){ return pick(d,['PercentPayment','percentPayment','Percentpayment']); } },
+            { title: 'จำนวนเงิน',    data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['Amount','amount'],0)) + '</span>'; } },
+            { title: 'เลขที่บิล',    data: null, render: function(d){ return pick(d,['BillNO','billNO','BillNo','billNo']); } },
+            { title: 'วันที่บิล',    data: null, render: function(d){ return fmtDate(pick(d,['BillDate','billDate','Billdate'])); } },
+        ],
+        rebate: [
+            { title: 'ระดับ',         data: null, render: function(d){ return pick(d,['Levelcode','levelcode','LevelCode']); } },
+            { title: 'รหัสลูกทีม',    data: null, render: function(d){ return pick(d,['DLCode','dlCode','Dlcode']); } },
+            { title: 'PV',            data: null, render: function(d){ return fmtNum(pick(d,['PV','pv'],0)); } },
+            { title: '% จ่าย',        data: null, render: function(d){ return pick(d,['PercentPayment','percentPayment','Percentpayment']); } },
+            { title: 'จำนวนเงิน',    data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['Amount','amount'],0)) + '</span>'; } },
+        ],
+        binary: [
+            { title: 'คะแนนซ้าย (รอคำนวณ)',  data: null, render: function(d){ return fmtNum(pick(d,['LeftPV','leftPV','Leftpv'],0)); } },
+            { title: 'คะแนนขวา (รอคำนวณ)',   data: null, render: function(d){ return fmtNum(pick(d,['RightPV','rightPV','Rightpv'],0)); } },
+            { title: 'ตัดซ้าย',              data: null, render: function(d){ return fmtNum(pick(d,['CalcLeftPV','calcLeftPV','Calcleftpv'],0)); } },
+            { title: 'ตัดขวา',               data: null, render: function(d){ return fmtNum(pick(d,['CalcRightPV','calcRightPV','Calcrightpv'],0)); } },
+            { title: 'Max/วัน',              data: null, render: function(d){ return fmtNum(pick(d,['MaxCalcPerDay','maxCalcPerDay','Maxcalcperday'],0)); } },
+            { title: 'PV คำนวณ',             data: null, render: function(d){ return fmtNum(pick(d,['CalculatePV','calculatePV','Calculatepv'],0)); } },
+            { title: '% ฝั่งอ่อน (Weak)',    data: null, render: function(d){ return pick(d,['weak','Weak','WeakPercent','weakPercent']); } },
+            { title: 'TMB Bonus',            data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['TMBBonus','tmbBonus','Tmbbonus'],0)) + '</span>'; } },
+        ],
+        matching: [
+            { title: 'รหัสลูกทีม',           data: null, render: function(d){ return pick(d,['DLCode','dlCode','Dlcode']); } },
+            { title: 'รายได้ TMB ลูกทีม',    data: null, render: function(d){ return fmtNum(pick(d,['Income','income'],0)); } },
+            { title: '% แมทชิ่ง',            data: null, render: function(d){ return pick(d,['PercentPayment','percentPayment','Percentpayment']); } },
+            { title: 'จำนวนเงิน',            data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['Amount','amount'],0)) + '</span>'; } },
+        ],
+        mobile: [
+            { title: 'รหัสลูกทีม',    data: null, render: function(d){ return pick(d,['DLCode','dlCode','Dlcode']); } },
+            { title: 'PV',            data: null, render: function(d){ return fmtNum(pick(d,['PV','pv'],0)); } },
+            { title: '% จ่าย',        data: null, render: function(d){ return pick(d,['PercentPayment','percentPayment','Percentpayment']); } },
+            { title: 'จำนวนเงิน',    data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['Amount','amount'],0)) + '</span>'; } },
+            { title: 'เลขที่บิล',    data: null, render: function(d){ return pick(d,['BillNO','billNO','BillNo','billNo']); } },
+        ],
+    };
+
+    var DETAIL_LABELS = {
+        sponser:  'ค่าแนะนำ (Sponsor Bonus)',
+        rebate:   'ส่วนตัว (Rebate Bonus)',
+        binary:   'TMB / จับคู่ (Binary Bonus)',
+        matching: 'แมทชิ่ง (Matching Bonus)',
+        mobile:   'แจงยอด Hybrid Gold (Mobile Bonus)',
+    };
+
+    // ---- Load detail ----
+    function renderDetailTable(detailType, allRows, startDate) {
+        var rows = allRows;
+        if (startDate) {
+            var sd = parseRowDate(startDate);
+            if (sd) {
+                rows = allRows.filter(function (r) {
+                    var raw = pick(r, ['FromDate','fromDate','BillDate','billDate','Date','date','PaymentDate','paymentDate']);
+                    var d   = parseRowDate(raw);
+                    if (!d) return true;
+                    // same day or same month for monthly context
+                    return d.toDateString() === sd.toDateString() || (d.getFullYear() === sd.getFullYear() && d.getMonth() === sd.getMonth());
+                });
             }
-
-            return Array.isArray(data) ? data : [];
         }
 
-        function toNumber(value) {
-            const num = parseFloat(value);
-            return isNaN(num) ? 0 : num;
-        }
-
-        function toDateValue(value) {
-            if (!value) return null;
-            const date = new Date(value);
-            return isNaN(date.getTime()) ? null : date;
-        }
-
-        function getWeekStartDate(date) {
-            const weekDate = new Date(date);
-            const day = weekDate.getDay();
-            const diff = weekDate.getDate() - day + (day === 0 ? -6 : 1);
-            weekDate.setDate(diff);
-            weekDate.setHours(0, 0, 0, 0);
-            return weekDate;
-        }
-
-        function formatDateLabel(date) {
-            if (!date) return '-';
-            return date.toLocaleDateString('th-TH');
-        }
-
-        function applyReportFormat(rows, reportFormat, isDeduction) {
-            if (reportFormat === 'daily') {
-                return rows;
-            }
-
-            const grouped = {};
-
-            rows.forEach(function (row) {
-                const rowDate = toDateValue(isDeduction ? row.calculateDate : row.balanceDate);
-                if (!rowDate) return;
-
-                let key = '';
-                let label = '';
-
-                if (reportFormat === 'weekly') {
-                    const weekStart = getWeekStartDate(rowDate);
-                    key = `week-${weekStart.toISOString().split('T')[0]}`;
-                    label = `สัปดาห์ของ ${formatDateLabel(weekStart)}`;
-                } else {
-                    key = `month-${rowDate.getFullYear()}-${rowDate.getMonth() + 1}`;
-                    label = rowDate.toLocaleDateString('th-TH', { year: 'numeric', month: 'long' });
-                }
-
-                if (!grouped[key]) {
-                    grouped[key] = {
-                        label: label,
-                        leftPV: 0,
-                        rightPV: 0,
-                        cutLeftPV: 0,
-                        cutRightPV: 0,
-                        memberPosition: '-'
-                    };
-                }
-
-                grouped[key].leftPV += toNumber(row.leftPV);
-                grouped[key].rightPV += toNumber(row.rightPV);
-                grouped[key].cutLeftPV += toNumber(row.cutLeftPV);
-                grouped[key].cutRightPV += toNumber(row.cutRightPV);
-            });
-
-            return Object.values(grouped).map(function (item) {
-                if (isDeduction) {
-                    return {
-                        calculateDate: item.label,
-                        memberPosition: item.memberPosition,
-                        leftPV: item.leftPV,
-                        rightPV: item.rightPV,
-                        cutLeftPV: item.cutLeftPV,
-                        cutRightPV: item.cutRightPV
-                    };
-                }
-
-                return {
-                    balanceDate: item.label,
-                    leftPV: item.leftPV,
-                    rightPV: item.rightPV
-                };
-            });
-        }
-
-        function createTable(reportType) {
-            const isDeduction = reportType === 'deduction';
-            const reportFormat = $('input[name="report_format"]:checked').val() || 'daily';
-            const fromDate = $('#fromDate').val();
-            const toDate = $('#toDate').val();
-
-            const columns = isDeduction
-                ? [
-                    { title: "วันที่คำนวณ", data: "calculateDate", orderable: true },
-                    { title: "ตำแหน่ง", data: "memberPosition" },
-                    { title: "คะแนนซ้าย", data: "leftPV" },
-                    { title: "คะแนนขวา", data: "rightPV" },
-                    { title: "หักซ้าย", data: "cutLeftPV" },
-                    { title: "หักขวา", data: "cutRightPV" }
-                ]
-                : [
-                    { title: "วันที่", data: "balanceDate", orderable: true },
-                    { title: "คะแนนด้านซ้าย", data: "leftPV" },
-                    { title: "คะแนนด้านขวา", data: "rightPV" }
-                ];
-
-            pointTable = $("#data-table-responsive").DataTable({
-                responsive: true,
-                processing: true,
-                serverSide: false,
-                filter: false,
-                orderMulti: false,
-                ordering: true,
-                lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
-                pageLength: 25,
-                destroy: true,
-                searching: false,
-                contentType: "application/json; charset=utf-8",
-                ajax: {
-                    url: '@Url.Action("GetPointHistoryData", "reports")',
-                    type: 'GET',
-                    data: {
-                        reportType: reportType,
-                        reportFormat: reportFormat,
-                        fromDate: fromDate,
-                        toDate: toDate
-                    },
-                    dataSrc: function (json) {
-                        const rows = normalizeRows(json);
-                        const mappedRows = rows.map(function (item) {
-                            return {
-                                balanceDate: pick(item, ['BalanceDate', 'balanceDate']),
-                                leftPV: toNumber(pick(item, ['LeftPV', 'leftPV'], 0)),
-                                rightPV: toNumber(pick(item, ['RightPV', 'rightPV'], 0)),
-                                calculateDate: pick(item, ['calculatedate', 'CalculateDate', 'calculateDate']),
-                                memberPosition: pick(item, ['Memberposition', 'MemberPosition', 'memberPosition']),
-                                cutLeftPV: toNumber(pick(item, ['CutLeftPV', 'cutLeftPV'], 0)),
-                                cutRightPV: toNumber(pick(item, ['CutRightPV', 'cutRightPV'], 0))
-                            };
-                        });
-
-                        const filteredByDate = mappedRows.filter(function (row) {
-                            if (!fromDate && !toDate) return true;
-
-                            const baseDate = isDeduction ? row.calculateDate : row.balanceDate;
-                            const rowDate = toDateValue(baseDate);
-                            if (!rowDate) return false;
-
-                            if (fromDate) {
-                                const from = new Date(fromDate);
-                                if (rowDate < from) return false;
-                            }
-                            if (toDate) {
-                                const to = new Date(toDate);
-                                to.setHours(23, 59, 59, 999);
-                                if (rowDate > to) return false;
-                            }
-                            return true;
-                        });
-
-                        const finalRows = applyReportFormat(filteredByDate, reportFormat, isDeduction);
-                        $('#pointMessage').removeClass('alert-danger').addClass('alert-secondary').text(`พบข้อมูล ${finalRows.length} รายการ`);
-                        return finalRows;
-                    },
-                    error: function () {
-                        $('#pointMessage').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูลคะแนน');
-                    }
-                },
-                columns: columns
-            });
-        }
-
-        $('input[name="report_type"]').on('change', function () {
-            const selectedType = $(this).attr('id') === 'point_deduction' ? 'deduction' : 'daily';
-            createTable(selectedType);
+        if (detailTable) { detailTable.destroy(); }
+        $('#detailBonusTable').empty();
+        detailTable = $('#detailBonusTable').DataTable({
+            data: rows,
+            columns: DETAIL_COLS[detailType] || [],
+            responsive: true,
+            ordering: true,
+            searching: false,
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'ทั้งหมด']],
+            language: { emptyTable: 'ไม่พบรายละเอียด', zeroRecords: 'ไม่พบรายละเอียด' }
         });
 
-        $('#btnSearchPoint').on('click', function () {
-            const selectedType = $('input[name="report_type"]:checked').val() === 'deduction' ? 'deduction' : 'daily';
-            $('#pointMessage').removeClass('alert-danger').addClass('alert-secondary').text('กำลังค้นหาข้อมูล...');
-            createTable(selectedType);
-        });
+        $('#detailMessage').removeClass('alert-secondary alert-danger').addClass('alert-success')
+            .text('พบข้อมูล ' + rows.length + ' รายการ');
+    }
 
-        $('#btnResetPoint').on('click', function () {
-            $('#daily_points').prop('checked', true);
-            $('#report_daily').prop('checked', true);
-            $('#fromDate').val('');
-            $('#toDate').val('');
-            $('#pointMessage').removeClass('alert-danger').addClass('alert-secondary').text('กำลังโหลดข้อมูลคะแนน...');
-            createTable('daily');
-        });
+    function loadDetail(detailType, startDate) {
+        var label = DETAIL_LABELS[detailType] || detailType;
+        $('#detailTitle').text(label + (startDate ? ' — ' + fmtDate(startDate) : ''));
+        $('#detailMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+        $('#detailSection').slideDown(300);
+        $('html, body').animate({ scrollTop: $('#detailSection').offset().top - 80 }, 400);
 
-        createTable('daily');
+        if (allDetailData[detailType]) {
+            renderDetailTable(detailType, allDetailData[detailType], startDate);
+            return;
+        }
+
+        $.ajax({
+            url: '@Url.Action("GetBonusDetail", "reports")',
+            type: 'GET',
+            data: { detailType: detailType },
+            success: function (json) {
+                var rows = normalizeRows(json);
+                allDetailData[detailType] = rows;
+                renderDetailTable(detailType, rows, startDate);
+            },
+            error: function () {
+                $('#detailMessage').removeClass('alert-secondary').addClass('alert-danger')
+                    .text('เกิดข้อผิดพลาดในการดึงข้อมูลรายละเอียด');
+            }
+        });
+    }
+
+    // ---- Event handlers ----
+    $('input[name="report_type"]').on('change', function () {
+        allDetailData = {};
+        loadMain();
     });
+
+    $('#btnSearch').on('click', function () {
+        allDetailData = {};
+        loadMain();
+    });
+
+    $('#btnReset').on('click', function () {
+        $('input[name="report_type"][value="daily"]').prop('checked', true);
+        $('#fromDate').val('');
+        $('#toDate').val('');
+        allDetailData = {};
+        loadMain();
+    });
+
+    // Drill-down click via event delegation
+    $('#mainBonusTable').on('click', '.bonus-link', function () {
+        var detailType = $(this).data('detail');
+        var startDate  = $(this).data('date');
+        loadDetail(detailType, startDate);
+    });
+
+    $('#btnCloseDetail').on('click', function () {
+        $('#detailSection').slideUp(200);
+        if (detailTable) { detailTable.destroy(); detailTable = null; }
+    });
+
+    // Init
+    loadMain();
+});
 </script>
 
 @section scripts{
-    <!-- App js -->
     <script src="~/assets/js/app.js"></script>
 }
