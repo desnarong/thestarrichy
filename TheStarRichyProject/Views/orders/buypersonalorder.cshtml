@@ -673,7 +673,8 @@
                                         </button>
                                     </div>
                                     <button type="button" class="form-control btn btn-primary btn-add-to-cart"
-                                            data-product-id="@product.ProductId">
+                                            data-product-id="@product.ProductId"
+                                            data-x50="@product.M01_X50" data-x69="@product.M01_X69" data-x46="@product.M01_X46">
                                         <i class="bx bx-cart"></i> <span data-key="t-add-product">เพิ่มสินค้า</span>
                                     </button>
                                 }
@@ -703,7 +704,8 @@
                                     </div>
                                     <button type="button" class="form-control btn btn-primary btn-add-to-cart"
                                             data-product-id="@product.ProductId"
-                                            data-limit="@product.LimitPerMembercode">
+                                            data-limit="@product.LimitPerMembercode"
+                                            data-x50="@product.M01_X50" data-x69="@product.M01_X69" data-x46="@product.M01_X46">
                                         <i class="bx bx-cart"></i> <span data-key="t-add-product">เพิ่มสินค้า</span> (<span data-key="t-limited">จำกัด</span> @product.LimitPerMembercode <span data-key="t-pieces">ชิ้น</span>)
                                     </button>
                                 }
@@ -890,6 +892,9 @@
                 const quantityInput = $(`.product-quantity[data-product-id="${productId}"]`);
                 const quantity = quantityInput.length > 0 ? parseInt(quantityInput.val()) : 1;
                 const limit = $(this).data('limit');
+                const productX50 = $(this).attr('data-x50') === '1';
+                const productX69 = $(this).attr('data-x69') === '1';
+                const productX46 = $(this).attr('data-x46') === '1';
 
                 // ตรวจสอบจำนวนที่เลือก
                 if (isNaN(quantity) || quantity < 1) {
@@ -925,6 +930,44 @@
                                 }
                             });
                             return;
+                        }
+
+                        // ⭐ ตรวจสอบกฎสินค้าพิเศษ (M01_X50/X69/X46)
+                        if (itemCount > 0) {
+                            const cartItems = cartResponse.items || [];
+                            const getFlags = (pid) => {
+                                const b = $(`.btn-add-to-cart[data-product-id="${pid}"]`);
+                                return { x50: b.attr('data-x50') === '1', x69: b.attr('data-x69') === '1', x46: b.attr('data-x46') === '1' };
+                            };
+
+                            // สินค้าที่จะเพิ่มมีกฎพิเศษ → ต้องอยู่คนเดียวในตะกร้า
+                            if (productX50 || productX69 || productX46) {
+                                const hasOtherItems = cartItems.some(item => {
+                                    const pid = item.productID || item.ProductID;
+                                    return pid && pid !== productId;
+                                });
+                                if (hasOtherItems) {
+                                    const msg = productX50
+                                        ? 'สินค้านี้มีค่าส่งฟรี ไม่สามารถซื้อร่วมกับสินค้าอื่นได้\nกรุณาล้างตะกร้าก่อนเพิ่มสินค้าชิ้นนี้'
+                                        : productX69
+                                            ? 'สินค้านี้ไม่ร่วมรายการกับสินค้าอื่น\nกรุณาล้างตะกร้าก่อนเพิ่มสินค้าชิ้นนี้'
+                                            : 'สินค้านี้ต้องรับเองที่ศูนย์ ไม่สามารถซื้อร่วมกับสินค้าอื่นได้\nกรุณาล้างตะกร้าก่อนเพิ่มสินค้าชิ้นนี้';
+                                    Swal.fire('ไม่สามารถเพิ่มสินค้าได้', msg, 'warning');
+                                    return;
+                                }
+                            }
+
+                            // ตะกร้ามีสินค้าพิเศษอยู่แล้ว → ห้ามเพิ่มสินค้าอื่น
+                            const cartHasRestrictedOther = cartItems.some(item => {
+                                const pid = item.productID || item.ProductID;
+                                if (!pid || pid === productId) return false;
+                                const f = getFlags(pid);
+                                return f.x50 || f.x69 || f.x46;
+                            });
+                            if (cartHasRestrictedOther) {
+                                Swal.fire('ไม่สามารถเพิ่มสินค้าได้', 'ตะกร้ามีสินค้าพิเศษที่ไม่สามารถซื้อร่วมกับสินค้าอื่นได้', 'warning');
+                                return;
+                            }
                         }
 
                         addProductToCart(productId, quantity, limit, quantityInput);

@@ -385,6 +385,18 @@ namespace TheStarRichyProject.Controllers
 
                 ViewBag.Cart = cart.Data;
 
+                // ⭐ ตรวจสอบว่ามีสินค้า M01_X46='1' (ต้องรับเอง) ในตะกร้าหรือไม่
+                bool forcePickup = false;
+                var productListJson = HttpContext.Session.GetString("ProductList");
+                if (!string.IsNullOrEmpty(productListJson) && cart.Data?.Items?.Any() == true)
+                {
+                    var products = JsonSerializer.Deserialize<List<Product>>(productListJson);
+                    if (products != null)
+                        forcePickup = cart.Data.Items.Any(item =>
+                            products.FirstOrDefault(p => p.ProductId == item.ProductID)?.M01_X46 == "1");
+                }
+                ViewBag.ForcePickup = forcePickup;
+
                 // ดึงที่อยู่ที่เคยใช้
                 var addresses = await _orderService.GetMemberAddressesAsync(token, passkey);
                 ViewBag.Addresses = addresses.Data ?? new List<MemberAddressData>();

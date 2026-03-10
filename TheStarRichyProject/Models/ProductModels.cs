@@ -120,6 +120,15 @@ namespace TheStarRichyProject.Models
         public decimal? DeliveryFee2 { get; set; }
         public bool IsActive => TopupCheck == "2";
         public bool IsTopup => TopupCheck == "2";
+
+        [JsonPropertyName("M01_X46")]
+        public string? M01_X46 { get; set; }
+
+        [JsonPropertyName("M01_X50")]
+        public string? M01_X50 { get; set; }
+
+        [JsonPropertyName("M01_X69")]
+        public string? M01_X69 { get; set; }
     }
 
     ///// <summary>
@@ -173,6 +182,8 @@ namespace TheStarRichyProject.Models
                 var product = Products.FirstOrDefault(x => x.ProductId == cartitem.ProductID);
                 if (product != null)
                 {
+                    // M01_X50='1': ค่าส่งฟรี / M01_X46='1': รับเองที่ศูนย์ ไม่มีค่าส่ง
+                    if (product.M01_X50 == "1" || product.M01_X46 == "1") return 0;
                     if (product.TypeofFee == "1")
                     {
                         if (CartItems.Sum(x => x.PV) > product.CondFee) return 0;
