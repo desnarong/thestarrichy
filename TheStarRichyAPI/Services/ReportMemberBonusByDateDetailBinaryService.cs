@@ -125,14 +125,9 @@ namespace TheStarRichyApi.Services
 
             // Get Membercode from JWT
             string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string calcdate = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(memberCode))
             {
                 return new List<dynamic> { new { Membercode = "" } };
-            }
-            if (string.IsNullOrEmpty(calcdate))
-            {
-                return new List<dynamic> { new { calcdate = "" } };
             }
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
@@ -148,13 +143,12 @@ namespace TheStarRichyApi.Services
                     string query = "SELECT Membercode,CalculateDate,LeftPV,RightPV,CalcLeftPV,CalcRightPV,MaxCalcPerDay,CalculatePV,weak,strong,TMBBonus,StrongBonus,BinaryBonus ";
                     query += " FROM [000_Member_bonus_Binary_detail]  (nolock) ";
  
-                    query += " where Membercode = @Membercode and CalculateDate=@Membercalc";
+                    query += " where Membercode = @Membercode";
                     query += " ORDER BY CalculateDate ";
 
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
-                        command.Parameters.AddWithValue("@Membercalc", calcdate);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
