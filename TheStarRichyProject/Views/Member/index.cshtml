@@ -997,19 +997,44 @@
                 $('#info-idcard').val(member.idcard || '');
                 $('#info-dateofbirth').val(member.dateofBirth || '');
                 $('#info-marital').val(member.marryStatus || '');
+                $('#info-gender').val(member.sex || '');
                 $('#info-membershiptype').val(member.typeofperson || '');
                 $('#info-lang').val(member.lang || '');
-                $('#info-smsType').text(member.smsType || '');//smsType
+                const smsTypeVal = member.sMSType || member.smsType || member.SMSType || '';
+                $('#info-smsnews').prop('checked', smsTypeVal === 'Y' || smsTypeVal === '1');
                 //address
                 $('#info-idcardaddress').val(member.idcardAddress || '');
-                $('#info-idcardpostcode').val((member.iDcardPostcode || '').toString().replace(/\D/g, '').slice(0, 5)).trigger('input');
-                if (member.iDcardDustrictCode) {
-                    $('#info-idcardprovince').val(member.iDcardDustrictCode).trigger('change');
+                const idcardPostcode = (member.iDcardPostcode || '').toString().replace(/\D/g, '').slice(0, 5);
+                if (idcardPostcode) {
+                    $('#info-idcardpostcode').val(idcardPostcode).trigger('input');
+                    const idcardTambon = String(member.iDcardTambonId || member.idcardTambonId || '');
+                    const idcardMatch = idcardTambon && masterAddressData.length > 0
+                        ? masterAddressData.find(item => String(item.tambon_code) === idcardTambon)
+                        : null;
+                    if (idcardMatch) {
+                        $('#info-idcardprovince').val(idcardMatch.province_code).trigger('change');
+                        $('#info-idcarddistrict').val(idcardMatch.amphoe_code).trigger('change');
+                        $('#info-idcardsubdistrict').val(idcardMatch.tambon_code);
+                    } else if (member.iDcardDustrictCode) {
+                        $('#info-idcardprovince').val(member.iDcardDustrictCode).trigger('change');
+                    }
                 }
+
                 $('#info-presentaddress').val(member.presentAddress || '');
-                $('#info-presentpostcode').val((member.presentPostcode || '').toString().replace(/\D/g, '').slice(0, 5)).trigger('input');
-                if (member.presentDistrictCode) {
-                    $('#info-presentprovince').val(member.presentDistrictCode).trigger('change');
+                const presentPostcode = (member.presentPostcode || '').toString().replace(/\D/g, '').slice(0, 5);
+                if (presentPostcode) {
+                    $('#info-presentpostcode').val(presentPostcode).trigger('input');
+                    const presentTambon = String(member.presentTambonId || '');
+                    const presentMatch = presentTambon && masterAddressData.length > 0
+                        ? masterAddressData.find(item => String(item.tambon_code) === presentTambon)
+                        : null;
+                    if (presentMatch) {
+                        $('#info-presentprovince').val(presentMatch.province_code).trigger('change');
+                        $('#info-presentdistrict').val(presentMatch.amphoe_code).trigger('change');
+                        $('#info-presentsubdistrict').val(presentMatch.tambon_code);
+                    } else if (member.presentDistrictCode) {
+                        $('#info-presentprovince').val(member.presentDistrictCode).trigger('change');
+                    }
                 }
                 $('#info-mobilephone').val(member.mobilePhone || '');
                 $('#info-homephone').val(member.homephone || '');

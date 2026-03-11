@@ -310,7 +310,9 @@ namespace TheStarRichyApi.Services
                                         AmountBUY_Month = reader["AmountBUY_Month"]?.ToString() ?? "0",
                                         Totalmember_buy_month = reader["Totalmember_buy_month"]?.ToString() ?? "0",
                                         LastMonthStatus = reader["LastMonthStatus"]?.ToString() ?? "0",
-                                        CurrentMonthStatus = reader["CurrentMonthStatus"]?.ToString() ?? "0"
+                                        CurrentMonthStatus = reader["CurrentMonthStatus"]?.ToString() ?? "0",
+                                        IDcardTambonId = SafeReadColumn(reader, "M06_X12_TAMBON_ID"),
+                                        PresentTambonId = SafeReadColumn(reader, "M06_X11_TAMBON_ID")
 
 
                                     };
@@ -510,12 +512,20 @@ WHERE M06_PX1 = @Membercode
                 const string sql = @"
 UPDATE M06
 SET
-    M06_X5 = COALESCE(@BussinessName, M06_X5),
-    M06_X11 = COALESCE(@PresentAddress, M06_X11),
-    M06_X12 = COALESCE(@IdcardAddress, M06_X12),
-    M06_X25 = COALESCE(@Bookbankname, M06_X25),
-    M06_X27 = COALESCE(@Accountnumber, M06_X27),
-    M06_X28 = COALESCE(@Branchname, M06_X28),
+    M06_X5              = COALESCE(@BussinessName, M06_X5),
+    M06_X11             = COALESCE(@PresentAddress, M06_X11),
+    M06_X11_Zipcode     = COALESCE(@PresentPostcode, M06_X11_Zipcode),
+    M06_X11_TAMBON_ID   = COALESCE(@PresentSubdistrictCode, M06_X11_TAMBON_ID),
+    M06_X12             = COALESCE(@IdcardAddress, M06_X12),
+    M06_X12_Zipcode     = COALESCE(@IdcardPostcode, M06_X12_Zipcode),
+    M06_X12_TAMBON_ID   = COALESCE(@IdcardSubdistrictCode, M06_X12_TAMBON_ID),
+    M06_X13             = COALESCE(@IdcardPostcode, M06_X13),
+    M06_X19             = COALESCE(@PresentPostcode, M06_X19),
+    M06_X25             = COALESCE(@Bookbankname, M06_X25),
+    M06_X26             = COALESCE(@BankCode, M06_X26),
+    M06_X27             = COALESCE(@Accountnumber, M06_X27),
+    M06_X28             = COALESCE(@Branchname, M06_X28),
+    Zipcode             = COALESCE(@IdcardPostcode, Zipcode),
     PIC1 = COALESCE(@Pic1, PIC1),
     PIC2 = COALESCE(@Pic2, PIC2),
     PIC3 = COALESCE(@Pic3, PIC3),
@@ -527,8 +537,13 @@ WHERE M06_PX1 = @Membercode
                 command.Parameters.AddWithValue("@Membercode", memberCode);
                 command.Parameters.AddWithValue("@BussinessName", ToDbValue(request.PersonalInfo?.BussinessName));
                 command.Parameters.AddWithValue("@PresentAddress", ToDbValue(request.AddressInfo?.PresentAddress?.AddressLine));
+                command.Parameters.AddWithValue("@PresentPostcode", ToDbValue(request.AddressInfo?.PresentAddress?.Postcode));
+                command.Parameters.AddWithValue("@PresentSubdistrictCode", ToDbValue(request.AddressInfo?.PresentAddress?.SubdistrictCode));
                 command.Parameters.AddWithValue("@IdcardAddress", ToDbValue(request.AddressInfo?.IdCardAddress?.AddressLine));
+                command.Parameters.AddWithValue("@IdcardPostcode", ToDbValue(request.AddressInfo?.IdCardAddress?.Postcode));
+                command.Parameters.AddWithValue("@IdcardSubdistrictCode", ToDbValue(request.AddressInfo?.IdCardAddress?.SubdistrictCode));
                 command.Parameters.AddWithValue("@Bookbankname", ToDbValue(request.BankInfo?.AccountName));
+                command.Parameters.AddWithValue("@BankCode", ToDbValue(request.BankInfo?.BankCode));
                 command.Parameters.AddWithValue("@Accountnumber", ToDbValue(request.BankInfo?.AccountNumber));
                 command.Parameters.AddWithValue("@Branchname", ToDbValue(request.BankInfo?.BranchName));
                 command.Parameters.AddWithValue("@Pic1", ToDbValue(request.DocumentInfo?.IdCardImageUrl));
@@ -565,6 +580,12 @@ WHERE M06_PX1 = @Membercode
         private static object ToDbValue(string? value)
         {
             return string.IsNullOrWhiteSpace(value) ? DBNull.Value : value.Trim();
+        }
+
+        private static string SafeReadColumn(SqlDataReader reader, string columnName)
+        {
+            try { return reader[columnName]?.ToString() ?? ""; }
+            catch (IndexOutOfRangeException) { return ""; }
         }
     }
     public class GetInfoMember2
@@ -610,8 +631,8 @@ WHERE M06_PX1 = @Membercode
         public string IdcardAddress { get; set; } = "";
         public string IDcardPostcode { get; set; } = "";
         public string IDcardDustrict { get; set; } = "";
-        public string IDcardDustrictCode { get; set; } = "";
-        public string CountryCode { get; set; } = "";
+        public string IDcardDustrictCode { get; set; } = "";        public string IDcardTambonId { get; set; } = "";
+        public string PresentTambonId { get; set; } = "";        public string CountryCode { get; set; } = "";
         public string Countryname { get; set; } = "";
         public string LocationCode { get; set; } = "";
         public string Locationname { get; set; } = "";
