@@ -99,6 +99,8 @@ app.Use(async (context, next) =>
         path.StartsWith("/Auth/", StringComparison.OrdinalIgnoreCase) ||
         path.StartsWith("/ExternalRegistration/", StringComparison.OrdinalIgnoreCase) ||
         path.StartsWith("/Culture/", StringComparison.OrdinalIgnoreCase) ||
+        path.Equals("/home/GetSlideImages", StringComparison.OrdinalIgnoreCase) ||
+        path.Equals("/home/GetPopupSlideImages", StringComparison.OrdinalIgnoreCase) ||
         path.Equals("/", StringComparison.OrdinalIgnoreCase);
 
     if (!isPublicPath)
