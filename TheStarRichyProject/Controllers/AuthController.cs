@@ -186,6 +186,7 @@ namespace TheStarRichyProject.Controllers
                         var memberpermission = JsonConvert.DeserializeObject<dynamic>(response.Content);
 
                         responseData.TotalBonus = memberinfo.totalBonus;
+                        responseData.kyc = (string)memberinfo.kyc ?? "N";
 
                         CookieHelper.SetCookie(_httpContextAccessor, CookieHelper.MemberCodeKey, memberCode,
                            new CookieOptions
