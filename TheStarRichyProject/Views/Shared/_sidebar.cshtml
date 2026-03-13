@@ -206,10 +206,10 @@
                                     @if (permissions.M11.ToString() != "Y" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
-                                            <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> ประวัติการสั่งซื้อ ส่วนตัว</a>
+                                            <a href="@Url.Action("buyorder", "reports")" class="nav-link" data-key="t-buyorder"> ประวัติการสั่งซื้อ ส่วนตัว</a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> ประวัติการสั่งซื้อ HOLD</a>
+                                            <a href="@Url.Action("buyhold", "reports")" class="nav-link" data-key="t-buyhold"> ประวัติการสั่งซื้อ HOLD</a>
                                         </li>
                                         <li class="nav-item">
                                             <a href="@Url.Action("orderhistory", "reports")" class="nav-link" data-key="t-orderhistory"> รายงานสั่งซื้อรอดำเนินการ</a>
