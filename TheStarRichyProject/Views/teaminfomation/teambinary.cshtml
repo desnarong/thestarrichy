@@ -760,9 +760,16 @@
 </script>
 
 <style>
+    #binaryTreeContainer {
+        overflow: auto;
+        max-height: calc(100vh - 220px);
+        -webkit-overflow-scrolling: touch;
+    }
+
     .binary-tree-container {
         padding: 20px;
-        overflow-x: auto;
+        display: inline-block;
+        min-width: max-content;
         background: unset;
     }
 
@@ -1292,8 +1299,8 @@
     @@media (max-width: 768px) {
         #binaryTreeContainer {
             text-align: left !important;
-            overflow-x: auto;
-            overflow-y: hidden;
+            overflow: auto;
+            max-height: calc(100vh - 180px);
             -webkit-overflow-scrolling: touch;
         }
 
@@ -1301,7 +1308,6 @@
             display: inline-block;
             min-width: max-content;
             padding: 10px 6px;
-            overflow-x: auto;
         }
 
         .teambinary-search .input-group .form-control {
