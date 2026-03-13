@@ -34,6 +34,10 @@ namespace TheStarRichyProject.Controllers
         {
             return View();
         }
+        public IActionResult poorder()
+        {
+            return View();
+        }
         public IActionResult salereport()
         {
             return View();
