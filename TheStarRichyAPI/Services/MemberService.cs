@@ -15,6 +15,7 @@ namespace TheStarRichyApi.Services
         Task<List<GetInfoMember2>> GetMember2DisplayAsync(string baseUrl);
         Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(UpdateMemberProfileRequest request);
         Task<UpdateMemberProfileResult> UpdateMemberProfilePic4Async(string profileImageUrl);
+        Task<bool> UpdateKYCAsync();
     }
     public class MemberService : IMemberService
     {
@@ -574,6 +575,28 @@ WHERE M06_PX1 = @Membercode
                     Success = false,
                     Message = $"เกิดข้อผิดพลาดในการอัปเดตข้อมูล: {ex.Message}"
                 };
+            }
+        }
+
+        public async Task<bool> UpdateKYCAsync()
+        {
+            string memberCode = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+            if (string.IsNullOrWhiteSpace(memberCode)) return false;
+
+            string connectionString = _configuration.GetConnectionString("MLMConnectionString");
+            try
+            {
+                using var con = new SqlConnection(connectionString);
+                await con.OpenAsync();
+                const string sql = "UPDATE M06 SET kyc = 'Y' WHERE M06_PX1 = @Membercode AND M06_X47 = N'0'";
+                using var cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@Membercode", memberCode);
+                await cmd.ExecuteNonQueryAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
             }
         }
 

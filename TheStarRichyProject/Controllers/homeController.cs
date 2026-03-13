@@ -56,6 +56,36 @@ namespace TheStarRichyProject.Controllers
             var token = Request.Cookies[CookieHelper.UserKey];
             return Ok(new { token });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptKYC()
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            var options = new RestClientOptions(_config["Api:Url"])
+            {
+                ThrowOnAnyError = false,
+                ConfigureMessageHandler = handler =>
+                {
+                    var httpClientHandler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+                    return httpClientHandler;
+                }
+            };
+            var passkey = _config["Api:Passkey"];
+            var token = Request.Cookies[CookieHelper.UserKey];
+            var client = new RestClient(options);
+            var request = new RestRequest("/Member/updatekyc", Method.Post);
+            request.AddHeader("X-Passkey", passkey);
+            request.AddHeader("Authorization", $"Bearer {token}");
+            request.AddHeader("Accept", "application/json");
+            RestResponse response = await client.ExecuteAsync(request);
+            if (response.IsSuccessful)
+                return Ok(response.Content);
+            return StatusCode((int)(response.StatusCode), response.Content);
+        }
+
         public async Task<IActionResult> GetMemberInfo()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;

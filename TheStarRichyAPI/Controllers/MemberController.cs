@@ -243,6 +243,22 @@ namespace TheStarRichyApi.Controllers
             }
         }
 
+        [HttpPost("updatekyc")]
+        public async Task<IActionResult> UpdateKYC()
+        {
+            try
+            {
+                var result = await _memberService.UpdateKYCAsync();
+                if (result)
+                    return Ok(new { success = true, message = "อัปเดต KYC เรียบร้อย" });
+                return StatusCode(500, new { success = false, message = "ไม่สามารถอัปเดต KYC ได้" });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
         [HttpGet("incomebyperiod")]
         public async Task<IActionResult> GetMemberIncomeByPeriod()
         {
