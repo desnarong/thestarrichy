@@ -24,6 +24,7 @@ builder.Services.AddScoped<IMemberPermissionService, MemberPermissionService>();
 builder.Services.AddScoped<IMessagetoMemberService, MessagetoMemberService>();
 builder.Services.AddScoped<IEstimatePositionService, EstimatePositionService>();
 builder.Services.AddScoped<IMemberDeliveryAddressService, MemberDeliveryAddressService>();
+builder.Services.AddScoped<IMemberAddressService, MemberAddressService>();
 
 // Team Management
 builder.Services.AddScoped<IMemberTeamBuyProductService, MemberTeamBuyProductService>();

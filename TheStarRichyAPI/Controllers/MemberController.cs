@@ -63,6 +63,7 @@ namespace TheStarRichyApi.Controllers
         private readonly IMemberDeliveryAddressService _memberDeliveryAddressService;
         private readonly IBranchService _branchService;
         private readonly IMemberFavoriteAddressService _memberFavoriteAddressService;
+        private readonly IMemberAddressService _memberAddressService;
         public MemberController(
             IMemberService memberService,
             IMemberIncomeByPeriodService memberIncomeByPeriodService,
@@ -111,7 +112,8 @@ namespace TheStarRichyApi.Controllers
             IReportMemberBonusByDateDetailBinaryService reportMemberBonusByDateDetailBinaryService,
             IMemberDeliveryAddressService memberDeliveryAddressService,
             IBranchService branchService,
-            IMemberFavoriteAddressService memberFavoriteAddressService
+            IMemberFavoriteAddressService memberFavoriteAddressService,
+            IMemberAddressService memberAddressService
             )
         {
             _memberService = memberService;
@@ -164,6 +166,7 @@ namespace TheStarRichyApi.Controllers
             _memberDeliveryAddressService = memberDeliveryAddressService;
             _branchService = branchService;
             _memberFavoriteAddressService = memberFavoriteAddressService;
+            _memberAddressService = memberAddressService;
         }
 
         [HttpGet("hello")]
@@ -866,28 +869,53 @@ namespace TheStarRichyApi.Controllers
 
                 if (result.Count > 0)
                 {
-                    // ✅ เติม Ok() เพื่อครอบ Object และส่ง HTTP Status 200 กลับไป
-                    return Ok(new
-                    {
-                        Success = true,
-                        Message = "Success",
-                        Data = result
-                    });
+                    return Ok(new { Success = true, Message = "Success", Data = result });
                 }
                 else
                 {
-                    // ✅ เติม Ok() เช่นกัน (API ทำงานสำเร็จตามปกติ แค่ไม่มีข้อมูล)
-                    return Ok(new
-                    {
-                        Success = false,
-                        Message = "Not found",
-                        Data = new List<dynamic>()
-                    });
+                    return Ok(new { Success = false, Message = "Not found", Data = new List<dynamic>() });
                 }
             }
             catch (Exception)
             {
                 return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        // ============================================================
+        // Profile Addresses (TBL_MEMBER_ADDRESSES) — Type 1,2,3
+        // ============================================================
+
+        [HttpGet("profile-addresses")]
+        public async Task<IActionResult> GetProfileAddresses()
+        {
+            try
+            {
+                var result = await _memberAddressService.GetAddressesAsync();
+                return Ok(new { success = true, data = result });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
+        [HttpPut("profile-addresses")]
+        public async Task<IActionResult> UpsertProfileAddresses([FromBody] UpsertMemberAddressesRequest request)
+        {
+            if (request == null || request.Addresses == null || request.Addresses.Count == 0)
+                return BadRequest(new { success = false, message = "ไม่มีข้อมูลที่อยู่ที่ส่งมา" });
+
+            try
+            {
+                var (success, message) = await _memberAddressService.UpsertAddressesAsync(request.Addresses);
+                if (success)
+                    return Ok(new { success = true, message });
+                return BadRequest(new { success = false, message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
             }
         }
     }

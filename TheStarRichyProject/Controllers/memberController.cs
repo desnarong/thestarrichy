@@ -531,7 +531,10 @@ namespace TheStarRichyProject.Controllers
                 string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string
-                string rawJsonString = request.GetRawText();
+                //string rawJsonString = request.GetRawText();
+                string rawJsonString = request is System.Text.Json.JsonElement je
+                    ? je.GetRawText()
+                    : Newtonsoft.Json.JsonConvert.SerializeObject(request);
 
                 // 2. แปลง string ให้เป็น JsonObject (เพื่อให้เพิ่ม/แก้ไขข้อมูลได้)
                 var jsonObject = JsonNode.Parse(rawJsonString).AsObject();
@@ -700,7 +703,12 @@ namespace TheStarRichyProject.Controllers
                 string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string และแปลงเป็น JsonObject
-                string rawJsonString = request.GetRawText();
+                //string rawJsonString = request.GetRawText();
+                //var jsonObject = JsonNode.Parse(rawJsonString).AsObject();
+
+                string rawJsonString = request is System.Text.Json.JsonElement je
+                    ? je.GetRawText()
+                    : Newtonsoft.Json.JsonConvert.SerializeObject(request);
                 var jsonObject = JsonNode.Parse(rawJsonString).AsObject();
 
                 // บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง
@@ -848,6 +856,86 @@ namespace TheStarRichyProject.Controllers
             {
                 _logger.LogError(ex, "Error calling FullFinalizeRegistration API");
                 return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการลงทะเบียน" });
+            }
+        }
+
+        // ============================================================
+        // Profile Addresses — GET (proxy → /Member/profile-addresses)
+        // ============================================================
+        public async Task<IActionResult> GetProfileAddresses()
+        {
+            try
+            {
+                var options = new RestClientOptions(_config["Api:Url"]!)
+                {
+                    ThrowOnAnyError = false,
+                    ConfigureMessageHandler = _ => new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+                    }
+                };
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                var passkey = _config["Api:Passkey"]!;
+                var token   = Request.Cookies[CookieHelper.UserKey];
+                var client  = new RestClient(options);
+                var req     = new RestRequest("/Member/profile-addresses", Method.Get);
+                req.AddHeader("X-Passkey",     passkey);
+                req.AddHeader("Authorization", $"Bearer {token}");
+                req.AddHeader("Accept",        "application/json");
+
+                var response = await client.ExecuteAsync(req);
+                if (response.IsSuccessful)
+                    return Ok(response.Content);
+
+                return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode),
+                    response.Content);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calling GetProfileAddresses API");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการดึงข้อมูลที่อยู่" });
+            }
+        }
+
+        // ============================================================
+        // Profile Addresses — PUT (proxy → /Member/profile-addresses)
+        // ============================================================
+        [HttpPut]
+        public async Task<IActionResult> UpdateProfileAddresses([FromBody] JObject requestBody)
+        {
+            try
+            {
+                var options = new RestClientOptions(_config["Api:Url"]!)
+                {
+                    ThrowOnAnyError = false,
+                    ConfigureMessageHandler = _ => new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (_, _, _, _) => true
+                    }
+                };
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                var passkey = _config["Api:Passkey"]!;
+                var token   = Request.Cookies[CookieHelper.UserKey];
+                var client  = new RestClient(options);
+                var req     = new RestRequest("/Member/profile-addresses", Method.Put);
+                req.AddHeader("X-Passkey",     passkey);
+                req.AddHeader("Authorization", $"Bearer {token}");
+                req.AddHeader("Accept",        "application/json");
+                req.AddStringBody(requestBody?.ToString() ?? "{}", "application/json");
+
+                var response = await client.ExecuteAsync(req);
+                if (response.IsSuccessful)
+                    return Ok(response.Content);
+
+                return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode),
+                    response.Content);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calling UpdateProfileAddresses API");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการบันทึกที่อยู่" });
             }
         }
     }

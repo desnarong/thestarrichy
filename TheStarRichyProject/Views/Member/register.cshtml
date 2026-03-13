@@ -299,10 +299,30 @@
                                             <h5 class="mb-0">ข้อมูลที่อยู่ <small class="text-muted">(สำหรับการจัดส่ง)</small></h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ที่อยู่ตามบัตรฯ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน" required></textarea>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-8 col-md-5">
+                                                    <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="simpleHouseNumber" placeholder="เช่น 123/4" required />
+                                                </div>
+                                                <div class="col-4 col-md-2">
+                                                    <label class="form-label">หมู่ที่</label>
+                                                    <input type="text" class="form-control" id="simpleMoo" placeholder="หมู่" />
+                                                </div>
+                                                <div class="col-6 col-md-5">
+                                                    <label class="form-label">ซอย / ตรอก</label>
+                                                    <input type="text" class="form-control" id="simpleAlley" placeholder="ชื่อซอย" />
+                                                </div>
+                                                <div class="col-6 col-md-4">
+                                                    <label class="form-label">ถนน</label>
+                                                    <input type="text" class="form-control" id="simpleRoad" placeholder="ชื่อถนน" />
+                                                </div>
+                                                <div class="col-8 col-md-5">
+                                                    <label class="form-label">อาคาร / หมู่บ้าน</label>
+                                                    <input type="text" class="form-control" id="simpleBuilding" placeholder="ชื่ออาคาร" />
+                                                </div>
+                                                <div class="col-4 col-md-2">
+                                                    <label class="form-label">ชั้น</label>
+                                                    <input type="text" class="form-control" id="simpleFloor" placeholder="ชั้น" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -333,6 +353,7 @@
                                                     <select class="form-control" id="simpleSubdistrict" required disabled>
                                                         <option value="">-- เลือกตำบล --</option>
                                                     </select>
+                                                    <input type="hidden" id="simpleTambonId" />
                                                 </div>
                                             </div>
                                         </div>
@@ -632,9 +653,31 @@
                                                 <div class="col-12 mb-3">
                                                     <h6 class="mb-3">ที่อยู่ตามบัตรประชาชน</h6>
 
-                                                    <div class="form-group mb-3">
-                                                        <label class="form-label small">บ้านเลขที่/ถนน <span class="text-danger">*</span></label>
-                                                        <textarea id="fullAddressIdCard" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง" required></textarea>
+                                                    <div class="row g-2 mb-3">
+                                                        <div class="col-7">
+                                                            <label class="form-label small">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" id="fullHouseNumber" placeholder="เช่น 123/4" required />
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <label class="form-label small">หมู่ที่</label>
+                                                            <input type="text" class="form-control" id="fullMoo" placeholder="หมู่" />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label small">ซอย / ตรอก</label>
+                                                            <input type="text" class="form-control" id="fullAlley" placeholder="ชื่อซอย" />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label small">ถนน</label>
+                                                            <input type="text" class="form-control" id="fullRoad" placeholder="ชื่อถนน" />
+                                                        </div>
+                                                        <div class="col-8">
+                                                            <label class="form-label small">อาคาร / หมู่บ้าน</label>
+                                                            <input type="text" class="form-control" id="fullBuilding" placeholder="ชื่ออาคาร" />
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label small">ชั้น</label>
+                                                            <input type="text" class="form-control" id="fullFloor" placeholder="ชั้น" />
+                                                        </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
@@ -662,6 +705,7 @@
                                                             <select id="fullSubdistrictIdCard" class="form-control" disabled required>
                                                                 <option value="">-- เลือกตำบล --</option>
                                                             </select>
+                                                            <input type="hidden" id="fullTambonId" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -676,9 +720,31 @@
                                                         </div>
                                                     </div>
 
-                                                    <div class="form-group mb-3">
-                                                        <label class="form-label small">ที่อยู่ <span class="text-danger">*</span></label>
-                                                        <textarea id="fullCurrentAddress" class="form-control" rows="3" placeholder="บ้านเลขที่, หมู่, ถนน, ตำบล/แขวง" required></textarea>
+                                                    <div class="row g-2 mb-3">
+                                                        <div class="col-7">
+                                                            <label class="form-label small">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                            <input type="text" class="form-control" id="fullCurrentHouseNumber" placeholder="เช่น 123/4" required />
+                                                        </div>
+                                                        <div class="col-5">
+                                                            <label class="form-label small">หมู่ที่</label>
+                                                            <input type="text" class="form-control" id="fullCurrentMoo" placeholder="หมู่" />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label small">ซอย / ตรอก</label>
+                                                            <input type="text" class="form-control" id="fullCurrentAlley" placeholder="ชื่อซอย" />
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <label class="form-label small">ถนน</label>
+                                                            <input type="text" class="form-control" id="fullCurrentRoad" placeholder="ชื่อถนน" />
+                                                        </div>
+                                                        <div class="col-8">
+                                                            <label class="form-label small">อาคาร / หมู่บ้าน</label>
+                                                            <input type="text" class="form-control" id="fullCurrentBuilding" placeholder="ชื่ออาคาร" />
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <label class="form-label small">ชั้น</label>
+                                                            <input type="text" class="form-control" id="fullCurrentFloor" placeholder="ชั้น" />
+                                                        </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
@@ -706,6 +772,7 @@
                                                             <select id="fullCurrentSubdistrict" class="form-control" disabled required>
                                                                 <option value="">-- เลือกตำบล --</option>
                                                             </select>
+                                                            <input type="hidden" id="fullCurrentTambonId" />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -1570,6 +1637,13 @@
             }
         });
 
+        // Update fullTambonId when fullSubdistrictIdCard changes
+        $('#fullSubdistrictIdCard').change(function () {
+            const code = $(this).val();
+            const match = masterData.find(item => String(item.tambon_code) === String(code));
+            $('#fullTambonId').val(match ? match.id : '');
+        });
+
         // --- Full: province/district change handlers (Current address) ---
         $('#fullCurrentProvince').change(function () {
             const selectedZip = $('#fullCurrentPostcode').val();
@@ -1601,6 +1675,13 @@
                 filtered.forEach(item => $('#fullCurrentSubdistrict').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
                 $('#fullCurrentSubdistrict').prop('disabled', false);
             }
+        });
+
+        // Update fullCurrentTambonId when fullCurrentSubdistrict changes
+        $('#fullCurrentSubdistrict').change(function () {
+            const code = $(this).val();
+            const match = masterData.find(item => String(item.tambon_code) === String(code));
+            $('#fullCurrentTambonId').val(match ? match.id : '');
         });
 
         // Populate province/district/subdistrict when user types postcode (Full - ID card)
@@ -1650,28 +1731,22 @@
         // When checkbox 'ใช้ที่อยู่ตามบัตร' is toggled copy/clear current address fields
         $('#fullUseIdCardAddress').change(function () {
             if ($(this).is(':checked')) {
-                // 1. ก๊อปปี้บ้านเลขที่
-                $('#fullCurrentAddress').val($('#fullAddressIdCard').val());
+                // Copy granular address fields
+                ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
+                    $(`#fullCurrent${f}`).val($(`#full${f}`).val() || '')
+                );
 
-                // 2. ยัดรหัสไปรษณีย์ + สั่ง trigger('input')
-                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> จังหวัดเสร็จ จึงจะไปบรรทัดที่ 3
                 $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
-
-                // 3. ยัดค่าจังหวัด + สั่ง trigger('change')
-                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> อำเภอเสร็จ จึงจะไปบรรทัดที่ 4
                 $('#fullCurrentProvince').val($('#fullProvinceIdCard').val()).trigger('change');
-
-                // 4. ยัดค่าอำเภอ + สั่ง trigger('change')
-                // -> โค้ดจะหยุดรอจนกว่าจะวาด <option> ตำบลเสร็จ จึงจะไปบรรทัดที่ 5
                 $('#fullCurrentDistrict').val($('#fullDistrictIdCard').val()).trigger('change');
-
-                // 5. ยัดค่าตำบล (จบกระบวนการ ไม่ต้อง trigger ต่อแล้ว)
                 $('#fullCurrentSubdistrict').val($('#fullSubdistrictIdCard').val());
-
+                $('#fullCurrentTambonId').val($('#fullTambonId').val() || '');
             } else {
-                // ล้างข้อมูลเมื่อเอาติ๊กถูกออก
-                $('#fullCurrentAddress').val('');
+                ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
+                    $(`#fullCurrent${f}`).val('')
+                );
                 $('#fullCurrentPostcode').val('');
+                $('#fullCurrentTambonId').val('');
                 resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
                 resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
                 resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
@@ -1727,7 +1802,7 @@
             // ==========================================
             // 3. Validate Address (บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง)
             // ==========================================
-            const addressFields = ['#simpleAddressIdCard', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
+            const addressFields = ['#simpleHouseNumber', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
             let addressComplete = true;
 
             addressFields.forEach(fieldId => {
@@ -1782,11 +1857,18 @@
                     homePhone: $('#simpleHomePhone').val(), // เพิ่ม: เบอร์บ้าน
                     email: $('#simpleEmail').val(),
                     lineId: $('#simpleLineId').val(),
-                    addressIdCard: $('#simpleAddressIdCard').val(),
+                    addressIdCard: [$('#simpleHouseNumber').val(), $('#simpleMoo').val() ? 'หมู่ ' + $('#simpleMoo').val() : '', $('#simpleAlley').val() ? 'ซ.' + $('#simpleAlley').val() : '', $('#simpleRoad').val() ? 'ถ.' + $('#simpleRoad').val() : '', $('#simpleBuilding').val(), $('#simpleFloor').val() ? 'ชั้น ' + $('#simpleFloor').val() : ''].filter(Boolean).join(' '),
+                    houseNumber: $('#simpleHouseNumber').val(),
+                    moo: $('#simpleMoo').val(),
+                    alley: $('#simpleAlley').val(),
+                    road: $('#simpleRoad').val(),
+                    building: $('#simpleBuilding').val(),
+                    floor: $('#simpleFloor').val(),
                     postcode: $('#simplePostcode').val(),
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
+                    tambonId: parseInt($('#simpleTambonId').val()) || null,
                     ipAddress: clientIpAddress
                 };
 
@@ -1954,19 +2036,33 @@
                 beneficiaryCardNumber: $('#fullBeneficiaryCardNumber').val() || '', // เพิ่ม: เลขบัตรผู้รับผลประโยชน์
 
                 // Address (ID card) -> เปลี่ยน Key ไม่ให้มีคำว่า IdCard ห้อยท้าย (ให้ตรงกับ Model)
-                addressIdCard: $('#fullAddressIdCard').val(),
+                addressIdCard: [$('#fullHouseNumber').val(), $('#fullMoo').val() ? 'หมู่ ' + $('#fullMoo').val() : '', $('#fullAlley').val() ? 'ซ.' + $('#fullAlley').val() : '', $('#fullRoad').val() ? 'ถ.' + $('#fullRoad').val() : '', $('#fullBuilding').val(), $('#fullFloor').val() ? 'ชั้น ' + $('#fullFloor').val() : ''].filter(Boolean).join(' '),
+                houseNumber: $('#fullHouseNumber').val(),
+                moo: $('#fullMoo').val(),
+                alley: $('#fullAlley').val(),
+                road: $('#fullRoad').val(),
+                building: $('#fullBuilding').val(),
+                floor: $('#fullFloor').val(),
                 postcode: $('#fullPostcodeIdCard').val(),
                 provinceCode: $('#fullProvinceIdCard').val(),
                 districtCode: $('#fullDistrictIdCard').val(),
                 subdistrictCode: $('#fullSubdistrictIdCard').val(),
+                tambonId: parseInt($('#fullTambonId').val()) || null,
 
                 // Current / contact address
                 useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
-                currentAddress: $('#fullCurrentAddress').val(),
+                currentAddress: [$('#fullCurrentHouseNumber').val(), $('#fullCurrentMoo').val() ? 'หมู่ ' + $('#fullCurrentMoo').val() : '', $('#fullCurrentAlley').val() ? 'ซ.' + $('#fullCurrentAlley').val() : '', $('#fullCurrentRoad').val() ? 'ถ.' + $('#fullCurrentRoad').val() : '', $('#fullCurrentBuilding').val(), $('#fullCurrentFloor').val() ? 'ชั้น ' + $('#fullCurrentFloor').val() : ''].filter(Boolean).join(' '),
+                currentHouseNumber: $('#fullCurrentHouseNumber').val(),
+                currentMoo: $('#fullCurrentMoo').val(),
+                currentAlley: $('#fullCurrentAlley').val(),
+                currentRoad: $('#fullCurrentRoad').val(),
+                currentBuilding: $('#fullCurrentBuilding').val(),
+                currentFloor: $('#fullCurrentFloor').val(),
                 currentPostcode: $('#fullCurrentPostcode').val(),
                 currentProvinceCode: $('#fullCurrentProvince').val(),
                 currentDistrictCode: $('#fullCurrentDistrict').val(),
                 currentSubdistrictCode: $('#fullCurrentSubdistrict').val(),
+                currentTambonId: parseInt($('#fullCurrentTambonId').val()) || null,
 
                 ipAddress: clientIpAddress
             };

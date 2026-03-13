@@ -161,12 +161,12 @@
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${modalData.nextCMonth} ${formatNumber(modalData.currentMonthQualifyPV)} PV - ${modalData.currentMonthQualifyStatus}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.lastCMonth} รับ ${formatNumber(modalData.nextCMonth)} - ${modalData.currentMonthQualifyStatus}</div>
                 </div>
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${modalData.currentMonth} ${formatNumber(modalData.lastMonthQualifyPV)} PV - ${modalData.lastMonthQualifyStatus}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.currentMonth1} รับ ${formatNumber(modalData.currentMonth)} - ${modalData.lastMonthQualifyStatus}</div>
                 </div>
             </div>
         `;
@@ -525,7 +525,7 @@
             const nextPosaddLeftBalance = node.nextPosaddLeftBalance || 0;
             const nextPosaddRightBalance = node.nextPosaddRightBalance || 0;
 
-            const cardColorClass = isYesStatus(node.currentMonthQualifyStatus) ? 'card-green' : 'card-red';
+            const cardColorClass = isYesStatus(node.lastMonthQualifyStatus) ? 'card-green' : 'card-red';
             const memberPicture = node.memberPositionPicture || '/images/1_Black1_40x40.gif';
 
             const isLeft = positionLevel.toLowerCase().includes('left');
@@ -580,7 +580,7 @@
                             <div class="member-name">${membername}</div>
                             <div class="member-code">${childCode}</div>
                             <div class="member-position">${memberpositionName}</div>
-                            <div class="member-position-ranking">รักษายอด ${currentMonth} - ${lastMonthQualifyPV} PV</div>
+                            <div class="member-position-ranking">รักษายอด ${currentMonth1} - ${lastMonthQualifyPV} PV</div>
                         </div>
                     </div>
                     ${!isLastLevel ? `

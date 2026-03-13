@@ -276,10 +276,30 @@
                                             <h5 class="mb-0">ข้อมูลที่อยู่ <small class="text-muted">(สำหรับการจัดส่ง)</small></h5>
                                         </div>
                                         <div class="card-body">
-                                            <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ที่อยู่ตามบัตรฯ <span class="text-danger">*</span></label>
-                                                <div class="col-md-7">
-                                                    <textarea class="form-control" rows="3" id="simpleAddressIdCard" placeholder="บ้านเลขที่, หมู่, ถนน" required></textarea>
+                                            <div class="row g-2 mb-3">
+                                                <div class="col-8 col-md-5">
+                                                    <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                    <input type="text" class="form-control" id="simpleHouseNumber" placeholder="เช่น 123/4" required />
+                                                </div>
+                                                <div class="col-4 col-md-2">
+                                                    <label class="form-label">หมู่ที่</label>
+                                                    <input type="text" class="form-control" id="simpleMoo" placeholder="หมู่" />
+                                                </div>
+                                                <div class="col-6 col-md-5">
+                                                    <label class="form-label">ซอย / ตรอก</label>
+                                                    <input type="text" class="form-control" id="simpleAlley" placeholder="ชื่อซอย" />
+                                                </div>
+                                                <div class="col-6 col-md-4">
+                                                    <label class="form-label">ถนน</label>
+                                                    <input type="text" class="form-control" id="simpleRoad" placeholder="ชื่อถนน" />
+                                                </div>
+                                                <div class="col-8 col-md-5">
+                                                    <label class="form-label">อาคาร / หมู่บ้าน</label>
+                                                    <input type="text" class="form-control" id="simpleBuilding" placeholder="ชื่ออาคาร" />
+                                                </div>
+                                                <div class="col-4 col-md-2">
+                                                    <label class="form-label">ชั้น</label>
+                                                    <input type="text" class="form-control" id="simpleFloor" placeholder="ชั้น" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -310,6 +330,7 @@
                                                     <select class="form-control" id="simpleSubdistrict" required disabled>
                                                         <option value="">-- เลือกตำบล --</option>
                                                     </select>
+                                                    <input type="hidden" id="simpleTambonId" />
                                                 </div>
                                             </div>
                                         </div>
@@ -918,6 +939,13 @@
                 }
             });
 
+            // Update simpleTambonId when subdistrict changes
+            $('#simpleSubdistrict').change(function () {
+                const code = $(this).val();
+                const match = masterData.find(item => String(item.tambon_code) === String(code));
+                $('#simpleTambonId').val(match ? match.id : '');
+            });
+
             // 5. Simple form submission
             $('#simpleRegistrationForm').submit(async function (e) {
                 e.preventDefault();
@@ -966,7 +994,7 @@
                 // ==========================================
                 // 3. Validate Address (บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง)
                 // ==========================================
-                const addressFields = ['#simpleAddressIdCard', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
+                const addressFields = ['#simpleHouseNumber', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
                 let addressComplete = true;
 
                 addressFields.forEach(fieldId => {
@@ -1084,11 +1112,18 @@
                     email: $('#email').val(),
                     lineId: $('#lineId').val(),
 
-                    addressIdCard: $('#simpleAddressIdCard').val(),
+                    addressIdCard: [$('#simpleHouseNumber').val(), $('#simpleMoo').val() ? 'หมู่ ' + $('#simpleMoo').val() : '', $('#simpleAlley').val() ? 'ซ.' + $('#simpleAlley').val() : '', $('#simpleRoad').val() ? 'ถ.' + $('#simpleRoad').val() : '', $('#simpleBuilding').val(), $('#simpleFloor').val() ? 'ชั้น ' + $('#simpleFloor').val() : ''].filter(Boolean).join(' '),
+                    houseNumber: $('#simpleHouseNumber').val(),
+                    moo: $('#simpleMoo').val(),
+                    alley: $('#simpleAlley').val(),
+                    road: $('#simpleRoad').val(),
+                    building: $('#simpleBuilding').val(),
+                    floor: $('#simpleFloor').val(),
                     postcode: $('#simplePostcode').val(),
                     provinceCode: $('#simpleProvince').val(),
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
+                    tambonId: parseInt($('#simpleTambonId').val()) || null,
                     ipAddress: clientIpAddress
                 };
             }
