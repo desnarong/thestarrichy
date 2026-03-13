@@ -3,6 +3,189 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- ส่วนที่ 1: เงื่อนไขการค้นหา -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bx bx-store text-primary fs-4"></i>
+                <h4 class="mb-0">รายงานการขาย</h4>
+            </div>
+            <div class="card-body pb-2">
+                <!-- สรุปยอด -->
+                <div class="row mb-3 align-items-center">
+                    <label class="col-lg-2 col-md-3 col-form-label fw-semibold">ยอดรวม :</label>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="totalAmountDisplay" class="form-control bg-light fw-bold text-success text-end" readonly value="-">
+                            <span class="input-group-text">บาท</span>
+                        </div>
+                    </div>
+                    <label class="col-lg-2 col-md-3 col-form-label fw-semibold">PV รวม :</label>
+                    <div class="col-lg-3 col-md-4">
+                        <div class="input-group">
+                            <input type="text" id="totalPvDisplay" class="form-control bg-light fw-bold text-info text-end" readonly value="-">
+                            <span class="input-group-text">PV</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- ช่วงเวลา -->
+                <div class="row mb-2 align-items-end">
+                    <div class="col-lg-2 col-md-3 mb-2">
+                        <label class="form-label fw-semibold mb-1">จากวันที่ :</label>
+                        <input type="date" class="form-control" id="fromDate">
+                    </div>
+                    <div class="col-lg-2 col-md-3 mb-2">
+                        <label class="form-label fw-semibold mb-1">ถึงวันที่ :</label>
+                        <input type="date" class="form-control" id="toDate">
+                    </div>
+                    <div class="col-lg-3 col-md-3 mb-2">
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-light" id="btnReset" type="button"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+                            <button class="btn btn-primary" id="btnSearch" type="button"><i class="bx bx-search me-1"></i>ค้นหา</button>
+                        </div>
+                    </div>
+                </div>
+                <small class="text-muted d-block mt-1 mb-1"><i class="bx bx-info-circle me-1"></i>ถ้าไม่ได้ระบุวันที่ จะแสดงข้อมูลทั้งหมด</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ส่วนที่ 2: ตารางผลลัพธ์ -->
+<div class="row mt-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header" style="background-color:#e3f2fd; border-bottom:2px solid #1976d2;">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0"><i class="bx bx-table me-2 text-primary"></i>รายการขาย</h5>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-secondary py-2 mb-3" id="mainMessage">กำลังโหลดข้อมูล...</div>
+                <div class="table-responsive">
+                    <table id="saleTable" class="table table-striped table-bordered table-hover nowrap w-100"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+    var saleTable = null;
+
+    function pick(obj, keys, def) {
+        if (def === undefined) def = '';
+        for (var i = 0; i < keys.length; i++) {
+            if (obj != null && obj[keys[i]] !== undefined && obj[keys[i]] !== null)
+                return obj[keys[i]];
+        }
+        return def;
+    }
+
+    function normalizeRows(payload) {
+        var d = payload;
+        if (typeof d === 'string') { try { d = JSON.parse(d); } catch(e) { return []; } }
+        if (d && Array.isArray(d.data)) d = d.data;
+        return Array.isArray(d) ? d : [];
+    }
+
+    function toNum(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+    function fmtNum(v) {
+        return toNum(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(v) {
+        if (!v) return '-';
+        var d = new Date(v);
+        return isNaN(d.getTime()) ? String(v) : d.toLocaleDateString('th-TH');
+    }
+
+    function filterByDate(rows) {
+        var fromDate = $('#fromDate').val();
+        var toDate   = $('#toDate').val();
+        if (!fromDate && !toDate) return rows;
+        var from = fromDate ? new Date(fromDate) : null;
+        var to   = toDate   ? new Date(toDate + 'T23:59:59') : null;
+        return rows.filter(function (row) {
+            var raw = pick(row, ['BillDate','billDate']);
+            if (!raw) return true;
+            var d = new Date(raw);
+            if (isNaN(d.getTime())) return true;
+            if (from && d < from) return false;
+            if (to   && d > to)   return false;
+            return true;
+        });
+    }
+
+    var COLUMNS = [
+        { title: 'เลขที่บิล',      data: null, render: function(d){ return pick(d,['BillNo','billNo']); } },
+        { title: 'วันที่บิล',      data: null, render: function(d){ return fmtDate(pick(d,['BillDate','billDate'])); } },
+        { title: 'รหัสสมาชิก',    data: null, render: function(d){ return pick(d,['Membercode','memberCode','membercode']); } },
+        { title: 'ชื่อสมาชิก',    data: null, render: function(d){ return pick(d,['Membername','memberName','membername']); } },
+        { title: 'รหัสศูนย์',      data: null, render: function(d){ return pick(d,['HybridGOLDID','hybridGoldId','hybridGOLDID']); } },
+        { title: 'PV',             data: null, render: function(d){ return '<span class="text-info fw-semibold">' + fmtNum(pick(d,['TotalPV','totalPV','TotalPv'],0)) + '</span>'; } },
+        { title: 'ยอดรวม',        data: null, render: function(d){ return '<span class="fw-bold text-success">' + fmtNum(pick(d,['TotalAmount','totalAmount'],0)) + '</span>'; } },
+        { title: 'ประเภทชำระ',    data: null, render: function(d){ return pick(d,['PaymentType','paymentType']); } },
+        { title: 'สถานะ',         data: null, render: function(d){ return pick(d,['BillConfirmType','billConfirmType']); } },
+        { title: 'เลขอ้างอิง',    data: null, render: function(d){ return pick(d,['ReferenceNo','referenceNo']); } },
+    ];
+
+    function loadData() {
+        $('#mainMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...');
+
+        $.ajax({
+            url: '@Url.Action("GetSaleReportData", "reports")',
+            type: 'GET',
+            success: function (json) {
+                var rows = filterByDate(normalizeRows(json));
+
+                var totalAmt = rows.reduce(function(s, r){ return s + toNum(pick(r,['TotalAmount','totalAmount'],0)); }, 0);
+                var totalPV  = rows.reduce(function(s, r){ return s + toNum(pick(r,['TotalPV','totalPV','TotalPv'],0)); }, 0);
+                $('#totalAmountDisplay').val(fmtNum(totalAmt));
+                $('#totalPvDisplay').val(fmtNum(totalPV));
+
+                if (saleTable) { saleTable.destroy(); }
+                $('#saleTable').empty();
+                saleTable = $('#saleTable').DataTable({
+                    data: rows,
+                    columns: COLUMNS,
+                    responsive: true,
+                    ordering: true,
+                    searching: false,
+                    pageLength: 25,
+                    lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'ทั้งหมด']],
+                    language: { emptyTable: 'ไม่พบข้อมูล', zeroRecords: 'ไม่พบข้อมูล' }
+                });
+
+                $('#mainMessage').removeClass('alert-secondary').addClass('alert-success')
+                    .text('พบข้อมูล ' + rows.length + ' รายการ');
+            },
+            error: function () {
+                $('#mainMessage').removeClass('alert-secondary').addClass('alert-danger')
+                    .text('เกิดข้อผิดพลาดในการดึงข้อมูล');
+            }
+        });
+    }
+
+    $('#btnSearch').on('click', function () { loadData(); });
+
+    $('#btnReset').on('click', function () {
+        $('#fromDate').val('');
+        $('#toDate').val('');
+        loadData();
+    });
+
+    loadData();
+});
+</script>
+
+@section scripts {
+    <script src="~/assets/js/app.js"></script>
+}
+
 <div class="row">
     <div class="col-md-12 col-lg-12">
         <div class="card">
