@@ -1820,7 +1820,33 @@
             }
 
             // ==========================================
-            // 4. แสดงผลลัพธ์และส่งข้อมูล
+            // 4. Validate Birth Date (วันเกิด)
+            // ==========================================
+            ['#simpleBirthDay', '#simpleBirthMonth', '#simpleBirthYear'].forEach(sel => {
+                if (!$(sel).val()) $(sel).addClass('is-invalid');
+                else $(sel).removeClass('is-invalid');
+            });
+
+            const sBirthDay = $('#simpleBirthDay').val();
+            const sBirthMonth = $('#simpleBirthMonth').val();
+            const sBirthYear = $('#simpleBirthYear').val();
+
+            if (!sBirthDay || !sBirthMonth || !sBirthYear) {
+                toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+                isValid = false;
+            } else {
+                var yearCE = parseInt(sBirthYear);
+                if (currentLang === 'th' && yearCE > 2500) yearCE -= 543;
+                var sAge = Math.floor((today - new Date(yearCE, parseInt(sBirthMonth) - 1, parseInt(sBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
+                if (sAge < 18) {
+                    $('#simpleBirthYear').addClass('is-invalid');
+                    toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+                    isValid = false;
+                }
+            }
+
+            // ==========================================
+            // 5. แสดงผลลัพธ์และส่งข้อมูล
             // ==========================================
 
             // Additional content validation (name/business/mobile/email/lineId)
@@ -1980,6 +2006,32 @@
                 toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
             } else {
                 citizenInput.next('.invalid-feedback-custom').remove();
+            }
+
+            // ==========================================
+            // 3. Validate Birth Date (วันเกิด)
+            // ==========================================
+            ['#fullBirthDay', '#fullBirthMonth', '#fullBirthYear'].forEach(sel => {
+                if (!$(sel).val()) $(sel).addClass('is-invalid');
+                else $(sel).removeClass('is-invalid');
+            });
+
+            const fBirthDay = $('#fullBirthDay').val();
+            const fBirthMonth = $('#fullBirthMonth').val();
+            const fBirthYear = $('#fullBirthYear').val();
+
+            if (!fBirthDay || !fBirthMonth || !fBirthYear) {
+                toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+                isValid = false;
+            } else {
+                var fYearCE = parseInt(fBirthYear);
+                if (currentLang === 'th' && fYearCE > 2500) fYearCE -= 543;
+                var fAge = Math.floor((today - new Date(fYearCE, parseInt(fBirthMonth) - 1, parseInt(fBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
+                if (fAge < 18) {
+                    $('#fullBirthYear').addClass('is-invalid');
+                    toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+                    isValid = false;
+                }
             }
 
             // Additional content validation (name/business/mobile)

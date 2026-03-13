@@ -1029,9 +1029,17 @@
                 var birthDay = $('#birthDay').val();
                 var birthMonth = $('#birthMonth').val();
                 var birthYear = $('#birthYear').val();
-                
+
+                ['#birthDay', '#birthMonth', '#birthYear'].forEach(sel => {
+                    if (!$(sel).val()) $(sel).addClass('is-invalid');
+                    else $(sel).removeClass('is-invalid');
+                });
+
                 if (!birthDay || !birthMonth || !birthYear) {
                     toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+                    isValid = false;
+                } else if (!validateBirthAge()) {
+                    $('#birthYear').addClass('is-invalid');
                     isValid = false;
                 }
                 
