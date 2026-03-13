@@ -74,5 +74,31 @@
     </script>
 
     @RenderSection("scripts", required: false)
+
+    <script>
+        // Global session-expired handler
+        (function () {
+            var loginUrl = '/Auth/Login';
+
+            // jQuery AJAX — catch 401 on all requests
+            if (typeof $ !== 'undefined') {
+                $(document).ajaxError(function (event, jqxhr) {
+                    if (jqxhr.status === 401) {
+                        window.location.replace(loginUrl);
+                    }
+                });
+            }
+
+            // Native fetch — wrap to catch 401
+            var _originalFetch = window.fetch;
+            window.fetch = async function () {
+                var response = await _originalFetch.apply(this, arguments);
+                if (response.status === 401) {
+                    window.location.replace(loginUrl);
+                }
+                return response;
+            };
+        })();
+    </script>
 </body>
 </html>
