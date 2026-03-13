@@ -1921,7 +1921,8 @@
 
                 } catch (err) {
                     console.error(err);
-                    Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
+                    const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+                    Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
                 }
             } else {
                 // เลื่อนจอไปหาจุดที่ผิดที่แรกให้ User
@@ -2141,7 +2142,8 @@
 
             } catch (err) {
                 console.error(err);
-                Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
+                const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+                Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
             }
         });
 
@@ -2504,13 +2506,9 @@
                     Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
                 }
             } catch (e) {
-                console.warn('SendOTP API failed, using demo fallback', e);
-                window.currentFormData = formData;
-                window.currentReferenceId = 'REF-DEMO';
-                $('#otpPhoneNumber').text(formData.mobile);
-                new bootstrap.Modal(document.getElementById('otpModal')).show();
-                startResendCountdown();
-                Swal.close();
+                console.error('SendOTP error:', e);
+                const errMsg = (e.responseJSON && e.responseJSON.message) || e.responseText || e.message || 'ไม่สามารถส่ง OTP ได้';
+                Swal.fire('ส่ง OTP ไม่สำเร็จ', errMsg, 'error');
             }
         }
 
@@ -2596,7 +2594,8 @@
                 }
             } catch (err) {
                 console.error(err);
-                Swal.fire('Error', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+                const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'ไม่สามารถบันทึกข้อมูลได้';
+                Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
             }
         }
     });

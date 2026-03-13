@@ -1161,7 +1161,8 @@
 
                 } catch (error) {
                     console.error(error);
-                    Swal.fire('Error', 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล', 'error');
+                    const errMsg = (error.responseJSON && error.responseJSON.message) || error.responseText || error.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+                    Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
                 }
             }
 
@@ -1195,13 +1196,9 @@
                         Swal.fire('ส่ง OTP ไม่สำเร็จ', sendOTPResponse.message, 'error');
                     }
                 } catch (e) {
-                    console.warn("API failed, simulating success for demo");
-                    window.currentFormData = formData;
-                    window.currentReferenceId = "REF-DEMO";
-                    $('#otpPhoneNumber').text(formData.mobile);
-                    new bootstrap.Modal(document.getElementById('otpModal')).show();
-                    startResendCountdown();
-                    Swal.close();
+                    console.error('SendOTP error:', e);
+                    const errMsg = (e.responseJSON && e.responseJSON.message) || e.responseText || e.message || 'ไม่สามารถส่ง OTP ได้';
+                    Swal.fire('ส่ง OTP ไม่สำเร็จ', errMsg, 'error');
                 }
             }
 
@@ -1285,7 +1282,9 @@
                         Swal.fire('ไม่สำเร็จ', data.message, 'error');
                     }
                 } catch(e) {
-                    Swal.fire('Error', 'ไม่สามารถบันทึกข้อมูลได้', 'error');
+                    console.error(e);
+                    const errMsg = (e.responseJSON && e.responseJSON.message) || e.responseText || e.message || 'ไม่สามารถบันทึกข้อมูลได้';
+                    Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
                 }
             }
 
