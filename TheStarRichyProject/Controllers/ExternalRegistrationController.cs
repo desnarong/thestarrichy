@@ -615,7 +615,9 @@ namespace TheStarRichyProject.Controllers
                 string ipAddress = GetClientIPAddress();
 
                 // 1. ดึงข้อมูล JSON เดิมออกมาเป็น string
-                string rawJsonString = request.GetRawText();
+                string rawJsonString = request is System.Text.Json.JsonElement je
+                    ? je.GetRawText()
+                    : Newtonsoft.Json.JsonConvert.SerializeObject(request);
 
                 // 2. แปลง string ให้เป็น JsonObject (เพื่อให้เพิ่ม/แก้ไขข้อมูลได้)
                 var jsonObject = System.Text.Json.Nodes.JsonNode.Parse(rawJsonString).AsObject();
