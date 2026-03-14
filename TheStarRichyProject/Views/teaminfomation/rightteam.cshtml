@@ -231,27 +231,27 @@
                         <thead class="align-middle text-center"
                                style="background: linear-gradient(135deg, #fff3e0, #ffe0b2); font-size:0.73rem;">
                             <tr>
-                                <th rowspan="2" class="text-center" style="min-width:36px;">#</th>
-                                <th style="min-width:60px;">ชั้นที่<br><span class="text-danger fw-normal">LevelName</span></th>
-                                <th style="min-width:110px;">รหัสสมาชิก<br><span class="text-danger fw-normal">MemberRightCode</span></th>
-                                <th style="min-width:140px;">ชื่อสมาชิก<br><span class="text-danger fw-normal">MemberRightName</span></th>
-                                <th style="min-width:95px;">วันสมัคร<br><span class="text-danger fw-normal">RegisterDate</span></th>
-                                <th style="min-width:110px;">วันครบคุณสมบัติ<br><span class="text-danger fw-normal">QualifyDate</span></th>
-                                <th style="min-width:55px;">ด้าน<br><span class="text-danger fw-normal">SIDE</span></th>
-                                <th style="min-width:90px;">ตำแหน่ง<br><span class="text-danger fw-normal">PositionName</span></th>
-                                <th style="min-width:110px;">ตำแหน่งคุณวุฒิ<br><span class="text-danger fw-normal">PrestigeRankingEngName</span></th>
-                                <th style="min-width:90px;">คะแนนส่วนตัว<br><span class="text-danger fw-normal">PersonalPV</span></th>
-                                <th style="min-width:130px;">ผู้แนะนำ<br><span class="text-danger fw-normal">SponserName</span></th>
-                                <th style="min-width:85px;">คะแนนซ้าย<br><span class="text-danger fw-normal">PVLeft</span></th>
-                                <th style="min-width:85px;">คะแนนขวา<br><span class="text-danger fw-normal">PVRight</span></th>
-                                <th style="min-width:90px;">สถานะรักษายอด<br><span class="text-danger fw-normal">Qualify</span></th>
-                                <th style="min-width:110px;">รักษายอดเดือนปัจจุบัน<br><span class="text-danger fw-normal">LastMonthQualifyPV</span></th>
-                                <th style="min-width:110px;">รักษายอดเดือนที่แล้ว<br><span class="text-danger fw-normal">PresentMonthQualifyPV</span></th>
-                                <th style="min-width:90px;">Active ด้านซ้าย<br><span class="text-danger fw-normal">LeftCountActive</span></th>
-                                <th style="min-width:90px;">Active ด้านขวา<br><span class="text-danger fw-normal">RightCountActive</span></th>
-                                <th style="min-width:95px;">คะแนนบาลานซ์<br><span class="text-danger fw-normal">TotalBalance</span></th>
-                                <th style="min-width:95px;">คะแนนท่องเที่ยว 1<br><span class="text-danger fw-normal">Travelpoint1</span></th>
-                                <th style="min-width:95px;">คะแนนท่องเที่ยว 2<br><span class="text-danger fw-normal">Travelpoint2</span></th>
+                                <th class="text-center" style="min-width:36px;">#</th>
+                                <th style="min-width:60px;">ชั้นที่</th>
+                                <th style="min-width:110px;">รหัสสมาชิก</th>
+                                <th style="min-width:140px;">ชื่อสมาชิก</th>
+                                <th style="min-width:95px;">วันสมัคร</th>
+                                <th style="min-width:110px;">วันครบคุณสมบัติ</th>
+                                <th style="min-width:55px;">ด้าน</th>
+                                <th style="min-width:90px;">ตำแหน่ง</th>
+                                <th style="min-width:110px;">ตำแหน่งคุณวุฒิ</th>
+                                <th style="min-width:90px;">คะแนนส่วนตัว</th>
+                                <th style="min-width:130px;">ผู้แนะนำ</th>
+                                <th style="min-width:85px;">คะแนนซ้าย</th>
+                                <th style="min-width:85px;">คะแนนขวา</th>
+                                <th style="min-width:90px;">สถานะรักษายอด</th>
+                                <th style="min-width:110px;">รักษายอดเดือนปัจจุบัน</th>
+                                <th style="min-width:110px;">รักษายอดเดือนที่แล้ว</th>
+                                <th style="min-width:90px;">Active ด้านซ้าย</th>
+                                <th style="min-width:90px;">Active ด้านขวา</th>
+                                <th style="min-width:95px;">คะแนนบาลานซ์</th>
+                                <th style="min-width:95px;">คะแนนท่องเที่ยว 1</th>
+                                <th style="min-width:95px;">คะแนนท่องเที่ยว 2</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
@@ -389,8 +389,8 @@ $(document).ready(function () {
             var tm  = toNum(p.TotalMember  ?? p.totalMember  ?? p.Totalmember  ?? 0);
             totalMembers += tm;
 
-            var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase();
-            if (qualify === 'yes') {
+            var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
+            if (qualify.startsWith('yes')) {
                 qualifyCount++;
                 qualifyPvSum += toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
             }
@@ -512,7 +512,7 @@ $(document).ready(function () {
             var rows = '';
             pageData.forEach(function (m, i) {
                 var qualify   = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
-                var isQualify = qualify === 'yes';
+                var isQualify = qualify.startsWith('yes');
                 var rowCls    = isQualify ? 'rt-qualify-yes' : 'rt-qualify-no';
                 var qualBadge = isQualify
                     ? '<span class="badge" style="background:#2e7d32;font-size:0.7rem;">Yes</span>'
@@ -521,16 +521,16 @@ $(document).ready(function () {
                 rows +=
                     '<tr class="' + rowCls + '">' +
                     '<td class="text-center">'  + (start + i + 1) + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '-') + '</td>' +
-                    '<td class="text-center"><strong>' + escHtml(m.MemberRightCode ?? m.memberRightCode ?? '-') + '</strong></td>' +
-                    '<td>'                           + escHtml(m.MemberRightName  ?? m.memberRightName  ?? '-') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '') + '</td>' +
+                    '<td class="text-center"><strong>' + escHtml(m.MemberRightCode ?? m.memberRightCode ?? '') + '</strong></td>' +
+                    '<td>'                           + escHtml(m.MemberRightName  ?? m.memberRightName  ?? '') + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.SIDE ?? m.Side ?? m.side ?? '-') + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '-') + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '-') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.SIDE ?? m.Side ?? m.side ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PersonalPV    ?? m.personalPV)    + '</td>' +
-                    '<td>'                           + escHtml(m.SponserName  ?? m.sponserName  ?? m.SponsorName ?? '-') + '</td>' +
+                    '<td>'                           + escHtml(m.SponserName  ?? m.sponserName  ?? m.SponsorName ?? '') + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft        ?? m.pvLeft)        + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVRight       ?? m.pvRight)       + '</td>' +
                     '<td class="text-center">'  + qualBadge                                  + '</td>' +
@@ -598,20 +598,20 @@ $(document).ready(function () {
     }
 
     function fmtNum(v) {
-        if (v === undefined || v === null || v === '') return '-';
+        if (v === undefined || v === null || v === '') return '';
         var n = parseFloat(v);
-        if (isNaN(n)) return String(v);
+        if (isNaN(n)) return '';
         return n.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
     }
 
     function fmtDate(v) {
-        if (!v) return '-';
+        if (!v) return '';
         var d = new Date(v);
-        return isNaN(d.getTime()) ? String(v) : d.toLocaleDateString('th-TH');
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString('th-TH');
     }
 
     function escHtml(s) {
-        if (s === null || s === undefined) return '-';
+        if (s === null || s === undefined) return '';
         return String(s)
             .replace(/&/g, '&amp;')
             .replace(/</g, '&lt;')
