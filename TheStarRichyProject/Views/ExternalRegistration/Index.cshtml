@@ -772,8 +772,10 @@
                 //     $('#businessName').val($(this).val());
                 //     validateBusinessName(); 
                 // }
-                $('#businessName').val($(this).val());
-                validateBusinessName();
+                if (!$('#businessName').data('userEdited')) {
+                    $('#businessName').val($(this).val());
+                    validateBusinessName();
+                }
                 validateIdCardName();
             });
 
@@ -808,7 +810,7 @@
                 }
             });
 
-            $('#businessName').on('input', validateBusinessName);
+            $('#businessName').on('input', function() { $(this).data('userEdited', true); validateBusinessName(); });
             $('#documentNumber').on('input', function() { this.value = this.value.replace(/[-\s]/g, ''); validateDocumentNumber(); });
 
             $('#mobile').on('input', function() { this.value = this.value.replace(/\D/g, ''); validateMobile(); });

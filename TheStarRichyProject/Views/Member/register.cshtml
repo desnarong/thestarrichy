@@ -1509,7 +1509,10 @@
 
         // Auto-copy name-on-card -> business name (only if user hasn't edited business name)
         $('#simpleFullName').on('input', function() {
-            $('#simpleBusinessName').val($(this).val());
+            if (!$('#simpleBusinessName').data('userEdited')) {
+                $('#simpleBusinessName').val($(this).val());
+                validateSimpleBusinessName();
+            }
             validateSimpleFullName();
         });
         $('#simpleBusinessName').on('input', function(){ 
