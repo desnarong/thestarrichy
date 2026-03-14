@@ -586,12 +586,21 @@ WHERE M06_PX1 = @Membercode
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
             try
             {
+                string ipAddress = _httpContextAccessor.HttpContext?.Connection?.RemoteIpAddress?.ToString() ?? "";
+
                 using var con = new SqlConnection(connectionString);
                 await con.OpenAsync();
                 const string sql = "UPDATE M06 SET kyc = 'Y' WHERE M06_PX1 = @Membercode AND M06_X47 = N'0'";
                 using var cmd = new SqlCommand(sql, con);
                 cmd.Parameters.AddWithValue("@Membercode", memberCode);
                 await cmd.ExecuteNonQueryAsync();
+
+                const string logSql = "INSERT INTO [LogDirectSale] ([ComName],[Message],[Username],[Computername]) VALUES (@username, N'ทำ KYC', @username, @ipaddress)";
+                using var logCmd = new SqlCommand(logSql, con);
+                logCmd.Parameters.AddWithValue("@username", memberCode);
+                logCmd.Parameters.AddWithValue("@ipaddress", ipAddress);
+                await logCmd.ExecuteNonQueryAsync();
+
                 return true;
             }
             catch
