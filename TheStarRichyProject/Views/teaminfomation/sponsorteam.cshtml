@@ -323,21 +323,13 @@ $(document).ready(function () {
 
             if (!memberCode) throw new Error('ไม่พบรหัสสมาชิกใน session');
 
-            const [summaryRes, teamRes] = await Promise.all([
-                fetch('/teaminfomation/GetSponsorTeamSummary?memberCode=' + encodeURIComponent(memberCode)),
-                fetch('/teaminfomation/GetSponsorTeam?memberCode='        + encodeURIComponent(memberCode))
-            ]);
+            const teamRes = await fetch('/teaminfomation/GetSponsorTeam?memberCode=' + encodeURIComponent(memberCode));
+            if (!teamRes.ok) throw new Error('GetSponsorTeam HTTP ' + teamRes.status);
 
-            if (!summaryRes.ok) throw new Error('GetSponsorTeamSummary HTTP ' + summaryRes.status);
-            if (!teamRes.ok)    throw new Error('GetSponsorTeam HTTP '        + teamRes.status);
-
-            const summaryRaw = await summaryRes.json();
-            const teamRaw    = await teamRes.json();
-
-            const summaryData = typeof summaryRaw === 'string' ? JSON.parse(summaryRaw) : summaryRaw;
-            renderSummary(summaryData);
+            const teamRaw = await teamRes.json();
 
             allData = normalizeRows(teamRaw);
+            renderSummaryFromData(allData);
             populateLevelDropdown(allData);
             applyFilters();
 
@@ -353,39 +345,39 @@ $(document).ready(function () {
     }
 
     /* ================================================================
-       Render summary
+       Render summary — computed from team row data
     ================================================================ */
-    function renderSummary(summaryData) {
-        var packages = normalizeRows(summaryData && summaryData.packages);
-        var rankings = normalizeRows(summaryData && summaryData.rankings);
-
-        var totalMembers  = 0;
+    function renderSummaryFromData(data) {
+        var totalMembers  = data.length;
         var qualifyCount  = 0;
         var qualifyPvSum  = 0;
         var noPositionCnt = 0;
         var starCnt       = 0;
         var silverStarCnt = 0;
         var goldStarCnt   = 0;
+        var rankingMap    = {};
 
-        packages.forEach(function (p) {
-            var tm = toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? 0);
-            totalMembers += tm;
-
-            var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
+        data.forEach(function (m) {
+            var qualify = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
             if (qualify.startsWith('yes')) {
                 qualifyCount++;
-                qualifyPvSum += toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
+                qualifyPvSum += toNum(m.LastMonthQualifyPV ?? m.lastMonthQualifyPV ?? 0);
             }
 
-            var pos = ((p.PositionName ?? p.positionName ?? p.Positionname ?? '') + '').toLowerCase().trim();
+            var pos = ((m.PositionName ?? m.positionName ?? '') + '').toLowerCase().trim();
             if (!pos || pos === '-' || pos === 'none' || pos === 'ไม่มีตำแหน่ง') {
-                noPositionCnt += tm;
+                noPositionCnt++;
             } else if (pos === 'star') {
-                starCnt += tm;
+                starCnt++;
             } else if (pos.includes('silver')) {
-                silverStarCnt += tm;
+                silverStarCnt++;
             } else if (pos.includes('gold')) {
-                goldStarCnt += tm;
+                goldStarCnt++;
+            }
+
+            var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
+            if (rankName && rankName !== '-') {
+                rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
             }
         });
 
@@ -397,14 +389,12 @@ $(document).ready(function () {
         $('#posSilverStar').text(fmtInt(silverStarCnt));
         $('#posGoldStar').text(fmtInt(goldStarCnt));
 
-        if (rankings.length > 0) {
-            var html = rankings.map(function (r) {
-                var name  = r.PrestigeRankingName ?? r.prestigeRankingName ??
-                            r.Positionname ?? r.positionName ?? r.RankName ?? '-';
-                var count = toNum(r.Totalmember ?? r.TotalMember ?? r.totalMember ?? 0);
+        var rankKeys = Object.keys(rankingMap);
+        if (rankKeys.length > 0) {
+            var html = rankKeys.map(function (name) {
                 return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb;">' +
                        '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
-                       '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(count) + '</div>' +
+                       '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(rankingMap[name]) + '</div>' +
                        '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
                        '</div>';
             }).join('');
