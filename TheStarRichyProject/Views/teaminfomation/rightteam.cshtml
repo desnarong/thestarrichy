@@ -285,13 +285,7 @@ $(document).ready(function () {
     var dateMode     = 'all';   // 'all' | 'bydate'
 
     /* ================================================================
-       Init
-    ================================================================ */
-    setDateMode('all');
-    loadData();
-
-    /* ================================================================
-       Date mode toggle
+       Date mode toggle  (exposed global for onclick= attributes)
     ================================================================ */
     window.setDateMode = function (mode) {
         dateMode = mode;
@@ -308,37 +302,68 @@ $(document).ready(function () {
 
     /* ================================================================
        Load data from server
+       API 1: /home/GetMemberInfo                      → get member code
+       API 2: /teaminfomation/GetRightTeamSummary      → packages + rankings
+       API 3: /teaminfomation/GetRightTeam             → main table data
     ================================================================ */
     async function loadData() {
+        // --- show loading state ---
+        $('#tableMessage')
+            .text('กำลังโหลดข้อมูล...')
+            .removeClass('alert-danger alert-success').addClass('alert-secondary').show();
+        $('#tableBody').html('<tr><td colspan="21" class="text-center py-4 text-muted"><i class="bx bx-loader-alt bx-spin me-2"></i>กำลังโหลด...</td></tr>');
+        $('#sumTotalMembers,#sumQualifyCount,#sumQualifyPV,#posNoPosition,#posStar,#posSilverStar,#posGoldStar')
+            .html('<span class="placeholder col-6"></span>');
+        $('#rankingCards').html('<div class="text-muted small fst-italic"><i class="bx bx-loader-alt bx-spin me-1"></i>กำลังโหลด...</div>');
+
         try {
+            // ── Step 1: รับ member code จาก session ────────────────────────────
             const memberRes  = await fetch('/home/GetMemberInfo');
+            if (!memberRes.ok) throw new Error('GetMemberInfo HTTP ' + memberRes.status);
             const memberData = await memberRes.json();
             const mi         = typeof memberData === 'string' ? JSON.parse(memberData) : memberData;
-            const memberCode = (mi?.membercode || mi?.memberInfo?.[0]?.membercode || '').toString().trim();
+            const memberCode = (
+                mi?.membercode ||
+                mi?.MemberCode ||
+                mi?.memberInfo?.[0]?.membercode ||
+                mi?.memberInfo?.[0]?.MemberCode ||
+                ''
+            ).toString().trim();
 
-            if (!memberCode) throw new Error('ไม่พบรหัสสมาชิก');
+            if (!memberCode) throw new Error('ไม่พบรหัสสมาชิกใน session');
 
-            // Load summary + table in parallel
+            // ── Step 2: เรียก API summary + table พร้อมกัน ─────────────────────
+            //   API: Member_Right_Sum_position_package  → packages
+            //   API: Member_Right_Sum_position_Ranking  → rankings
+            //   API: ReportMemberRightTeamService       → allData
             const [summaryRes, teamRes] = await Promise.all([
                 fetch('/teaminfomation/GetRightTeamSummary?memberCode=' + encodeURIComponent(memberCode)),
                 fetch('/teaminfomation/GetRightTeam?memberCode='        + encodeURIComponent(memberCode))
             ]);
 
-            const summaryRaw = await summaryRes.json();
-            const teamRaw    = await teamRes.json();
+            if (!summaryRes.ok) throw new Error('GetRightTeamSummary HTTP ' + summaryRes.status);
+            if (!teamRes.ok)    throw new Error('GetRightTeam HTTP '        + teamRes.status);
 
+            const summaryRaw  = await summaryRes.json();
+            const teamRaw     = await teamRes.json();
+
+            // ── Step 3: Render summary cards ───────────────────────────────────
             const summaryData = typeof summaryRaw === 'string' ? JSON.parse(summaryRaw) : summaryRaw;
             renderSummary(summaryData);
 
+            // ── Step 4: Render table ────────────────────────────────────────────
             allData = normalizeRows(teamRaw);
             populateLevelDropdown(allData);
             applyFilters();
 
+            $('#tableMessage').hide();
+
         } catch (err) {
             console.error('loadData error:', err);
             $('#tableMessage')
-                .text('เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + err.message)
+                .html('<i class="bx bx-error-circle me-2"></i>เกิดข้อผิดพลาดในการโหลดข้อมูล: <strong>' + escHtml(err.message) + '</strong>')
                 .removeClass('alert-secondary').addClass('alert-danger').show();
+            $('#tableBody').html('<tr><td colspan="21" class="text-center py-4 text-danger">โหลดข้อมูลไม่สำเร็จ</td></tr>');
         }
     }
 
@@ -597,6 +622,12 @@ $(document).ready(function () {
     function escAttr(s) {
         return String(s).replace(/"/g, '&quot;');
     }
+
+    /* ================================================================
+       Init  (must be LAST — after all function definitions above)
+    ================================================================ */
+    window.setDateMode('all');   // set initial UI state
+    loadData();                  // kick off API calls
 
 });
 </script>
