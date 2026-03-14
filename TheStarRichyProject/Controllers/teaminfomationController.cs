@@ -133,6 +133,28 @@ namespace TheStarRichyProject.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetSponsorTeamSummary(string memberCode)
+        {
+            try
+            {
+                var packageResult = await _apiService.GetAsync<dynamic>(
+                    $"/Member/reportmembersponsersumpackage?membercode={memberCode}"
+                );
+
+                var rankingResult = await _apiService.GetAsync<dynamic>(
+                    $"/Member/reportmembersponsersumranking?membercode={memberCode}"
+                );
+
+                return Ok(new { packages = packageResult, rankings = rankingResult });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting sponsor team summary");
+                return StatusCode(500, new { error = ex.Message });
+            }
+        }
+
         #endregion
 
         #region Left Team
