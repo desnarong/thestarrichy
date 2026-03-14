@@ -203,5 +203,182 @@ namespace TheStarRichyProject.Controllers
                 return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลรายละเอียดโบนัสได้" });
             }
         }
+
+        // ─── View actions ──────────────────────────────────────────────────────────
+        public IActionResult loginlog()       => View();
+        public IActionResult cutpoint()       => View();
+        public IActionResult dailypoint()     => View();
+
+        // ─── Data endpoints ────────────────────────────────────────────────────────
+
+        [HttpGet]
+        public async Task<IActionResult> GetSaleReportDataV2(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportsaleandexpainorder{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting sale report");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBuyOrderData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportbuytopuporder{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting buy order data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetBuyHoldData(string fromDate = "", string toDate = "", string checktype = "all")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                if (!string.IsNullOrWhiteSpace(checktype) && checktype != "all")
+                    qs += (qs.Length > 0 ? "&" : "?") + $"checktype={Uri.EscapeDataString(checktype)}";
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportbuyholdorder{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting buy hold data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPoOrderData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportpoorder{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting PO order data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetLoginLogData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportmemberlog{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting login log data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPositionHistoryData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportpositionhistory{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting position history data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCutPointData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportdailycutpoint{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting cut point data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyPointData(string fromDate = "", string toDate = "")
+        {
+            try
+            {
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportdailypoint{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting daily point data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyPointSourceLeft(string balanceDate = "")
+        {
+            try
+            {
+                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}";
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportleftsourceofpv{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting left PV source");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDailyPointSourceRight(string balanceDate = "")
+        {
+            try
+            {
+                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}";
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportrightsourceofpv{qs}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting right PV source");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        private static string BuildDateQuery(string fromDate, string toDate)
+        {
+            var parts = new List<string>();
+            if (!string.IsNullOrWhiteSpace(fromDate)) parts.Add($"fromdate={Uri.EscapeDataString(fromDate)}");
+            if (!string.IsNullOrWhiteSpace(toDate))   parts.Add($"todate={Uri.EscapeDataString(toDate)}");
+            return parts.Count > 0 ? "?" + string.Join("&", parts) : "";
+        }
     }
 }

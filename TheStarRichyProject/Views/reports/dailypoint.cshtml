@@ -1,0 +1,185 @@
+﻿@{
+    ViewData["Title"] = "รายงานคะแนนเข้ารายวัน";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#1b5e20,#43a047);">
+        <i class="bx bx-bar-chart-alt-2 fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานคะแนนเข้ารายวัน</h5>
+      </div>
+      <div class="card-body py-3">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#e8f5e9;border:2px solid #43a047 !important;">
+              <div class="text-muted small">ยอดรวมด้านซ้าย</div>
+              <div class="fs-4 fw-bold" style="color:#1b5e20;" id="sumLeft">-</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#e3f2fd;border:2px solid #1976d2 !important;">
+              <div class="text-muted small">ยอดรวมด้านขวา</div>
+              <div class="fs-4 fw-bold" style="color:#0d47a1;" id="sumRight">-</div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-end g-2 mb-2">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ช่วงวันที่</label>
+            <div class="d-flex gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="viewMode" id="vmAll" value="all" checked><label class="form-check-label" for="vmAll">ดูทั้งหมด</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="viewMode" id="vmDate" value="date"><label class="form-check-label" for="vmDate">กำหนดวัน</label></div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-end g-2" id="dateRange" style="display:none!important;">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="fromDate">
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ถึงวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="toDate">
+          </div>
+        </div>
+        <div class="mt-2">
+          <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+          <button class="btn btn-sm" id="btnSearch" style="background:#43a047;border-color:#43a047;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+        </div>
+        <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ค่าเริ่มต้นดึงเดือนปัจจุบัน — คลิก LeftPV/RightPV เพื่อดูรายละเอียด</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-4 mb-3">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header" style="background:#e8f5e9;border-bottom:2px solid #43a047;">
+        <h6 class="mb-0 fw-semibold" style="color:#1b5e20;"><i class="bx bx-calendar me-2"></i>คะแนนรายวัน &nbsp;<span class="badge bg-success" id="rowCount">0</span></h6>
+      </div>
+      <div class="card-body p-0">
+        <div class="alert alert-secondary py-2 mb-0 m-2" id="msgMain">กำลังโหลดข้อมูล...</div>
+        <div class="table-responsive">
+          <table id="mainTable" class="table table-bordered table-sm table-hover mb-0 align-middle" style="font-size:.82rem;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-8 mb-3" id="detailPanel" style="display:none;">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header d-flex align-items-center justify-content-between" style="background:#e3f2fd;border-bottom:2px solid #1976d2;">
+        <h6 class="mb-0 fw-semibold" style="color:#0d47a1;"><i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span> <span id="detailSide" class="badge ms-1"></span></h6>
+        <button type="button" class="btn-close" id="btnCloseDetail"></button>
+      </div>
+      <div class="card-body p-0">
+        <div class="alert alert-secondary py-2 mb-0 m-2" id="msgDetail" style="display:none;">กำลังโหลด...</div>
+        <div class="table-responsive">
+          <table id="detailTable" class="table table-bordered table-sm table-hover mb-0 align-middle" style="font-size:.8rem;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var mainTbl=null, detailTbl=null;
+  var now=new Date();
+  var firstOfMonth=new Date(now.getFullYear(),now.getMonth(),1).toISOString().substring(0,10);
+  var todayStr=now.toISOString().substring(0,10);
+  $('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);
+
+  $('input[name="viewMode"]').on('change',function(){
+    if($('#vmDate').is(':checked'))$('#dateRange').show();
+    else{$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);}
+  });
+
+  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
+  function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
+  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmtDate(v){if(!v)return'';var d=new Date(v);return isNaN(d.getTime())?String(v):d.toLocaleDateString('th-TH');}
+  function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function buildMainTable(rows){
+    if(mainTbl){mainTbl.destroy();mainTbl=null;}$('#mainTable').empty();
+    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);font-size:.78rem;"><tr><th>#</th><th>วันที่</th><th style="color:#1b5e20;">Left PV</th><th style="color:#0d47a1;">Right PV</th></tr></thead>';
+    var tbody='<tbody>';
+    rows.forEach(function(r,i){
+      var bd=p(r,['BalanceDate','balanceDate','Balancedate']);
+      var lv=p(r,['LeftPV','leftPV'],0);
+      var rv=p(r,['RightPV','rightPV'],0);
+      tbody+='<tr>'+
+        '<td class="text-center">'+(i+1)+'</td>'+
+        '<td class="text-center">'+fmtDate(bd)+'</td>'+
+        '<td class="text-end"><a href="#" class="fw-bold text-success text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'left\');return false;">'+fmt2(lv)+'</a></td>'+
+        '<td class="text-end"><a href="#" class="fw-bold text-primary text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'right\');return false;">'+fmt2(rv)+'</a></td>'+
+        '</tr>';
+    });
+    tbody+='</tbody>';
+    $('#mainTable').html(thead+tbody);
+    mainTbl=$('#mainTable').DataTable({paging:true,pageLength:31,lengthMenu:[[10,31,62,-1],[10,31,62,'ทั้งหมด']],ordering:true,searching:false,
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
+    var sumL=rows.reduce(function(s,r){return s+num(p(r,['LeftPV','leftPV'],0));},0);
+    var sumR=rows.reduce(function(s,r){return s+num(p(r,['RightPV','rightPV'],0));},0);
+    $('#sumLeft').text(fmt2(sumL));$('#sumRight').text(fmt2(sumR));$('#rowCount').text(rows.length);
+    $('#msgMain').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' วัน');
+  }
+
+  window.loadDetail=function(balDate,side){
+    $('#detailPanel').show();
+    $('#msgDetail').show().removeClass('alert-danger').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+    $('#detailDate').text(fmtDate(balDate));
+    $('#detailSide').text(side==='left'?'ซ้าย':'ขวา').css('background',side==='left'?'#43a047':'#1976d2');
+    if(detailTbl){detailTbl.destroy();detailTbl=null;}$('#detailTable').empty();
+    var url=side==='left'?'@Url.Action("GetDailyPointSourceLeft","reports")':'@Url.Action("GetDailyPointSourceRight","reports")';
+    $.get(url,{balanceDate:balDate},function(json){
+      var rows=norm(json);
+      var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);font-size:.78rem;"><tr><th>#</th><th>ชั้นที่</th><th>รหัสนักธุรกิจ</th><th>ชื่อนักธุรกิจ</th><th>เลขที่บิล</th><th>วันที่</th><th>ประเภท</th><th class="text-end">PV</th></tr></thead>';
+      var tbody='<tbody>';
+      var totalPV=0;
+      rows.forEach(function(r,i){
+        var pv=num(p(r,['PV','pv','Pv'],0));totalPV+=pv;
+        tbody+='<tr>'+
+          '<td class="text-center">'+(i+1)+'</td>'+
+          '<td class="text-center">'+esc(p(r,['DLLevel','dlLevel']))+'</td>'+
+          '<td>'+esc(p(r,['DLCode','dlCode']))+'</td>'+
+          '<td>'+esc(p(r,['DLName','dlName']))+'</td>'+
+          '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
+          '<td class="text-center">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
+          '<td>'+esc(p(r,['Billtype','billtype','BillType']))+'</td>'+
+          '<td class="text-end fw-bold text-success">'+fmt2(pv)+'</td>'+
+          '</tr>';
+      });
+      tbody+='</tbody>';
+      var tfoot='<tfoot><tr><td colspan="7" class="text-end fw-bold bg-light">รวมทั้งหมด</td><td class="text-end fw-bold text-success bg-light">'+fmt2(totalPV)+'</td></tr></tfoot>';
+      $('#detailTable').html(thead+tbody+tfoot);
+      detailTbl=$('#detailTable').DataTable({paging:false,ordering:false,searching:false,info:false,
+        language:{emptyTable:'ไม่พบข้อมูล'}});
+      $('#msgDetail').hide();
+    }).fail(function(){$('#msgDetail').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  };
+
+  $('#btnCloseDetail').on('click',function(){$('#detailPanel').hide();});
+
+  function loadData(){
+    $('#msgMain').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
+    var isAll=$('#vmAll').is(':checked');
+    var f=isAll?firstOfMonth:$('#fromDate').val();
+    var t=isAll?todayStr:$('#toDate').val();
+    $.get('@Url.Action("GetDailyPointData","reports")',{fromDate:f,toDate:t},function(json){
+      buildMainTable(norm(json));
+    }).fail(function(){$('#msgMain').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  }
+
+  $('#btnSearch').on('click',loadData);
+  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);$('#detailPanel').hide();loadData();});
+  loadData();
+});
+</script>
+@section scripts {
+    <script src="~/assets/js/app.js"></script>
+}

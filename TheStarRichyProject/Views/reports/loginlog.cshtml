@@ -1,0 +1,98 @@
+﻿@{
+    ViewData["Title"] = "รายงานประวัติการเข้าใช้งาน";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#004d40,#26a69a);">
+        <i class="bx bx-history fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานประวัติการเข้าใช้งาน</h5>
+      </div>
+      <div class="card-body py-3">
+        <div class="row align-items-end g-2">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="fromDate">
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ถึงวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="toDate">
+          </div>
+          <div class="col-auto align-self-end">
+            <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+            <button class="btn btn-sm" id="btnSearch" style="background:#26a69a;border-color:#26a69a;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+          </div>
+        </div>
+        <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ค่าเริ่มต้นแสดงข้อมูลวันนี้</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header" style="background:#e0f2f1;border-bottom:2px solid #26a69a;">
+        <h5 class="mb-0 fw-semibold" style="color:#004d40;"><i class="bx bx-list-ul me-2"></i>ประวัติการเข้าใช้งาน &nbsp;<span class="badge" style="background:#26a69a;" id="rowCount">0</span></h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
+        <div class="table-responsive">
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var tbl=null;
+  var today=new Date();
+  var todayStr=today.toISOString().substring(0,10);
+  $('#fromDate').val(todayStr);$('#toDate').val(todayStr);
+
+  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
+  function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
+  function fmtDateTime(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);
+    return d.toLocaleDateString('th-TH')+' '+d.toLocaleTimeString('th-TH',{hour:'2-digit',minute:'2-digit',second:'2-digit'});}
+  function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function buildTable(rows){
+    if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
+    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e0f2f1,#b2dfdb);font-size:.78rem;"><tr><th>#</th><th>วัน-เวลา</th><th>รายละเอียด</th><th>IP Address</th></tr></thead>';
+    var tbody='<tbody>';
+    rows.forEach(function(r,i){
+      tbody+='<tr>'+
+        '<td class="text-center">'+(i+1)+'</td>'+
+        '<td class="text-center" style="white-space:nowrap;">'+fmtDateTime(p(r,['EntryDatetime','entryDatetime','entryDateTime','Entrydatetime']))+'</td>'+
+        '<td>'+esc(p(r,['Message','message']))+'</td>'+
+        '<td class="text-center text-monospace">'+esc(p(r,['Computername','computerName','computername','ComputerName']))+'</td>'+
+        '</tr>';
+    });
+    tbody+='</tbody>';
+    $('#mainTable').html(thead+tbody);
+    tbl=$('#mainTable').DataTable({paging:true,pageLength:50,lengthMenu:[[25,50,100,-1],[25,50,100,'ทั้งหมด']],ordering:true,searching:true,order:[[1,'desc']],
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
+    $('#rowCount').text(rows.length);
+    $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+  }
+
+  function loadData(){
+    $('#msg').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
+    var f=$('#fromDate').val(),t=$('#toDate').val();
+    $.get('@Url.Action("GetLoginLogData","reports")',{fromDate:f,toDate:t},function(json){
+      buildTable(norm(json));
+    }).fail(function(){$('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  }
+
+  $('#btnSearch').on('click',loadData);
+  $('#btnReset').on('click',function(){$('#fromDate').val(todayStr);$('#toDate').val(todayStr);loadData();});
+  loadData();
+});
+</script>
+@section scripts {
+    <script src="~/assets/js/app.js"></script>
+}

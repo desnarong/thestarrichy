@@ -1,0 +1,142 @@
+﻿@{
+    ViewData["Title"] = "รายงานประวัติการตัดคะแนน";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#bf360c,#ff7043);">
+        <i class="bx bx-cut fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานประวัติการตัดคะแนน</h5>
+      </div>
+      <div class="card-body py-3">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#fbe9e7;border:2px solid #ff7043 !important;">
+              <div class="text-muted small">คะแนนคำนวณรวม</div>
+              <div class="fs-4 fw-bold" style="color:#bf360c;" id="sumCalcPV">-</div>
+            </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#e0f7fa;border:2px solid #00acc1 !important;">
+              <div class="text-muted small">รายได้ TMB รวม</div>
+              <div class="fs-4 fw-bold" style="color:#00838f;" id="sumBonus">-</div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-end g-2 mb-2">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ช่วงวันที่</label>
+            <div class="d-flex gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="viewMode" id="vmAll" value="all" checked><label class="form-check-label" for="vmAll">ดูทั้งหมด</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="viewMode" id="vmDate" value="date"><label class="form-check-label" for="vmDate">กำหนดวัน</label></div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-end g-2" id="dateRange">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="fromDate">
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ถึงวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="toDate">
+          </div>
+        </div>
+        <div class="mt-2">
+          <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+          <button class="btn btn-sm" id="btnSearch" style="background:#ff7043;border-color:#ff7043;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+        </div>
+        <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ค่าเริ่มต้นดึงเดือนปัจจุบัน</small>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header" style="background:#fbe9e7;border-bottom:2px solid #ff7043;">
+        <h5 class="mb-0 fw-semibold" style="color:#bf360c;"><i class="bx bx-table me-2"></i>ประวัติการตัดคะแนน &nbsp;<span class="badge" style="background:#ff7043;" id="rowCount">0</span></h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
+        <div class="table-responsive">
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+$(function(){
+  var tbl=null;
+  var now=new Date();
+  var firstOfMonth=new Date(now.getFullYear(),now.getMonth(),1).toISOString().substring(0,10);
+  var todayStr=now.toISOString().substring(0,10);
+  $('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);
+  $('#dateRange').hide();
+
+  $('input[name="viewMode"]').on('change',function(){
+    if($('#vmDate').is(':checked'))$('#dateRange').show();
+    else{$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);}
+  });
+
+  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
+  function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
+  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmtDate(v){if(!v)return'';var d=new Date(v);return isNaN(d.getTime())?String(v):d.toLocaleDateString('th-TH');}
+  function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+  function buildTable(rows){
+    if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
+    var cols=['#','วันที่','ตำแหน่ง','คะแนนซ้าย','คะแนนขวา','ตัดซ้าย','ตัดขวา','ยกไปซ้าย','ยกไปขวา','คะแนนคำนวณ','สูงสุด/วัน','รายได้ TMB'];
+    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#fbe9e7,#ffccbc);font-size:.78rem;"><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join('')+'</tr></thead>';
+    var tbody='<tbody>';
+    rows.forEach(function(r,i){
+      tbody+='<tr>'+
+        '<td class="text-center">'+(i+1)+'</td>'+
+        '<td class="text-center">'+fmtDate(p(r,['calculatedate','Calculatedate','CalculateDate']))+'</td>'+
+        '<td class="text-center">'+esc(p(r,['Memberposition','memberPosition','memberposition']))+'</td>'+
+        '<td class="text-end">'+fmt2(p(r,['LeftPV','leftPV'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(p(r,['RightPV','rightPV'],0))+'</td>'+
+        '<td class="text-end text-danger">'+fmt2(p(r,['CutLeftPV','cutLeftPV'],0))+'</td>'+
+        '<td class="text-end text-danger">'+fmt2(p(r,['CutRightPV','cutRightPV'],0))+'</td>'+
+        '<td class="text-end text-info">'+fmt2(p(r,['FWDLeftPV','fwdLeftPV'],0))+'</td>'+
+        '<td class="text-end text-info">'+fmt2(p(r,['FWDRightPV','fwdRightPV'],0))+'</td>'+
+        '<td class="text-end fw-bold text-success">'+fmt2(p(r,['CalculatePV','calculatePV'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(p(r,['StepPV','stepPV'],0))+'</td>'+
+        '<td class="text-end fw-bold" style="color:#bf360c;">'+fmt2(p(r,['weakBonus','WeakBonus'],0))+'</td>'+
+        '</tr>';
+    });
+    tbody+='</tbody>';
+    $('#mainTable').html(thead+tbody);
+    tbl=$('#mainTable').DataTable({paging:true,pageLength:31,lengthMenu:[[10,31,62,-1],[10,31,62,'ทั้งหมด']],ordering:true,searching:true,
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
+    var sumCalc=rows.reduce(function(s,r){return s+num(p(r,['CalculatePV','calculatePV'],0));},0);
+    var sumBonus=rows.reduce(function(s,r){return s+num(p(r,['weakBonus','WeakBonus'],0));},0);
+    $('#sumCalcPV').text(fmt2(sumCalc));$('#sumBonus').text(fmt2(sumBonus));$('#rowCount').text(rows.length);
+    $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+  }
+
+  function loadData(){
+    $('#msg').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
+    var isAll=$('#vmAll').is(':checked');
+    var f=isAll?firstOfMonth:$('#fromDate').val();
+    var t=isAll?todayStr:$('#toDate').val();
+    $.get('@Url.Action("GetCutPointData","reports")',{fromDate:f,toDate:t},function(json){
+      buildTable(norm(json));
+    }).fail(function(){$('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  }
+
+  $('#btnSearch').on('click',loadData);
+  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);loadData();});
+  loadData();
+});
+</script>
+@section scripts {
+    <script src="~/assets/js/app.js"></script>
+}
