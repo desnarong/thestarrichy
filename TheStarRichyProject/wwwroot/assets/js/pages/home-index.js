@@ -1020,7 +1020,9 @@ $(document).ready(function () {
     }
 
     (async () => {
-        await loadAndShowMessages();
+        if (window.kycStatus !== 'N') {
+            await loadAndShowMessages();
+        }
         await loadMemberInfo();
         await loadMemberTeamTotalPositionPackage();
         await loadMemberTeamTotalPositionRanking();

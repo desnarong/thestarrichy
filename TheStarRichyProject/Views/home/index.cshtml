@@ -8,6 +8,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     var cookieValue = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.UserInfoKey);
+    var kyc = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.KYCKey);
     var userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
 
 }<link href="~/assets/css/home-index.css" rel="stylesheet" />
@@ -540,9 +541,8 @@
     <script src="~/assets/js/app.js"></script>
     <script>
         (function () {
-            var kycStatus = '@(userinfo.kyc)';
-            console.log(kycStatus);
-            if (kycStatus === 'N') {
+            window.kycStatus = '@(kyc)';
+            if (window.kycStatus === 'N') {
                 var kycModal = new bootstrap.Modal(document.getElementById('kycModal'), { backdrop: 'static', keyboard: false });
                 kycModal.show();
             }
