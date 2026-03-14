@@ -218,7 +218,16 @@
                                             <a href="@Url.Action("salereport", "reports")" class="nav-link" data-key="t-salereport"> รายงานการขาย </a>
                                         </li>
                                         <li class="nav-item">
-                                            <a href="@Url.Action("registerapplication", "reports")" class="nav-link" data-key="t-registerapplication"> Register Application </a>
+                                            <a href="@Url.Action("registerapplication", "reports")" class="nav-link" data-key="t-registerapplication"> ประวัติการขึ้นตำแหน่ง </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("loginlog", "reports")" class="nav-link" data-key="t-loginlog"> ประวัติการเข้าใช้งาน </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("cutpoint", "reports")" class="nav-link" data-key="t-cutpoint"> ประวัติการตัดคะแนน </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a href="@Url.Action("dailypoint", "reports")" class="nav-link" data-key="t-dailypoint"> คะแนนเข้ารายวัน </a>
                                         </li>
                                     }
                                     @if (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00")
