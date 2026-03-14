@@ -432,7 +432,7 @@
     #kycModal .modal-content { background: #0d1b2a; color: #e8e8e8; }
     #kycModal .modal-footer { background: #0d1b2a; border-top-color: #2a3f55; }
     #kycModal .modal-body .container p { color: #cdd8e3 !important; }
-    #kycModal .modal-body .container > p { padding-left: 2.5rem !important; }
+    #kycModal .modal-body .container > p { padding-left: 2.5rem !important; text-indent: -2.5rem !important; }
     #kycModal .modal-body .container h5 { color: #7ab8f5 !important; }
     #kycModal .modal-body .container h6 { color: #7ab8f5 !important; border-bottom-color: #2a4060 !important; }
     #kycModal .modal-body .container div { color: #cdd8e3 !important; }
@@ -444,13 +444,12 @@
 <div class="modal fade" id="kycModal" tabindex="-1" role="dialog" data-bs-backdrop="static" data-bs-keyboard="false" aria-labelledby="kycModalLabel">
     <div class="modal-dialog modal-fullscreen" role="document">
         <div class="modal-content" style="position:relative; overflow:hidden;">
-            <img src="~/assets/images/login/loginlogo.png"
+            <img src="~/assets/images/fulllogo.png"
                  style="position:absolute; opacity:0.07; width:50%; top:50%; left:50%; transform:translate(-50%,-50%); pointer-events:none; z-index:0; user-select:none;"
                  alt="" />
 
             <div class="modal-header border-bottom" style="position:relative; z-index:1; background:linear-gradient(135deg,#1a3f6f,#2d6fbc);">
                 <div class="mx-auto text-center">
-                    <img src="~/assets/images/login/loginlogo.png" alt="Logo" style="height:56px;" />
                     <h5 class="modal-title text-white mt-2 mb-0" id="kycModalLabel">ข้อกำหนดและเงื่อนไขการเป็นผู้จำหน่ายอิสระ</h5>
                     <div class="text-white mt-1" style="font-size:1rem;">สวัสดี คุณ <strong>@userinfo.bussinessName</strong> &nbsp;|&nbsp; กรุณาอ่านและเลื่อนลงมาจนสุดก่อนกดยืนยัน</div>
                 </div>
@@ -459,12 +458,16 @@
             <div id="kycModalBody" class="modal-body" style="position:relative; z-index:1; overflow-y:auto; height:calc(100vh - 200px); padding:2rem;">
                 <div class="container" style="max-width:860px; margin:0 auto; font-size:1.05rem; color:#1a1a2e;">
 
-                    <div class="text-center mb-4">
-                        <h5 class="fw-bold" style="color:#1a3f6f;">STAR บริษัท เดอะสตาร์ริชชี จำกัด</h5>
-                        <p class="text-muted small">44/433 หมู่บ้านอัมรินทร์นิเวศน์ 1 ถนนพหลโยธิน แขวงอนุสาวรีย์ เขตบางเขน กรุงเทพ 10220 ทะเบียนนิติบุคคล เลขที่ 0135564012380</p>
+                    <div class="d-flex align-items-center justify-content-center mb-4">
+                        <img src="~/assets/images/logo_sm2.png" alt="Logo" class="me-3" style="height:92px;" />
+                        <div class="text-start">
+                            <h5 class="fw-bold mb-1" style="color:#1a3f6f;">บริษัท เดอะสตาร์ริชชี จำกัด</h5>
+                            <p class="text-muted small mb-0">44/433 หมู่บ้านอัมรินทร์นิเวศน์ 1 ถนนพหลโยธิน แขวงอนุสาวรีย์ เขตบางเขน กรุงเทพ 10220</p>
+                            <p class="text-muted small mb-0">ทะเบียนนิติบุคคล เลขที่ 0135564012380</p>
+                        </div>
                     </div>
 
-                    <h6 class="fw-bold mb-3 mt-4" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">ข้อกำหนดและเงื่อนไขการสมัครสมาชิก</h6>
+                    <h6 class="text-center fw-bold mb-3 mt-4" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">ข้อกำหนดและเงื่อนไขการสมัครสมาชิก</h6>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">
                         1. ข้าพเจ้าอายุครบ หรือเกิน 18 ปี บริบูรณ์ และมีคุณสมบัติทางกฎหมายที่จะเป็นคู่สัญญาได้
                     </p>
@@ -526,7 +529,7 @@
                         20. ข้าพเจ้าขอรับรองว่า ข้อมูลทั้งหมดในเอกสารใบสมัคร/ข้อตกลงการเป็นผู้จำหน่ายอิสระฉบับนี้เป็นข้อมูลที่ถูกต้องสมบูรณ์และรับทราบว่าการให้ข้อมูลที่เป็นเท็จหรือสร้างความเข้าใจผิด จะถือเป็นการมอบอำนาจให้ บริษัท เดอะสตาร์ ริชชี จำกัด สามารถพิจารณาประกาศให้ใบสมัคร/ข้อตกลงการเป็นผู้จำหน่ายอิสระนี้เป็นโมฆะตั้งแต่แรกเริ่มมีผลบังคับ
                     </p>
 
-                    <h6 class="fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">ข้อกำหนดและเงื่อนไขการเป็นผู้จำหน่ายอิสระ</h6>
+                    <h6 class="text-center fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">ข้อกำหนดและเงื่อนไขการเป็นผู้จำหน่ายอิสระ</h6>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">
                         1. บริษัท เดอะสตาร์ ริชชี จำกัดจ่ายผลตอบแทนให้กับผู้จำหน่ายอิสระ เป็นไปตามแผนการจ่ายผลตอบแทนที่ได้จดทะเบียนต่อนายทะเบียน ณ สำนักงานคณะกรรมการคุ้มครองผู้บริโภค (สคบ.) และดังที่ปรากฏในแผนการจ่ายผลตอบแทนของบริษัท เดอะสตาร์ ริชซี จำกัด ที่มอบให้กับผู้จำหน่ายอิสระ
                     </p>
@@ -551,7 +554,7 @@
                         5. ข้าพเจ้าได้อ่านข้อกำหนดและเงื่อนไขของสัญญาการเป็นผู้จำหน่ายอิสระบริษัท เดอะสตาร์ ริชซี จำกัด ข้าพเจ้าตกลงที่จะปฏิบัติตามเงื่อนไขและข้อกำหนดดังกล่าวที่มีอยู่ในปัจจุบันและอาจจะมีขึ้นในอนาคตในกรณีที่ข้าพเจ้ากระทำการใดๆ อันเป็นการฝ่าฝืนข้อกำหนดหรือเงื่อนไขดังกล่าวไม่ว่าจะเป็นการกระทำโดยเจตนาหรือประมาท ข้าพเจ้ายอมรับคำตัดสินจากทางบริษัทฯ โดยไม่มีข้อโต้แย้งใดๆ รวมถึงการที่บริษัทฯ จะยกเลิกสัญญาการเป็นผู้จำหน่ายอิสระ และการทำธุรกรรมร่วมกับบริษัทฯ โดยไม่ต้องแจ้งให้ทราบล่วงหน้า
                     </p>
 
-                    <h6 class="fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">จรรยาบรรณในวิชาชีพ 8 ข้อ</h6>
+                    <h6 class="text-center fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">จรรยาบรรณในวิชาชีพ 8 ข้อ</h6>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">1. ข้าพเจ้ามีความซื่อสัตย์สุจริตต่อลูกค้า เพื่อนร่วมงานอาชีพและบริษัท</p>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">2. ข้าพเจ้าไม่กล่าวร้ายทับถมเพื่อนร่วมอาชีพ เพื่อหวังให้เกิดการเข้าใจผิดเกิดความไม่ไว้วางใจ และเกิดความเสียหาย</p>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">3. ข้าพเจ้าไม่ลด หรือเสนอที่จะลดราคา เพื่อเป็นการจูงใจให้ซื้อผลิตภัณฑ์</p>
@@ -561,7 +564,7 @@
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">7. ข้าพเจ้าไม่นำเสนอธุรกิจอื่นหรือผลิตภัณฑ์อื่นอันส่งผลกระทบต่อธุรกิจสายงานเพื่อนร่วมอาชีพและบริษัท</p>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">8. ข้าพเจ้าพร้อมปฏิบัติตนตามกฎหมาย โดยเฉพาะ พระราชบัญญัติอาชีพขายตรงกฎกติกาจากสำนักงานคุ้มครองผู้บริโภค และกฎหมายเกี่ยวกับการโฆษณาหรือการทำธุรกิจผ่านอิเล็กทรอนิกส์ (ระบบบออบไลน์)</p>
 
-                    <h6 class="fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">กฎระเบียบในการทําออนไลน์ของบริษัท The Star Richy</h6>
+                    <h6 class="text-center fw-bold mb-3 mt-5" style="font-size:1.1rem; color:#1a3f6f; border-bottom: 1px solid #ddd; padding-bottom: 5px;">กฎระเบียบในการทําออนไลน์ของบริษัท The Star Richy</h6>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">1. ไม่ขายบนพื้นที่บุคคลอื่น เช่น กลุ่ม FB ที่เราไม่ได้เป็นผู้ก่อตั้ง ฯลฯ</p>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">2. ไม่ขายบนช่องทางขายปลีกออนไลน์ Market Place และห้ามขายสินค้าในตะกร้า Tiktok</p>
                     <p style="padding-left:1.5rem; text-align:justify; color:#212529; margin-bottom: 0.5rem;">3. ไม่ใช่นักธุรกิจห้ามขาย เช่น จ้างอินฟูเอ็นเซอร์ ฯลฯ</p>
