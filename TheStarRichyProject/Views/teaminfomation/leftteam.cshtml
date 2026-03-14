@@ -5,25 +5,628 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
-    <!-- Summary Cards -->
-    <div class="col-md-6 mb-3">
-        <div class="card summary-card success">
-            <div class="card-body">
-                <h6 class="text-muted">จำนวนสมาชิก</h6>
-                <h3 id="totalMembers" class="mb-0">0</h3>
+<style>
+    #leftTeamTable th { white-space: nowrap; }
+    #leftTeamTable td { vertical-align: middle; white-space: nowrap; }
+    .lt-qualify-yes { background-color: #c8e6c9 !important; }
+    .lt-qualify-no  { background-color: #ffcdd2 !important; }
+    .lt-qualify-yes:hover { background-color: #a5d6a7 !important; }
+    .lt-qualify-no:hover  { background-color: #ef9a9a !important; }
+    .pos-card { min-width: 110px; border-radius: 8px; padding: 10px 14px; text-align: center; }
+    .rank-chip { border-radius: 20px; padding: 6px 16px; display: inline-flex; flex-direction: column; align-items: center; min-width: 100px; }
+</style>
+
+<!-- ===== ส่วนที่ 1: Header & Filters ===== -->
+<div class="row mb-3">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header d-flex align-items-center gap-2"
+                 style="background: linear-gradient(135deg, #1b5e20, #4caf50); border-radius: 8px 8px 0 0;">
+                <i class="ri-arrow-left-circle-fill text-white fs-4"></i>
+                <h5 class="mb-0 text-white fw-semibold">ทีมซ้าย &nbsp;<small class="opacity-75 fw-normal">Left Team</small></h5>
             </div>
-        </div>
-    </div>
-    <div class="col-md-6 mb-3">
-        <div class="card summary-card info">
-            <div class="card-body">
-                <h6 class="text-muted">PV รวม</h6>
-                <h3 id="totalPV" class="mb-0">0</h3>
+            <div class="card-body py-3">
+                <div class="d-flex flex-wrap align-items-end gap-3">
+
+                    <!-- Toggle: ดูตามวัน / ดูทั้งหมด -->
+                    <div>
+                        <label class="form-label mb-1 small fw-semibold">ช่วงข้อมูล</label>
+                        <div class="btn-group d-flex" role="group">
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="btnByDate"
+                                    onclick="setDateMode('bydate')">
+                                <i class="bx bx-calendar me-1"></i>ดูตามวัน
+                            </button>
+                            <button type="button" class="btn btn-sm btn-primary" id="btnAllData"
+                                    onclick="setDateMode('all')">
+                                <i class="bx bx-list-ul me-1"></i>ดูทั้งหมด
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Date range (shown when bydate mode) -->
+                    <div id="dateRangeArea" class="d-none d-flex align-items-end gap-2">
+                        <div>
+                            <label class="form-label mb-1 small">จากวันที่</label>
+                            <input type="date" class="form-control form-control-sm" id="fromDate">
+                        </div>
+                        <div>
+                            <label class="form-label mb-1 small">ถึงวันที่</label>
+                            <input type="date" class="form-control form-control-sm" id="toDate">
+                        </div>
+                    </div>
+
+                    <!-- Level dropdown -->
+                    <div>
+                        <label class="form-label mb-1 small fw-semibold">เลือกชั้น</label>
+                        <select class="form-select form-select-sm" id="levelSelect" style="min-width: 140px;">
+                            <option value="">-- ทุกชั้น --</option>
+                        </select>
+                    </div>
+
+                    <!-- Search button -->
+                    <div class="align-self-end">
+                        <button type="button" class="btn btn-sm btn-success text-white px-4 fw-semibold"
+                                id="btnApply" onclick="applyFilters()">
+                            <i class="bx bx-check-circle me-1"></i>เลือก
+                        </button>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- ===== ส่วนที่ 2: Summary Section ===== -->
+<div class="row mb-3">
+
+    <!-- Package Summary -->
+    <div class="col-12 mb-3">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header py-2"
+                 style="background: #e8f5e9; border-bottom: 2px solid #388e3c;">
+                <h6 class="mb-0 text-success fw-semibold">
+                    <i class="bx bx-bar-chart-alt-2 me-2"></i>สรุปภาพรวม
+                </h6>
+            </div>
+            <div class="card-body py-3">
+                <div class="row g-3 align-items-stretch">
+
+                    <!-- Total members -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#e8f5e9; border: 2px solid #4caf50;">
+                            <div class="text-muted" style="font-size:0.72rem;">จำนวนสมาชิกทั้งหมด</div>
+                            <div class="fs-3 fw-bold text-success my-1" id="sumTotalMembers">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                        </div>
+                    </div>
+
+                    <!-- Qualify -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#f1f8e9; border: 2px solid #8bc34a;">
+                            <div class="text-muted" style="font-size:0.72rem;">สมาชิกที่รักษายอด</div>
+                            <div class="fs-3 fw-bold text-success my-1" id="sumQualifyCount">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                            <div class="mt-1">
+                                <span class="badge bg-success" style="font-size:0.7rem;">
+                                    PV รวม: <span id="sumQualifyPV">-</span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Position: ไม่มีตำแหน่ง -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#f5f5f5; border: 2px solid #9e9e9e;">
+                            <div class="text-muted" style="font-size:0.72rem;">ไม่มีตำแหน่ง</div>
+                            <div class="fs-3 fw-bold text-secondary my-1" id="posNoPosition">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                        </div>
+                    </div>
+
+                    <!-- Position: Star -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#fff8e1; border: 2px solid #ffc107;">
+                            <div class="text-muted" style="font-size:0.72rem;">Star</div>
+                            <div class="fs-3 fw-bold text-warning my-1" id="posStar">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                        </div>
+                    </div>
+
+                    <!-- Position: Silver Star -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#eceff1; border: 2px solid #90a4ae;">
+                            <div class="text-muted" style="font-size:0.72rem;">Silver Star</div>
+                            <div class="fs-3 fw-bold my-1" style="color:#546e7a;" id="posSilverStar">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                        </div>
+                    </div>
+
+                    <!-- Position: Gold Star -->
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <div class="pos-card h-100" style="background:#fff9c4; border: 2px solid #f9a825;">
+                            <div class="text-muted" style="font-size:0.72rem;">Gold Star</div>
+                            <div class="fs-3 fw-bold my-1" style="color:#f57f17;" id="posGoldStar">-</div>
+                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ranking Summary -->
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header py-2" style="background:#e3f2fd; border-bottom: 2px solid #1976d2;">
+                <h6 class="mb-0 text-primary fw-semibold">
+                    <i class="bx bx-trophy me-2"></i>ตำแหน่งคุณวุฒิ
+                </h6>
+            </div>
+            <div class="card-body py-2">
+                <div class="d-flex flex-wrap gap-3 py-1" id="rankingCards">
+                    <div class="text-muted small fst-italic">กำลังโหลด...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ===== ส่วนที่ 3: Data Table ===== -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header"
+                 style="background:#e8f5e9; border-bottom: 2px solid #4caf50;">
+                <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                    <h5 class="mb-0 fw-semibold">
+                        <i class="ri-arrow-left-line me-1 text-success"></i>รายชื่อสมาชิกทีมซ้าย
+                    </h5>
+                    <!-- Legend -->
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <div class="d-flex align-items-center gap-1">
+                            <div style="width:16px;height:16px;background:#c8e6c9;border:1px solid #4caf50;border-radius:3px;flex-shrink:0;"></div>
+                            <small class="text-muted">รักษายอด</small>
+                        </div>
+                        <div class="d-flex align-items-center gap-1">
+                            <div style="width:16px;height:16px;background:#ffcdd2;border:1px solid #f44336;border-radius:3px;flex-shrink:0;"></div>
+                            <small class="text-muted">ไม่รักษายอด</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+
+                <!-- Top pagination controls -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between mb-2 gap-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <label class="form-label mb-0 small">แสดง</label>
+                        <select class="form-select form-select-sm" id="rowsPerPage"
+                                style="width: 80px;" onchange="renderPage(1)">
+                            <option value="50">50</option>
+                            <option value="100" selected>100</option>
+                            <option value="200">200</option>
+                            <option value="500">500</option>
+                        </select>
+                        <label class="form-label mb-0 small">รายการต่อหน้า</label>
+                    </div>
+                    <div class="text-muted small">
+                        ทั้งหมด <strong id="totalRecordsTop">0</strong> ราย
+                        &nbsp;|&nbsp; แสดง <strong id="showingFrom">0</strong> – <strong id="showingTo">0</strong>
+                    </div>
+                    <div id="paginationTop" class="d-flex align-items-center gap-1 flex-wrap"></div>
+                </div>
+
+                <div id="tableMessage" class="alert alert-secondary py-2 mb-2">กำลังโหลดข้อมูล...</div>
+
+                <!-- Table: 20 columns + 1 # = 21 cols -->
+                <div class="table-responsive">
+                    <table class="table table-bordered table-sm align-middle" id="leftTeamTable" style="font-size: 0.78rem;">
+                        <thead class="align-middle text-center"
+                               style="background: linear-gradient(135deg, #e8f5e9, #c8e6c9); font-size:0.73rem;">
+                            <tr>
+                                <th class="text-center" style="min-width:36px;">#</th>
+                                <th style="min-width:60px;">ชั้นที่</th>
+                                <th style="min-width:110px;">รหัสสมาชิก</th>
+                                <th style="min-width:140px;">ชื่อสมาชิก</th>
+                                <th style="min-width:95px;">วันสมัคร</th>
+                                <th style="min-width:110px;">วันครบคุณสมบัติ</th>
+                                <th style="min-width:55px;">ด้าน</th>
+                                <th style="min-width:90px;">ตำแหน่ง</th>
+                                <th style="min-width:110px;">ตำแหน่งคุณวุฒิ</th>
+                                <th style="min-width:90px;">คะแนนส่วนตัว</th>
+                                <th style="min-width:130px;">ผู้แนะนำ</th>
+                                <th style="min-width:85px;">คะแนนซ้าย</th>
+                                <th style="min-width:85px;">คะแนนขวา</th>
+                                <th style="min-width:90px;">สถานะรักษายอด</th>
+                                <th style="min-width:110px;">รักษายอดเดือนปัจจุบัน</th>
+                                <th style="min-width:110px;">รักษายอดเดือนที่แล้ว</th>
+                                <th style="min-width:90px;">Active ด้านซ้าย</th>
+                                <th style="min-width:90px;">Active ด้านขวา</th>
+                                <th style="min-width:95px;">คะแนนบาลานซ์</th>
+                                <th style="min-width:95px;">คะแนนท่องเที่ยว 1</th>
+                                <th style="min-width:95px;">คะแนนท่องเที่ยว 2</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tableBody">
+                            <tr><td colspan="21" class="text-center py-5 text-muted">กำลังโหลด...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Bottom pagination controls -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between mt-2 gap-2">
+                    <div class="text-muted small">
+                        ทั้งหมด <strong id="totalRecordsBottom">0</strong> ราย
+                    </div>
+                    <div id="paginationBottom" class="d-flex align-items-center gap-1 flex-wrap"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+    /* ================================================================
+       State
+    ================================================================ */
+    var allData      = [];
+    var filteredData = [];
+    var currentPage  = 1;
+    var dateMode     = 'all';   // 'all' | 'bydate'
+
+    /* ================================================================
+       Date mode toggle  (exposed global for onclick= attributes)
+    ================================================================ */
+    window.setDateMode = function (mode) {
+        dateMode = mode;
+        if (mode === 'bydate') {
+            $('#btnByDate').removeClass('btn-outline-primary').addClass('btn-primary');
+            $('#btnAllData').removeClass('btn-primary').addClass('btn-outline-primary');
+            $('#dateRangeArea').removeClass('d-none').addClass('d-flex');
+        } else {
+            $('#btnAllData').removeClass('btn-outline-primary').addClass('btn-primary');
+            $('#btnByDate').removeClass('btn-primary').addClass('btn-outline-primary');
+            $('#dateRangeArea').removeClass('d-flex').addClass('d-none');
+        }
+    };
+
+    /* ================================================================
+       Load data from server
+       API 1: /home/GetMemberInfo                     → get member code
+       API 2: /teaminfomation/GetLeftTeamSummary      → packages + rankings
+       API 3: /teaminfomation/GetLeftTeam             → main table data
+    ================================================================ */
+    async function loadData() {
+        // --- show loading state ---
+        $('#tableMessage')
+            .text('กำลังโหลดข้อมูล...')
+            .removeClass('alert-danger alert-success').addClass('alert-secondary').show();
+        $('#tableBody').html('<tr><td colspan="21" class="text-center py-4 text-muted"><i class="bx bx-loader-alt bx-spin me-2"></i>กำลังโหลด...</td></tr>');
+        $('#sumTotalMembers,#sumQualifyCount,#sumQualifyPV,#posNoPosition,#posStar,#posSilverStar,#posGoldStar')
+            .html('<span class="placeholder col-6"></span>');
+        $('#rankingCards').html('<div class="text-muted small fst-italic"><i class="bx bx-loader-alt bx-spin me-1"></i>กำลังโหลด...</div>');
+
+        try {
+            // ── Step 1: รับ member code จาก session ────────────────────────────
+            const memberRes  = await fetch('/home/GetMemberInfo');
+            if (!memberRes.ok) throw new Error('GetMemberInfo HTTP ' + memberRes.status);
+            const memberData = await memberRes.json();
+            const mi         = typeof memberData === 'string' ? JSON.parse(memberData) : memberData;
+            const memberCode = (
+                mi?.membercode ||
+                mi?.MemberCode ||
+                mi?.memberInfo?.[0]?.membercode ||
+                mi?.memberInfo?.[0]?.MemberCode ||
+                ''
+            ).toString().trim();
+
+            if (!memberCode) throw new Error('ไม่พบรหัสสมาชิกใน session');
+
+            // ── Step 2: เรียก API summary + table พร้อมกัน ─────────────────────
+            const [summaryRes, teamRes] = await Promise.all([
+                fetch('/teaminfomation/GetLeftTeamSummary?memberCode=' + encodeURIComponent(memberCode)),
+                fetch('/teaminfomation/GetLeftTeam?memberCode='        + encodeURIComponent(memberCode))
+            ]);
+
+            if (!summaryRes.ok) throw new Error('GetLeftTeamSummary HTTP ' + summaryRes.status);
+            if (!teamRes.ok)    throw new Error('GetLeftTeam HTTP '        + teamRes.status);
+
+            const summaryRaw  = await summaryRes.json();
+            const teamRaw     = await teamRes.json();
+
+            // ── Step 3: Render summary cards ───────────────────────────────────
+            const summaryData = typeof summaryRaw === 'string' ? JSON.parse(summaryRaw) : summaryRaw;
+            renderSummary(summaryData);
+
+            // ── Step 4: Render table ────────────────────────────────────────────
+            allData = normalizeRows(teamRaw);
+            populateLevelDropdown(allData);
+            applyFilters();
+
+            $('#tableMessage').hide();
+
+        } catch (err) {
+            console.error('loadData error:', err);
+            $('#tableMessage')
+                .html('<i class="bx bx-error-circle me-2"></i>เกิดข้อผิดพลาดในการโหลดข้อมูล: <strong>' + escHtml(err.message) + '</strong>')
+                .removeClass('alert-secondary').addClass('alert-danger').show();
+            $('#tableBody').html('<tr><td colspan="21" class="text-center py-4 text-danger">โหลดข้อมูลไม่สำเร็จ</td></tr>');
+        }
+    }
+
+    /* ================================================================
+       Render summary (packages + rankings)
+    ================================================================ */
+    function renderSummary(summaryData) {
+        var packages = normalizeRows(summaryData && summaryData.packages);
+        var rankings = normalizeRows(summaryData && summaryData.rankings);
+
+        /* ---- Package stats ---- */
+        var totalMembers   = 0;
+        var qualifyCount   = 0;
+        var qualifyPvSum   = 0;
+        var noPositionCnt  = 0;
+        var starCnt        = 0;
+        var silverStarCnt  = 0;
+        var goldStarCnt    = 0;
+
+        packages.forEach(function (p) {
+            var tm  = toNum(p.TotalMember  ?? p.totalMember  ?? p.Totalmember  ?? 0);
+            totalMembers += tm;
+
+            var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
+            if (qualify.startsWith('yes')) {
+                qualifyCount++;
+                qualifyPvSum += toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
+            }
+
+            var pos = ((p.PositionName ?? p.positionName ?? p.Positionname ?? '') + '').toLowerCase().trim();
+            if (!pos || pos === '-' || pos === 'none' || pos === 'ไม่มีตำแหน่ง') {
+                noPositionCnt += tm;
+            } else if (pos === 'star') {
+                starCnt += tm;
+            } else if (pos.includes('silver')) {
+                silverStarCnt += tm;
+            } else if (pos.includes('gold')) {
+                goldStarCnt += tm;
+            }
+        });
+
+        $('#sumTotalMembers').text(fmtInt(totalMembers));
+        $('#sumQualifyCount').text(fmtInt(qualifyCount));
+        $('#sumQualifyPV').text(fmtNum(qualifyPvSum));
+        $('#posNoPosition').text(fmtInt(noPositionCnt));
+        $('#posStar').text(fmtInt(starCnt));
+        $('#posSilverStar').text(fmtInt(silverStarCnt));
+        $('#posGoldStar').text(fmtInt(goldStarCnt));
+
+        /* ---- Rankings ---- */
+        if (rankings.length > 0) {
+            var html = rankings.map(function (r) {
+                var name  = r.PrestigeRankingName ?? r.prestigeRankingName ?? r.RankName ?? r.rankName ?? '-';
+                var count = toNum(r.Totalmember ?? r.TotalMember ?? r.totalMember ?? 0);
+                return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb;">' +
+                       '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
+                       '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(count) + '</div>' +
+                       '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
+                       '</div>';
+            }).join('');
+            $('#rankingCards').html(html);
+        } else {
+            $('#rankingCards').html('<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
+        }
+    }
+
+    /* ================================================================
+       Populate level dropdown from table data
+    ================================================================ */
+    function populateLevelDropdown(data) {
+        var levels = [];
+        data.forEach(function (d) {
+            var lv = (d.LevelName ?? d.levelName ?? d.Level ?? d.level ?? '').toString().trim();
+            if (lv && levels.indexOf(lv) === -1) levels.push(lv);
+        });
+        levels.sort(function (a, b) {
+            var na = parseInt(a), nb = parseInt(b);
+            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            return a.localeCompare(b, 'th');
+        });
+        var sel = $('#levelSelect');
+        sel.find('option:not(:first)').remove();
+        levels.forEach(function (l) {
+            sel.append('<option value="' + escAttr(l) + '">' + escHtml(l) + '</option>');
+        });
+    }
+
+    /* ================================================================
+       Apply filters and render page 1
+    ================================================================ */
+    window.applyFilters = function () {
+        var selectedLevel = $('#levelSelect').val();
+        var fromDate = dateMode === 'bydate' ? $('#fromDate').val() : '';
+        var toDate   = dateMode === 'bydate' ? $('#toDate').val()   : '';
+        var from = fromDate ? new Date(fromDate)             : null;
+        var to   = toDate   ? new Date(toDate + 'T23:59:59') : null;
+
+        filteredData = allData.filter(function (row) {
+            if (selectedLevel) {
+                var lv = (row.LevelName ?? row.levelName ?? row.Level ?? '').toString().trim();
+                if (lv !== selectedLevel) return false;
+            }
+            if (from || to) {
+                var rawDate = row.RegisterDate ?? row.registerDate ?? row.registerdate ?? '';
+                var d = rawDate ? new Date(rawDate) : null;
+                if (d && !isNaN(d.getTime())) {
+                    if (from && d < from) return false;
+                    if (to   && d > to)   return false;
+                }
+            }
+            return true;
+        });
+
+        renderPage(1);
+    };
+
+    /* ================================================================
+       Render paged table
+    ================================================================ */
+    window.renderPage = function (page) {
+        var rowsPerPage  = parseInt($('#rowsPerPage').val()) || 100;
+        var totalRecords = filteredData.length;
+        var totalPages   = Math.max(1, Math.ceil(totalRecords / rowsPerPage));
+        currentPage      = Math.min(Math.max(1, page), totalPages);
+
+        var start    = (currentPage - 1) * rowsPerPage;
+        var end      = Math.min(start + rowsPerPage, totalRecords);
+        var pageData = filteredData.slice(start, end);
+
+        /* Count displays */
+        $('#totalRecordsTop, #totalRecordsBottom').text(fmtInt(totalRecords));
+        $('#showingFrom').text(totalRecords === 0 ? 0 : start + 1);
+        $('#showingTo').text(end);
+
+        /* Table body */
+        var tbody = $('#tableBody');
+        tbody.empty();
+
+        if (pageData.length === 0) {
+            tbody.html('<tr><td colspan="21" class="text-center py-5 text-muted fst-italic">ไม่พบข้อมูล</td></tr>');
+            $('#tableMessage').hide();
+        } else {
+            $('#tableMessage').hide();
+            var rows = '';
+            pageData.forEach(function (m, i) {
+                var qualify   = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
+                var isQualify = qualify.startsWith('yes');
+                var rowCls    = isQualify ? 'lt-qualify-yes' : 'lt-qualify-no';
+                var qualBadge = isQualify
+                    ? '<span class="badge" style="background:#2e7d32;font-size:0.7rem;">Yes</span>'
+                    : '<span class="badge" style="background:#c62828;font-size:0.7rem;">No</span>';
+
+                rows +=
+                    '<tr class="' + rowCls + '">' +
+                    '<td class="text-center">'  + (start + i + 1) + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '') + '</td>' +
+                    '<td class="text-center"><strong>' + escHtml(m.MemberLeftCode ?? m.memberLeftCode ?? '') + '</strong></td>' +
+                    '<td>'                           + escHtml(m.MemberLeftName  ?? m.memberLeftName  ?? '') + '</td>' +
+                    '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +
+                    '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.SIDE ?? m.Side ?? m.side ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PersonalPV    ?? m.personalPV)    + '</td>' +
+                    '<td>'                           + escHtml(m.SponserName  ?? m.sponserName  ?? m.SponsorName ?? '') + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVLeft        ?? m.pvLeft)        + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVRight       ?? m.pvRight)       + '</td>' +
+                    '<td class="text-center">'  + qualBadge                                  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV)    + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV) + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive)  + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalBalance  ?? m.totalBalance)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.Travelpoint1  ?? m.travelpoint1)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.Travelpoint2  ?? m.travelpoint2)  + '</td>' +
+                    '</tr>';
+            });
+            tbody.html(rows);
+        }
+
+        renderPagination(totalPages, currentPage);
+    };
+
+    /* ================================================================
+       Pagination renderer
+    ================================================================ */
+    function renderPagination(totalPages, current) {
+        function mkBtn(label, page, disabled, active) {
+            var cls = 'btn btn-sm ' + (active ? 'btn-success fw-bold' : 'btn-outline-secondary');
+            if (disabled) cls += ' disabled';
+            return '<button class="' + cls + '" onclick="renderPage(' + page + ')">' + label + '</button>';
+        }
+
+        var html = '';
+        html += mkBtn('«', 1,           current <= 1);
+        html += mkBtn('‹', current - 1, current <= 1);
+
+        var rangeStart = Math.max(1, current - 2);
+        var rangeEnd   = Math.min(totalPages, rangeStart + 4);
+        for (var p = rangeStart; p <= rangeEnd; p++) {
+            html += mkBtn(p, p, false, p === current);
+        }
+
+        html += mkBtn('›', current + 1, current >= totalPages);
+        html += mkBtn('»', totalPages,  current >= totalPages);
+
+        $('#paginationTop, #paginationBottom').html(html);
+    }
+
+    /* ================================================================
+       Helpers
+    ================================================================ */
+    function normalizeRows(payload) {
+        var d = payload;
+        if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return []; } }
+        if (d && Array.isArray(d.data))   return d.data;
+        if (d && Array.isArray(d.result)) return d.result;
+        if (d && Array.isArray(d.items))  return d.items;
+        if (d && Array.isArray(d.rows))   return d.rows;
+        return Array.isArray(d) ? d : [];
+    }
+
+    function toNum(v) {
+        var n = parseFloat(v);
+        return isNaN(n) ? 0 : n;
+    }
+
+    function fmtInt(v) {
+        return Math.round(toNum(v)).toLocaleString('th-TH');
+    }
+
+    function fmtNum(v) {
+        if (v === undefined || v === null || v === '') return '';
+        var n = parseFloat(v);
+        if (isNaN(n)) return '';
+        return n.toLocaleString('th-TH', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+    }
+
+    function fmtDate(v) {
+        if (!v) return '';
+        var d = new Date(v);
+        return isNaN(d.getTime()) ? '' : d.toLocaleDateString('th-TH');
+    }
+
+    function escHtml(s) {
+        if (s === null || s === undefined) return '';
+        return String(s)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function escAttr(s) {
+        return String(s).replace(/"/g, '&quot;');
+    }
+
+    /* ================================================================
+       Init  (must be LAST — after all function definitions above)
+    ================================================================ */
+    window.setDateMode('all');   // set initial UI state
+    loadData();                  // kick off API calls
+
+});
+</script>
+
+@section scripts {
+    <!-- App js -->
+    <script src="~/assets/js/app.js"></script>
+}
 
 <div class="row">
     <div class="col-12">
