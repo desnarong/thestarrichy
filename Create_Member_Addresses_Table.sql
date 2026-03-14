@@ -1,5 +1,5 @@
 -- ============================================================
--- TBL_MEMBER_ADDRESSES
+-- M06_Addresses
 -- เก็บที่อยู่ของสมาชิก แยกตามประเภท:
 --   Type 1 = ที่อยู่ตามบัตรประชาชน/พาสปอร์ต
 --   Type 2 = ที่อยู่ปัจจุบัน
@@ -10,10 +10,10 @@
 
 IF NOT EXISTS (
     SELECT 1 FROM INFORMATION_SCHEMA.TABLES
-    WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TBL_MEMBER_ADDRESSES'
+    WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'M06_Addresses'
 )
 BEGIN
-    CREATE TABLE [dbo].[TBL_MEMBER_ADDRESSES] (
+    CREATE TABLE [dbo].[M06_Addresses] (
         -- Primary Key
         [Id]             INT            IDENTITY(1,1) NOT NULL,
 
@@ -44,45 +44,45 @@ BEGIN
         [BranchName]     NVARCHAR(100)  NULL,  -- ชื่อสาขา
 
         -- ============ Audit ============
-        [CreatedAt]      DATETIME       NOT NULL CONSTRAINT [DF_TBL_MEMBER_ADDRESSES_CreatedAt] DEFAULT GETDATE(),
+        [CreatedAt]      DATETIME       NOT NULL CONSTRAINT [DF_M06_Addresses_CreatedAt] DEFAULT GETDATE(),
         [UpdatedAt]      DATETIME       NULL,
         [UpdatedBy]      NVARCHAR(50)   NULL,
-        [IsActive]       BIT            NOT NULL CONSTRAINT [DF_TBL_MEMBER_ADDRESSES_IsActive] DEFAULT 1,
+        [IsActive]       BIT            NOT NULL CONSTRAINT [DF_M06_Addresses_IsActive] DEFAULT 1,
 
         -- ============ Constraints ============
-        CONSTRAINT [PK_TBL_MEMBER_ADDRESSES]
+        CONSTRAINT [PK_M06_Addresses]
             PRIMARY KEY CLUSTERED ([Id] ASC),
 
         -- สมาชิกหนึ่งคนมีที่อยู่แต่ละประเภทได้เพียง 1 รายการ
-        CONSTRAINT [UK_TBL_MEMBER_ADDRESSES_MemberCode_Type]
+        CONSTRAINT [UK_M06_Addresses_MemberCode_Type]
             UNIQUE ([MemberCode], [AddressType]),
 
         -- FK ไปยัง TBL_TAMBONS
-        CONSTRAINT [FK_TBL_MEMBER_ADDRESSES_TAMBONS]
+        CONSTRAINT [FK_M06_Addresses_TAMBONS]
             FOREIGN KEY ([TambonId])
             REFERENCES [dbo].[TBL_TAMBONS] ([id])
     );
 
-    PRINT 'Created table TBL_MEMBER_ADDRESSES';
+    PRINT 'Created table M06_Addresses';
 END
 ELSE
 BEGIN
-    PRINT 'Table TBL_MEMBER_ADDRESSES already exists — skipped.';
+    PRINT 'Table M06_Addresses already exists — skipped.';
 END
 GO
 
 -- Index เพื่อเพิ่มความเร็วในการ query ตาม MemberCode
 IF NOT EXISTS (
     SELECT 1 FROM sys.indexes
-    WHERE object_id = OBJECT_ID('dbo.TBL_MEMBER_ADDRESSES')
-      AND name = 'IX_TBL_MEMBER_ADDRESSES_MemberCode'
+    WHERE object_id = OBJECT_ID('dbo.M06_Addresses')
+      AND name = 'IX_M06_Addresses_MemberCode'
 )
 BEGIN
-    CREATE NONCLUSTERED INDEX [IX_TBL_MEMBER_ADDRESSES_MemberCode]
-        ON [dbo].[TBL_MEMBER_ADDRESSES] ([MemberCode] ASC)
+    CREATE NONCLUSTERED INDEX [IX_M06_Addresses_MemberCode]
+        ON [dbo].[M06_Addresses] ([MemberCode] ASC)
         INCLUDE ([AddressType], [IsActive]);
 
-    PRINT 'Created index IX_TBL_MEMBER_ADDRESSES_MemberCode';
+    PRINT 'Created index IX_M06_Addresses_MemberCode';
 END
 GO
 
@@ -91,12 +91,12 @@ GO
 -- ============================================================
 IF NOT EXISTS (
     SELECT 1 FROM sys.check_constraints
-    WHERE parent_object_id = OBJECT_ID('dbo.TBL_MEMBER_ADDRESSES')
-      AND name = 'CK_TBL_MEMBER_ADDRESSES_AddressType'
+    WHERE parent_object_id = OBJECT_ID('dbo.M06_Addresses')
+      AND name = 'CK_M06_Addresses_AddressType'
 )
 BEGIN
-    ALTER TABLE [dbo].[TBL_MEMBER_ADDRESSES]
-        ADD CONSTRAINT [CK_TBL_MEMBER_ADDRESSES_AddressType]
+    ALTER TABLE [dbo].[M06_Addresses]
+        ADD CONSTRAINT [CK_M06_Addresses_AddressType]
             CHECK ([AddressType] IN (1, 2, 3));
 
     PRINT 'Added CHECK constraint for AddressType (1=บัตร, 2=ปัจจุบัน, 3=ออกภาษี)';
@@ -155,7 +155,7 @@ SELECT
     a.[UpdatedBy],
     a.[IsActive]
 FROM
-    [dbo].[TBL_MEMBER_ADDRESSES] a
+    [dbo].[M06_Addresses] a
 LEFT JOIN
     [dbo].[TBL_TAMBONS] t ON t.[id] = a.[TambonId];
 GO
