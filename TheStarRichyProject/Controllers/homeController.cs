@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Reflection;
 using System.Text;
 using TheStarRichyProject.Helper;
 using TheStarRichyProject.Models;
@@ -75,14 +76,27 @@ namespace TheStarRichyProject.Controllers
             };
             var passkey = _config["Api:Passkey"];
             var token = Request.Cookies[CookieHelper.UserKey];
+            var ipAddress = GetClientIPAddress();
             var client = new RestClient(options);
             var request = new RestRequest("/Member/updatekyc", Method.Post);
             request.AddHeader("X-Passkey", passkey);
             request.AddHeader("Authorization", $"Bearer {token}");
             request.AddHeader("Accept", "application/json");
+            request.AddJsonBody(new { ipAddress });
             RestResponse response = await client.ExecuteAsync(request);
             if (response.IsSuccessful)
+            {
+                CookieHelper.SetCookie(_httpContextAccessor, CookieHelper.KYCKey, "Y",
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddHours(int.Parse(_config["Defualt:HourExpires"]))
+                    }
+                );
                 return Ok(response.Content);
+            }
             return StatusCode((int)(response.StatusCode), response.Content);
         }
 
@@ -112,6 +126,17 @@ namespace TheStarRichyProject.Controllers
             RestResponse response = await client.ExecuteAsync(request);
             if (response.IsSuccessful)
             {
+                var memberinfo = JsonConvert.DeserializeObject<dynamic>(response.Content);
+                CookieHelper.SetCookie(_httpContextAccessor, CookieHelper.MemberInfoKey, memberinfo.ToString(),
+                    new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Secure = true,
+                        SameSite = SameSiteMode.Strict,
+                        Expires = DateTimeOffset.UtcNow.AddHours(int.Parse(_config["Defualt:HourExpires"])) // Match JWT expiration
+                    }
+                );
+
                 //Console.WriteLine(response.Content);
                 return Ok(response.Content);
             }

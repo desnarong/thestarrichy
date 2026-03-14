@@ -243,12 +243,14 @@ namespace TheStarRichyApi.Controllers
             }
         }
 
+        public class UpdateKycRequest { public string IpAddress { get; set; } = ""; }
+
         [HttpPost("updatekyc")]
-        public async Task<IActionResult> UpdateKYC()
+        public async Task<IActionResult> UpdateKYC([FromBody] UpdateKycRequest body)
         {
             try
             {
-                var result = await _memberService.UpdateKYCAsync();
+                var result = await _memberService.UpdateKYCAsync(body?.IpAddress ?? "");
                 if (result)
                     return Ok(new { success = true, message = "อัปเดต KYC เรียบร้อย" });
                 return StatusCode(500, new { success = false, message = "ไม่สามารถอัปเดต KYC ได้" });
