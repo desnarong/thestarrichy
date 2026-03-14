@@ -1,278 +1,155 @@
 ﻿@{
-    ViewData["Title"] = "รายได้";
+    ViewData["Title"] = "รายงานรายได้";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row">
-    <div class="col-md-12 col-lg-12">
-        <div class="card">
-            <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
-                <h4 class="mb-0" data-key="t-income-report">รายงานรายได้สำหรับสมาชิก</h4>
-                <span class="badge bg-primary-subtle text-primary">Income Report</span>
+<div class="row mb-3">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#e65100,#ff9800);">
+        <i class="bx bx-money fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานรายได้สำหรับสมาชิก</h5>
+      </div>
+      <div class="card-body py-3">
+        <div class="row g-3 mb-3">
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#fff3e0;border:2px solid #ff9800 !important;">
+              <div class="text-muted small">โบนัสสะสม</div>
+              <div class="fs-4 fw-bold" style="color:#e65100;" id="sumBonusText">-</div>
+              <div class="text-muted" style="font-size:.7rem;">บาท</div>
             </div>
-            <div class="card-block p-3">
-                <div class="row g-3 mb-4">
-                    <div class="col-lg-6 col-md-6">
-                        <div class="card border h-100 mb-0">
-                            <div class="card-body">
-                                <h6 class="text-muted mb-2">โบนัสสะสม</h6>
-                                <div class="h4 mb-0" id="accumulatedBonusText">0.00</div>
-                                <input type="hidden" id="accumulatedBonus" value="0.00" />
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-6 col-md-6">
-                        <div class="card border h-100 mb-0">
-                            <div class="card-body">
-                                <h6 class="text-muted mb-2">จำนวนรายการ</h6>
-                                <div class="h4 mb-0" id="incomeTotalRows">0</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card border mb-3">
-                    <div class="card-body">
-                        <div class="row g-3 align-items-end">
-                            <div class="col-lg-4 col-md-6">
-                                <label class="form-label mb-2" data-key="t-purchase-type">ประเภทการสั่งซื้อ</label>
-                                <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="report_type" id="daily_points" value="daily_points" checked>
-                                        <label class="form-check-label" for="daily_points" data-key="t-daily-points-entry">บันทึกคะแนนรายวัน</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="report_type" id="points_deduction" value="points_deduction">
-                                        <label class="form-check-label" for="points_deduction" data-key="t-points-deduction-history">ประวัติการหักคะแนน</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4 col-md-6">
-                                <label class="form-label mb-2" data-key="t-report-type">ประเภทรายงาน</label>
-                                <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="report_format" id="daily" value="daily" checked>
-                                        <label class="form-check-label" for="daily" data-key="t-daily">รายวัน</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="report_format" id="weekly" value="weekly">
-                                        <label class="form-check-label" for="weekly" data-key="t-weekly">รายสัปดาห์</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="report_format" id="monthly" value="monthly">
-                                        <label class="form-check-label" for="monthly" data-key="t-monthly">รายเดือน</label>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-2 col-md-6">
-                                <label class="form-label" for="fromDate" data-key="t-from-date">จากวันที่</label>
-                                <input type="date" id="fromDate" class="form-control" />
-                            </div>
-
-                            <div class="col-lg-2 col-md-6">
-                                <label class="form-label" for="toDate" data-key="t-to-date">ถึงวันที่</label>
-                                <input type="date" id="toDate" class="form-control" />
-                            </div>
-
-                            <div class="col-12 d-flex justify-content-end gap-2">
-                                <button class="btn btn-light" id="btnResetIncome" type="button">รีเซ็ต</button>
-                                <button class="btn btn-primary" id="btnSearchIncome" type="button" data-key="t-search">ค้นหา</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="alert alert-secondary mb-3 py-2" id="incomeMessage">กำลังโหลดข้อมูลรายได้...</div>
-
-                <div>
-                    <h5 data-key="t-report" class="mb-3">รายการรายได้</h5>
-                    <div class="table-responsive mt-1">
-                        <table id="data-table-responsive" class="table table-striped table-bordered align-middle w-100"></table>
-                    </div>
-                </div>
+          </div>
+          <div class="col-sm-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-3" style="background:#e8f5e9;border:2px solid #43a047 !important;">
+              <div class="text-muted small">จำนวนรายการ</div>
+              <div class="fs-4 fw-bold" style="color:#2e7d32;" id="sumRows">-</div>
+              <div class="text-muted" style="font-size:.7rem;">รายการ</div>
             </div>
+          </div>
         </div>
+        <div class="row align-items-end g-3 mb-2">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ประเภทข้อมูล</label>
+            <div class="d-flex gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="report_type" id="daily_points" value="daily_points" checked><label class="form-check-label" for="daily_points">บันทึกคะแนนรายวัน</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="report_type" id="points_deduction" value="points_deduction"><label class="form-check-label" for="points_deduction">ประวัติการหักคะแนน</label></div>
+            </div>
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ประเภทรายงาน</label>
+            <div class="d-flex gap-3">
+              <div class="form-check"><input class="form-check-input" type="radio" name="report_format" id="fmt_daily" value="daily" checked><label class="form-check-label" for="fmt_daily">รายวัน</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="report_format" id="fmt_weekly" value="weekly"><label class="form-check-label" for="fmt_weekly">รายสัปดาห์</label></div>
+              <div class="form-check"><input class="form-check-input" type="radio" name="report_format" id="fmt_monthly" value="monthly"><label class="form-check-label" for="fmt_monthly">รายเดือน</label></div>
+            </div>
+          </div>
+        </div>
+        <div class="row align-items-end g-2">
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="fromDate">
+          </div>
+          <div class="col-auto">
+            <label class="form-label mb-1 small fw-semibold">ถึงวันที่</label>
+            <input type="date" class="form-control form-control-sm" id="toDate">
+          </div>
+          <div class="col-auto align-self-end">
+            <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
+            <button class="btn btn-sm" id="btnSearch" style="background:#ff9800;border-color:#ff9800;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    <div class="card shadow-sm border-0">
+      <div class="card-header" style="background:#fff3e0;border-bottom:2px solid #ff9800;">
+        <h5 class="mb-0 fw-semibold" style="color:#e65100;"><i class="bx bx-list-ul me-2"></i>รายการรายได้ &nbsp;<span class="badge" style="background:#ff9800;" id="rowCount">0</span></h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูลรายได้...</div>
+        <div class="table-responsive">
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.84rem;"></table>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-    $(document).ready(function () {
-        const table = $("#data-table-responsive").DataTable({
-            "responsive": true,
-            "processing": true,
-            "serverSide": false,
-            "filter": false,
-            "orderMulti": false,
-            "ordering": true,
-            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "ทั้งหมด"]],
-            "pageLength": 25,
-            "destroy": true,
-            "searching": false,
-            "contentType": "application/json; charset=utf-8",
-            "ajax": {
-                "url": '@Url.Action("GetIncomeByPeriod", "home")',
-                "type": 'GET',
-                "data": function (d) {
-                    d.reportType = $('input[name="report_type"]:checked').val();
-                    d.reportFormat = $('input[name="report_format"]:checked').val();
-                    d.fromDate = $('#fromDate').val();
-                    d.toDate = $('#toDate').val();
-                },
-                "dataSrc": function (json) {
-                    let payload = json;
+$(function(){
+  var tbl=null;
+  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
+  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
-                    if (typeof payload === 'string') {
-                        try {
-                            payload = JSON.parse(payload);
-                        } catch (e) {
-                            payload = [];
-                        }
-                    }
+  function mapPeriodLabel(period){
+    var m={'1_months':'1 เดือน','2_months':'2 เดือน','3_months':'3 เดือน','4_months':'4 เดือน','5_months':'5 เดือน','6_months':'6 เดือน','7_months':'7 เดือน','8_months':'8 เดือน','9_months':'9 เดือน','10_months':'10 เดือน','11_months':'11 เดือน','1_year':'1 ปี','2_year':'2 ปี'};
+    return m[period]||period||'-';
+  }
 
-                    if (payload && Array.isArray(payload.data)) {
-                        payload = payload.data;
-                    }
-
-                    if (!Array.isArray(payload)) {
-                        payload = [];
-                    }
-
-                    const fromDate = $('#fromDate').val();
-                    const toDate = $('#toDate').val();
-                    const selectedReportType = $('input[name="report_type"]:checked').val();
-                    const selectedReportFormat = $('input[name="report_format"]:checked').val();
-
-                    const rows = payload.map(function (item) {
-                        const rawBonus = parseFloat(item.TotalBonusPeriod ?? item.totalBonusPeriod ?? item.totalBonus ?? 0);
-                        const bonus = isNaN(rawBonus) ? 0 : rawBonus;
-
-                        const sourceDate = item.PaymentDate ?? item.paymentDate ?? item.Startdate ?? item.startdate ?? item.Enddate ?? item.enddate ?? '';
-                        const periodRaw = (item.period ?? item.Period ?? '').toString();
-                        const typeOfBonusRaw = (item.TypeofBonus ?? item.typeofBonus ?? '').toString().toLowerCase();
-
-                        return {
-                            sourceDate: sourceDate,
-                            periodRaw: periodRaw,
-                            typeOfBonusRaw: typeOfBonusRaw,
-                            bonusValue: bonus,
-                            periodLabel: mapPeriodLabel(periodRaw),
-                            bonusDisplay: bonus.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                        };
-                    });
-
-                    const filteredRows = rows.filter(function (row) {
-                        if (selectedReportType === 'points_deduction') {
-                            const isDeductionByType = row.typeOfBonusRaw.includes('cut') || row.typeOfBonusRaw.includes('deduct') || row.typeOfBonusRaw.includes('หัก');
-                            const isDeductionByValue = row.bonusValue < 0;
-                            if (!isDeductionByType && !isDeductionByValue) {
-                                return false;
-                            }
-                        }
-
-                        if (selectedReportType === 'daily_points') {
-                            const isDeductionByType = row.typeOfBonusRaw.includes('cut') || row.typeOfBonusRaw.includes('deduct') || row.typeOfBonusRaw.includes('หัก');
-                            if (isDeductionByType || row.bonusValue < 0) {
-                                return false;
-                            }
-                        }
-
-                        if (selectedReportFormat === 'monthly') {
-                            const lowerPeriod = row.periodRaw.toLowerCase();
-                            if (!lowerPeriod.includes('month')) {
-                                return false;
-                            }
-                        }
-
-                        if (selectedReportFormat === 'weekly') {
-                            const lowerPeriod = row.periodRaw.toLowerCase();
-                            if (!lowerPeriod.includes('week')) {
-                                return false;
-                            }
-                        }
-
-                        if (!fromDate && !toDate) {
-                            return true;
-                        }
-
-                        if (!row.sourceDate) {
-                            return false;
-                        }
-
-                        const rowDate = new Date(row.sourceDate);
-                        if (isNaN(rowDate.getTime())) {
-                            return false;
-                        }
-
-                        if (fromDate && rowDate < new Date(fromDate)) return false;
-                        if (toDate && rowDate > new Date(toDate)) return false;
-                        return true;
-                    });
-
-                    const filteredTotalBonus = filteredRows.reduce(function (sum, row) {
-                        return sum + (row.bonusValue || 0);
-                    }, 0);
-
-                    const formattedTotal = filteredTotalBonus.toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                    $('#accumulatedBonus').val(formattedTotal);
-                    $('#accumulatedBonusText').text(formattedTotal);
-                    $('#incomeTotalRows').text(filteredRows.length.toLocaleString('th-TH'));
-
-                    if (filteredRows.length > 0) {
-                        $('#incomeMessage').removeClass('alert-danger').addClass('alert-secondary').text(`พบข้อมูล ${filteredRows.length} รายการ`);
-                    } else {
-                        $('#incomeMessage').removeClass('alert-danger').addClass('alert-secondary').text('ไม่พบข้อมูลรายได้');
-                    }
-
-                    return filteredRows;
-                },
-                "error": function () {
-                    $('#incomeMessage').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูลรายได้');
-                }
-            },
-            "columns": [
-                { title: "รอบการรับโบนัส", "data": 'periodLabel', "targets": 0, "orderable": true },
-                { title: "รายได้ (บาท)", "data": 'bonusDisplay', "orderable": true, "className": "text-end" }
-            ],
-        });
-
-        $('#btnSearchIncome').on('click', function () {
-            $('#incomeMessage').removeClass('alert-danger').addClass('alert-secondary').text('กำลังค้นหาข้อมูล...');
-            table.ajax.reload();
-        });
-
-        $('#btnResetIncome').on('click', function () {
-            $('#daily_points').prop('checked', true);
-            $('#daily').prop('checked', true);
-            $('#fromDate').val('');
-            $('#toDate').val('');
-            $('#incomeMessage').removeClass('alert-danger').addClass('alert-secondary').text('กำลังโหลดข้อมูลรายได้...');
-            table.ajax.reload();
-        });
-
-        function mapPeriodLabel(period) {
-            switch (period) {
-                case '1_months': return '1 เดือน';
-                case '2_months': return '2 เดือน';
-                case '3_months': return '3 เดือน';
-                case '4_months': return '4 เดือน';
-                case '5_months': return '5 เดือน';
-                case '6_months': return '6 เดือน';
-                case '7_months': return '7 เดือน';
-                case '8_months': return '8 เดือน';
-                case '9_months': return '9 เดือน';
-                case '10_months': return '10 เดือน';
-                case '11_months': return '11 เดือน';
-                case '1_year': return '1 ปี';
-                case '2_year': return '2 ปี';
-                default: return period || '-';
-            }
-        }
+  function buildTable(rows){
+    if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
+    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#fff3e0,#ffe0b2);font-size:.78rem;"><tr><th>#</th><th>รอบการรับโบนัส</th><th>รายได้ (บาท)</th></tr></thead>';
+    var tbody='<tbody>';
+    rows.forEach(function(r,i){
+      tbody+='<tr><td class="text-center">'+(i+1)+'</td><td>'+mapPeriodLabel(r.periodRaw)+'</td><td class="text-end fw-bold text-success">'+r.bonusDisplay+'</td></tr>';
     });
-</script>
+    tbody+='</tbody>';
+    $('#mainTable').html(thead+tbody);
+    tbl=$('#mainTable').DataTable({paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],ordering:true,searching:true,
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
+    var total=rows.reduce(function(s,r){return s+r.bonusValue;},0);
+    $('#sumBonusText').text(fmt2(total));$('#sumRows').text(rows.length);$('#rowCount').text(rows.length);
+    $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+  }
 
+  function loadData(){
+    $('#msg').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
+    var rtype=$('input[name="report_type"]:checked').val()||'daily_points';
+    var rfmt=$('input[name="report_format"]:checked').val()||'daily';
+    var f=$('#fromDate').val(),t=$('#toDate').val();
+    $.ajax({
+      url:'@Url.Action("GetIncomeByPeriod","home")',type:'GET',
+      data:{reportType:rtype,reportFormat:rfmt,fromDate:f,toDate:t},
+      success:function(json){
+        var payload=norm(json);
+        var rows=payload.map(function(item){
+          var rawBonus=parseFloat(item.TotalBonusPeriod??item.totalBonusPeriod??item.totalBonus??0);
+          var bonus=isNaN(rawBonus)?0:rawBonus;
+          var srcDate=item.PaymentDate??item.paymentDate??item.Startdate??item.startdate??item.Enddate??item.enddate??'';
+          var periodRaw=(item.period??item.Period??'').toString();
+          var typeOfBonusRaw=(item.TypeofBonus??item.typeofBonus??'').toString().toLowerCase();
+          return{sourceDate:srcDate,periodRaw:periodRaw,typeOfBonusRaw:typeOfBonusRaw,bonusValue:bonus,bonusDisplay:bonus.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2})};
+        });
+        rows=rows.filter(function(row){
+          if(rtype==='points_deduction'){var isDed=row.typeOfBonusRaw.includes('cut')||row.typeOfBonusRaw.includes('deduct')||row.typeOfBonusRaw.includes('หัก');var isDedVal=row.bonusValue<0;if(!isDed&&!isDedVal)return false;}
+          if(rtype==='daily_points'){var isDed=row.typeOfBonusRaw.includes('cut')||row.typeOfBonusRaw.includes('deduct')||row.typeOfBonusRaw.includes('หัก');if(isDed||row.bonusValue<0)return false;}
+          if(rfmt==='monthly'&&!row.periodRaw.toLowerCase().includes('month'))return false;
+          if(rfmt==='weekly'&&!row.periodRaw.toLowerCase().includes('week'))return false;
+          if(!f&&!t)return true;
+          if(!row.sourceDate)return false;
+          var rd=new Date(row.sourceDate);if(isNaN(rd.getTime()))return false;
+          if(f&&rd<new Date(f))return false;if(t&&rd>new Date(t))return false;
+          return true;
+        });
+        buildTable(rows);
+      },
+      error:function(){$('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');}
+    });
+  }
+
+  $('#btnSearch').on('click',loadData);
+  $('#btnReset').on('click',function(){
+    $('#daily_points').prop('checked',true);$('#fmt_daily').prop('checked',true);
+    $('#fromDate').val('');$('#toDate').val('');loadData();
+  });
+  loadData();
+});
+</script>
 @section scripts{
-    <!-- App js -->
     <script src="~/assets/js/app.js"></script>
 }
