@@ -97,7 +97,7 @@ namespace TheStarRichyApi.Services
                         t.amphoe_code  AS AmphoeCode,
                         t.province_code AS ProvinceCode,
                         ISNULL(a.Zipcode, t.zipcode) AS EffectiveZipcode
-                    FROM TBL_MEMBER_ADDRESSES a
+                    FROM M06_Addresses a
                     LEFT JOIN TBL_TAMBONS t ON t.id = a.TambonId
                     WHERE a.MemberCode = @MemberCode
                       AND a.IsActive = 1
@@ -182,7 +182,7 @@ namespace TheStarRichyApi.Services
                 foreach (var addr in addresses)
                 {
                     const string sql = @"
-                        MERGE INTO TBL_MEMBER_ADDRESSES AS target
+                        MERGE INTO M06_Addresses AS target
                         USING (SELECT @MemberCode AS MemberCode, @AddressType AS AddressType) AS src
                         ON target.MemberCode = src.MemberCode AND target.AddressType = src.AddressType
                         WHEN MATCHED THEN
