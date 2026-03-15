@@ -12,6 +12,7 @@
         public static string PagesKey = "pages";
         public static string MemberPositionPictureKey = "MemberPositionPicture";
         public static string MemberInfoKey = "memberinfo";
+        public static string KYCKey = "kyc";
         public static void SetCookie(this IHttpContextAccessor httpContextAccessor, string key, string value, TimeSpan expires)
         {
             var cookieOptions = new CookieOptions

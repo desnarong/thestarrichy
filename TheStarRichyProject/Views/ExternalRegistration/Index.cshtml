@@ -194,7 +194,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">ชื่อธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control bg-secondary-subtle" id="businessName" placeholder="กรอกชื่อธุรกิจ" required readonly />
+                                                    <input type="text" class="form-control" id="businessName" placeholder="กรอกชื่อธุรกิจ" required />
                                                     <small class="text-muted mt-1" id="businessNameValidation"></small>
                                                 </div>
                                             </div>
@@ -1098,12 +1098,13 @@
                 var birthMonth = $('#birthMonth').val();
                 var birthYearBE = $('#birthYear').val();
                 
-                // Format as dd-MM-yyyy (Thai date format)
+                // Format as dd-MM-yyyy (CE year — แปลงจาก พ.ศ. → ค.ศ. ก่อนส่ง API)
                 var birthDate = '';
                 if (birthDay && birthMonth && birthYearBE) {
                     var dayStr = String(birthDay).padStart(2, '0');
                     var monthStr = String(birthMonth).padStart(2, '0');
-                    birthDate = `${dayStr}-${monthStr}-${birthYearBE}`;
+                    var birthYearCE = parseInt(birthYearBE) - 543; // พ.ศ. → ค.ศ.
+                    birthDate = `${dayStr}-${monthStr}-${birthYearCE}`;
                 }
                 
                 return {

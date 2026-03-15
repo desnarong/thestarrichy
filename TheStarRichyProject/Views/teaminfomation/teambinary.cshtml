@@ -119,7 +119,8 @@
     }
 
     function normalizeYesNoStatus(value) {
-        return isYesStatus(value) ? 'Yes' : 'No';
+        return value;
+        //return isYesStatus(value) ? 'Yes' : 'No';
     }
 
     function buildNodeInfoStatsHtml(modalData) {
@@ -161,12 +162,12 @@
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${modalData.lastCMonth} รับ ${formatNumber(modalData.nextCMonth)} - ${modalData.currentMonthQualifyStatus}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.lastCMonth} รับ ${formatNumber(modalData.nextCMonth)} PV - ${modalData.currentMonthQualifyStatus}</div>
                 </div>
             </div>
             <div class="stats-row">
                 <div class="stat-item keep-text">
-                    <div class="middle-text">รักษายอด - ${modalData.currentMonth1} รับ ${formatNumber(modalData.currentMonth)} - ${modalData.lastMonthQualifyStatus}</div>
+                    <div class="middle-text">รักษายอด - ${modalData.currentMonth1} รับ ${formatNumber(modalData.currentMonth)} PV - ${modalData.lastMonthQualifyStatus}</div>
                 </div>
             </div>
         `;

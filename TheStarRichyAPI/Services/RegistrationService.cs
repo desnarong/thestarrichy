@@ -468,6 +468,11 @@ namespace TheStarRichyApi.Services
                 System.Globalization.CultureInfo.InvariantCulture,
                 System.Globalization.DateTimeStyles.None, out DateTime result))
             {
+                // ป้องกัน BE year หลุดมา: ถ้าปี > 2400 แสดงว่าเป็น พ.ศ. → แปลงเป็น ค.ศ.
+                if (result.Year > 2400)
+                {
+                    result = result.AddYears(-543);
+                }
                 return result;
             }
 

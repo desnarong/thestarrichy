@@ -217,7 +217,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label required">ชื่อธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control bg-secondary-subtle" id="simpleBusinessName" placeholder="กรอกชื่อธุรกิจ" required readonly />
+                                                    <input type="text" class="form-control" id="simpleBusinessName" placeholder="กรอกชื่อธุรกิจ" required />
                                                     <small class="text-muted mt-1" id="simpleBusinessNameValidation"></small>
                                                 </div>
                                             </div>
@@ -513,7 +513,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-business-name">ชื่อธุรกิจ</label>
                                                 <div class="col-md-7">
-                                                    <input type="text" id="fullBusinessName" class="form-control bg-secondary-subtle" placeholder="กรอกชื่อธุรกิจ" readonly />
+                                                    <input type="text" id="fullBusinessName" class="form-control" placeholder="กรอกชื่อธุรกิจ" />
                                                     <small class="text-muted mt-1" id="fullBusinessNameValidation"></small>
                                                 </div>
                                             </div>
@@ -1309,7 +1309,7 @@
             
             // Convert BE to CE for age calculation
             var yearCE = yearBE;
-            if (currentLang === 'th' && yearBE > 2500) {
+            if (currentLang === 'th' && yearBE > 2400) {
                 yearCE = yearBE - 543;
             }
             
@@ -1864,12 +1864,15 @@
             if (isValid) {
                 Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-                // Construct birth date from dropdowns (format: dd-mm-yyyy)
+                // Construct birth date from dropdowns (format: dd-MM-yyyy, CE year)
                 var simpleBirthDay = $('#simpleBirthDay').val();
                 var simpleBirthMonth = $('#simpleBirthMonth').val();
                 var simpleBirthYear = $('#simpleBirthYear').val();
+                // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
+                var simpleBirthYearCE = parseInt(simpleBirthYear);
+                if (currentLang === 'th' && simpleBirthYearCE > 2400) simpleBirthYearCE -= 543;
                 var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear 
-                    ? simpleBirthDay + '-' + simpleBirthMonth + '-' + simpleBirthYear 
+                    ? simpleBirthDay + '-' + simpleBirthMonth + '-' + String(simpleBirthYearCE) 
                     : '';
 
                 const formData = {
@@ -2056,12 +2059,15 @@
 
             Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // Construct birth date from dropdowns (format: dd-mm-yyyy)
+            // Construct birth date from dropdowns (format: dd-MM-yyyy, CE year)
             var fullBirthDay = $('#fullBirthDay').val();
             var fullBirthMonth = $('#fullBirthMonth').val();
             var fullBirthYear = $('#fullBirthYear').val();
+            // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
+            var fullBirthYearCE = parseInt(fullBirthYear);
+            if (currentLang === 'th' && fullBirthYearCE > 2400) fullBirthYearCE -= 543;
             var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear 
-                ? fullBirthDay + '-' + fullBirthMonth + '-' + fullBirthYear 
+                ? fullBirthDay + '-' + fullBirthMonth + '-' + String(fullBirthYearCE) 
                 : '';
 
             const formData = {
