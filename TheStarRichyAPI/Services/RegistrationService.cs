@@ -50,10 +50,8 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Side", (object)MapSide(request.Position) ?? DBNull.Value);
 
                         // 💡 ใช้วันที่ปัจจุบันถ้าไม่ได้ส่งมา
-                        DateTime registerDate = ParseCustomDate(NormalizeString(request.RegistrationDate)) ?? DateTime.Now;
-                        command.Parameters.AddWithValue("@Registerdate", registerDate);
-                        DateTime? birthDate = ParseCustomDate(NormalizeString(request.BirthDate));
-                        command.Parameters.AddWithValue("@birthDate", (object)birthDate ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Registerdate", DateTime.Now.ToString("yyyy-MM-dd"));
+                        command.Parameters.AddWithValue("@birthDate", (object)request.BirthDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@NameTitle", (object)NormalizeString(request.Title) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@IdcardName", (object)NormalizeString(request.IdCardName) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@BusinessName", (object)NormalizeString(request.BusinessName) ?? DBNull.Value);
@@ -212,8 +210,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Uplinecode", (object)NormalizeString(request.UplineCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Side", (object)MapSide(request.UplineSide ?? request.Position) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Registerdate", DateTime.Now.ToString("yyyy-MM-dd"));
-                        DateTime? birthDate = ParseCustomDate(NormalizeString(request.BirthDate));
-                        command.Parameters.AddWithValue("@birthDate", (object)birthDate ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@birthDate", (object)request.BirthDate ?? DBNull.Value);
                         command.Parameters.AddWithValue("@NameTitle", (object)NormalizeString(request.Title) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@IdcardName", (object)NormalizeString(request.IdCardName) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@BusinessName", (object)NormalizeString(request.BusinessName) ?? DBNull.Value);
@@ -463,21 +460,21 @@ namespace TheStarRichyApi.Services
         {
             if (string.IsNullOrWhiteSpace(dateStr)) return null;
 
-            // ระบบหน้าบ้านส่งมาเป็น dd-MM-yyyy (เช่น 17-02-2026)
-            if (DateTime.TryParseExact(dateStr, "dd-MM-yyyy",
-                System.Globalization.CultureInfo.InvariantCulture,
-                System.Globalization.DateTimeStyles.None, out DateTime result))
-            {
-                // ป้องกัน BE year หลุดมา: ถ้าปี > 2400 แสดงว่าเป็น พ.ศ. → แปลงเป็น ค.ศ.
-                if (result.Year > 2400)
-                {
-                    result = result.AddYears(-543);
-                }
-                return result;
-            }
+            //// ระบบหน้าบ้านส่งมาเป็น dd-MM-yyyy (เช่น 17-02-2026)
+            //if (DateTime.TryParseExact(dateStr, "dd-MM-yyyy",
+            //    System.Globalization.CultureInfo.InvariantCulture,
+            //    System.Globalization.DateTimeStyles.None, out DateTime result))
+            //{
+            //    // ป้องกัน BE year หลุดมา: ถ้าปี > 2400 แสดงว่าเป็น พ.ศ. → แปลงเป็น ค.ศ.
+            //    if (result.Year > 2400)
+            //    {
+            //        result = result.AddYears(-543);
+            //    }
+            //    return result;
+            //}
 
             // Fallback เผื่อส่งมาฟอร์แมตอื่น
-            if (DateTime.TryParse(dateStr, out result)) return result;
+            if (DateTime.TryParse(dateStr, out DateTime result)) return result;
 
             return null;
         }
@@ -668,36 +665,6 @@ namespace TheStarRichyApi.Services
                     Success = false,
                     Message = "เกิดข้อผิดพลาดในการค้นหาข้อมูล: " + ex.Message
                 };
-            }
-        }
-
-        /// <summary>
-        /// ตรวจสอบว่าเลขบัตรประชาชน/เอกสารซ้ำหรือไม่
-        /// </summary>
-        public async Task<bool> IsDocumentNumberExistsAsync(string IDCard)
-        {
-            try
-            {
-                using (var con = new SqlConnection(_connectionString))
-                {
-                    await con.OpenAsync();
-                    string query = @"SELECT COUNT(1) FROM M06 WHERE M06_X10 = @IDCard";
-                    using (var command = new SqlCommand(query, con))
-                    {
-                        command.Parameters.AddWithValue("@IDCard", IDCard);
-                        var result = await command.ExecuteScalarAsync();
-                        if (result != null && int.TryParse(result.ToString(), out int count))
-                        {
-                            return count > 0;
-                        }
-                        return false;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error checking document number {IDCard}", IDCard);
-                return false;
             }
         }
 

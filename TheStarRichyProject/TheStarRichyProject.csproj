@@ -351,12 +351,7 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\assets\images\users\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="wwwroot\images\Product\FD0001-4_1.jpg">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
+    <Folder Include="wwwroot\uploads\" />
   </ItemGroup>
 
 </Project>

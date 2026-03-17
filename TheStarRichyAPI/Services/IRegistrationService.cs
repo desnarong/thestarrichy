@@ -27,11 +27,6 @@ namespace TheStarRichyApi.Services
         /// </summary>
         Task<FindReferrerResponse> FindReferrerAsync(string referrerCode);
 
-        /// <summary>
-        /// ตรวจสอบว่าเลขบัตรประชาชน/เอกสารซ้ำหรือไม่
-        /// </summary>
-        Task<bool> IsDocumentNumberExistsAsync(string documentNumber);
-
         // Validation methods for external registration
         Task<ValidationResponse> CheckBlacklistAsync(string idCardNumber);
         Task<ValidationResponse> CheckExpireAsync(string idCardNumber);

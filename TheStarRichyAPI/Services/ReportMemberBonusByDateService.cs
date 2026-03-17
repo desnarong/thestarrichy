@@ -133,6 +133,7 @@ namespace TheStarRichyApi.Services
                     string query = "SELECT * FROM [000_Member_bonus_for_mobile]  (nolock) ";
  
                     query += " where Membercode = @Membercode";
+                    query += " ORDER BY FromDate desc";
                     //query += " ORDER BY MemberCalc1 desc ,TypeofBonus desc ";
 
                     using (var command = new SqlCommand(query, con))

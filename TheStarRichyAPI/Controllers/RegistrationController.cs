@@ -60,8 +60,12 @@ namespace TheStarRichyApi.Controllers
                     });
                 }
 
+                // Get current member code from JWT token
+                var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
                 // ตรวจสอบเลขบัตรประชาชน/เอกสารซ้ำ
-                if (await _registrationService.IsDocumentNumberExistsAsync(request.DocumentNumber))
+                var dup = await _registrationService.CheckDuplicateIDCardAsync(request.DocumentNumber);
+                if (!dup.Success)
                 {
                     return BadRequest(new RegistrationResponse
                     {
@@ -69,10 +73,6 @@ namespace TheStarRichyApi.Controllers
                         Message = "เลขที่เอกสารนี้ถูกใช้ลงทะเบียนแล้ว"
                     });
                 }
-
-                // Get current member code from JWT token
-                var currentMemberCode = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                
 
                 var result = await _registrationService.EasyRegisterAsync(request, currentMemberCode);
 
@@ -137,8 +137,8 @@ namespace TheStarRichyApi.Controllers
                     });
                 }
 
-                // ตรวจสอบเลขบัตรประชาชน/เอกสารซ้ำ
-                if (await _registrationService.IsDocumentNumberExistsAsync(request.DocumentNumber))
+                var dup = await _registrationService.CheckDuplicateIDCardAsync(request.DocumentNumber);
+                if (!dup.Success)
                 {
                     return BadRequest(new RegistrationResponse
                     {
@@ -199,7 +199,8 @@ namespace TheStarRichyApi.Controllers
                 }
 
                 // ตรวจสอบเลขบัตรประชาชน/เอกสารซ้ำ
-                if (await _registrationService.IsDocumentNumberExistsAsync(request.DocumentNumber))
+                var dup = await _registrationService.CheckDuplicateIDCardAsync(request.DocumentNumber);
+                if (!dup.Success)
                 {
                     return BadRequest(new RegistrationResponse
                     {
@@ -288,14 +289,9 @@ namespace TheStarRichyApi.Controllers
                     return BadRequest(new { success = false, message = "กรุณาระบุเลขที่เอกสาร" });
                 }
 
-                var exists = await _registrationService.IsDocumentNumberExistsAsync(documentNumber);
+                var exists = await _registrationService.CheckDuplicateIDCardAsync(documentNumber);
                 
-                return Ok(new 
-                { 
-                    success = true, 
-                    exists = exists,
-                    message = exists ? "เลขที่เอกสารนี้ถูกใช้ลงทะเบียนแล้ว" : "เลขที่เอกสารนี้สามารถใช้ได้"
-                });
+                return Ok(exists);
             }
             catch (Exception ex)
             {

@@ -197,12 +197,12 @@
                                             <a href="@Url.Action("income", "reports")" class="nav-link" data-key="t-income"> รายได้ </a>
                                         </li>
                                     }
-                                    @if (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00")
+                                    @* @if (permissions.M12.ToString() != "Y" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">
                                             <a href="@Url.Action("pointhistory", "reports")" class="nav-link" data-key="t-pointhistory"> ประวัติคะแนน </a>
                                         </li>
-                                    }
+                                    } *@
                                     @if (permissions.M11.ToString() != "Y" && permissions.MemberType.ToString() != "00")
                                     {
                                         <li class="nav-item">

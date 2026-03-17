@@ -1871,9 +1871,8 @@
                 // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
                 var simpleBirthYearCE = parseInt(simpleBirthYear);
                 if (currentLang === 'th' && simpleBirthYearCE > 2400) simpleBirthYearCE -= 543;
-                var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear 
-                    ? simpleBirthDay + '-' + simpleBirthMonth + '-' + String(simpleBirthYearCE) 
-                    : '';
+                var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear ? String(simpleBirthYearCE) + '-' + 
+                String(simpleBirthMonth).padStart(2, '0') + '-' +  String(simpleBirthDay).padStart(2, '0') : '';
 
                 const formData = {
                     country: $('#simpleCountry').val(),
@@ -2066,9 +2065,8 @@
             // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
             var fullBirthYearCE = parseInt(fullBirthYear);
             if (currentLang === 'th' && fullBirthYearCE > 2400) fullBirthYearCE -= 543;
-            var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear 
-                ? fullBirthDay + '-' + fullBirthMonth + '-' + String(fullBirthYearCE) 
-                : '';
+            var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear ? String(fullBirthYearCE) + '-' + 
+                String(fullBirthMonth).padStart(2, '0') + '-' + String(fullBirthDay).padStart(2, '0') : '';
 
             const formData = {
                 _origin: 'full',

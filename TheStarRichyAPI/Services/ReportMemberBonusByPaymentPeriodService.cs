@@ -136,7 +136,7 @@ namespace TheStarRichyApi.Services
                     query += " FROM [000_Member_bonus_for_mobile_Period]  (nolock) ";
  
                     query += " where Membercode = @Membercode";
-                    query += " ORDER BY paymentDate desc   ";
+                    query += " ORDER BY FromDate desc   ";
 
                     using (var command = new SqlCommand(query, con))
                     {

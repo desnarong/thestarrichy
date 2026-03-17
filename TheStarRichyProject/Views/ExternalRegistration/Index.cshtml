@@ -1104,15 +1104,14 @@
                     var dayStr = String(birthDay).padStart(2, '0');
                     var monthStr = String(birthMonth).padStart(2, '0');
                     var birthYearCE = parseInt(birthYearBE) - 543; // พ.ศ. → ค.ศ.
-                    birthDate = `${dayStr}-${monthStr}-${birthYearCE}`;
+                    birthDate = `${birthYearCE}-${monthStr}-${dayStr}`;
                 }
-                
+
                 return {
                     country: $('#country').val(),
                     countryBusiness: $('#countryBusiness').val(),
                     referrerCode: $('#referrerCode').val(),
                     position: $('input[name="position"]:checked').val(),
-                    registrationDate: $('#registrationDate').val(),
                     birthDate: birthDate,
                     title: $('#title').val(),
                     idCardName: $('#idCardName').val(),
