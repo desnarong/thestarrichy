@@ -137,10 +137,11 @@
 
       function bonusTh(bt,rows){
         var val=toNum(pick(rows,[bt.key,bt.key.toLowerCase()],0));
-        var dtKey=pick(rows,['FromDate','fromDate','CalcMonth','calcMonth','PaymentDate','paymentDate']);
+        var fromDate=pick(rows,['FromDate','fromDate']);
+        var toDate=pick(rows,['ToDate','toDate']);
         var num=fmt2(val);
         if(bt.detail&&val!==0){
-          return '<span class="text-primary fw-bold bonus-link" style="cursor:pointer;text-decoration:underline;" data-detail="'+bt.detail+'" data-date="'+esc(dtKey)+'">'+num+'</span>';
+          return '<span class="text-primary fw-bold bonus-link" style="cursor:pointer;text-decoration:underline;" data-detail="'+bt.detail+'" data-fromdate="'+esc(fromDate)+'" data-todate="'+esc(toDate)+'">'+num+'</span>';
         }
         return num;
       }
@@ -215,12 +216,12 @@
         mobile:[{title:'รหัสนักธุรกิจ',k:['Membercode','memberCode']},{title:'ชื่อ',k:['MemberName','memberName']},{title:'ประเภท',k:['BillType','billType']},{title:'PV',k:['PV','pv'],num:true},{title:'โบนัส',k:['MobileBonus','mobileBonus'],num:true}]
       };
 
-      function loadDetail(dtype,dateRaw){
+      function loadDetail(dtype,fromDate,toDate){
         allDetailData={};
-        $('#detailTitle').text((dtype==='sponser'?'ค่าแนะนำ':dtype==='rebate'?'ส่วนตัว':dtype==='binary'?'TMB/จับคู่':dtype==='matching'?'แมทชิ่ง':'แจงยอด')+' ('+fmtDate(dateRaw)+')');
+        $('#detailTitle').text((dtype==='sponser'?'ค่าแนะนำ':dtype==='rebate'?'ส่วนตัว':dtype==='binary'?'TMB/จับคู่':dtype==='matching'?'แมทชิ่ง':'แจงยอด')+' ('+fmtDate(fromDate)+' - '+fmtDate(toDate)+')');
         $('#detailSection').show();
         $('#detailMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
-        $.ajax({url:'@Url.Action("GetBonusDetail", "reports")',type:'GET',data:{detailType:dtype},success:function(json){
+        $.ajax({url:'@Url.Action("GetBonusDetail", "reports")',type:'GET',data:{detailType:dtype,fromDate:fromDate,toDate:toDate},success:function(json){
           var rows=norm(json);
           var cfg=DETAIL_COLS[dtype]||[];
           if(detailTbl){detailTbl.destroy();}$('#detailBonusTable').empty();
@@ -244,7 +245,7 @@
       }
 
       $(document).on('click','.bonus-link',function(){
-        loadDetail($(this).data('detail'),$(this).data('date'));
+        loadDetail($(this).data('detail'),$(this).data('fromdate'),$(this).data('todate'));
       });
       $('#btnCloseDetail').on('click',function(){$('#detailSection').hide();});
       $('#btnSearch').on('click',loadMain);

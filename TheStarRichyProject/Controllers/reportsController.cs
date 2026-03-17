@@ -182,7 +182,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetBonusDetail(string detailType = "sponser")
+        public async Task<IActionResult> GetBonusDetail(string detailType = "sponser", string fromDate = "", string toDate = "")
         {
             try
             {
@@ -194,7 +194,8 @@ namespace TheStarRichyProject.Controllers
                     "mobile"   => "/Member/reportbonusbydatedetailmobile",
                     _          => "/Member/reportbonusbydatedetailsponser"
                 };
-                var result = await _apiService.GetAsync<dynamic>(endpoint);
+                var qs = BuildDateQuery(fromDate, toDate);
+                var result = await _apiService.GetAsync<dynamic>($"{endpoint}{qs}");
                 return Ok(result);
             }
             catch (Exception ex)

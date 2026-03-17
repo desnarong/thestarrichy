@@ -783,11 +783,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbonusbydatedetailsponser")]
-        public async Task<IActionResult> GetReportMemberBonusByDateDetailSponser()
+        public async Task<IActionResult> GetReportMemberBonusByDateDetailSponser([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberBonusByDateDetailSponserService.GetDisplayAsync();
+                var result = await _reportMemberBonusByDateDetailSponserService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)
@@ -797,11 +797,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbonusbydatedetailrebate")]
-        public async Task<IActionResult> GetReportMemberBonusByDateDetailRebate()
+        public async Task<IActionResult> GetReportMemberBonusByDateDetailRebate([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberBonusByDateDetailRebateService.GetDisplayAsync();
+                var result = await _reportMemberBonusByDateDetailRebateService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)
@@ -811,11 +811,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbonusbydatedetailmobile")]
-        public async Task<IActionResult> GetReportMemberBonusByDateDetailMobile()
+        public async Task<IActionResult> GetReportMemberBonusByDateDetailMobile([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberBonusByDateDetailMobileService.GetDisplayAsync();
+                var result = await _reportMemberBonusByDateDetailMobileService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)
@@ -825,11 +825,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbonusbydatedetailmatching")]
-        public async Task<IActionResult> GetReportMemberBonusByDateDetailMatching()
+        public async Task<IActionResult> GetReportMemberBonusByDateDetailMatching([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberBonusByDateDetailMatchingService.GetDisplayAsync();
+                var result = await _reportMemberBonusByDateDetailMatchingService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)
@@ -839,11 +839,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbonusbydatedetailbinary")]
-        public async Task<IActionResult> GetReportMemberBonusByDateDetailBinary()
+        public async Task<IActionResult> GetReportMemberBonusByDateDetailBinary([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberBonusByDateDetailBinaryService.GetDisplayAsync();
+                var result = await _reportMemberBonusByDateDetailBinaryService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)

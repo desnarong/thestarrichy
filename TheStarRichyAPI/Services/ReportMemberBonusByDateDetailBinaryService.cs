@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberBonusByDateDetailBinaryService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "");
     }
     public class ReportMemberBonusByDateDetailBinaryService : IReportMemberBonusByDateDetailBinaryService
     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -142,13 +142,30 @@ namespace TheStarRichyApi.Services
 
                     string query = "SELECT Membercode,CalculateDate,LeftPV,RightPV,CalcLeftPV,CalcRightPV,MaxCalcPerDay,CalculatePV,weak,strong,TMBBonus,StrongBonus,BinaryBonus ";
                     query += " FROM [000_Member_bonus_Binary_detail]  (nolock) ";
- 
-                    query += " where Membercode = @Membercode";
+                    query += " WHERE Membercode = @Membercode";
+                    
+                    if (!string.IsNullOrWhiteSpace(fromDate))
+                    {
+                        query += " AND CalculateDate >= @FromDate";
+                    }
+                    if (!string.IsNullOrWhiteSpace(toDate))
+                    {
+                        query += " AND CalculateDate <= @ToDate";
+                    }
+                    
                     query += " ORDER BY CalculateDate ";
 
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
+                        if (!string.IsNullOrWhiteSpace(fromDate))
+                        {
+                            command.Parameters.AddWithValue("@FromDate", DateTime.Parse(fromDate));
+                        }
+                        if (!string.IsNullOrWhiteSpace(toDate))
+                        {
+                            command.Parameters.AddWithValue("@ToDate", DateTime.Parse(toDate).AddDays(1).AddSeconds(-1));
+                        }
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
