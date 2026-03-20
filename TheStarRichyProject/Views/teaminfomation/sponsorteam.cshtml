@@ -316,6 +316,9 @@ $(document).ready(function () {
 
             // Count by ranking
             var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
+            if (!rankName || rankName === '-' || rankName === '0') {
+                rankName = 'No Position';
+            }
             if (rankName && rankName !== '-') {
                 rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
             }
@@ -428,6 +431,9 @@ $(document).ready(function () {
         var rankingMap = {};
         allData.forEach(function (m) {
             var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
+            if (!rankName || rankName === '-' || rankName === '0') {
+                rankName = 'No Position';
+            }
             if (rankName && rankName !== '-') {
                 rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
             }
@@ -545,6 +551,12 @@ $(document).ready(function () {
                 if (!posName || posName === '-' || posName === '0') {
                     posName = 'No Position';
                 }
+                
+                // Prestige Ranking: show "No Position" if empty or 0
+                var prestigeRanking = (m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '').toString().trim();
+                if (!prestigeRanking || prestigeRanking === '-' || prestigeRanking === '0') {
+                    prestigeRanking = 'No Position';
+                }
 
                 rows +=
                     '<tr class="' + rowCls + '">' +
@@ -556,7 +568,7 @@ $(document).ready(function () {
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
                     '<td class="text-center">'  + escHtml(m.SIDEX ?? m.sidex ?? m.SIDE ?? m.side ?? '') + '</td>' +
                     '<td class="text-center">'  + escHtml(posName) + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(prestigeRanking) + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV)   + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft)       + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight)      + '</td>' +
