@@ -370,12 +370,15 @@ $(document).ready(function () {
                 }
                 
                 var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
-                var rawPosName = Object.keys(positionMap).find(function (k) { 
-                    return k.toLowerCase() === posName; 
+                var rawPosName = Object.keys(positionMap).find(function (k) {
+                    return k.toLowerCase() === posName;
                 }) || posName;
                 
+                // Add highlight for active filter
+                var activeStyle = selectedPosition === rawPosName ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
+
                 return '<div class="col-6 col-md-3 col-lg-2">' +
-                       '  <div class="pos-card h-100" style="background:' + bgColor + '; border: 2px solid ' + borderColor + '; cursor: pointer;" ' +
+                       '  <div class="pos-card h-100" style="background:' + bgColor + '; border: 2px solid ' + borderColor + '; cursor: pointer; ' + activeStyle + '" ' +
                        '       onclick="togglePositionFilter(\'' + escAttr(rawPosName) + '\')" title="คลิกเพื่อกรอง">' +
                        '    <div class="text-muted" style="font-size:0.72rem;">' + escHtml(posDisplay) + '</div>' +
                        '    <div class="fs-3 fw-bold my-1" style="color:' + textColor + ';">' + fmtInt(item.count) + '</div>' +
@@ -415,7 +418,7 @@ $(document).ready(function () {
             selectedPosition = positionName;
         }
         applyFilters();
-        renderRankingCards();
+        renderSummaryFromData(allData); // Re-render to show active state
     };
 
     /* ================================================================
