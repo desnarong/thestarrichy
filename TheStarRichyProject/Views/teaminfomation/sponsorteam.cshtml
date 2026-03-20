@@ -187,13 +187,15 @@
                                 <th style="min-width:110px;">รักษายอดเดือนก่อนหน้า</th>
                                 <th style="min-width:90px;">Active ด้านซ้าย</th>
                                 <th style="min-width:90px;">Active ด้านขวา</th>
-                                <th style="min-width:95px;">คะแนนบาลานซ์</th>
-                                <th style="min-width:95px;">คะแนนท่องเที่ยว 1</th>
-                                <th style="min-width:95px;">คะแนนท่องเที่ยว 2</th>
+                                <th style="min-width:95px;">Balance ซ้าย</th>
+                                <th style="min-width:95px;">Balance ขวา</th>
+                                <th style="min-width:110px;">ตำแหน่งถัดไป</th>
+                                <th style="min-width:95px;">ทำเพิ่มซ้าย</th>
+                                <th style="min-width:95px;">ทำเพิ่มขวา</th>
                             </tr>
                         </thead>
                         <tbody id="tableBody">
-                            <tr><td colspan="21" class="text-center py-5 text-muted">กำลังโหลด...</td></tr>
+                            <tr><td colspan="23" class="text-center py-5 text-muted">กำลังโหลด...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -247,9 +249,8 @@ $(document).ready(function () {
         $('#tableMessage')
             .text('กำลังโหลดข้อมูล...')
             .removeClass('alert-danger alert-success').addClass('alert-secondary').show();
-        $('#tableBody').html('<tr><td colspan="21" class="text-center py-4 text-muted"><i class="bx bx-loader-alt bx-spin me-2"></i>กำลังโหลด...</td></tr>');
-        $('#sumTotalMembers,#sumQualifyCount,#sumQualifyPV,#posNoPosition,#posStar,#posSilverStar,#posGoldStar')
-            .html('<span class="placeholder col-6"></span>');
+        $('#tableBody').html('<tr><td colspan="23" class="text-center py-4 text-muted"><i class="bx bx-loader-alt bx-spin me-2"></i>กำลังโหลด...</td></tr>');
+        $('#packageSummaryCards').html('<div class="text-muted small fst-italic">กำลังโหลด...</div>');
         $('#rankingCards').html('<div class="text-muted small fst-italic"><i class="bx bx-loader-alt bx-spin me-1"></i>กำลังโหลด...</div>');
 
         try {
@@ -294,6 +295,7 @@ $(document).ready(function () {
     function renderSummaryFromData(data) {
         var positionMap = {};
         var rankingMap  = {};
+        var totalMembers = data.length;
 
         data.forEach(function (m) {
             // Count by position
@@ -320,48 +322,58 @@ $(document).ready(function () {
         });
 
         /* ---- Render package summary cards dynamically ---- */
-        var packageCardsHtml = Object.keys(positionMap).map(function (posName) {
-            var item = positionMap[posName];
-            var isQualify = item.qualify;
-            
-            // Determine card colors based on position
-            var bgColor = '#f5f5f5';
-            var borderColor = '#9e9e9e';
-            var textColor = '#546e7a';
-            
-            if (posName.toLowerCase() === 'star') {
-                bgColor = '#fff8e1';
-                borderColor = '#ffc107';
-                textColor = '#f57f17';
-            } else if (posName.toLowerCase().includes('silver')) {
-                bgColor = '#eceff1';
-                borderColor = '#90a4ae';
-                textColor = '#546e7a';
-            } else if (posName.toLowerCase().includes('gold')) {
-                bgColor = '#fff9c4';
-                borderColor = '#f9a825';
-                textColor = '#f57f17';
-            } else if (isQualify) {
-                bgColor = '#e8f5e9';
-                borderColor = '#4caf50';
-                textColor = '#2e7d32';
-            }
-            
-            var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
-            var rawPosName = Object.keys(positionMap).find(function (k) { 
-                return k.toLowerCase() === posName; 
-            }) || posName;
-            
-            return '<div class="col-6 col-md-3 col-lg-2">' +
-                   '  <div class="pos-card h-100" style="background:' + bgColor + '; border: 2px solid ' + borderColor + '; cursor: pointer;" ' +
-                   '       onclick="togglePositionFilter(\'' + escAttr(rawPosName) + '\')" title="คลิกเพื่อกรอง">' +
-                   '    <div class="text-muted" style="font-size:0.72rem;">' + escHtml(posDisplay) + '</div>' +
-                   '    <div class="fs-3 fw-bold my-1" style="color:' + textColor + ';">' + fmtInt(item.count) + '</div>' +
-                   '    <div class="text-muted" style="font-size:0.7rem;">คน</div>' +
-                   (isQualify ? '    <div class="mt-1"><span class="badge bg-success" style="font-size:0.7rem;">PV: ' + fmtNum(item.pv) + '</span></div>' : '') +
-                   '  </div>' +
-                   '</div>';
-        }).join('');
+        var packageCardsHtml = 
+            // Total Members card (first card)
+            '<div class="col-6 col-md-3 col-lg-2">' +
+            '  <div class="pos-card h-100" style="background:#e8eaf6; border: 2px solid #3f51b5;">' +
+            '    <div class="text-muted" style="font-size:0.72rem;">จำนวนสมาชิกทั้งหมด</div>' +
+            '    <div class="fs-3 fw-bold my-1" style="color:#3f51b5;">' + fmtInt(totalMembers) + '</div>' +
+            '    <div class="text-muted" style="font-size:0.7rem;">คน</div>' +
+            '  </div>' +
+            '</div>' +
+            // Position cards
+            Object.keys(positionMap).map(function (posName) {
+                var item = positionMap[posName];
+                var isQualify = item.qualify;
+                
+                // Determine card colors based on position
+                var bgColor = '#f5f5f5';
+                var borderColor = '#9e9e9e';
+                var textColor = '#546e7a';
+                
+                if (posName.toLowerCase() === 'star') {
+                    bgColor = '#fff8e1';
+                    borderColor = '#ffc107';
+                    textColor = '#f57f17';
+                } else if (posName.toLowerCase().includes('silver')) {
+                    bgColor = '#eceff1';
+                    borderColor = '#90a4ae';
+                    textColor = '#546e7a';
+                } else if (posName.toLowerCase().includes('gold')) {
+                    bgColor = '#fff9c4';
+                    borderColor = '#f9a825';
+                    textColor = '#f57f17';
+                } else if (isQualify) {
+                    bgColor = '#e8f5e9';
+                    borderColor = '#4caf50';
+                    textColor = '#2e7d32';
+                }
+                
+                var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
+                var rawPosName = Object.keys(positionMap).find(function (k) { 
+                    return k.toLowerCase() === posName; 
+                }) || posName;
+                
+                return '<div class="col-6 col-md-3 col-lg-2">' +
+                       '  <div class="pos-card h-100" style="background:' + bgColor + '; border: 2px solid ' + borderColor + '; cursor: pointer;" ' +
+                       '       onclick="togglePositionFilter(\'' + escAttr(rawPosName) + '\')" title="คลิกเพื่อกรอง">' +
+                       '    <div class="text-muted" style="font-size:0.72rem;">' + escHtml(posDisplay) + '</div>' +
+                       '    <div class="fs-3 fw-bold my-1" style="color:' + textColor + ';">' + fmtInt(item.count) + '</div>' +
+                       '    <div class="text-muted" style="font-size:0.7rem;">คน</div>' +
+                       (isQualify ? '    <div class="mt-1"><span class="badge bg-success" style="font-size:0.7rem;">PV: ' + fmtNum(item.pv) + '</span></div>' : '') +
+                       '  </div>' +
+                       '</div>';
+            }).join('');
         
         $('#packageSummaryCards').html(packageCardsHtml);
 
@@ -515,7 +527,7 @@ $(document).ready(function () {
         tbody.empty();
 
         if (pageData.length === 0) {
-            tbody.html('<tr><td colspan="21" class="text-center py-5 text-muted fst-italic">ไม่พบข้อมูล</td></tr>');
+            tbody.html('<tr><td colspan="23" class="text-center py-5 text-muted fst-italic">ไม่พบข้อมูล</td></tr>');
             $('#tableMessage').hide();
         } else {
             $('#tableMessage').hide();
@@ -527,6 +539,12 @@ $(document).ready(function () {
                 var qualBadge = isQualify
                     ? '<span class="badge" style="background:#2e7d32;font-size:0.7rem;">Yes</span>'
                     : '<span class="badge" style="background:#c62828;font-size:0.7rem;">No</span>';
+                
+                // Position: show "No Position" if empty or 0
+                var posName = (m.PositionName ?? m.positionName ?? '').toString().trim();
+                if (!posName || posName === '-' || posName === '0') {
+                    posName = 'No Position';
+                }
 
                 rows +=
                     '<tr class="' + rowCls + '">' +
@@ -537,20 +555,22 @@ $(document).ready(function () {
                     '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
                     '<td class="text-center">'  + escHtml(m.SIDEX ?? m.sidex ?? m.SIDE ?? m.side ?? '') + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(posName) + '</td>' +
                     '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV)   + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft)       + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight)      + '</td>' +
                     '<td>'                           + escHtml(m.SponserName ?? m.sponserName ?? m.SponsorName ?? '') + '</td>' +
                     '<td class="text-center">'  + qualBadge + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV)    + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV)    + '</td>' +
                     '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive)  + '</td>' +
                     '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.TotalBalance  ?? m.totalBalance)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.Travelpoint1  ?? m.travelpoint1)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.Travelpoint2  ?? m.travelpoint2)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalLeftBalance  ?? m.totalLeftBalance)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalRightBalance ?? m.totalRightBalance) + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.NextPosition ?? m.nextPosition ?? '') + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.NextPosaddLeftBalance  ?? m.nextPosaddLeftBalance)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.NextPosaddRightBalance ?? m.nextPosaddRightBalance) + '</td>' +
                     '</tr>';
             });
             tbody.html(rows);
