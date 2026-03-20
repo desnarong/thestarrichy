@@ -7,11 +7,18 @@
 
 <style>
     #sponsorTeamTable th { white-space: nowrap; }
-    #sponsorTeamTable td { vertical-align: middle; white-space: nowrap; }
-    .st-qualify-yes { background-color: #c8e6c9 !important; }
-    .st-qualify-no  { background-color: #ffcdd2 !important; }
-    .st-qualify-yes:hover { background-color: #a5d6a7 !important; }
-    .st-qualify-no:hover  { background-color: #ef9a9a !important; }
+    #sponsorTeamTable td { vertical-align: middle; white-space: nowrap; background-color: #ffffff; }
+    /* Only code and name columns have colored background */
+    .st-qualify-yes td:nth-child(3),
+    .st-qualify-yes td:nth-child(4) { background-color: #c8e6c9 !important; }
+    .st-qualify-no td:nth-child(3),
+    .st-qualify-no td:nth-child(4)  { background-color: #ffcdd2 !important; }
+    /* Hover highlights entire row */
+    .st-qualify-yes:hover td { background-color: #a5d6a7 !important; }
+    .st-qualify-no:hover td { background-color: #ef9a9a !important; }
+    /* Prestige Ranking column clickable */
+    #sponsorTeamTable td:nth-child(9) { cursor: pointer; }
+    #sponsorTeamTable td:nth-child(9):hover { background-color: #e3f2fd !important; }
     .pos-card { min-width: 110px; border-radius: 8px; padding: 10px 14px; text-align: center; }
     .rank-chip { border-radius: 20px; padding: 6px 16px; display: inline-flex; flex-direction: column; align-items: center; min-width: 100px; }
 </style>
