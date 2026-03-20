@@ -508,6 +508,7 @@ $(document).ready(function () {
        Toggle prestige ranking filter from card click
     ================================================================ */
     window.togglePrestigeRankingFilter = function (rankingName) {
+        // If clicking same ranking, clear filter
         if (selectedPrestigeRanking === rankingName) {
             selectedPrestigeRanking = ''; // Clear filter
         } else {
@@ -523,6 +524,9 @@ $(document).ready(function () {
     function renderRankingCards() {
         var rankings = normalizeRows(allData.reduce(function (acc, row) {
             var rankName = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
+            if (!rankName || rankName === '-' || rankName === '0') {
+                rankName = 'No Position';
+            }
             if (rankName && rankName !== '-') {
                 var existing = acc.find(function (r) { 
                     return (r.PrestigeRankingName || r.prestigeRankingName) === rankName; 
@@ -540,7 +544,8 @@ $(document).ready(function () {
             var html = rankings.map(function (r) {
                 var name  = r.PrestigeRankingName ?? r.prestigeRankingName ?? '-';
                 var count = toNum(r.Totalmember ?? 0);
-                var isActive = selectedPrestigeRanking === name ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
+                // Add highlight for active filter (compare lowercase)
+                var isActive = selectedPrestigeRanking.toLowerCase() === name.toLowerCase() ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
                 return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb; cursor: pointer; ' + isActive + '" ' +
                        '     onclick="togglePrestigeRankingFilter(\'' + escAttr(name) + '\')" title="คลิกเพื่อกรอง">' +
                        '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
@@ -603,7 +608,7 @@ $(document).ready(function () {
             }
             if (selectedPrestigeRanking) {
                 var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
-                if (pr !== selectedPrestigeRanking) return false;
+                if (pr.toLowerCase() !== selectedPrestigeRanking.toLowerCase()) return false;
             }
             return true;
         });
