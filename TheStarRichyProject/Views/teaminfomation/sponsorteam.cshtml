@@ -333,9 +333,11 @@ $(document).ready(function () {
 
         /* ---- Render package summary cards dynamically ---- */
         var packageCardsHtml = 
-            // Total Members card (first card)
+            // Total Members card (first card) - clickable to clear filter
+            // Highlight when no filter is active
             '<div class="col-6 col-md-3 col-lg-2">' +
-            '  <div class="pos-card h-100" style="background:#e8eaf6; border: 2px solid #3f51b5;">' +
+            '  <div class="pos-card h-100" style="background:#e8eaf6; border: ' + (!selectedPosition ? '3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '2px solid #3f51b5;') + ' cursor: pointer;" ' +
+            '       onclick="togglePositionFilter(\'\')" title="คลิกเพื่อดูทั้งหมด">' +
             '    <div class="text-muted" style="font-size:0.72rem;">จำนวนสมาชิกทั้งหมด</div>' +
             '    <div class="fs-3 fw-bold my-1" style="color:#3f51b5;">' + fmtInt(totalMembers) + '</div>' +
             '    <div class="text-muted" style="font-size:0.7rem;">คน</div>' +
@@ -412,7 +414,8 @@ $(document).ready(function () {
        Toggle position filter from package summary card click
     ================================================================ */
     window.togglePositionFilter = function (positionName) {
-        if (selectedPosition === positionName) {
+        // If clicking Total Members card (empty string) or same position, clear filter
+        if (!positionName || selectedPosition === positionName) {
             selectedPosition = ''; // Clear filter
         } else {
             selectedPosition = positionName;
