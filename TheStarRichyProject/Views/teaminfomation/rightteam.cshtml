@@ -342,7 +342,7 @@ $(document).ready(function () {
             '</div>' +
             // Position cards
             packages.map(function (p) {
-                var posName = p.PositionName ?? p.positionName ?? p.Positionname ?? 'ไม่มีตำแหน่ง';
+                var posName = p.PositionName ?? p.positionName ?? p.Positionname ?? 'No Position';
                 var tm = toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? 0);
                 var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
                 var isQualify = qualify.startsWith('yes');
@@ -371,7 +371,7 @@ $(document).ready(function () {
                     textColor = '#2e7d32';
                 }
                 
-                var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
+                var posDisplay = posName === '-' || !posName ? 'No Position' : posName;
                 
                 // Add highlight for active filter
                 var activeStyle = selectedPosition === posName ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
@@ -431,8 +431,8 @@ $(document).ready(function () {
         
         allData.forEach(function (m) {
             var pos = ((m.PositionName ?? m.positionName ?? '') + '').toLowerCase().trim();
-            if (!pos || pos === '-' || pos === 'none' || pos === 'ไม่มีตำแหน่ง') {
-                pos = 'ไม่มีตำแหน่ง';
+            if (!pos || pos === '-' || pos === 'none' || pos === 'No Position') {
+                pos = 'No Position';
             }
             if (!positionMap[pos]) {
                 positionMap[pos] = { count: 0, qualify: false, pv: 0 };
@@ -486,7 +486,7 @@ $(document).ready(function () {
                     textColor = '#2e7d32';
                 }
                 
-                var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
+                var posDisplay = posName === '-' || !posName ? 'No Position' : posName;
                 // Capitalize first letter for display
                 if (posDisplay && posDisplay.length > 0) {
                     posDisplay = posDisplay.charAt(0).toUpperCase() + posDisplay.slice(1);
@@ -520,7 +520,7 @@ $(document).ready(function () {
             selectedPrestigeRanking = rankingName;
         }
         applyFilters();
-        renderRankingCards(); // Re-render to show active state
+        //renderRankingCards(); // Re-render to show active state
     };
 
     /* ================================================================
@@ -529,9 +529,9 @@ $(document).ready(function () {
     function renderRankingCards() {
         var rankings = normalizeRows(allData.reduce(function (acc, row) {
             var rankName = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
-            // Convert empty, '-', '0' to "No Position"
+            // Convert empty, '-', '0' to "ไม่มีตำแหน่ง"
             if (!rankName || rankName === '-' || rankName === '0') {
-                rankName = 'No Position';
+                rankName = 'ไม่มีตำแหน่ง';
             }
             var existing = acc.find(function (r) { 
                 return (r.PrestigeRankingName || r.prestigeRankingName) === rankName; 
@@ -613,8 +613,10 @@ $(document).ready(function () {
                 if (pos !== filterPos) return false;
             }
             if (selectedPrestigeRanking) {
-                var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
-                if (pr.toLowerCase() !== selectedPrestigeRanking.toLowerCase()) return false;
+                var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim().toLowerCase();
+                if(pr == 0) pr = 'ไม่มีตำแหน่ง';
+                var filterPos = selectedPrestigeRanking.toLowerCase();
+                if (pr !== filterPos) return false;
             }
             return true;
         });
@@ -658,6 +660,11 @@ $(document).ready(function () {
                     ? '<span class="badge" style="background:#2e7d32;font-size:0.7rem;">Yes</span>'
                     : '<span class="badge" style="background:#c62828;font-size:0.7rem;">No</span>';
 
+                var prestigeRanking = (m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '').toString().trim();
+                if (!prestigeRanking || prestigeRanking === '-' || prestigeRanking === '0') {
+                    prestigeRanking = 'ไม่มีตำแหน่ง';
+                }
+
                 rows +=
                     '<tr class="' + rowCls + '">' +
                     '<td class="text-center">'  + (start + i + 1) + '</td>' +
@@ -668,7 +675,7 @@ $(document).ready(function () {
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
                     '<td class="text-center">'  + escHtml(m.SIDE ?? m.Side ?? m.side ?? '') + '</td>' +
                     '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '') + '</td>' +
-                    '<td class="text-center">'  + escHtml(m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(prestigeRanking) + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PersonalPV    ?? m.personalPV)    + '</td>' +
                     '<td>'                           + escHtml(m.SponserName  ?? m.sponserName  ?? m.SponsorName ?? '') + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft        ?? m.pvLeft)        + '</td>' +

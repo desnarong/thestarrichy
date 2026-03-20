@@ -149,7 +149,7 @@ namespace TheStarRichyApi.Services
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
                     string query = "SELECT  DLLevel,DLCode,DLName, BillNo,BillDate,Billtype,PV ";
-                    query += " FROM [000_Member_Binary_Left_Source_PV]  (nolock) ";
+                    query += " FROM [000_Member_Binary_Right_Source_PV]  (nolock) ";
  
                     query += " where Membercode = @Membercode and billdate=@billdate";
                     query += " ORDER BY DLLevel,DLCode ";

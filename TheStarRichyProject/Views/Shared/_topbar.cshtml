@@ -713,7 +713,7 @@
                                                 <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-decrease" data-product-id="${productId}" aria-label="ลดจำนวน">
                                                     <i class="bx bx-minus"></i>
                                                 </button>
-                                                <input type="text" class="form-control form-control-sm cart-item-quantity" value="${item.quantity}" readonly data-product-id="${productId}">
+                                                <input type="text" class="form-control form-control-sm cart-item-quantity" value="${item.quantity}" readonly data-product-id="${productId}" data-limit="${item.limit}" >
                                                 <button type="button" class="btn btn-light btn-sm cart-qty-btn cart-qty-increase" data-product-id="${productId}" aria-label="เพิ่มจำนวน">
                                                     <i class="bx bx-plus"></i>
                                                 </button>
@@ -744,7 +744,10 @@
             $('#globalCartItemsContainer .cart-qty-increase').click(function () {
                 const productId = $(this).data('product-id');
                 const qtyInput = $(`#globalCartItemsContainer .cart-item-quantity[data-product-id="${productId}"]`);
+                const limit = qtyInput.data('limit');
                 const currentQty = parseInt(qtyInput.val(), 10) || 1;
+
+                if(limit >= currentQty) return;
 
                 updateGlobalCartQuantity(productId, currentQty + 1);
             });

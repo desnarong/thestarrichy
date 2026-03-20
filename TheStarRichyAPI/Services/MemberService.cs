@@ -537,10 +537,10 @@ WHERE M06_PX1 = @Membercode
                 using var command = new SqlCommand(sql, con);
                 command.Parameters.AddWithValue("@Membercode", memberCode);
                 command.Parameters.AddWithValue("@BussinessName", ToDbValue(request.PersonalInfo?.BussinessName));
-                command.Parameters.AddWithValue("@PresentAddress", ToDbValue(request.AddressInfo?.PresentAddress?.AddressLine));
+                command.Parameters.AddWithValue("@PresentAddress", ToDbValue(request.AddressInfo?.PresentAddress?.AddressLine?.Trim()));
                 command.Parameters.AddWithValue("@PresentPostcode", ToDbValue(request.AddressInfo?.PresentAddress?.Postcode));
                 command.Parameters.AddWithValue("@PresentSubdistrictCode", ToDbValue(request.AddressInfo?.PresentAddress?.SubdistrictCode));
-                command.Parameters.AddWithValue("@IdcardAddress", ToDbValue(request.AddressInfo?.IdCardAddress?.AddressLine));
+                command.Parameters.AddWithValue("@IdcardAddress", ToDbValue(request.AddressInfo?.IdCardAddress?.AddressLine?.Trim()));
                 command.Parameters.AddWithValue("@IdcardPostcode", ToDbValue(request.AddressInfo?.IdCardAddress?.Postcode));
                 command.Parameters.AddWithValue("@IdcardSubdistrictCode", ToDbValue(request.AddressInfo?.IdCardAddress?.SubdistrictCode));
                 command.Parameters.AddWithValue("@Bookbankname", ToDbValue(request.BankInfo?.AccountName));

@@ -131,7 +131,7 @@ namespace TheStarRichyApi.Services
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
                     string query = "SELECT  Membercode,  PrestigeRankingName  ,Totalmember" +
-                        " FROM [000_Member_Left_Sum_position_Ranking] where Membercode=@Membercode ORDER BY LevelCode ";
+                        " FROM [000_Member_Right_Sum_position_Ranking] where Membercode=@Membercode ORDER BY LevelCode ";
 
 
 

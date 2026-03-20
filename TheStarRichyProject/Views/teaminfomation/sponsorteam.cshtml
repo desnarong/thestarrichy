@@ -439,7 +439,7 @@ $(document).ready(function () {
             selectedPrestigeRanking = rankingName;
         }
         applyFilters();
-        renderRankingCards(); // Re-render to show active state
+        //renderRankingCards(); // Re-render to show active state
     };
 
     /* ================================================================
@@ -524,8 +524,10 @@ $(document).ready(function () {
                 if (pos !== filterPos) return false;
             }
             if (selectedPrestigeRanking) {
-                var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
-                if (pr.toLowerCase() !== selectedPrestigeRanking.toLowerCase()) return false;
+                var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim().toLowerCase();
+                if(pr == 0) pr = 'no position';
+                var filterPos = selectedPrestigeRanking.toLowerCase();
+                if (pr !== filterPos) return false;
             }
             return true;
         });

@@ -360,11 +360,25 @@
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="row mt-4">
+                            <div class="full-action-bar d-print-none">
+                                <div class="container-fluid d-flex justify-content-end align-items-center">
+                                    <div class="d-flex gap-2">
+                                        <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
+                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                        </a>
+                                        <button type="button" id="btnResetSimple" class="btn btn-outline-danger btn-lg">
+                                            <i class="fas fa-times me-2"></i>ยกเลิก
+                                        </button>
+                                        <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg">
+                                            <i class="fas fa-save me-2"></i>ลงทะเบียน
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            @* <div class="row mt-4">
                                 <div class="col-12">
                                     <div class="d-flex flex-column flex-md-row justify-content-end gap-3">
-                                        <a href="/" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
+                                        <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
                                             <i class="fas fa-home me-2"></i>กลับหน้าแรก
                                         </a>
                                         <button type="button" class="btn btn-outline-secondary w-100 w-md-auto" id="btnResetSimple">
@@ -375,7 +389,7 @@
                                         </button>
                                     </div>
                                 </div>
-                            </div>
+                            </div> *@
                         </form>
                     </div>
 
@@ -810,11 +824,14 @@
                             <div class="full-action-bar d-print-none">
                                 <div class="container-fluid d-flex justify-content-end align-items-center">
                                     <div class="d-flex gap-2">
+                                        <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
+                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                        </a>
                                         <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
                                             <i class="fas fa-times me-2"></i>ยกเลิก
                                         </button>
                                         <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save me-2"></i>บันทึกข้อมูล
+                                            <i class="fas fa-save me-2"></i>ลงทะเบียน
                                         </button>
                                     </div>
                                 </div>
