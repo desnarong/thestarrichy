@@ -487,6 +487,10 @@ $(document).ready(function () {
                 }
                 
                 var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
+                // Capitalize first letter for display
+                if (posDisplay && posDisplay.length > 0) {
+                    posDisplay = posDisplay.charAt(0).toUpperCase() + posDisplay.slice(1);
+                }
                 
                 // Add highlight for active filter (compare lowercase)
                 var activeStyle = selectedPosition.toLowerCase() === posName ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
@@ -598,8 +602,9 @@ $(document).ready(function () {
                 }
             }
             if (selectedPosition) {
-                var pos = (row.PositionName ?? row.positionName ?? '').toString().trim();
-                if (pos !== selectedPosition) return false;
+                var pos = (row.PositionName ?? row.positionName ?? '').toString().trim().toLowerCase();
+                var filterPos = selectedPosition.toLowerCase();
+                if (pos !== filterPos) return false;
             }
             if (selectedPrestigeRanking) {
                 var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
