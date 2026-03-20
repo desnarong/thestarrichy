@@ -191,10 +191,10 @@ namespace TheStarRichyApi.Services
             catch (Exception ex)
             {
                 // Log exception
-                return new List<dynamic> { new { Membercode = "", Error = "An error occurred while fetching data" } };
+                return new List<dynamic>();
             }
 
-            return result.Count > 0 ? result : new List<dynamic> ();
+            return result.Count > 0 ? result : new List<dynamic>();
         }
     }
 }

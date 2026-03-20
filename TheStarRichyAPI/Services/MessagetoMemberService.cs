@@ -75,7 +75,7 @@ namespace TheStarRichyApi.Services
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
             if (string.IsNullOrEmpty(passkey))
             {
-                return new List<dynamic> { new { Membercode = "" } };
+                return new List<dynamic>();
             }
 
             string passwordEncode1 = await GetPasskeyAsync("Passkey1");
@@ -84,14 +84,14 @@ namespace TheStarRichyApi.Services
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
             {
-                return new List<dynamic> { new { Membercode = "" } };
+                return new List<dynamic>();
             }
 
             // Get Membercode from JWT
             string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(memberCode))
             {
-                return new List<dynamic> { new { Membercode = "" } };
+                return new List<dynamic>();
             }
 
             var result = new List<dynamic>();
@@ -133,10 +133,10 @@ namespace TheStarRichyApi.Services
             catch (Exception ex)
             {
                 // Log exception
-                return new List<dynamic> { new { Membercode = "", Error = "An error occurred while fetching data" } };
+                return new List<dynamic>();
             }
 
-            return result.Count > 0 ? result : new List<dynamic> { new { Membercode = "" } };
+            return result.Count > 0 ? result : new List<dynamic>();
         }
     }
 }
