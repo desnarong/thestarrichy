@@ -97,67 +97,9 @@
                 </h6>
             </div>
             <div class="card-body py-3">
-                <div class="row g-3 align-items-stretch">
-
-                    <!-- Total members -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#e8f5e9; border: 2px solid #4caf50;">
-                            <div class="text-muted" style="font-size:0.72rem;">จำนวนสมาชิกทั้งหมด</div>
-                            <div class="fs-3 fw-bold text-success my-1" id="sumTotalMembers">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                        </div>
-                    </div>
-
-                    <!-- Qualify -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#f1f8e9; border: 2px solid #8bc34a;">
-                            <div class="text-muted" style="font-size:0.72rem;">สมาชิกที่รักษายอด</div>
-                            <div class="fs-3 fw-bold text-success my-1" id="sumQualifyCount">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                            <div class="mt-1">
-                                <span class="badge bg-success" style="font-size:0.7rem;">
-                                    PV รวม: <span id="sumQualifyPV">-</span>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Position: ไม่มีตำแหน่ง -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#f5f5f5; border: 2px solid #9e9e9e;">
-                            <div class="text-muted" style="font-size:0.72rem;">ไม่มีตำแหน่ง</div>
-                            <div class="fs-3 fw-bold text-secondary my-1" id="posNoPosition">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                        </div>
-                    </div>
-
-                    <!-- Position: Star -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#fff8e1; border: 2px solid #ffc107;">
-                            <div class="text-muted" style="font-size:0.72rem;">Star</div>
-                            <div class="fs-3 fw-bold text-warning my-1" id="posStar">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                        </div>
-                    </div>
-
-                    <!-- Position: Silver Star -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#eceff1; border: 2px solid #90a4ae;">
-                            <div class="text-muted" style="font-size:0.72rem;">Silver Star</div>
-                            <div class="fs-3 fw-bold my-1" style="color:#546e7a;" id="posSilverStar">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                        </div>
-                    </div>
-
-                    <!-- Position: Gold Star -->
-                    <div class="col-6 col-md-3 col-lg-2">
-                        <div class="pos-card h-100" style="background:#fff9c4; border: 2px solid #f9a825;">
-                            <div class="text-muted" style="font-size:0.72rem;">Gold Star</div>
-                            <div class="fs-3 fw-bold my-1" style="color:#f57f17;" id="posGoldStar">-</div>
-                            <div class="text-muted" style="font-size:0.7rem;">คน</div>
-                        </div>
-                    </div>
-
+                <div class="row g-3 align-items-stretch" id="packageSummaryCards">
+                    <!-- Cards will be rendered dynamically from API -->
+                    <div class="text-muted small fst-italic">กำลังโหลด...</div>
                 </div>
             </div>
         </div>
@@ -287,6 +229,7 @@ $(document).ready(function () {
     var currentPage       = 1;
     var dateMode          = 'all';   // 'all' | 'bydate'
     var selectedPrestigeRanking = ''; // For filtering by prestige ranking
+    var selectedPosition  = '';       // For filtering by position from package summary
 
     /* ================================================================
        Date mode toggle  (exposed global for onclick= attributes)
@@ -375,51 +318,65 @@ $(document).ready(function () {
         var packages = normalizeRows(summaryData && summaryData.packages);
         var rankings = normalizeRows(summaryData && summaryData.rankings);
 
-        /* ---- Package stats ---- */
-        var totalMembers   = 0;
-        var qualifyCount   = 0;
-        var qualifyPvSum   = 0;
-        var noPositionCnt  = 0;
-        var starCnt        = 0;
-        var silverStarCnt  = 0;
-        var goldStarCnt    = 0;
-
-        packages.forEach(function (p) {
-            var tm  = toNum(p.TotalMember  ?? p.totalMember  ?? p.Totalmember  ?? 0);
-            totalMembers += tm;
-
+        /* ---- Render package summary cards dynamically ---- */
+        var packageCardsHtml = packages.map(function (p) {
+            var posName = p.PositionName ?? p.positionName ?? p.Positionname ?? 'ไม่มีตำแหน่ง';
+            var tm = toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? 0);
             var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
-            if (qualify.startsWith('yes')) {
-                qualifyCount++;
-                qualifyPvSum += toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
+            var isQualify = qualify.startsWith('yes');
+            var pv = toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
+            
+            // Determine card colors based on position
+            var bgColor = '#f5f5f5';
+            var borderColor = '#9e9e9e';
+            var textColor = '#546e7a';
+            var iconColor = 'text-secondary';
+            
+            if (posName.toLowerCase() === 'star') {
+                bgColor = '#fff8e1';
+                borderColor = '#ffc107';
+                textColor = '#f57f17';
+                iconColor = 'text-warning';
+            } else if (posName.toLowerCase().includes('silver')) {
+                bgColor = '#eceff1';
+                borderColor = '#90a4ae';
+                textColor = '#546e7a';
+                iconColor = '';
+            } else if (posName.toLowerCase().includes('gold')) {
+                bgColor = '#fff9c4';
+                borderColor = '#f9a825';
+                textColor = '#f57f17';
+                iconColor = '';
+            } else if (isQualify) {
+                bgColor = '#e8f5e9';
+                borderColor = '#4caf50';
+                textColor = '#2e7d32';
+                iconColor = 'text-success';
             }
+            
+            var posDisplay = posName === '-' || !posName ? 'ไม่มีตำแหน่ง' : posName;
+            
+            return '<div class="col-6 col-md-3 col-lg-2">' +
+                   '  <div class="pos-card h-100" style="background:' + bgColor + '; border: 2px solid ' + borderColor + '; cursor: pointer;" ' +
+                   '       onclick="togglePositionFilter(\'' + escAttr(posName) + '\')" title="คลิกเพื่อกรอง">' +
+                   '    <div class="text-muted" style="font-size:0.72rem;">' + escHtml(posDisplay) + '</div>' +
+                   '    <div class="fs-3 fw-bold my-1" style="color:' + textColor + ';">' + fmtInt(tm) + '</div>' +
+                   '    <div class="text-muted" style="font-size:0.7rem;">คน</div>' +
+                   (isQualify ? '    <div class="mt-1"><span class="badge bg-success" style="font-size:0.7rem;">PV: ' + fmtNum(pv) + '</span></div>' : '') +
+                   '  </div>' +
+                   '</div>';
+        }).join('');
+        
+        $('#packageSummaryCards').html(packageCardsHtml);
 
-            var pos = ((p.PositionName ?? p.positionName ?? p.Positionname ?? '') + '').toLowerCase().trim();
-            if (!pos || pos === '-' || pos === 'none' || pos === 'ไม่มีตำแหน่ง') {
-                noPositionCnt += tm;
-            } else if (pos === 'star') {
-                starCnt += tm;
-            } else if (pos.includes('silver')) {
-                silverStarCnt += tm;
-            } else if (pos.includes('gold')) {
-                goldStarCnt += tm;
-            }
-        });
-
-        $('#sumTotalMembers').text(fmtInt(totalMembers));
-        $('#sumQualifyCount').text(fmtInt(qualifyCount));
-        $('#sumQualifyPV').text(fmtNum(qualifyPvSum));
-        $('#posNoPosition').text(fmtInt(noPositionCnt));
-        $('#posStar').text(fmtInt(starCnt));
-        $('#posSilverStar').text(fmtInt(silverStarCnt));
-        $('#posGoldStar').text(fmtInt(goldStarCnt));
-
-        /* ---- Rankings ---- */
+        /* ---- Render rankings ---- */
         if (rankings.length > 0) {
             var html = rankings.map(function (r) {
                 var name  = r.PrestigeRankingName ?? r.prestigeRankingName ?? r.RankName ?? r.rankName ?? '-';
                 var count = toNum(r.Totalmember ?? r.TotalMember ?? r.totalMember ?? 0);
-                return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb;">' +
+                var isActive = selectedPrestigeRanking === name ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
+                return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb; cursor: pointer; ' + isActive + '" ' +
+                       '     onclick="togglePrestigeRankingFilter(\'' + escAttr(name) + '\')" title="คลิกเพื่อกรอง">' +
                        '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
                        '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(count) + '</div>' +
                        '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
@@ -428,6 +385,66 @@ $(document).ready(function () {
             $('#rankingCards').html(html);
         } else {
             $('#rankingCards').html('<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
+        }
+    }
+
+    /* ================================================================
+       Toggle position filter from package summary card click
+    ================================================================ */
+    window.togglePositionFilter = function (positionName) {
+        if (selectedPosition === positionName) {
+            selectedPosition = ''; // Clear filter
+        } else {
+            selectedPosition = positionName;
+        }
+        applyFilters();
+    };
+
+    /* ================================================================
+       Toggle prestige ranking filter from card click
+    ================================================================ */
+    window.togglePrestigeRankingFilter = function (rankingName) {
+        if (selectedPrestigeRanking === rankingName) {
+            selectedPrestigeRanking = ''; // Clear filter
+        } else {
+            selectedPrestigeRanking = rankingName;
+        }
+        applyFilters();
+        renderRankingCards(); // Re-render to show active state
+    };
+
+    /* ================================================================
+       Render ranking cards with active state
+    ================================================================ */
+    function renderRankingCards() {
+        var rankings = normalizeRows(allData.reduce(function (acc, row) {
+            var rankName = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
+            if (rankName && rankName !== '-') {
+                var existing = acc.find(function (r) { 
+                    return (r.PrestigeRankingName || r.prestigeRankingName) === rankName; 
+                });
+                if (existing) {
+                    existing.Totalmember = (existing.Totalmember || 0) + 1;
+                } else {
+                    acc.push({ PrestigeRankingName: rankName, Totalmember: 1 });
+                }
+            }
+            return acc;
+        }, []));
+        
+        if (rankings.length > 0) {
+            var html = rankings.map(function (r) {
+                var name  = r.PrestigeRankingName ?? r.prestigeRankingName ?? '-';
+                var count = toNum(r.Totalmember ?? 0);
+                var isActive = selectedPrestigeRanking === name ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
+                return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb; cursor: pointer; ' + isActive + '" ' +
+                       '     onclick="togglePrestigeRankingFilter(\'' + escAttr(name) + '\')" title="คลิกเพื่อกรอง">' +
+                       '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
+                       '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(count) + '</div>' +
+                       '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
+                       '</div>';
+            }).join('');
+            $('#rankingCards').html(html);
         }
     }
 
@@ -474,6 +491,10 @@ $(document).ready(function () {
                     if (from && d < from) return false;
                     if (to   && d > to)   return false;
                 }
+            }
+            if (selectedPosition) {
+                var pos = (row.PositionName ?? row.positionName ?? '').toString().trim();
+                if (pos !== selectedPosition) return false;
             }
             if (selectedPrestigeRanking) {
                 var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
