@@ -449,12 +449,11 @@ $(document).ready(function () {
         var rankingMap = {};
         allData.forEach(function (m) {
             var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
-            if (!rankName || rankName === '-' || rankName === '0') {
-                rankName = 'No Position';
+            // Skip empty, '-', '0', or 'ไม่มีตำแหน่ง' values
+            if (!rankName || rankName === '-' || rankName === '0' || rankName === 'ไม่มีตำแหน่ง') {
+                return;
             }
-            if (rankName && rankName !== '-') {
-                rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
-            }
+            rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
         });
 
         var rankKeys = Object.keys(rankingMap);
@@ -470,6 +469,8 @@ $(document).ready(function () {
                        '</div>';
             }).join('');
             $('#rankingCards').html(html);
+        } else {
+            $('#rankingCards').html('<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
         }
     }
 
