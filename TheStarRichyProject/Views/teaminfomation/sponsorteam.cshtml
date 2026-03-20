@@ -449,9 +449,9 @@ $(document).ready(function () {
         var rankingMap = {};
         allData.forEach(function (m) {
             var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
-            // Skip empty, '-', '0', or 'ไม่มีตำแหน่ง' values
-            if (!rankName || rankName === '-' || rankName === '0' || rankName === 'ไม่มีตำแหน่ง') {
-                return;
+            // Convert empty, '-', '0' to "No Position"
+            if (!rankName || rankName === '-' || rankName === '0') {
+                rankName = 'No Position';
             }
             rankingMap[rankName] = (rankingMap[rankName] || 0) + 1;
         });

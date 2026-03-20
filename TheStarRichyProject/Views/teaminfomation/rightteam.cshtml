@@ -529,9 +529,9 @@ $(document).ready(function () {
     function renderRankingCards() {
         var rankings = normalizeRows(allData.reduce(function (acc, row) {
             var rankName = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim();
-            // Skip empty, '-', '0', or 'ไม่มีตำแหน่ง' values
-            if (!rankName || rankName === '-' || rankName === '0' || rankName === 'ไม่มีตำแหน่ง') {
-                return acc;
+            // Convert empty, '-', '0' to "No Position"
+            if (!rankName || rankName === '-' || rankName === '0') {
+                rankName = 'No Position';
             }
             var existing = acc.find(function (r) { 
                 return (r.PrestigeRankingName || r.prestigeRankingName) === rankName; 
