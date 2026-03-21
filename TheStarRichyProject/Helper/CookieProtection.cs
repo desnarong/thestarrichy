@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -6,6 +8,19 @@ namespace TheStarRichyProject.Helper
 {
     internal static class CookieProtection
     {
+        private static IDataProtector? _dataProtector;
+
+        private static void Initialize(IConfiguration config)
+        {
+            if (_dataProtector == null)
+            {
+                // Use the static DataProtectionProvider.Create with a key directory
+                var keysFolder = Path.Combine(AppContext.BaseDirectory, "DataProtection-Keys");
+                var provider = DataProtectionProvider.Create(keysFolder);
+                _dataProtector = provider.CreateProtector("SessionCookie");
+            }
+        }
+
         internal static string NewSessionKey()
         {
             // No valid cookie, new session.
@@ -14,6 +29,7 @@ namespace TheStarRichyProject.Helper
             var sessionKey = new Guid(guidBytes).ToString();
             return sessionKey;
         }
+
         internal static string Protect(IDataProtector protector, string data)
         {
             if (protector == null)
@@ -59,6 +75,43 @@ namespace TheStarRichyProject.Helper
                 // Log the exception, but do not leak other information
                 //logger.ErrorUnprotectingSessionCookie(ex);
                 return string.Empty;
+            }
+        }
+
+        internal static JObject? Unprotect(string protectedText, IConfiguration config)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(protectedText))
+                {
+                    return null;
+                }
+
+                Initialize(config);
+                
+                if (_dataProtector == null)
+                {
+                    return null;
+                }
+
+                var protectedData = Convert.FromBase64String(Pad(protectedText));
+                if (protectedData == null)
+                {
+                    return null;
+                }
+
+                var userData = _dataProtector.Unprotect(protectedData);
+                if (userData == null)
+                {
+                    return null;
+                }
+
+                var json = Encoding.UTF8.GetString(userData);
+                return JObject.Parse(json);
+            }
+            catch
+            {
+                return null;
             }
         }
 

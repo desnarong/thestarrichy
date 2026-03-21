@@ -337,6 +337,7 @@
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.1.35" />
     <PackageReference Include="Localization.SqlLocalizer" Version="3.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="7.0.20" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="7.0.19" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.20" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.20">

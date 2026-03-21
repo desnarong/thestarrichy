@@ -585,27 +585,27 @@ $(document).ready(function () {
                     '<tr class="' + rowCls + '">' +
                     '<td class="text-center">'  + (start + i + 1) + '</td>' +
                     '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '') + '</td>' +
-                    '<td class="text-center"><strong>' + escHtml(m.DLCode ?? m.dlCode ?? '') + '</strong></td>' +
+                    '<td class="text-center"><a href="javascript:void(0)" onclick="openBinaryTeam(\'' + escAttr(m.DLCode ?? m.dlCode ?? '') + '\')" class="text-primary fw-bold" style="cursor:pointer;">' + escHtml(m.DLCode ?? m.dlCode ?? '') + '</a></td>' +
                     '<td>'                           + escHtml(m.DLName  ?? m.dlName  ?? '') + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
                     '<td class="text-center">'  + escHtml(m.SIDEX ?? m.sidex ?? m.SIDE ?? m.side ?? '') + '</td>' +
                     '<td class="text-center">'  + escHtml(posName) + '</td>' +
                     '<td class="text-center">'  + escHtml(prestigeRanking) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV)   + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft)       + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight)      + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV ?? 0)   + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft ?? 0)       + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight ?? 0)      + '</td>' +
                     '<td>'                           + escHtml(m.SponserName ?? m.sponserName ?? m.SponsorName ?? '') + '</td>' +
                     '<td class="text-center">'  + qualBadge + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV)    + '</td>' +
-                    '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive)  + '</td>' +
-                    '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.TotalLeftBalance  ?? m.totalLeftBalance)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.TotalRightBalance ?? m.totalRightBalance) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV ?? 0) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV ?? 0)    + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive ?? 0)  + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive ?? 0) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalLeftBalance  ?? m.totalLeftBalance ?? 0)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalRightBalance ?? m.totalRightBalance ?? 0) + '</td>' +
                     '<td class="text-center">'  + escHtml(m.NextPosition ?? m.nextPosition ?? '') + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.NextPosaddLeftBalance  ?? m.nextPosaddLeftBalance)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.NextPosaddRightBalance ?? m.nextPosaddRightBalance) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.NextPosaddLeftBalance  ?? m.nextPosaddLeftBalance ?? 0)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.NextPosaddRightBalance ?? m.nextPosaddRightBalance ?? 0) + '</td>' +
                     '</tr>';
             });
             tbody.html(rows);
@@ -672,7 +672,11 @@ $(document).ready(function () {
     function fmtDate(v) {
         if (!v) return '';
         var d = new Date(v);
-        return isNaN(d.getTime()) ? '' : d.toLocaleDateString('th-TH');
+        if (isNaN(d.getTime())) return '';
+        var day = String(d.getDate()).padStart(2, '0');
+        var month = String(d.getMonth() + 1).padStart(2, '0');
+        var year = d.getFullYear();
+        return day + '/' + month + '/' + year;
     }
 
     function escHtml(s) {
@@ -687,6 +691,26 @@ $(document).ready(function () {
     function escAttr(s) {
         return String(s).replace(/"/g, '&quot;');
     }
+
+    /* ================================================================
+       Open Binary Team from Sponsor (POST method)
+    ================================================================ */
+    window.openBinaryTeam = function (memberCode) {
+        // Create a form and submit via POST
+        var form = $('<form>', {
+            'method': 'POST',
+            'action': '/teaminfomation/OpenBinaryTeamFromSponsor'
+        });
+        
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'memberCode',
+            'value': memberCode
+        }));
+        
+        $('body').append(form);
+        form.submit();
+    };
 
     /* ================================================================
        Init  (LAST — after all definitions)

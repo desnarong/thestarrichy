@@ -6,6 +6,7 @@ using TheStarRichyProject.Services;
 
 namespace TheStarRichyProject.Controllers
 {
+    [Route("[controller]")]
     public class teaminfomationController : BaseController
     {
         private readonly IApiService _apiService;
@@ -24,10 +25,13 @@ namespace TheStarRichyProject.Controllers
 
         #region Binary Team
 
+        [Route("[action]")]
         public IActionResult teambinary()
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null) return cookieCheck;
+            if (!CheckCookie(out _))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
 
             var preferredCode = HttpContext.Session.GetString("TeamBinaryPreferredCode");
             if (!string.IsNullOrWhiteSpace(preferredCode))
@@ -40,10 +44,13 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpPost]
+        [Route("[action]")]
         public IActionResult OpenBinaryTeamFromSponsor([FromForm] string memberCode)
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null) return cookieCheck;
+            if (!CheckCookie(out _))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
 
             if (!string.IsNullOrWhiteSpace(memberCode))
             {
@@ -54,6 +61,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetBinaryTeam(string memberCode)
         {
             try
@@ -71,6 +79,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> FindLeftBinary(string memberCode)
         {
             try
@@ -88,6 +97,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> FindRightBinary(string memberCode)
         {
             try
@@ -108,14 +118,18 @@ namespace TheStarRichyProject.Controllers
 
         #region Sponsor Team
 
+        [Route("[action]")]
         public IActionResult sponsorteam()
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null) return cookieCheck;
+            if (!CheckCookie(out _))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View();
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetSponsorTeam(string memberCode)
         {
             try
@@ -134,6 +148,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetSponsorTeamSummary(string memberCode)
         {
             try
@@ -159,14 +174,18 @@ namespace TheStarRichyProject.Controllers
 
         #region Left Team
 
+        [Route("[action]")]
         public IActionResult leftteam()
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null) return cookieCheck;
+            if (!CheckCookie(out _))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View();
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetLeftTeam(string memberCode)
         {
             try
@@ -184,6 +203,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetLeftTeamSummary(string memberCode)
         {
             try
@@ -209,14 +229,18 @@ namespace TheStarRichyProject.Controllers
 
         #region Right Team
 
+        [Route("[action]")]
         public IActionResult rightteam()
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null) return cookieCheck;
+            if (!CheckCookie(out _))
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View();
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetRightTeam(string memberCode)
         {
             try
@@ -234,6 +258,7 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> GetRightTeamSummary(string memberCode)
         {
             try

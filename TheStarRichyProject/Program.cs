@@ -8,6 +8,7 @@ using System.Net;
 using System.Reflection;
 using TheStarRichyProject;
 using TheStarRichyProject.Services;
+using TheStarRichyProject.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,6 +66,9 @@ builder.Services.AddScoped<ICartApiService, CartApiService>();
 builder.Services.AddScoped<IOrderApiService, OrderApiService>();
 builder.Services.AddScoped<IApiService, ApiService>();
 
+// Add logging for session debugging
+builder.Services.AddLogging();
+
 var app = builder.Build();
 
 // Error handling
@@ -91,42 +95,8 @@ app.UseRouting();
 app.UseCors("AllowOrigin");
 app.UseSession();
 
-// Session expiry guard — redirect to login when UserSession cookie is missing
-//app.Use(async (context, next) =>
-//{
-//    var path = context.Request.Path.Value ?? "";
-//    var isPublicPath =
-//        path.StartsWith("/Auth/", StringComparison.OrdinalIgnoreCase) ||
-//        path.StartsWith("/ExternalRegistration/", StringComparison.OrdinalIgnoreCase) ||
-//        path.StartsWith("/Culture/", StringComparison.OrdinalIgnoreCase) ||
-//        path.Equals("/home/GetSlideImages", StringComparison.OrdinalIgnoreCase) ||
-//        path.Equals("/home/GetPopupSlideImages", StringComparison.OrdinalIgnoreCase) ||
-//        path.Equals("/", StringComparison.OrdinalIgnoreCase);
-
-//    if (!isPublicPath)
-//    {
-//        var userSession = context.Request.Cookies["UserSession"];
-//        if (string.IsNullOrEmpty(userSession))
-//        {
-//            var acceptHeader = context.Request.Headers["Accept"].ToString();
-//            var isAjax = context.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
-//                || (acceptHeader.Contains("application/json") && !acceptHeader.Contains("text/html"));
-
-//            if (isAjax)
-//            {
-//                context.Response.StatusCode = 401;
-//                context.Response.ContentType = "application/json; charset=utf-8";
-//                await context.Response.WriteAsync("{\"error\":\"session_expired\",\"message\":\"กรุณาเข้าสู่ระบบใหม่\"}");
-//                return;
-//            }
-
-//            context.Response.Redirect("/Auth/Login");
-//            return;
-//        }
-//    }
-
-//    await next();
-//});
+// Global Exception Handler - Catch all unhandled exceptions including session errors
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 

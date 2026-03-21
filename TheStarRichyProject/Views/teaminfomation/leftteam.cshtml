@@ -662,25 +662,25 @@ $(document).ready(function () {
                     '<tr class="' + rowCls + '">' +
                     '<td class="text-center">'  + (start + i + 1) + '</td>' +
                     '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '') + '</td>' +
-                    '<td class="text-center"><strong>' + escHtml(m.MemberLeftCode ?? m.memberLeftCode ?? '') + '</strong></td>' +
+                    '<td class="text-center"><a href="javascript:void(0)" onclick="openBinaryTeam(\'' + escAttr(m.MemberLeftCode ?? m.memberLeftCode ?? '') + '\')" class="text-primary fw-bold" style="cursor:pointer;">' + escHtml(m.MemberLeftCode ?? m.memberLeftCode ?? '') + '</a></td>' +
                     '<td>'                           + escHtml(m.MemberLeftName  ?? m.memberLeftName  ?? '') + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.QualifyDate  ?? m.qualifyDate  ?? m.qualifydate)  + '</td>' +
                     '<td class="text-center">'  + escHtml(m.SIDE ?? m.Side ?? m.side ?? '') + '</td>' +
                     '<td class="text-center">'  + escHtml(m.PositionName ?? m.positionName ?? '') + '</td>' +
                     '<td class="text-center">'  + escHtml(prestigeRanking) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PersonalPV    ?? m.personalPV)    + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PersonalPV    ?? m.personalPV ?? 0)    + '</td>' +
                     '<td>'                           + escHtml(m.SponserName  ?? m.sponserName  ?? m.SponsorName ?? '') + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PVLeft        ?? m.pvLeft)        + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PVRight       ?? m.pvRight)       + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVLeft        ?? m.pvLeft ?? 0)        + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PVRight       ?? m.pvRight ?? 0)       + '</td>' +
                     '<td class="text-center">'  + qualBadge                                  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV)    + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV) + '</td>' +
-                    '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive)  + '</td>' +
-                    '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive) + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.TotalBalance  ?? m.totalBalance)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.Travelpoint1  ?? m.travelpoint1)  + '</td>' +
-                    '<td class="text-end">'     + fmtNum(m.Travelpoint2  ?? m.travelpoint2)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV ?? 0)    + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV ?? 0) + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.LeftCountActive  ?? m.leftCountActive ?? 0)  + '</td>' +
+                    '<td class="text-center">'  + fmtNum(m.RightCountActive ?? m.rightCountActive ?? 0) + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.TotalBalance  ?? m.totalBalance ?? 0)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.Travelpoint1  ?? m.travelpoint1 ?? 0)  + '</td>' +
+                    '<td class="text-end">'     + fmtNum(m.Travelpoint2  ?? m.travelpoint2 ?? 0)  + '</td>' +
                     '</tr>';
             });
             tbody.html(rows);
@@ -780,6 +780,26 @@ $(document).ready(function () {
     function escAttr(s) {
         return String(s).replace(/"/g, '&quot;');
     }
+
+    /* ================================================================
+       Open Binary Team from Sponsor (POST method)
+    ================================================================ */
+    window.openBinaryTeam = function (memberCode) {
+        // Create a form and submit via POST
+        var form = $('<form>', {
+            'method': 'POST',
+            'action': '/teaminfomation/OpenBinaryTeamFromSponsor'
+        });
+        
+        form.append($('<input>', {
+            'type': 'hidden',
+            'name': 'memberCode',
+            'value': memberCode
+        }));
+        
+        $('body').append(form);
+        form.submit();
+    };
 
     /* ================================================================
        Init  (must be LAST — after all function definitions above)

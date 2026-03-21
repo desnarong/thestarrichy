@@ -1,126 +1,125 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.Logging;
 using TheStarRichyProject.Helper;
 
 namespace TheStarRichyProject.Controllers
 {
+    [SessionCheck]
     public class BaseController : Controller
     {
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        protected IConfiguration Config { get; private set; }
+        protected readonly IHttpContextAccessor _httpContextAccessor;
+        protected readonly ILogger _logger;
+        protected readonly IConfiguration _config;
+
         public BaseController(IHttpContextAccessor httpContextAccessor, ILoggerFactory loggerFactory, IConfiguration config)
         {
-            Config = config;
             _httpContextAccessor = httpContextAccessor;
-        }
-        public ActionResult CheckCookie()
-        {
-            var cookie = _httpContextAccessor.HttpContext.Request.Cookies[CookieHelper.UserKey];
-            if (string.IsNullOrEmpty(cookie))
-            {
-                return Redirect("/Auth/Login");
-            }
-            return null;
+            _logger = loggerFactory.CreateLogger(GetType());
+            _config = config;
         }
 
-        /// <summary>
-        /// ดึง IP Address ของ client โดยตรวจสอบจาก headers ต่างๆ ด้วย loop
-        /// </summary>
+        protected string GetUserSession()
+        {
+            return Request.Cookies["UserSession"];
+        }
+
+        protected bool IsSessionValid()
+        {
+            return !string.IsNullOrEmpty(GetUserSession());
+        }
+
+        protected bool CheckCookie(out string userCode)
+        {
+            userCode = string.Empty;
+            
+            // Check if UserSession cookie exists (contains JWT token)
+            var cookieToken = Request.Cookies["UserSession"];
+            if (string.IsNullOrEmpty(cookieToken))
+            {
+                return false;
+            }
+            
+            // Get MemberCode from separate cookie (stored during login)
+            userCode = Request.Cookies[CookieHelper.MemberCodeKey] ?? string.Empty;
+            
+            // Valid if we have both session token and member code
+            return !string.IsNullOrEmpty(userCode);
+        }
+
         protected string GetClientIPAddress()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
-            if (httpContext == null) return "0";
-
-            // รายการ headers ที่ใช้ตรวจสอบ IP address (เรียงลำดับความสำคัญ)
-            var ipHeaders = new[]
+            string ip = string.Empty;
+            
+            if (_httpContextAccessor.HttpContext != null)
             {
-                "X-Forwarded-For",
-                "X-Real-IP",
-                "CF-Connecting-IP", // Cloudflare
-                "X-Client-IP",
-                "X-Cluster-Client-IP",
-                "Forwarded-For",
-                "Forwarded"
-            };
-
-            // ใช้ loop ตรวจสอบแต่ละ header
-            foreach (var headerName in ipHeaders)
-            {
-                var headerValue = httpContext.Request.Headers[headerName].FirstOrDefault();
-                if (!string.IsNullOrEmpty(headerValue))
+                ip = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].FirstOrDefault();
+                
+                if (string.IsNullOrEmpty(ip))
                 {
-                    // header อาจมีหลาย IP คั่นด้วย comma (เช่น X-Forwarded-For: client, proxy1, proxy2)
-                    var ips = headerValue.Split(',', StringSplitOptions.RemoveEmptyEntries);
-                    
-                    foreach (var ip in ips)
-                    {
-                        var cleanIp = ip.Trim();
-                        
-                        // ตรวจสอบว่าเป็น IP address ที่ valid และไม่ใช่ localhost
-                        if (IsValidIpAddress(cleanIp) && !IsLocalhost(cleanIp))
-                        {
-                            return cleanIp;
-                        }
-                    }
+                    ip = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress?.ToString();
                 }
             }
 
-            // ถ้าไม่มี header ที่ valid ให้ใช้ RemoteIpAddress
-            var remoteIp = httpContext.Connection.RemoteIpAddress;
-            if (remoteIp != null)
+            return ip ?? "127.0.0.1";
+        }
+
+        protected IConfiguration Config => _config;
+    }
+
+    public class SessionCheckAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(ActionExecutingContext context)
+        {
+            // Skip for public paths
+            var path = context.HttpContext.Request.Path.Value ?? "";
+            var controller = context.Controller.GetType().Name;
+            
+            // Skip AuthController and ExternalRegistrationController entirely (login, register, etc.)
+            if (controller.Equals("AuthController", StringComparison.OrdinalIgnoreCase) ||
+                controller.Equals("ExternalRegistrationController", StringComparison.OrdinalIgnoreCase))
             {
-                var ipString = remoteIp.ToString();
-                
-                // แปลง IPv6 loopback เป็น IPv4 loopback
-                if (IsLocalhost(ipString))
-                    return "127.0.0.1";
-                    
-                // แปลง IPv6 mapped IPv4 address
-                if (remoteIp.IsIPv4MappedToIPv6)
-                    return remoteIp.MapToIPv4().ToString();
-                    
-                return ipString;
+                base.OnActionExecuting(context);
+                return;
+            }
+            
+            var isPublicPath =
+                path.StartsWith("/Auth/", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("/ExternalRegistration/", StringComparison.OrdinalIgnoreCase) ||
+                path.StartsWith("/Culture/", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/home/GetSlideImages", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/home/GetPopupSlideImages", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/", StringComparison.OrdinalIgnoreCase) ||
+                path.Equals("/Home/Error", StringComparison.OrdinalIgnoreCase);
+
+            if (isPublicPath)
+            {
+                base.OnActionExecuting(context);
+                return;
             }
 
-            return "0";
-        }
+            var userSession = context.HttpContext.Request.Cookies["UserSession"];
 
-        /// <summary>
-        /// ตรวจสอบว่าเป็น IP address ที่ valid หรือไม่
-        /// </summary>
-        private bool IsValidIpAddress(string ip)
-        {
-            if (string.IsNullOrEmpty(ip))
-                return false;
-
-            // ตรวจสอบรูปแบบ IP address (ทั้ง IPv4 และ IPv6)
-            return System.Net.IPAddress.TryParse(ip, out _);
-        }
-
-        /// <summary>
-        /// ตรวจสอบว่าเป็น localhost address หรือไม่
-        /// </summary>
-        private bool IsLocalhost(string ip)
-        {
-            if (string.IsNullOrEmpty(ip))
-                return false;
-
-            // รายการ localhost addresses
-            var localhostAddresses = new[]
+            if (string.IsNullOrEmpty(userSession))
             {
-                "::1",
-                "127.0.0.1",
-                "localhost",
-                "0:0:0:0:0:0:0:1"
-            };
+                var acceptHeader = context.HttpContext.Request.Headers["Accept"].ToString();
+                var isAjax = context.HttpContext.Request.Headers["X-Requested-With"] == "XMLHttpRequest"
+                    || (acceptHeader.Contains("application/json") && !acceptHeader.Contains("text/html"));
 
-            // ตรวจสอบว่า IP ขึ้นต้นด้วย 2001: (IPv6 local range) หรือไม่
-            if (ip.StartsWith("2001:"))
-                return true;
+                if (isAjax)
+                {
+                    context.Result = new JsonResult(new { error = "session_expired", message = "กรุณาเข้าสู่ระบบใหม่" })
+                    {
+                        StatusCode = 401
+                    };
+                }
+                else
+                {
+                    context.Result = new RedirectToActionResult("Login", "Auth", null);
+                }
+            }
 
-            // ตรวจสอบว่าเป็น localhost address หรือไม่
-            return localhostAddresses.Contains(ip) || 
-                   ip.StartsWith("127.") || // IPv4 loopback range
-                   ip.StartsWith("fe80:"); // IPv6 link-local
+            base.OnActionExecuting(context);
         }
     }
 }

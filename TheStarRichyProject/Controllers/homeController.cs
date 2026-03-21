@@ -30,10 +30,9 @@ namespace TheStarRichyProject.Controllers
 
         public IActionResult index()
         {
-            var cookieCheck = CheckCookie();
-            if (cookieCheck != null)
+            if (!CheckCookie(out _))
             {
-                return cookieCheck; // Redirect to login if cookie is invalid or expired
+                return RedirectToAction("Login", "Auth");
             }
 
             if (!Request.Cookies.ContainsKey(CookieHelper.UserKey))
@@ -584,6 +583,22 @@ namespace TheStarRichyProject.Controllers
             {
                 return Content($"Request Failed: {ex.Message} | Stack: {ex.StackTrace}");
             }
+        }
+
+        [HttpGet]
+        public IActionResult Error(bool sessionExpired = false)
+        {
+            var model = new ErrorViewModel
+            {
+                RequestId = System.Diagnostics.Activity.Current?.Id ?? HttpContext.TraceIdentifier
+            };
+            
+            if (sessionExpired)
+            {
+                ViewBag.SessionExpired = true;
+            }
+            
+            return View(model);
         }
     }
 }
