@@ -284,7 +284,7 @@ namespace TheStarRichyProject.Controllers
             try
             {
                 var qs = BuildDateQuery(fromDate, toDate);
-                var result = await _apiService.GetAsync<dynamic>($"/Member/reportmemberlog{qs}");
+                var result = await _apiService.GetAsync<dynamic>($"/Member/reportlog{qs}");
                 return Ok(result);
             }
             catch (Exception ex)

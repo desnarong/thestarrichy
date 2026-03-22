@@ -130,10 +130,7 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT  aa.Membercode, aa.LevelName,  aa.MemberLeftCode,aa.MemberLeftName,aa.RegisterDate";
-                    query += ",aa.QualifyDate,aa.SIDE,aa.PositionName,aa.PrestigeRankingEngName  ,aa.PersonalPV,aa.PVLeft,aa.PVRight,aa.SponserName1 AS SponserName, aa.Qualify,";
-                    query += "aa.LastMonthQualifyPV,aa.PresentMonthQualifyPV,aa.LeftCountActive,aa.RightCountActive,aa.Travelpoint1,aa.Travelpoint2,COALESCE( aa.TotalBalance, 0) as TotalBalance ";
-                    query += " FROM [000_Member_LeftTeam] aa (nolock) ";
+                    string query = "SELECT  * FROM [000_Member_LeftTeam] aa (nolock) ";
 
                     if (Memberpermission != "Y")
                     {

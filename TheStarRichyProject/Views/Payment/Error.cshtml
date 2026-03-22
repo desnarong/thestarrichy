@@ -13,25 +13,25 @@
                     </div>
 
                     <!-- Error Message -->
-                    <h2 class="text-danger mb-3">เกิดข้อผิดพลาด</h2>
-                    
+                    <h2 class="text-danger mb-3" data-key="t-error-occurred">เกิดข้อผิดพลาด</h2>
+
                     <div class="alert alert-danger">
                         @ViewBag.ErrorMessage
                     </div>
 
-                    <p class="text-muted mb-4">
+                    <p class="text-muted mb-4" data-key="t-try-again-or-contact">
                         กรุณาลองใหม่อีกครั้ง หรือติดต่อฝ่ายบริการลูกค้า
                     </p>
 
                     <!-- Action Buttons -->
                     <div class="btn-group-vertical w-100" role="group">
-                        <button onclick="history.back()" class="btn btn-primary btn-lg mb-2">
+                        <button onclick="history.back()" class="btn btn-primary btn-lg mb-2" data-key="t-go-back">
                             <i class="fa fa-arrow-left"></i> ย้อนกลับ
                         </button>
-                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2">
+                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2" data-key="t-my-orders">
                             <i class="fa fa-shopping-bag"></i> คำสั่งซื้อของฉัน
                         </a>
-                        <a href="/" class="btn btn-outline-primary btn-lg">
+                        <a href="/" class="btn btn-outline-primary btn-lg" data-key="t-back-to-home">
                             <i class="fa fa-home"></i> กลับหน้าหลัก
                         </a>
                     </div>
@@ -41,16 +41,16 @@
             <!-- Contact Support -->
             <div class="card mt-3">
                 <div class="card-body">
-                    <h6 class="card-title">
+                    <h6 class="card-title" data-key="t-need-help">
                         <i class="fa fa-question-circle"></i> ต้องการความช่วยเหลือ?
                     </h6>
-                    <p class="card-text text-muted mb-2">
+                    <p class="card-text text-muted mb-2" data-key="t-contact-support">
                         ติดต่อฝ่ายบริการลูกค้า:
                     </p>
                     <ul class="list-unstyled mb-0">
-                        <li><i class="fa fa-phone"></i> โทร: 02-XXX-XXXX</li>
-                        <li><i class="fa fa-envelope"></i> อีเมล: support@example.com</li>
-                        <li><i class="fa fa-clock"></i> เวลาทำการ: จันทร์-ศุกร์ 9:00-18:00</li>
+                        <li data-key="t-phone"><i class="fa fa-phone"></i> โทร: 02-XXX-XXXX</li>
+                        <li data-key="t-email"><i class="fa fa-envelope"></i> อีเมล: support@example.com</li>
+                        <li data-key="t-business-hours"><i class="fa fa-clock"></i> เวลาทำการ: จันทร์-ศุกร์ 9:00-18:00</li>
                     </ul>
                 </div>
             </div>

@@ -247,8 +247,8 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <label for="paymentPromptPay" class="d-block mb-0 cursor-pointer">
-                                            <strong class="d-block">พร้อมเพย์ (QR Code)</strong>
-                                            <small class="text-muted">สแกนจ่ายได้ทุกแอปธนาคาร</small>
+                                            <strong class="d-block" data-key="t-promptpay">พร้อมเพย์ (QR Code)</strong>
+                                            <small class="text-muted" data-key="t-scan-all-banks">สแกนจ่ายได้ทุกแอปธนาคาร</small>
                                         </label>
                                     </div>
                                     <img src="https://upload.wikimedia.org/wikipedia/commons/c/c5/PromptPay-logo.png" height="20">
@@ -262,8 +262,8 @@
                                     </div>
                                     <div class="flex-grow-1">
                                         <label for="paymentCard" class="d-block mb-0 cursor-pointer">
-                                            <strong class="d-block">บัตรเครดิต / เดบิต</strong>
-                                            <small class="text-muted">Visa, MasterCard, JCB</small>
+                                            <strong class="d-block" data-key="t-credit-debit-card">บัตรเครดิต / เดบิต</strong>
+                                            <small class="text-muted" data-key="t-visa-mastercard-jcb">Visa, MasterCard, JCB</small>
                                         </label>
                                     </div>
                                     <div>
@@ -282,14 +282,14 @@
                                 <div class="flex-grow-1">
                                     <label for="paymentBankTransfer" class="d-block mb-0 cursor-pointer">
                                         <div class="d-flex align-items-center mb-1">
-                                            <strong class="text-dark">เงินโอน (Bank Transfer)</strong>
+                                            <strong class="text-dark" data-key="t-bank-transfer">เงินโอน (Bank Transfer)</strong>
                                         </div>
-                                        <small class="text-muted d-block mb-2">ตรวจสอบยอดภายใน 5-15 นาทีในขั้นตอนถัดไป</small>
+                                        <small class="text-muted d-block mb-2" data-key="t-verify-5-15min">ตรวจสอบยอดภายใน 5-15 นาทีในขั้นตอนถัดไป</small>
 
                                         <div class="bank-info-box p-2 rounded bg-light">
                                             <div class="d-flex align-items-center justify-content-between mb-1">
                                                 <small class="fw-bold text-uppercase">@paymentbank.BankName</small>
-                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 fs-11" onclick="copyAccNumber()">คัดลอก</button>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary py-0 px-2 fs-11" onclick="copyAccNumber()" data-key="t-copy">คัดลอก</button>
                                             </div>
                                             <div class="h6 mb-0 text-primary fw-bold">@($"เลขที่บัญชี {paymentbank.AccountNumber}")</div>
                                             <small class="text-muted fs-11">@($"ชื่อบัญชี {paymentbank.AccountName}")</small>
@@ -322,8 +322,8 @@
                                 <div class="flex-grow-1">
                                     <label for="deliveryShip" class="d-flex justify-content-between align-items-center mb-0 cursor-pointer">
                                         <div>
-                                            <strong class="d-block">ให้จัดส่งตามที่อยู่</strong>
-                                            <small class="text-muted">ส่งด่วนถึงบ้าน 1-3 วัน</small>
+                                            <strong class="d-block" data-key="t-ship-to-address">ให้จัดส่งตามที่อยู่</strong>
+                                            <small class="text-muted" data-key="t-express-delivery">ส่งด่วนถึงบ้าน 1-3 วัน</small>
                                         </div>
                                         <span class="badge bg-soft-primary text-primary" id="deliveryFeeBadge">฿ @((cart?.ShippingFee ?? 0).ToString("N2"))</span>
                                     </label>
@@ -391,44 +391,44 @@
                         <div id="customAddressForm" class="bg-light p-3 rounded-3" style="display: none;">
                             <div class="row">
                                 <div class="col-md-12 mb-3">
-                                    <label class="form-label fw-bold">ระบุที่อยู่โดยละเอียด *</label>
+                                    <label class="form-label fw-bold" data-key="t-specify-address">ระบุที่อยู่โดยละเอียด *</label>
                                     <textarea class="form-control" id="addressLine" rows="2" placeholder="บ้านเลขที่, อาคาร, ถนน..."></textarea>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">รหัสไปรษณีย์ *</label>
+                                    <label class="form-label" data-key="t-postcode">รหัสไปรษณีย์ *</label>
                                     <input type="text" class="form-control" id="zipcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" autocomplete="off">
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">จังหวัด *</label>
+                                    <label class="form-label" data-key="t-province">จังหวัด *</label>
                                     <select class="form-select" id="province" disabled>
                                         <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">เขต/อำเภอ *</label>
+                                    <label class="form-label" data-key="t-district">เขต/อำเภอ *</label>
                                     <select class="form-select" id="amphoe" disabled>
                                         <option value="">-- เลือกอำเภอ --</option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">แขวง/ตำบล *</label>
+                                    <label class="form-label" data-key="t-subdistrict">แขวง/ตำบล *</label>
                                     <select class="form-select" id="tambon" disabled>
                                         <option value="">-- เลือกตำบล --</option>
                                     </select>
                                 </div>
 
-                                <div class="col-md-12 mb-3"><label class="form-label">เบอร์โทรศัพท์ผู้รับ *</label><input type="tel" class="form-control" id="phone"></div>
-                                <div class="col-md-12 mb-3"><label class="form-label">ชื่อผู้รับ *</label><input type="text" class="form-control" id="recipientName"></div>
-                                <div class="col-md-12 mb-3"><label class="form-label">ชื่อย่อ *</label><input type="text" class="form-control" id="initials"></div>
+                                <div class="col-md-12 mb-3"><label class="form-label" data-key="t-recipient-phone">เบอร์โทรศัพท์ผู้รับ *</label><input type="tel" class="form-control" id="phone"></div>
+                                <div class="col-md-12 mb-3"><label class="form-label" data-key="t-recipient-name">ชื่อผู้รับ *</label><input type="text" class="form-control" id="recipientName"></div>
+                                <div class="col-md-12 mb-3"><label class="form-label" data-key="t-initials">ชื่อย่อ *</label><input type="text" class="form-control" id="initials"></div>
                                 <div class="col-sm-12 mb-3">
                                     <div>
                                         <div class="form-check mb-3">
                                             <input class="form-check-input" type="checkbox" id="favoriteaddress">
-                                            <label class="form-check-label" for="favoriteaddress">
+                                            <label class="form-check-label" for="favoriteaddress" data-key="t-add-to-frequent-address">
                                                 เพิ่มลงในที่อยู่ที่ใช้งานบ่อย
                                             </label>
                                         </div>
@@ -486,10 +486,10 @@
                         </div>
                     }
 
-                    <button type="button" class="btn btn-primary btn-lg w-100 fw-bold mb-2 shadow" id="btnProceedPayment">
+                    <button type="button" class="btn btn-primary btn-lg w-100 fw-bold mb-2 shadow" id="btnProceedPayment" data-key="t-proceed-to-payment">
                         ดำเนินการชำระเงิน <i class="ri-arrow-right-line ms-1"></i>
                     </button>
-                    <button type="button" class="btn btn-outline-secondary w-100 btn-md" onclick="window.location.href='/orders/buypersonalorder'">
+                    <button type="button" class="btn btn-outline-secondary w-100 btn-md" onclick="window.location.href='/orders/buypersonalorder'" data-key="t-back-to-edit-cart">
                         <i class="ri-arrow-left-line me-1"></i> กลับไปแก้ไขสินค้า
                     </button>
                 </div>

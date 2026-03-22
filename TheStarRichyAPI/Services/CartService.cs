@@ -108,24 +108,24 @@ namespace TheStarRichyApi.Services
                             if (await reader.ReadAsync())
                             {
                                 // ตรงกับ SP_GetMemberCart ที่แก้ไขแล้ว
-                                cartData.CartID = reader.GetDecimal(0);                // CartID
-                                cartData.MemberCode = reader.GetString(1);             // MemberCode
-                                cartData.CreatedDate = reader.GetDateTime(2);          // CreatedDate
-                                cartData.ExpiryDate = reader.GetDateTime(3);           // ExpiryDate
-                                cartData.Status = reader.GetString(4);                 // Status
-                                cartData.TotalAmount = reader.GetDecimal(5);           // TotalAmount
-                                cartData.TotalPV = reader.GetDecimal(6);               // TotalPV
+                                cartData.CartID = reader.IsDBNull(0) ? 0 : reader.GetDecimal(0);    // CartID
+                                cartData.MemberCode = reader.IsDBNull(1) ? null : reader.GetString(1); // MemberCode
+                                cartData.CreatedDate = reader.IsDBNull(2) ? (DateTime?)null : reader.GetDateTime(2); // CreatedDate
+                                cartData.ExpiryDate = reader.IsDBNull(3) ? (DateTime?)null : reader.GetDateTime(3);  // ExpiryDate
+                                cartData.Status = reader.IsDBNull(4) ? null : reader.GetString(4);   // Status
+                                cartData.TotalAmount = reader.IsDBNull(5) ? 0 : reader.GetDecimal(5); // TotalAmount
+                                cartData.TotalPV = reader.IsDBNull(6) ? 0 : reader.GetDecimal(6);    // TotalPV
                                 cartData.HoursRemaining = reader.IsDBNull(7) ? 0 : reader.GetInt32(7); // HoursRemaining
 
                                 // ⭐ ฟิลด์ใหม่ (index 8-13)
-                                cartData.CenterCode = reader.IsDBNull(8) ? null : reader.GetString(8);       // CenterCode (เดิม)
+                                cartData.CenterCode = reader.IsDBNull(8) ? null : reader.GetString(8);       // CenterCode
                                 cartData.CenterName = reader.IsDBNull(9) ? null : reader.GetString(9);       // CenterName (NEW)
-                                cartData.Makerby = reader.IsDBNull(10) ? null : reader.GetString(10);        // Makerby (เดิม)
+                                cartData.Makerby = reader.IsDBNull(10) ? null : reader.GetString(10);        // Makerby
                                 cartData.DLCode = reader.IsDBNull(11) ? null : reader.GetString(11);         // DLCode (NEW)
                                 cartData.DLName = reader.IsDBNull(12) ? null : reader.GetString(12);         // DLName (NEW)
-                                cartData.RegisterDate = reader.IsDBNull(13) ? null : reader.GetDateTime(13); // RegisterDate (NEW)
-                                cartData.ShippingFee = reader.GetDecimal(14);           // ShippingFee
-                                cartData.BillType = reader.GetString(15);
+                                cartData.RegisterDate = reader.IsDBNull(13) ? (DateTime?)null : reader.GetDateTime(13); // RegisterDate (NEW)
+                                cartData.ShippingFee = reader.IsDBNull(14) ? 0 : reader.GetDecimal(14);      // ShippingFee
+                                cartData.BillType = reader.IsDBNull(15) ? null : reader.GetString(15);       // BillType
                             }
 
                             // Result Set 2: รายการสินค้า

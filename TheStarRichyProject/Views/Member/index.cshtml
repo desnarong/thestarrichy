@@ -69,24 +69,24 @@
     <div class="col-xxl-9">
         <div class="card">
             <div class="card-header">
-                <h4 class="mb-1">จัดการข้อมูลสมาชิก</h4>
-                <p class="text-muted mb-0">เลือกหมวดข้อมูลที่ต้องการแก้ไข</p>
+                <h4 class="mb-1" data-key="t-manage-member-data">จัดการข้อมูลสมาชิก</h4>
+                <p class="text-muted mb-0" data-key="t-select-category-to-edit">เลือกหมวดข้อมูลที่ต้องการแก้ไข</p>
             </div>
             <div class="card-body">
                 <ul class="nav nav-tabs mb-4" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="member-personal-tab" data-bs-toggle="tab" data-bs-target="#tab-personalinformation" type="button" role="tab" aria-controls="tab-personalinformation" aria-selected="true" data-key="t-personalinformation">
-                            <i class="ri-user-3-line me-2"></i>ข้อมูลส่วนบุคคล
+                            <i class="ri-user-3-line me-2"></i><span data-key="t-personalinformation-text">ข้อมูลส่วนบุคคล</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="member-address-tab" data-bs-toggle="tab" data-bs-target="#tab-addressinformation" type="button" role="tab" aria-controls="tab-addressinformation" aria-selected="false" data-key="t-addressinformation">
-                            <i class="ri-map-pin-line me-2"></i>ข้อมูลที่อยู่
+                            <i class="ri-map-pin-line me-2"></i><span data-key="t-addressinformation-text">ข้อมูลที่อยู่</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="member-bank-tab" data-bs-toggle="tab" data-bs-target="#tab-bankinformation" type="button" role="tab" aria-controls="tab-bankinformation" aria-selected="false" data-key="t-bankinformation">
-                            <i class="ri-bank-card-line me-2"></i>ข้อมูลธนาคาร
+                            <i class="ri-bank-card-line me-2"></i><span data-key="t-bankinformation-text">ข้อมูลธนาคาร</span>
                         </button>
                     </li>
                 </ul>
@@ -232,7 +232,7 @@
                         <div class="row g-4 justify-content-end">
                             <div class="col-sm-auto">
                                 <div>
-                                    <button class="btn btn-success h4" id="btn-personalupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
+                                    <button class="btn btn-success h4" id="btn-personalupdate"><i class="ri-save-line align-bottom me-1"></i> <span data-key="t-update">อัพเดท</span></button>
                                 </div>
                             </div>
                         </div>
@@ -272,24 +272,24 @@
                                         <input type="text" class="form-control" id="info-idcard-floor" placeholder="ชั้น">
                                     </div>
                                     <div class="col-12 col-md-5">
-                                        <label class="form-label">อื่นๆ / หมายเหตุ</label>
+                                        <label class="form-label" data-key="t-other-note">อื่นๆ / หมายเหตุ</label>
                                         <input type="text" class="form-control" id="info-idcard-other" placeholder="ข้อมูลเพิ่มเติม">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                        <label class="form-label" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="info-idcard-zipcode" maxlength="5" placeholder="5 หลัก">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">จังหวัด</label>
-                                        <select class="form-select" id="info-idcard-province"><option value="">-- รอรหัสไปรษณีย์ --</option></select>
+                                        <label class="form-label" data-key="t-province">จังหวัด</label>
+                                        <select class="form-select" id="info-idcard-province"><option value="" data-key="t-waiting-postcode">-- รอรหัสไปรษณีย์ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">เขต / อำเภอ</label>
-                                        <select class="form-select" id="info-idcard-district"><option value="">-- เลือกอำเภอ --</option></select>
+                                        <label class="form-label" data-key="t-district">เขต / อำเภอ</label>
+                                        <select class="form-select" id="info-idcard-district"><option value="" data-key="t-select-district">-- เลือกอำเภอ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">แขวง / ตำบล</label>
-                                        <select class="form-select" id="info-idcard-subdistrict"><option value="">-- เลือกตำบล --</option></select>
+                                        <label class="form-label" data-key="t-subdistrict">แขวง / ตำบล</label>
+                                        <select class="form-select" id="info-idcard-subdistrict"><option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option></select>
                                         <input type="hidden" id="info-idcard-tambonid">
                                     </div>
                                 </div>
@@ -303,54 +303,54 @@
                                 <h6 class="mb-0 text-success fw-semibold">ที่อยู่ปัจจุบัน </h6>
                                 <div class="ms-auto form-check mb-0">
                                     <input class="form-check-input" type="checkbox" id="info-present-copyidcard">
-                                    <label class="form-check-label small" for="info-present-copyidcard">เหมือนที่อยู่ตามบัตร</label>
+                                    <label class="form-check-label small" for="info-present-copyidcard" data-key="t-same-as-id-card">เหมือนที่อยู่ตามบัตร</label>
                                 </div>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                        <label class="form-label" data-key="t-house-number">บ้านเลขที่ <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="info-present-housenumber" placeholder="เช่น 123/4">
                                     </div>
                                     <div class="col-6 col-md-2">
-                                        <label class="form-label">หมู่ที่</label>
+                                        <label class="form-label" data-key="t-moo">หมู่ที่</label>
                                         <input type="text" class="form-control" id="info-present-moo" placeholder="หมู่">
                                     </div>
                                     <div class="col-6 col-md-4">
-                                        <label class="form-label">ซอย / ตรอก</label>
+                                        <label class="form-label" data-key="t-alley">ซอย / ตรอก</label>
                                         <input type="text" class="form-control" id="info-present-alley" placeholder="ชื่อซอย">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">ถนน</label>
+                                        <label class="form-label" data-key="t-road">ถนน</label>
                                         <input type="text" class="form-control" id="info-present-road" placeholder="ชื่อถนน">
                                     </div>
                                     <div class="col-6 col-md-5">
-                                        <label class="form-label">อาคาร / หมู่บ้าน</label>
+                                        <label class="form-label" data-key="t-building">อาคาร / หมู่บ้าน</label>
                                         <input type="text" class="form-control" id="info-present-building" placeholder="ชื่ออาคาร">
                                     </div>
                                     <div class="col-6 col-md-2">
-                                        <label class="form-label">ชั้น</label>
+                                        <label class="form-label" data-key="t-floor">ชั้น</label>
                                         <input type="text" class="form-control" id="info-present-floor" placeholder="ชั้น">
                                     </div>
                                     <div class="col-12 col-md-5">
-                                        <label class="form-label">อื่นๆ / หมายเหตุ</label>
+                                        <label class="form-label" data-key="t-other-note">อื่นๆ / หมายเหตุ</label>
                                         <input type="text" class="form-control" id="info-present-other" placeholder="ข้อมูลเพิ่มเติม">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                        <label class="form-label" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="info-present-zipcode" maxlength="5" placeholder="5 หลัก">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">จังหวัด</label>
-                                        <select class="form-select" id="info-present-province"><option value="">-- รอรหัสไปรษณีย์ --</option></select>
+                                        <label class="form-label" data-key="t-province">จังหวัด</label>
+                                        <select class="form-select" id="info-present-province"><option value="" data-key="t-waiting-postcode">-- รอรหัสไปรษณีย์ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">เขต / อำเภอ</label>
-                                        <select class="form-select" id="info-present-district"><option value="">-- เลือกอำเภอ --</option></select>
+                                        <label class="form-label" data-key="t-district">เขต / อำเภอ</label>
+                                        <select class="form-select" id="info-present-district"><option value="" data-key="t-select-district">-- เลือกอำเภอ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">แขวง / ตำบล</label>
-                                        <select class="form-select" id="info-present-subdistrict"><option value="">-- เลือกตำบล --</option></select>
+                                        <label class="form-label" data-key="t-subdistrict">แขวง / ตำบล</label>
+                                        <select class="form-select" id="info-present-subdistrict"><option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option></select>
                                         <input type="hidden" id="info-present-tambonid">
                                     </div>
                                 </div>
@@ -364,7 +364,7 @@
                                 <h6 class="mb-0 text-warning fw-semibold">ที่อยู่ออกใบกำกับภาษี </h6>
                                 <div class="ms-auto form-check mb-0">
                                     <input class="form-check-input" type="checkbox" id="info-inv-copyidcard">
-                                    <label class="form-check-label small" for="info-inv-copyidcard">เหมือนที่อยู่ตามบัตร</label>
+                                    <label class="form-check-label small" for="info-inv-copyidcard" data-key="t-same-as-id-card">เหมือนที่อยู่ตามบัตร</label>
                                 </div>
                             </div>
                             <div class="card-body">
@@ -374,7 +374,7 @@
                                         <h6 class="text-muted small mb-2"><i class="ri-building-line me-1"></i>ข้อมูลบริษัท / นิติบุคคล (ถ้ามี)</h6>
                                     </div>
                                     <div class="col-sm-12 col-md-5">
-                                        <label class="form-label">ชื่อบริษัท / ชื่อในใบกำกับภาษี</label>
+                                        <label class="form-label" data-key="t-company-name">ชื่อบริษัท / ชื่อในใบกำกับภาษี</label>
                                         <input type="text" class="form-control" id="info-inv-companyname" placeholder="ชื่อบริษัท หรือชื่อ-นามสกุล บุคคล">
                                     </div>
                                     <div class="col-sm-12 col-md-4">
@@ -386,55 +386,55 @@
                                         <input type="text" class="form-control" id="info-inv-branchcode" maxlength="5" placeholder="เช่น 00000">
                                     </div>
                                     <div class="col-6 col-md-1">
-                                        <label class="form-label">ชื่อสาขา</label>
+                                        <label class="form-label" data-key="t-branch-name">ชื่อสาขา</label>
                                         <input type="text" class="form-control" id="info-inv-branchname" placeholder="สำนักงานใหญ่">
                                     </div>
                                 </div>
                                 <!-- ที่อยู่ออกใบกำกับภาษี -->
                                 <div class="row g-3">
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                        <label class="form-label" data-key="t-house-number">บ้านเลขที่ <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="info-inv-housenumber" placeholder="เช่น 123/4">
                                     </div>
                                     <div class="col-6 col-md-2">
-                                        <label class="form-label">หมู่ที่</label>
+                                        <label class="form-label" data-key="t-moo">หมู่ที่</label>
                                         <input type="text" class="form-control" id="info-inv-moo" placeholder="หมู่">
                                     </div>
                                     <div class="col-6 col-md-4">
-                                        <label class="form-label">ซอย / ตรอก</label>
+                                        <label class="form-label" data-key="t-alley">ซอย / ตรอก</label>
                                         <input type="text" class="form-control" id="info-inv-alley" placeholder="ชื่อซอย">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">ถนน</label>
+                                        <label class="form-label" data-key="t-road">ถนน</label>
                                         <input type="text" class="form-control" id="info-inv-road" placeholder="ชื่อถนน">
                                     </div>
                                     <div class="col-6 col-md-5">
-                                        <label class="form-label">อาคาร / หมู่บ้าน</label>
+                                        <label class="form-label" data-key="t-building">อาคาร / หมู่บ้าน</label>
                                         <input type="text" class="form-control" id="info-inv-building" placeholder="ชื่ออาคาร">
                                     </div>
                                     <div class="col-6 col-md-2">
-                                        <label class="form-label">ชั้น</label>
+                                        <label class="form-label" data-key="t-floor">ชั้น</label>
                                         <input type="text" class="form-control" id="info-inv-floor" placeholder="ชั้น">
                                     </div>
                                     <div class="col-12 col-md-5">
-                                        <label class="form-label">อื่นๆ / หมายเหตุ</label>
+                                        <label class="form-label" data-key="t-other-note">อื่นๆ / หมายเหตุ</label>
                                         <input type="text" class="form-control" id="info-inv-other" placeholder="ข้อมูลเพิ่มเติม">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                        <label class="form-label" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                         <input type="text" class="form-control" id="info-inv-zipcode" maxlength="5" placeholder="5 หลัก">
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">จังหวัด</label>
-                                        <select class="form-select" id="info-inv-province"><option value="">-- รอรหัสไปรษณีย์ --</option></select>
+                                        <label class="form-label" data-key="t-province">จังหวัด</label>
+                                        <select class="form-select" id="info-inv-province"><option value="" data-key="t-waiting-postcode">-- รอรหัสไปรษณีย์ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">เขต / อำเภอ</label>
-                                        <select class="form-select" id="info-inv-district"><option value="">-- เลือกอำเภอ --</option></select>
+                                        <label class="form-label" data-key="t-district">เขต / อำเภอ</label>
+                                        <select class="form-select" id="info-inv-district"><option value="" data-key="t-select-district">-- เลือกอำเภอ --</option></select>
                                     </div>
                                     <div class="col-6 col-md-3">
-                                        <label class="form-label">แขวง / ตำบล</label>
-                                        <select class="form-select" id="info-inv-subdistrict"><option value="">-- เลือกตำบล --</option></select>
+                                        <label class="form-label" data-key="t-subdistrict">แขวง / ตำบล</label>
+                                        <select class="form-select" id="info-inv-subdistrict"><option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option></select>
                                         <input type="hidden" id="info-inv-tambonid">
                                     </div>
                                 </div>
@@ -444,24 +444,24 @@
                         <!-- ข้อมูลติดต่อ -->
                         <div class="card shadow-sm mb-3">
                             <div class="card-header bg-light">
-                                <h6 class="mb-0">ข้อมูลติดต่อ</h6>
+                                <h6 class="mb-0" data-key="t-contact-info">ข้อมูลติดต่อ</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-sm-12 col-md-6">
-                                        <label for="info-mobilephone" class="form-label">โทรศัพท์มือถือ</label>
+                                        <label for="info-mobilephone" class="form-label" data-key="t-mobile-phone">โทรศัพท์มือถือ</label>
                                         <input type="text" class="form-control" id="info-mobilephone" disabled>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
-                                        <label for="info-homephone" class="form-label">โทรศัพท์บ้าน</label>
+                                        <label for="info-homephone" class="form-label" data-key="t-home-phone">โทรศัพท์บ้าน</label>
                                         <input type="text" class="form-control" id="info-homephone">
                                     </div>
                                     <div class="col-sm-12 col-md-6">
-                                        <label for="info-email" class="form-label">อีเมล</label>
+                                        <label for="info-email" class="form-label" data-key="t-email">อีเมล</label>
                                         <input type="text" class="form-control" id="info-email" disabled>
                                     </div>
                                     <div class="col-sm-12 col-md-6">
-                                        <label for="info-lineid" class="form-label">ไอดีไลน์</label>
+                                        <label for="info-lineid" class="form-label" data-key="t-line-id">ไอดีไลน์</label>
                                         <input type="text" class="form-control" id="info-lineid" disabled>
                                     </div>
                                 </div>
@@ -470,7 +470,7 @@
 
                         <div class="row g-4 justify-content-end mt-1">
                             <div class="col-sm-auto">
-                                <button class="btn btn-success h4" id="btn-addressupdate"><i class="ri-save-line align-bottom me-1"></i> อัพเดทที่อยู่</button>
+                                <button class="btn btn-success h4" id="btn-addressupdate"><i class="ri-save-line align-bottom me-1"></i> <span data-key="t-update-address">อัพเดทที่อยู่</span></button>
                             </div>
                         </div>
                     </div><!-- end tab-addressinformation -->
@@ -595,7 +595,7 @@
                             <div class="row g-4 justify-content-end" style="padding-top: var(--vz-gutter-y);">
                                 <div class="col-sm-auto">
                                     <div>
-                                        <button class="btn btn-success h4" id="btn-docupdate" data-key="t-update"><i class="ri-save-line align-bottom me-1"></i> อัพเดท</button>
+                                        <button class="btn btn-success h4" id="btn-docupdate"><i class="ri-save-line align-bottom me-1"></i> <span data-key="t-update">อัพเดท</span></button>
                                     </div>
                                 </div>
                             </div>

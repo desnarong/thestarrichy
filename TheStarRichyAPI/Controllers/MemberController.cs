@@ -602,11 +602,11 @@ namespace TheStarRichyApi.Controllers
 
         /*==================== UPDATE 2025-11-11 ====================*/
         [HttpGet("reportsaleandexpainorder")]
-        public async Task<IActionResult> GetreportMemberSaleandExpainOrder()
+        public async Task<IActionResult> GetreportMemberSaleandExpainOrder([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberSaleandExpainOrderService.GetDisplayAsync();
+                var result = await _reportMemberSaleandExpainOrderService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)
@@ -657,11 +657,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportlog")]
-        public async Task<IActionResult> GetReportMemberLog()
+        public async Task<IActionResult> GetReportMemberLog([FromQuery] string fromDate = "", [FromQuery] string toDate = "")
         {
             try
             {
-                var result = await _reportMemberLogService.GetDisplayAsync();
+                var result = await _reportMemberLogService.GetDisplayAsync(fromDate, toDate);
                 return Ok(result);
             }
             catch (Exception)

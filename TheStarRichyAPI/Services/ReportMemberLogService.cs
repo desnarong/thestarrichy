@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberLogService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "");
     }
     public class ReportMemberLogService : IReportMemberLogService
     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -130,7 +130,7 @@ namespace TheStarRichyApi.Services
             {
                 return new List<dynamic>();
             }
- 
+
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -140,22 +140,33 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    //string Memberpermission = await GetPermissionAsync("M16", memberCode);
+                    string query = "SELECT [ComName],[EntryDatetime],[Message],[Username],[Computername] ";
+                    query += " FROM [000_Member_Log] (nolock) ";
+                    query += " WHERE [ComName] = @MemberCode ";
 
+                    if (!string.IsNullOrWhiteSpace(fromDate))
+                    {
+                        query += " AND [EntryDatetime] >= @FromDate ";
+                    }
+                    if (!string.IsNullOrWhiteSpace(toDate))
+                    {
+                        query += " AND [EntryDatetime] <= @ToDate ";
+                    }
 
-                    string query = "SELECT  comname,EntryDatetime,Message,Username,Computername  ";
-
-                    query += " FROM [000_Member_Log]  (nolock) ";
-
-                    query += " where comname = @Membercode  ";
-
-                    query += " ORDER BY EntryDatetime desc  ";
-
+                    query += " ORDER BY [EntryDatetime] DESC ";
 
                     using (var command = new SqlCommand(query, con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
- 
+                        command.Parameters.AddWithValue("@MemberCode", memberCode);
+                        
+                        if (!string.IsNullOrWhiteSpace(fromDate))
+                        {
+                            command.Parameters.AddWithValue("@FromDate", fromDate);
+                        }
+                        if (!string.IsNullOrWhiteSpace(toDate))
+                        {
+                            command.Parameters.AddWithValue("@ToDate", DateTime.Parse(toDate).AddDays(1).ToString("yyyy-MM-dd"));
+                        }
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {

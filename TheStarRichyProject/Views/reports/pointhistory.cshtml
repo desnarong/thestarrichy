@@ -60,7 +60,15 @@
       <div class="card-body">
         <div class="alert alert-secondary py-2 mb-2" id="mainMessage">กำลังโหลดข้อมูล...</div>
         <div class="table-responsive">
-          <table id="mainBonusTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;"></table>
+          <table id="mainBonusTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;">
+            <style>
+              /* Hover effect - สีเทาเข้ม */
+              table.table-hover tbody tr:hover {
+                background-color: #e0e0e0 !important;
+                transition: background-color 0.2s ease;
+              }
+            </style>
+          </table>
         </div>
         <div id="periodSummarySection" style="display:none;" class="mt-3 border-top pt-3">
           <h6 class="fw-bold mb-2"><i class="bx bx-receipt me-1"></i>สรุปยอดหักค่าใช้จ่าย</h6>
@@ -90,7 +98,14 @@
       <div class="card-body">
         <div class="alert alert-secondary py-2 mb-2" id="detailMessage">กำลังโหลดรายละเอียด...</div>
         <div class="table-responsive">
-          <table id="detailBonusTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;"></table>
+          <table id="detailBonusTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;">
+            <style>
+              table.table-hover tbody tr:hover {
+                background-color: #e0e0e0 !important;
+                transition: background-color 0.2s ease;
+              }
+            </style>
+          </table>
         </div>
       </div>
     </div>
@@ -104,6 +119,7 @@ $(function(){
   function pick(o,k,d){if(d===undefined)d='';for(var i=0;i<k.length;i++){if(o!=null&&o[k[i]]!==undefined&&o[k[i]]!==null)return o[k[i]];}return d;}
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function toNum(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt2(v){return toNum(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmt0(v){return Math.round(toNum(v)).toLocaleString('th-TH');}
   function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -132,7 +148,7 @@ $(function(){
   function bonusTh(bt,rows){
     var val=toNum(pick(rows,[bt.key,bt.key.toLowerCase()],0));
     var dtKey=pick(rows,['FromDate','fromDate','CalcMonth','calcMonth','PaymentDate','paymentDate']);
-    var num=fmt0(val);
+    var num=fmt2(val);
     if(bt.detail&&val!==0){
       return '<span class="text-primary fw-bold bonus-link" style="cursor:pointer;text-decoration:underline;" data-detail="'+bt.detail+'" data-date="'+esc(dtKey)+'">'+num+'</span>';
     }
@@ -204,7 +220,7 @@ $(function(){
         cfg.forEach(function(c){
           var v=pick(r,c.k,'');
           if(c.dt)tbody+='<td class="text-center">'+fmtDate(v)+'</td>';
-          else if(c.num)tbody+='<td class="text-end">'+fmt0(v)+'</td>';
+          else if(c.num)tbody+='<td class="text-end">'+fmt2(v)+'</td>';
           else tbody+='<td>'+esc(String(v))+'</td>';
         });
         tbody+='</tr>';

@@ -16,9 +16,7 @@
     /* Hover highlights entire row */
     .st-qualify-yes:hover td { background-color: #a5d6a7 !important; }
     .st-qualify-no:hover td { background-color: #ef9a9a !important; }
-    /* Prestige Ranking column clickable */
-    #sponsorTeamTable td:nth-child(9) { cursor: pointer; }
-    #sponsorTeamTable td:nth-child(9):hover { background-color: #e3f2fd !important; }
+    /* Prestige Ranking column - not clickable */
     .pos-card { min-width: 110px; border-radius: 8px; padding: 10px 14px; text-align: center; }
     .rank-chip { border-radius: 20px; padding: 6px 16px; display: inline-flex; flex-direction: column; align-items: center; min-width: 100px; }
 </style>
@@ -314,7 +312,7 @@ $(document).ready(function () {
                 positionMap[pos] = { count: 0, qualify: false, pv: 0 };
             }
             positionMap[pos].count++;
-            
+
             var qualify = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
             if (qualify.startsWith('yes')) {
                 positionMap[pos].qualify = true;
@@ -322,7 +320,7 @@ $(document).ready(function () {
             }
 
             // Count by ranking
-            var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
+            var rankName = ((m.PrestigeRankingName ?? m.prestigeRankingName ?? '') + '').trim();
             if (!rankName || rankName === '-' || rankName === '0') {
                 rankName = 'No Position';
             }
@@ -332,7 +330,7 @@ $(document).ready(function () {
         });
 
         /* ---- Render package summary cards dynamically ---- */
-        var packageCardsHtml = 
+        var packageCardsHtml =
             // Total Members card (first card) - clickable to clear filter
             // Highlight when no filter is active
             '<div class="col-6 col-md-3 col-lg-2">' +
@@ -347,12 +345,12 @@ $(document).ready(function () {
             Object.keys(positionMap).map(function (posName) {
                 var item = positionMap[posName];
                 var isQualify = item.qualify;
-                
+
                 // Determine card colors based on position
                 var bgColor = '#f5f5f5';
                 var borderColor = '#9e9e9e';
                 var textColor = '#546e7a';
-                
+
                 if (posName.toLowerCase() === 'star') {
                     bgColor = '#fff8e1';
                     borderColor = '#ffc107';
@@ -370,16 +368,16 @@ $(document).ready(function () {
                     borderColor = '#4caf50';
                     textColor = '#2e7d32';
                 }
-                
+
                 // Capitalize first letter for display
                 var posDisplay = posName === '-' || !posName ? 'No Position' : posName;
                 if (posDisplay && posDisplay.length > 0) {
                     posDisplay = posDisplay.charAt(0).toUpperCase() + posDisplay.slice(1);
                 }
-                
+
                 // Store lowercase version for filter comparison
                 var rawPosNameLower = posName.toLowerCase();
-                
+
                 // Add highlight for active filter (compare lowercase)
                 var activeStyle = selectedPosition.toLowerCase() === rawPosNameLower ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
 
@@ -393,25 +391,11 @@ $(document).ready(function () {
                        '  </div>' +
                        '</div>';
             }).join('');
-        
+
         $('#packageSummaryCards').html(packageCardsHtml);
 
         /* ---- Render ranking cards ---- */
-        var rankKeys = Object.keys(rankingMap);
-        if (rankKeys.length > 0) {
-            var html = rankKeys.map(function (name) {
-                var isActive = selectedPrestigeRanking === name ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
-                return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb; cursor: pointer; ' + isActive + '" ' +
-                       '     onclick="togglePrestigeRankingFilter(\'' + escAttr(name) + '\')" title="คลิกเพื่อกรอง">' +
-                       '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">' + escHtml(name) + '</div>' +
-                       '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(rankingMap[name]) + '</div>' +
-                       '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
-                       '</div>';
-            }).join('');
-            $('#rankingCards').html(html);
-        } else {
-            $('#rankingCards').html('<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
-        }
+        renderRankingCards();
     }
 
     /* ================================================================
@@ -425,21 +409,21 @@ $(document).ready(function () {
             selectedPosition = positionName;
         }
         applyFilters();
-        renderSummaryFromData(allData); // Re-render to show active state
+        renderSummaryFromData(allData); // Re-render both position and ranking cards
     };
 
     /* ================================================================
        Toggle prestige ranking filter from card click
     ================================================================ */
     window.togglePrestigeRankingFilter = function (rankingName) {
-        // If clicking same ranking, clear filter
-        if (selectedPrestigeRanking === rankingName) {
+        // If clicking same ranking or "ทั้งหมด", clear filter
+        if (!rankingName || selectedPrestigeRanking === rankingName) {
             selectedPrestigeRanking = ''; // Clear filter
         } else {
             selectedPrestigeRanking = rankingName;
         }
         applyFilters();
-        //renderRankingCards(); // Re-render to show active state
+        renderSummaryFromData(allData); // Re-render both position and ranking cards
     };
 
     /* ================================================================
@@ -448,6 +432,7 @@ $(document).ready(function () {
     function renderRankingCards() {
         var rankingMap = {};
         allData.forEach(function (m) {
+            // ใช้ PrestigeRankingEngName สำหรับข้อมูลตาราง
             var rankName = ((m.PrestigeRankingEngName ?? m.prestigeRankingEngName ?? '') + '').trim();
             // Convert empty, '-', '0' to "No Position"
             if (!rankName || rankName === '-' || rankName === '0') {
@@ -457,8 +442,21 @@ $(document).ready(function () {
         });
 
         var rankKeys = Object.keys(rankingMap);
+        
+        // Add "ทั้งหมด" (All) card at the beginning
+        var totalRanking = rankKeys.reduce(function(sum, key) { return sum + rankingMap[key]; }, 0);
+        var allIsActive = selectedPrestigeRanking === '';
+        var allCard = '<div class="rank-chip" style="background:' + (allIsActive ? '#bbdefb' : '#e8eaf6') + 
+                      '; border: ' + (allIsActive ? '3px solid #1976d2' : '1.5px solid #7986cb') + 
+                      '; cursor: pointer; ' + (allIsActive ? 'box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '') + 
+                      '" onclick="togglePrestigeRankingFilter(\'\')" title="คลิกเพื่อดูทั้งหมด">' +
+                      '  <div class="small fw-semibold text-primary" style="font-size:0.75rem;">ทั้งหมด</div>' +
+                      '  <div class="fs-5 fw-bold" style="color:#3949ab;">' + fmtInt(totalRanking) + '</div>' +
+                      '  <div class="text-muted" style="font-size:0.65rem;">คน</div>' +
+                      '</div>';
+        
         if (rankKeys.length > 0) {
-            var html = rankKeys.map(function (name) {
+            var html = allCard + rankKeys.map(function (name) {
                 // Add highlight for active filter (compare lowercase)
                 var isActive = selectedPrestigeRanking.toLowerCase() === name.toLowerCase() ? 'border: 3px solid #1976d2; box-shadow: 0 2px 8px rgba(25,118,210,0.3);' : '';
                 return '<div class="rank-chip" style="background:#e8eaf6; border: 1.5px solid #7986cb; cursor: pointer; ' + isActive + '" ' +
@@ -470,7 +468,7 @@ $(document).ready(function () {
             }).join('');
             $('#rankingCards').html(html);
         } else {
-            $('#rankingCards').html('<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
+            $('#rankingCards').html(allCard + '<div class="text-muted small fst-italic">ไม่พบข้อมูลตำแหน่งคุณวุฒิ</div>');
         }
     }
 
@@ -506,10 +504,12 @@ $(document).ready(function () {
         var to   = toDate   ? new Date(toDate + 'T23:59:59') : null;
 
         filteredData = allData.filter(function (row) {
+            // Filter by level
             if (selectedLevel) {
                 var lv = (row.LevelName ?? row.levelName ?? row.Level ?? '').toString().trim();
                 if (lv !== selectedLevel) return false;
             }
+            // Filter by date range
             if (from || to) {
                 var rawDate = row.RegisterDate ?? row.registerDate ?? row.registerdate ?? '';
                 var d = rawDate ? new Date(rawDate) : null;
@@ -518,11 +518,13 @@ $(document).ready(function () {
                     if (to   && d > to)   return false;
                 }
             }
+            // Filter by position (AND condition)
             if (selectedPosition) {
                 var pos = (row.PositionName ?? row.positionName ?? '').toString().trim().toLowerCase();
                 var filterPos = selectedPosition.toLowerCase();
                 if (pos !== filterPos) return false;
             }
+            // Filter by prestige ranking (AND condition)
             if (selectedPrestigeRanking) {
                 var pr = (row.PrestigeRankingEngName ?? row.prestigeRankingEngName ?? '').toString().trim().toLowerCase();
                 if(pr == 0) pr = 'no position';

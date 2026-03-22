@@ -63,7 +63,14 @@
       <div class="card-body">
         <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
         <div class="table-responsive">
-          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;"></table>
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;">
+            <style>
+              table.table-hover tbody tr:hover {
+                background-color: #e0e0e0 !important;
+                transition: background-color 0.2s ease;
+              }
+            </style>
+          </table>
         </div>
       </div>
     </div>
@@ -76,6 +83,7 @@ $(function(){
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function pick(o,k,d){if(d===undefined)d='';for(var i=0;i<k.length;i++){if(o!=null&&o[k[i]]!==undefined&&o[k[i]]!==null)return o[k[i]];}return d;}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
 
@@ -99,13 +107,13 @@ $(function(){
         '<td class="text-center">'+(i+1)+'</td>'+
         '<td class="text-center">'+fmtDate(pick(r,['FromDate','fromDate']))+'</td>'+
         '<td class="text-center">'+fmtDate(pick(r,['ToDate','toDate']))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['SponserBonus','sponserBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['RebateBonus','rebateBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['WeakBonus','weakBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['MatchingBonus','matchingBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['MobileBonus','mobileBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(pick(r,['SpecialBonus','specialBonus'],0))+'</td>'+
-        '<td class="text-end fw-bold text-success">'+fmt0(pick(r,['TotalBonus','totalBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['SponserBonus','sponserBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['RebateBonus','rebateBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['WeakBonus','weakBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['MatchingBonus','matchingBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['MobileBonus','mobileBonus'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(pick(r,['SpecialBonus','specialBonus'],0))+'</td>'+
+        '<td class="text-end fw-bold text-success">'+fmt2(pick(r,['TotalBonus','totalBonus'],0))+'</td>'+
         '</tr>';
     });
     tbody+='</tbody>';
@@ -115,7 +123,7 @@ $(function(){
     var sumTot=rows.reduce(function(s,r){return s+num(pick(r,['TotalBonus','totalBonus'],0));},0);
     var sumSp=rows.reduce(function(s,r){return s+num(pick(r,['SponserBonus','sponserBonus'],0));},0);
     var sumWk=rows.reduce(function(s,r){return s+num(pick(r,['WeakBonus','weakBonus'],0));},0);
-    $('#sumTotal').text(fmt0(sumTot));$('#sumSponser').text(fmt0(sumSp));$('#sumWeak').text(fmt0(sumWk));$('#rowCount').text(rows.length);
+    $('#sumTotal').text(fmt2(sumTot));$('#sumSponser').text(fmt2(sumSp));$('#sumWeak').text(fmt2(sumWk));$('#rowCount').text(rows.length);
     $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
   }
 

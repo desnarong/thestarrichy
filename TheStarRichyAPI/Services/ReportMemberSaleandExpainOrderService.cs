@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberSaleandExpainOrderService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "");
     }
     public class ReportMemberSaleandExpainOrderService : IReportMemberSaleandExpainOrderService
     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string fromDate = "", string toDate = "")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -130,7 +130,7 @@ namespace TheStarRichyApi.Services
             {
                 return new List<dynamic>();
             }
- 
+
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -140,23 +140,35 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    //string Memberpermission = await GetPermissionAsync("M16", memberCode);
-
-
-                    string query = "SELECT  BillNo,BillDate,Membercode,Membername,ReferenceNo,HybridGOLDID,ExpireDate ";
+                    string query = "SELECT BillNo,BillDate,Membercode,Membername,ReferenceNo,HybridGOLDID,ExpireDate ";
                     query += "  ,TotalPV,TotalAmount,BillConfirmType,Createby,Receive,ReceiveDate,PaymentType ";
                     query += "  ,TrackingURL,Slip1,Slip2,Slip3,Slip4,Slip5,Billtype,BillReceiveType,DeliveryAddress";
-                    query += " FROM [000_Member_Order_Center_for_mobile]  (nolock) ";
+                    query += " FROM [000_Member_Order_Center_for_mobile] (nolock) ";
+                    query += " WHERE (Createby = @Membercode OR HybridGOLDID = @Membercode) ";
 
-                    query += " where Createby = @Membercode or HybridGOLDID= @Membercode";
+                    if (!string.IsNullOrWhiteSpace(fromDate))
+                    {
+                        query += " AND BillDate >= @FromDate ";
+                    }
+                    if (!string.IsNullOrWhiteSpace(toDate))
+                    {
+                        query += " AND BillDate <= @ToDate ";
+                    }
 
-                    query += " ORDER BY Billdate desc,BillNo desc  ";
-
+                    query += " ORDER BY BillDate DESC, BillNo DESC ";
 
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
- 
+                        
+                        if (!string.IsNullOrWhiteSpace(fromDate))
+                        {
+                            command.Parameters.AddWithValue("@FromDate", DateTime.Parse(fromDate));
+                        }
+                        if (!string.IsNullOrWhiteSpace(toDate))
+                        {
+                            command.Parameters.AddWithValue("@ToDate", DateTime.Parse(toDate).AddDays(1).AddSeconds(-1));
+                        }
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {

@@ -131,7 +131,7 @@ namespace TheStarRichyApi.Services
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
                     string query = "SELECT [Membercode] ,[CalcMonth] ,[CalcMonth1] ,[SponserBonus] ,[RebateBonus] ,[WeakBonus] ,[MatchingBonus] ," +
-                        "[StrongBonus] ,[AllSaleBonus] ,[MobileBonus] ,[UnilevelBonus] ,[SpecialBonus] ,[TotalBonus], 'รายเดือน/Monthly' AS BonusType " +
+                        "[StrongBonus] ,[AllSaleBonus] ,[MobileBonus] ,[UnilevelBonus] ,[SpecialBonus] ,[TotalBonus], 'รายเดือน/Monthly' AS TypeofBonus " +
                         "FROM [000_Member_bonus_for_mobile_monthly]  (nolock) ";
  
                     query += " where Membercode = @Membercode";

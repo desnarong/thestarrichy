@@ -40,7 +40,20 @@
       <div class="card-body">
         <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
         <div class="table-responsive">
-          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;"></table>
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;">
+            <style>
+              /* Hover effect - สีเข้มขึ้น */
+              #mainTable tbody tr:hover {
+                background-color: #f8bbd0 !important;
+                transition: background-color 0.2s ease;
+              }
+              /* ตารางทั้งหมด - hover สีเทาเข้ม */
+              table.table-hover tbody tr:hover {
+                background-color: #e0e0e0 !important;
+                transition: background-color 0.2s ease;
+              }
+            </style>
+          </table>
         </div>
       </div>
     </div>
@@ -63,6 +76,8 @@ $(function(){
     var thead='<thead class="text-center" style="background:linear-gradient(135deg,#fce4ec,#f8bbd0);font-size:.78rem;"><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join('')+'</tr></thead>';
     var tbody='<tbody>';
     rows.forEach(function(r,i){
+      var rankingVal=p(r,['Ranking','ranking']);
+      var rankingDisplay=(rankingVal===''||rankingVal===null||rankingVal===undefined||rankingVal==='0'||rankingVal==='-1')?'No Position':rankingVal;
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
         '<td class="text-center">'+fmtDate(p(r,['Baldate','baldate','BalDate']))+'</td>'+
@@ -71,7 +86,7 @@ $(function(){
         '<td class="text-end">'+fmt0(p(r,['LeftCount','leftCount'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['RightCount','rightCount'],0))+'</td>'+
         '<td class="text-center fw-bold" style="color:#880e4f;">'+esc(p(r,['Position','position']))+'</td>'+
-        '<td class="text-center fw-bold" style="color:#ad1457;">'+esc(p(r,['Ranking','ranking']))+'</td>'+
+        '<td class="text-center fw-bold" style="color:#ad1457;">'+esc(rankingDisplay)+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['LeftPS','leftPS'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['RightPS','rightPS'],0))+'</td>'+
         '</tr>';

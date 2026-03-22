@@ -65,12 +65,12 @@
                 <ul class="nav nav-tabs mb-4" id="registrationTabs" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link active" id="simple-tab" data-bs-toggle="tab" data-bs-target="#simple-tab-pane" type="button" role="tab" aria-controls="simple-tab-pane" aria-selected="true">
-                            <i class="fas fa-bolt me-2"></i>ลงทะเบียนแบบง่าย
+                            <i class="fas fa-bolt me-2"></i><span data-key="t-simple-registration">ลงทะเบียนแบบง่าย</span>
                         </button>
                     </li>
                     <li class="nav-item" role="presentation">
                         <button class="nav-link" id="full-tab" data-bs-toggle="tab" data-bs-target="#full-tab-pane" type="button" role="tab" aria-controls="full-tab-pane" aria-selected="false">
-                            <i class="fas fa-file-alt me-2"></i>ลงทะเบียนแบบเต็ม
+                            <i class="fas fa-file-alt me-2"></i><span data-key="t-full-registration">ลงทะเบียนแบบเต็ม</span>
                         </button>
                     </li>
                 </ul>
@@ -79,7 +79,7 @@
                     <div class="tab-pane fade show active" id="simple-tab-pane" role="tabpanel" aria-labelledby="simple-tab" tabindex="0">
                         <div class="alert alert-info mb-4">
                             <i class="fas fa-info-circle me-2"></i>
-                            <strong>ลงทะเบียนแบบง่าย:</strong> กรอกข้อมูลพื้นฐานที่จำเป็นเท่านั้น สามารถกรอกข้อมูลเพิ่มเติมได้ภายหลัง
+                            <strong data-key="t-simple-registration-desc"><strong>ลงทะเบียนแบบง่าย:</strong> กรอกข้อมูลพื้นฐานที่จำเป็นเท่านั้น สามารถกรอกข้อมูลเพิ่มเติมได้ภายหลัง</strong>
                         </div>
 
                         <form id="simpleRegistrationForm" method="post" novalidate>
@@ -87,127 +87,127 @@
                                 <div class="col-12 col-lg-6">
                                     <div class="card border-0 shadow-sm mb-4">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">ข้อมูลพื้นฐาน</h5>
+                                            <h5 class="mb-0" data-key="t-basic-information">ข้อมูลพื้นฐาน</h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ประเทศ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-country">ประเทศ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select name="country" id="simpleCountry" class="form-control" required>
-                                                        <option value="">-- เลือกประเทศ --</option>
+                                                        <option value="" data-key="t-select-country">-- เลือกประเทศ --</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-country-business">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select name="countryBusiness" id="simpleCountryBusiness" class="form-control" required>
-                                                        <option value="">-- เลือกประเทศที่ดำเนินธุรกิจ --</option>
+                                                        <option value="" data-key="t-select-country-business">-- เลือกประเทศที่ดำเนินธุรกิจ --</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="input-group">
                                                         <input type="text" class="form-control" id="simpleReferrerCode" value="@userinfo.membercode" placeholder="กรอกรหัสผู้แนะนำ" required />
-                                                        <button type="button" class="btn btn-primary" id="btnSearchReferrer">ค้นหา</button>
+                                                        <button type="button" class="btn btn-primary" id="btnSearchReferrer"><i class="fas fa-search me-2"></i><span data-key="t-search">ค้นหา</span></button>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ตำแหน่ง <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-position">ตำแหน่ง <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="position" id="positionLeft" value="left" checked />
-                                                        <label class="form-check-label" for="positionLeft">ซ้ายสุด</label>
+                                                        <label class="form-check-label" for="positionLeft" data-key="t-left">ซ้ายสุด</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="position" id="positionRight" value="right" />
-                                                        <label class="form-check-label" for="positionRight">ขวาสุด</label>
+                                                        <label class="form-check-label" for="positionRight" data-key="t-right">ขวาสุด</label>
                                                     </div>
                                                 </div> 
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">ชื่อผู้แนะนำ</label>
+                                                <label class="col-md-5 col-form-label" data-key="t-referrer-name">ชื่อผู้แนะนำ</label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleReferrerName" value="@userinfo.bussinessName" placeholder="ชื่อจะแสดงที่นี่หลังจากค้นหา" readonly disabled />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">วันที่สมัคร <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-registration-date">วันที่สมัคร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
                                                         <select class="form-control" id="simpleRegDay" required style="width: 70px;" disabled>
-                                                            <option value="">วัน</option>
+                                                            <option value="" data-key="t-day">วัน</option>
                                                         </select>
                                                         <select class="form-control" id="simpleRegMonth" required style="width: 110px;" disabled>
-                                                            <option value="">เดือน</option>
-                                                            <option value="1">มกราคม</option>
-                                                            <option value="2">กุมภาพันธ์</option>
-                                                            <option value="3">มีนาคม</option>
-                                                            <option value="4">เมษายน</option>
-                                                            <option value="5">พฤษภาคม</option>
-                                                            <option value="6">มิถุนายน</option>
-                                                            <option value="7">กรกฎาคม</option>
-                                                            <option value="8">สิงหาคม</option>
-                                                            <option value="9">กันยายน</option>
-                                                            <option value="10">ตุลาคม</option>
-                                                            <option value="11">พฤศจิกายน</option>
-                                                            <option value="12">ธันวาคม</option>
+                                                            <option value="" data-key="t-month">เดือน</option>
+                                                            <option value="1" data-key="t-january">มกราคม</option>
+                                                            <option value="2" data-key="t-february">กุมภาพันธ์</option>
+                                                            <option value="3" data-key="t-march">มีนาคม</option>
+                                                            <option value="4" data-key="t-april">เมษายน</option>
+                                                            <option value="5" data-key="t-may">พฤษภาคม</option>
+                                                            <option value="6" data-key="t-june">มิถุนายน</option>
+                                                            <option value="7" data-key="t-july">กรกฎาคม</option>
+                                                            <option value="8" data-key="t-august">สิงหาคม</option>
+                                                            <option value="9" data-key="t-september">กันยายน</option>
+                                                            <option value="10" data-key="t-october">ตุลาคม</option>
+                                                            <option value="11" data-key="t-november">พฤศจิกายน</option>
+                                                            <option value="12" data-key="t-december">ธันวาคม</option>
                                                         </select>
                                                         <select class="form-control" id="simpleRegYear" required style="width: 100px;" disabled>
-                                                            <option value="">ปี</option>
+                                                            <option value="" data-key="t-year">ปี</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">วันเกิด <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-date-of-birth">วันเกิด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
                                                         <select class="form-control" id="simpleBirthDay" required style="width: 70px;">
-                                                            <option value="">วัน</option>
+                                                            <option value="" data-key="t-day">วัน</option>
                                                         </select>
                                                         <select class="form-control" id="simpleBirthMonth" required style="width: 110px;">
-                                                            <option value="">เดือน</option>
-                                                            <option value="1">มกราคม</option>
-                                                            <option value="2">กุมภาพันธ์</option>
-                                                            <option value="3">มีนาคม</option>
-                                                            <option value="4">เมษายน</option>
-                                                            <option value="5">พฤษภาคม</option>
-                                                            <option value="6">มิถุนายน</option>
-                                                            <option value="7">กรกฎาคม</option>
-                                                            <option value="8">สิงหาคม</option>
-                                                            <option value="9">กันยายน</option>
-                                                            <option value="10">ตุลาคม</option>
-                                                            <option value="11">พฤศจิกายน</option>
-                                                            <option value="12">ธันวาคม</option>
+                                                            <option value="" data-key="t-month">เดือน</option>
+                                                            <option value="1" data-key="t-january">มกราคม</option>
+                                                            <option value="2" data-key="t-february">กุมภาพันธ์</option>
+                                                            <option value="3" data-key="t-march">มีนาคม</option>
+                                                            <option value="4" data-key="t-april">เมษายน</option>
+                                                            <option value="5" data-key="t-may">พฤษภาคม</option>
+                                                            <option value="6" data-key="t-june">มิถุนายน</option>
+                                                            <option value="7" data-key="t-july">กรกฎาคม</option>
+                                                            <option value="8" data-key="t-august">สิงหาคม</option>
+                                                            <option value="9" data-key="t-september">กันยายน</option>
+                                                            <option value="10" data-key="t-october">ตุลาคม</option>
+                                                            <option value="11" data-key="t-november">พฤศจิกายน</option>
+                                                            <option value="12" data-key="t-december">ธันวาคม</option>
                                                         </select>
                                                         <select class="form-control" id="simpleBirthYear" required style="width: 100px;">
-                                                            <option value="">ปี</option>
+                                                            <option value="" data-key="t-year">ปี</option>
                                                         </select>
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">คำนำหน้า <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-title">คำนำหน้า <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select name="simpleTitle" id="simpleTitle" class="form-control" required>
-                                                        <option value="">-- เลือกคำนำหน้า --</option>
+                                                        <option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>
                                                     </select>
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ชื่อบนบัตร <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-name-on-card">ชื่อบนบัตร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleFullName" placeholder="กรอกชื่อบนบัตร" required />
                                                     <small class="text-muted mt-1" id="simpleIdCardNameValidation"></small>
@@ -215,7 +215,7 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">ชื่อธุรกิจ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-business-name">ชื่อธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleBusinessName" placeholder="กรอกชื่อธุรกิจ" required />
                                                     <small class="text-muted mt-1" id="simpleBusinessNameValidation"></small>
@@ -223,7 +223,7 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">เลขบัตรปชช./พาสปอร์ต <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-id-card-passport">เลขบัตรปชช./พาสปอร์ต <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleDocumentNumber" placeholder="กรอกเลขที่เอกสาร" required />
                                                     <small class="text-muted mt-1" id="documentValidationMessage"></small>
@@ -231,7 +231,7 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-mobile-phone">โทรศัพท์มือถือ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <input type="tel" class="form-control" id="simpleMobile" placeholder="กรอกเบอร์โทรศัพท์มือถือ" required />
                                                     <small class="text-muted mt-1" id="mobileValidation"></small>
@@ -239,14 +239,14 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">โทรศัพท์บ้าน</label>
+                                                <label class="col-md-5 col-form-label" data-key="t-home-phone">โทรศัพท์บ้าน</label>
                                                 <div class="col-md-7">
                                                     <input type="tel" class="form-control" id="simpleHomePhone" placeholder="กรอกเบอร์โทรศัพท์บ้าน" />
                                                 </div>
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">อีเมล</label>
+                                                <label class="col-md-5 col-form-label" data-key="t-email">อีเมล</label>
                                                 <div class="col-md-7">
                                                     <input type="email" class="form-control" id="simpleEmail" placeholder="กรอกอีเมล" />
                                                     <small class="text-muted mt-1" id="emailValidation"></small>
@@ -254,7 +254,7 @@
                                             </div>
 
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label">Line ID</label>
+                                                <label class="col-md-5 col-form-label" data-key="t-line-id">Line ID</label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simpleLineId" placeholder="กรอก Line ID" />
                                                     <small class="text-muted mt-1" id="lineIdValidation"></small>
@@ -268,22 +268,22 @@
                                 <div class="col-12 col-lg-6">
                                     <div class="card border-0 shadow-sm mb-4">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">อัปโหลดเอกสาร <small class="text-muted">(ไม่บังคับ)</small></h5>
+                                            <h5 class="mb-0" data-key="t-upload-documents">อัปโหลดเอกสาร <small class="text-muted">(ไม่บังคับ)</small></h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="row">
                                                 <div class="col-12 mb-3">
-                                                    <label class="form-label">สำเนาบัตรประชาชน/พาสปอร์ต</label>
+                                                    <label class="form-label" data-key="t-copy-of-id-card-passport">สำเนาบัตรประชาชน/พาสปอร์ต</label>
                                                     <input type="file" class="form-control" id="simpleIdCardCopy" accept="image/*" />
                                                     <img id="simpleIdCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview ID card" />
                                                 </div>
                                                 <div class="col-12 mb-3">
-                                                    <label class="form-label">สำเนาหน้าสมุดบัญชีธนาคาร</label>
+                                                    <label class="form-label" data-key="t-copy-of-bank-book">สำเนาหน้าสมุดบัญชีธนาคาร</label>
                                                     <input type="file" class="form-control" id="simpleBankCardCopy" accept="image/*" />
                                                     <img id="simpleBankCardPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview bank book" />
                                                 </div>
                                                 <div class="col-12 mb-3">
-                                                    <label class="form-label">รูปถ่ายนักธุรกิจ</label>
+                                                    <label class="form-label" data-key="t-business-photo">รูปถ่ายนักธุรกิจ</label>
                                                     <input type="file" class="form-control" id="simpleBusinessPhoto" accept="image/*" />
                                                     <img id="simpleBusinessPhotoPreview" class="img-fluid mt-2" style="max-height:150px;display:none;object-fit:contain;border:1px solid #e9ecef;padding:4px;border-radius:4px;" alt="Preview business photo" />
                                                 </div>
@@ -296,62 +296,62 @@
 
                                     <div class="card border-0 shadow-sm">
                                         <div class="card-header bg-light">
-                                            <h5 class="mb-0">ข้อมูลที่อยู่ <small class="text-muted">(สำหรับการจัดส่ง)</small></h5>
+                                            <h5 class="mb-0" data-key="t-address-information-for-shipping">ข้อมูลที่อยู่ <small class="text-muted">(สำหรับการจัดส่ง)</small></h5>
                                         </div>
                                         <div class="card-body">
                                             <div class="row g-2 mb-3">
                                                 <div class="col-8 col-md-5">
-                                                    <label class="form-label">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                    <label class="form-label" data-key="t-house-number">บ้านเลขที่ <span class="text-danger">*</span></label>
                                                     <input type="text" class="form-control" id="simpleHouseNumber" placeholder="เช่น 123/4" required />
                                                 </div>
                                                 <div class="col-4 col-md-2">
-                                                    <label class="form-label">หมู่ที่</label>
+                                                    <label class="form-label" data-key="t-moo">หมู่ที่</label>
                                                     <input type="text" class="form-control" id="simpleMoo" placeholder="หมู่" />
                                                 </div>
                                                 <div class="col-6 col-md-5">
-                                                    <label class="form-label">ซอย / ตรอก</label>
+                                                    <label class="form-label" data-key="t-alley">ซอย / ตรอก</label>
                                                     <input type="text" class="form-control" id="simpleAlley" placeholder="ชื่อซอย" />
                                                 </div>
                                                 <div class="col-6 col-md-4">
-                                                    <label class="form-label">ถนน</label>
+                                                    <label class="form-label" data-key="t-road">ถนน</label>
                                                     <input type="text" class="form-control" id="simpleRoad" placeholder="ชื่อถนน" />
                                                 </div>
                                                 <div class="col-8 col-md-5">
-                                                    <label class="form-label">อาคาร / หมู่บ้าน</label>
+                                                    <label class="form-label" data-key="t-building">อาคาร / หมู่บ้าน</label>
                                                     <input type="text" class="form-control" id="simpleBuilding" placeholder="ชื่ออาคาร" />
                                                 </div>
                                                 <div class="col-4 col-md-2">
-                                                    <label class="form-label">ชั้น</label>
+                                                    <label class="form-label" data-key="t-floor">ชั้น</label>
                                                     <input type="text" class="form-control" id="simpleFloor" placeholder="ชั้น" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <input type="text" class="form-control" id="simplePostcode" maxlength="5" placeholder="กรอกรหัสไปรษณีย์ 5 หลัก" required />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">จังหวัด <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-province">จังหวัด <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select class="form-control" id="simpleProvince" required disabled>
-                                                        <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                        <option value="" data-key="t-waiting-postcode">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">เขต/อำเภอ <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-district">เขต/อำเภอ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select class="form-control" id="simpleDistrict" required disabled>
-                                                        <option value="">-- เลือกอำเภอ --</option>
+                                                        <option value="" data-key="t-select-district">-- เลือกอำเภอ --</option>
                                                     </select>
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label required">แขวง/ตำบล <span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label required" data-key="t-subdistrict">แขวง/ตำบล <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select class="form-control" id="simpleSubdistrict" required disabled>
-                                                        <option value="">-- เลือกตำบล --</option>
+                                                        <option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option>
                                                     </select>
                                                     <input type="hidden" id="simpleTambonId" />
                                                 </div>
@@ -364,13 +364,13 @@
                                 <div class="container-fluid d-flex justify-content-end align-items-center">
                                     <div class="d-flex gap-2">
                                         <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
-                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                            <i class="fas fa-home me-2"></i><span data-key="t-back-to-home">กลับหน้าแรก</span>
                                         </a>
                                         <button type="button" id="btnResetSimple" class="btn btn-outline-danger btn-lg">
-                                            <i class="fas fa-times me-2"></i>ยกเลิก
+                                            <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
                                         </button>
                                         <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save me-2"></i>ลงทะเบียน
+                                            <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
                                         </button>
                                     </div>
                                 </div>
@@ -396,7 +396,7 @@
                     <div class="tab-pane fade" id="full-tab-pane" role="tabpanel" aria-labelledby="full-tab" tabindex="0">
                         <div class="alert alert-warning mb-4">
                             <i class="fas fa-exclamation-circle me-2"></i>
-                            <strong>ลงทะเบียนแบบเต็ม:</strong> กรอกข้อมูลทั้งหมดครบถ้วนสำหรับสมาชิกที่ต้องการบันทึกข้อมูลทั้งหมดในครั้งเดียว
+                            <strong data-key="t-full-registration-desc"><strong>ลงทะเบียนแบบเต็ม:</strong> กรอกข้อมูลทั้งหมดครบถ้วนสำหรับสมาชิกที่ต้องการบันทึกข้อมูลทั้งหมดในครั้งเดียว</strong>
                         </div>
 
                         <form id="fullRegistrationForm" method="post" novalidate>
@@ -411,7 +411,7 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-country">ประเทศ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select id="fullCountry" name="country" class="form-control" required>
-                                                        <option value="">-- เลือก --</option>
+                                                        <option value="" data-key="t-select-country">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -419,7 +419,7 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-countries-conducting-business">ประเทศที่ดำเนินธุรกิจ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select id="fullCountryBusiness" name="business_country" class="form-control" required>
-                                                        <option value="">-- เลือก --</option>
+                                                        <option value="" data-key="t-select-country-business">-- เลือก --</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -435,7 +435,7 @@
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
-                                                <label class="col-md-5 col-form-label"><span class="text-danger">*</span></label>
+                                                <label class="col-md-5 col-form-label" data-key="t-position">ตำแหน่ง <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked required />
@@ -458,25 +458,25 @@
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
                                                         <select class="form-control" id="fullRegDay" required style="width: 70px;" disabled>
-                                                            <option value="">วัน</option>
+                                                            <option value="" data-key="t-day">วัน</option>
                                                         </select>
                                                         <select class="form-control" id="fullRegMonth" required style="width: 110px;" disabled>
-                                                            <option value="">เดือน</option>
-                                                            <option value="1">มกราคม</option>
-                                                            <option value="2">กุมภาพันธ์</option>
-                                                            <option value="3">มีนาคม</option>
-                                                            <option value="4">เมษายน</option>
-                                                            <option value="5">พฤษภาคม</option>
-                                                            <option value="6">มิถุนายน</option>
-                                                            <option value="7">กรกฎาคม</option>
-                                                            <option value="8">สิงหาคม</option>
-                                                            <option value="9">กันยายน</option>
-                                                            <option value="10">ตุลาคม</option>
-                                                            <option value="11">พฤศจิกายน</option>
-                                                            <option value="12">ธันวาคม</option>
+                                                            <option value="" data-key="t-month">เดือน</option>
+                                                            <option value="1" data-key="t-january">มกราคม</option>
+                                                            <option value="2" data-key="t-february">กุมภาพันธ์</option>
+                                                            <option value="3" data-key="t-march">มีนาคม</option>
+                                                            <option value="4" data-key="t-april">เมษายน</option>
+                                                            <option value="5" data-key="t-may">พฤษภาคม</option>
+                                                            <option value="6" data-key="t-june">มิถุนายน</option>
+                                                            <option value="7" data-key="t-july">กรกฎาคม</option>
+                                                            <option value="8" data-key="t-august">สิงหาคม</option>
+                                                            <option value="9" data-key="t-september">กันยายน</option>
+                                                            <option value="10" data-key="t-october">ตุลาคม</option>
+                                                            <option value="11" data-key="t-november">พฤศจิกายน</option>
+                                                            <option value="12" data-key="t-december">ธันวาคม</option>
                                                         </select>
                                                         <select class="form-control" id="fullRegYear" required style="width: 100px;" disabled>
-                                                            <option value="">ปี</option>
+                                                            <option value="" data-key="t-year">ปี</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -486,25 +486,25 @@
                                                 <div class="col-md-7">
                                                     <div class="d-flex gap-2">
                                                         <select class="form-control" id="fullBirthDay" required style="width: 70px;">
-                                                            <option value="">วัน</option>
+                                                            <option value="" data-key="t-day">วัน</option>
                                                         </select>
                                                         <select class="form-control" id="fullBirthMonth" required style="width: 110px;">
-                                                            <option value="">เดือน</option>
-                                                            <option value="1">มกราคม</option>
-                                                            <option value="2">กุมภาพันธ์</option>
-                                                            <option value="3">มีนาคม</option>
-                                                            <option value="4">เมษายน</option>
-                                                            <option value="5">พฤษภาคม</option>
-                                                            <option value="6">มิถุนายน</option>
-                                                            <option value="7">กรกฎาคม</option>
-                                                            <option value="8">สิงหาคม</option>
-                                                            <option value="9">กันยายน</option>
-                                                            <option value="10">ตุลาคม</option>
-                                                            <option value="11">พฤศจิกายน</option>
-                                                            <option value="12">ธันวาคม</option>
+                                                            <option value="" data-key="t-month">เดือน</option>
+                                                            <option value="1" data-key="t-january">มกราคม</option>
+                                                            <option value="2" data-key="t-february">กุมภาพันธ์</option>
+                                                            <option value="3" data-key="t-march">มีนาคม</option>
+                                                            <option value="4" data-key="t-april">เมษายน</option>
+                                                            <option value="5" data-key="t-may">พฤษภาคม</option>
+                                                            <option value="6" data-key="t-june">มิถุนายน</option>
+                                                            <option value="7" data-key="t-july">กรกฎาคม</option>
+                                                            <option value="8" data-key="t-august">สิงหาคม</option>
+                                                            <option value="9" data-key="t-september">กันยายน</option>
+                                                            <option value="10" data-key="t-october">ตุลาคม</option>
+                                                            <option value="11" data-key="t-november">พฤศจิกายน</option>
+                                                            <option value="12" data-key="t-december">ธันวาคม</option>
                                                         </select>
                                                         <select class="form-control" id="fullBirthYear" required style="width: 100px;">
-                                                            <option value="">ปี</option>
+                                                            <option value="" data-key="t-year">ปี</option>
                                                         </select>
                                                     </div>
                                                 </div>
@@ -513,7 +513,7 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-title">คำนำหน้า <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select id="fullTitle" name="title" class="form-control" required>
-                                                        <option value="">-- เลือกคำนำหน้า --</option>
+                                                        <option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -591,7 +591,7 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <select id="fullBank" name="bank" class="form-control" required>
-                                                        <option value="">-- เลือกธนาคาร --</option>
+                                                        <option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -665,59 +665,59 @@
                                         <div class="card-block p-3">
                                             <div class="row">
                                                 <div class="col-12 mb-3">
-                                                    <h6 class="mb-3">ที่อยู่ตามบัตรประชาชน</h6>
+                                                    <h6 class="mb-3" data-key="t-address-on-id-card">ที่อยู่ตามบัตรประชาชน</h6>
 
                                                     <div class="row g-2 mb-3">
                                                         <div class="col-7">
-                                                            <label class="form-label small">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-house-number">บ้านเลขที่ <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control" id="fullHouseNumber" placeholder="เช่น 123/4" required />
                                                         </div>
                                                         <div class="col-5">
-                                                            <label class="form-label small">หมู่ที่</label>
+                                                            <label class="form-label small" data-key="t-moo">หมู่ที่</label>
                                                             <input type="text" class="form-control" id="fullMoo" placeholder="หมู่" />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">ซอย / ตรอก</label>
+                                                            <label class="form-label small" data-key="t-alley">ซอย / ตรอก</label>
                                                             <input type="text" class="form-control" id="fullAlley" placeholder="ชื่อซอย" />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">ถนน</label>
+                                                            <label class="form-label small" data-key="t-road">ถนน</label>
                                                             <input type="text" class="form-control" id="fullRoad" placeholder="ชื่อถนน" />
                                                         </div>
                                                         <div class="col-8">
-                                                            <label class="form-label small">อาคาร / หมู่บ้าน</label>
+                                                            <label class="form-label small" data-key="t-building">อาคาร / หมู่บ้าน</label>
                                                             <input type="text" class="form-control" id="fullBuilding" placeholder="ชื่ออาคาร" />
                                                         </div>
                                                         <div class="col-4">
-                                                            <label class="form-label small">ชั้น</label>
+                                                            <label class="form-label small" data-key="t-floor">ชั้น</label>
                                                             <input type="text" class="form-control" id="fullFloor" placeholder="ชั้น" />
                                                         </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                                             <input id="fullPostcodeIdCard" type="text" class="form-control" placeholder="รหัสไปรษณีย์" required />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">จังหวัด <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-province">จังหวัด <span class="text-danger">*</span></label>
                                                             <select id="fullProvinceIdCard" name="province_id_card" class="form-control" disabled required>
-                                                                <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                                <option value="" data-key="t-waiting-postcode">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                             </select>
                                                         </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">เขต/อำเภอ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-district">เขต/อำเภอ <span class="text-danger">*</span></label>
                                                             <select id="fullDistrictIdCard" class="form-control" disabled required>
-                                                                <option value="">-- เลือกอำเภอ --</option>
+                                                                <option value="" data-key="t-select-district">-- เลือกอำเภอ --</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">แขวง/ตำบล <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-subdistrict">แขวง/ตำบล <span class="text-danger">*</span></label>
                                                             <select id="fullSubdistrictIdCard" class="form-control" disabled required>
-                                                                <option value="">-- เลือกตำบล --</option>
+                                                                <option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option>
                                                             </select>
                                                             <input type="hidden" id="fullTambonId" />
                                                         </div>
@@ -725,66 +725,66 @@
                                                 </div>
 
                                                 <div class="col-12 mb-3">
-                                                    <h6 class="mb-3">ที่อยู่ปัจจุบัน (ที่ติดต่อได้)</h6>
+                                                    <h6 class="mb-3" data-key="t-current-address">ที่อยู่ปัจจุบัน (ที่ติดต่อได้)</h6>
 
                                                     <div class="form-group mb-2">
                                                         <div class="form-check form-check-inline me-3">
                                                             <input class="form-check-input" type="checkbox" id="fullUseIdCardAddress" />
-                                                            <label class="form-check-label" for="fullUseIdCardAddress">ใช้ที่อยู่ตามบัตร</label>
+                                                            <label class="form-check-label" for="fullUseIdCardAddress" data-key="t-use-same-as-id-card">ใช้ที่อยู่ตามบัตร</label>
                                                         </div>
                                                     </div>
 
                                                     <div class="row g-2 mb-3">
                                                         <div class="col-7">
-                                                            <label class="form-label small">บ้านเลขที่ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-house-number">บ้านเลขที่ <span class="text-danger">*</span></label>
                                                             <input type="text" class="form-control" id="fullCurrentHouseNumber" placeholder="เช่น 123/4" required />
                                                         </div>
                                                         <div class="col-5">
-                                                            <label class="form-label small">หมู่ที่</label>
+                                                            <label class="form-label small" data-key="t-moo">หมู่ที่</label>
                                                             <input type="text" class="form-control" id="fullCurrentMoo" placeholder="หมู่" />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">ซอย / ตรอก</label>
+                                                            <label class="form-label small" data-key="t-alley">ซอย / ตรอก</label>
                                                             <input type="text" class="form-control" id="fullCurrentAlley" placeholder="ชื่อซอย" />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">ถนน</label>
+                                                            <label class="form-label small" data-key="t-road">ถนน</label>
                                                             <input type="text" class="form-control" id="fullCurrentRoad" placeholder="ชื่อถนน" />
                                                         </div>
                                                         <div class="col-8">
-                                                            <label class="form-label small">อาคาร / หมู่บ้าน</label>
+                                                            <label class="form-label small" data-key="t-building">อาคาร / หมู่บ้าน</label>
                                                             <input type="text" class="form-control" id="fullCurrentBuilding" placeholder="ชื่ออาคาร" />
                                                         </div>
                                                         <div class="col-4">
-                                                            <label class="form-label small">ชั้น</label>
+                                                            <label class="form-label small" data-key="t-floor">ชั้น</label>
                                                             <input type="text" class="form-control" id="fullCurrentFloor" placeholder="ชั้น" />
                                                         </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-postcode">รหัสไปรษณีย์ <span class="text-danger">*</span></label>
                                                             <input id="fullCurrentPostcode" type="text" class="form-control" placeholder="รหัสไปรษณีย์" required />
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">จังหวัด <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-province">จังหวัด <span class="text-danger">*</span></label>
                                                             <select id="fullCurrentProvince" name="province_current" class="form-control" disabled required>
-                                                                <option value="">-- รอผลจากรหัสไปรษณีย์ --</option>
+                                                                <option value="" data-key="t-waiting-postcode">-- รอผลจากรหัสไปรษณีย์ --</option>
                                                             </select>
                                                         </div>
                                                     </div>
 
                                                     <div class="form-group row mb-3">
                                                         <div class="col-6">
-                                                            <label class="form-label small">เขต/อำเภอ <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-district">เขต/อำเภอ <span class="text-danger">*</span></label>
                                                             <select id="fullCurrentDistrict" class="form-control" disabled required>
-                                                                <option value="">-- เลือกอำเภอ --</option>
+                                                                <option value="" data-key="t-select-district">-- เลือกอำเภอ --</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-6">
-                                                            <label class="form-label small">แขวง/ตำบล <span class="text-danger">*</span></label>
+                                                            <label class="form-label small" data-key="t-subdistrict">แขวง/ตำบล <span class="text-danger">*</span></label>
                                                             <select id="fullCurrentSubdistrict" class="form-control" disabled required>
-                                                                <option value="">-- เลือกตำบล --</option>
+                                                                <option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option>
                                                             </select>
                                                             <input type="hidden" id="fullCurrentTambonId" />
                                                         </div>
@@ -825,13 +825,13 @@
                                 <div class="container-fluid d-flex justify-content-end align-items-center">
                                     <div class="d-flex gap-2">
                                         <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
-                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                            <i class="fas fa-home me-2"></i><span data-key="t-back-to-home">กลับหน้าแรก</span>
                                         </a>
                                         <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
-                                            <i class="fas fa-times me-2"></i>ยกเลิก
+                                            <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
                                         </button>
                                         <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save me-2"></i>ลงทะเบียน
+                                            <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
                                         </button>
                                     </div>
                                 </div>
@@ -848,7 +848,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="otpModalLabel">
+                <h5 class="modal-title" id="otpModalLabel" data-key="t-verify-otp">
                     <i class="fas fa-mobile-alt me-2"></i>ยืนยันรหัส OTP
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -870,17 +870,17 @@
                     </div>
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <small class="text-muted">รหัส OTP จะหมดอายุใน 5 นาที</small>
+                        <small class="text-muted" data-key="t-otp-expire-5min">รหัส OTP จะหมดอายุใน 5 นาที</small>
                         <button type="button" class="btn btn-link btn-sm p-0" id="resendOTPBtn" disabled>
-                            <small>ส่งรหัสใหม่ (30)</small>
+                            <small data-key="t-resend-code">ส่งรหัสใหม่</small> (<span class="countdown">30</span>)
                         </button>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><span data-key="t-cancel">ยกเลิก</span></button>
                 <button type="button" class="btn btn-primary" id="verifyOTPBtn" disabled>
-                    <i class="fas fa-check me-2"></i>ยืนยัน
+                    <i class="fas fa-check me-2"></i><span data-key="t-verify">ยืนยัน</span>
                 </button>
             </div>
         </div>
@@ -1206,7 +1206,12 @@
         
         // Initialize date dropdowns based on language
         initializeDateDropdowns();
-        
+
+        // Setup form synchronization
+        setupFormSync();
+
+        console.log('Form sync initialized');
+
         // Function to initialize date dropdowns with proper year range
         function initializeDateDropdowns() {
             // Determine if using Thai (พ.ศ.) or English (ค.ศ.) year format
@@ -1370,9 +1375,9 @@
                 if (typeof resetAddressDropdowns === 'function') {
                     resetAddressDropdowns();
                 } else {
-                    $('#simpleProvince').html('<option value="">-- รอผลจากรหัสไปรษณีย์ --</option>');
-                    $('#simpleDistrict').html('<option value="">-- เลือกอำเภอ --</option>');
-                    $('#simpleSubdistrict').html('<option value="">-- เลือกตำบล --</option>');
+                    $('#simpleProvince').html('<option value="" data-key="t-waiting-postcode">-- รอผลจากรหัสไปรษณีย์ --</option>');
+                    $('#simpleDistrict').html('<option value="" data-key="t-select-district">-- เลือกอำเภอ --</option>');
+                    $('#simpleSubdistrict').html('<option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option>');
                 }
 
                 // 🔒 สำคัญ: บังคับ Disable Dropdown จังหวัด/อำเภอ/ตำบล กลับไปเหมือนเดิม
@@ -1561,7 +1566,7 @@
                     var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
 
                     // Create province options
-                    $('#simpleProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    $('#simpleProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
                     $.each(uniqueProvinces, function(index, item) {
                         $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
                     });
@@ -1715,7 +1720,7 @@
                 const filtered = masterData.filter(item => item.zipcode === selectedZip);
                 if (filtered.length > 0) {
                     const provinces = getUniqueList(filtered, 'province_code', 'province');
-                    $('#fullProvinceIdCard').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    $('#fullProvinceIdCard').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
                     provinces.forEach(p => $('#fullProvinceIdCard').append(`<option value="${p.province_code}">${p.province}</option>`));
                     $('#fullProvinceIdCard').prop('disabled', false);
 
@@ -1737,7 +1742,7 @@
                 const filtered = masterData.filter(item => item.zipcode === selectedZip);
                 if (filtered.length > 0) {
                     const provinces = getUniqueList(filtered, 'province_code', 'province');
-                    $('#fullCurrentProvince').empty().append('<option value="">-- เลือกจังหวัด --</option>');
+                    $('#fullCurrentProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
                     provinces.forEach(p => $('#fullCurrentProvince').append(`<option value="${p.province_code}">${p.province}</option>`));
                     $('#fullCurrentProvince').prop('disabled', false);
 
@@ -2292,7 +2297,7 @@
             $.get('/ExternalRegistration/GetCountries').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleCountry').empty().append('<option value="">-- เลือก --</option>');
+                $('#simpleCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
                 data.forEach(item => {
                     $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
@@ -2303,7 +2308,7 @@
             $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
+                $('#simpleCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
                 data.forEach(item => {
                     $('#simpleCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
@@ -2314,7 +2319,7 @@
             $.get('/orders/GetTitlename').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
+                $('#simpleTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
                 data.forEach(item => {
                     $('#simpleTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
                 });
@@ -2337,7 +2342,7 @@
             $.get('/ExternalRegistration/GetCountries').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullCountry').empty().append('<option value="">-- เลือก --</option>');
+                $('#fullCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
                 data.forEach(item => {
                     $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
@@ -2348,7 +2353,7 @@
             $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullCountryBusiness').empty().append('<option value="">-- เลือก --</option>');
+                $('#fullCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
                 data.forEach(item => {
                     $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                 });
@@ -2359,7 +2364,7 @@
             $.get('/orders/GetTitlename').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullTitle').empty().append('<option value="">-- เลือกคำนำหน้า --</option>');
+                $('#fullTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
                 data.forEach(item => {
                     $('#fullTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
                 });
@@ -2372,7 +2377,7 @@
             $.get('/Member/GetBanks').done(res => {
                 let data = (typeof res === 'string') ? JSON.parse(res) : res;
                 data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullBank').empty().append('<option value="">-- เลือกธนาคาร --</option>');
+                $('#fullBank').empty().append('<option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>');
                 data.forEach(item => {
                     const code = item.M17_PX1;
                     const name = item.Thainame;
@@ -2415,6 +2420,210 @@
             resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
             resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
             resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+        }
+
+        // Setup synchronization between simple and full registration forms
+        function setupFormSync() {
+            console.log('Setting up form sync...');
+            
+            // Map of corresponding field pairs: { simpleId: fullId }
+            const fieldMappings = {
+                // Country & Business
+                'simpleCountry': 'fullCountry',
+                'simpleCountryBusiness': 'fullCountryBusiness',
+                
+                // Referrer
+                'simpleReferrerCode': 'fullReferrerCode',
+                'simpleReferrerName': 'fullReferrerName',
+                
+                // Registration Date
+                'simpleRegDay': 'fullRegDay',
+                'simpleRegMonth': 'fullRegMonth',
+                'simpleRegYear': 'fullRegYear',
+                
+                // Birth Date
+                'simpleBirthDay': 'fullBirthDay',
+                'simpleBirthMonth': 'fullBirthMonth',
+                'simpleBirthYear': 'fullBirthYear',
+                
+                // Personal Info
+                'simpleTitle': 'fullTitle',
+                'simpleFullName': 'fullNameOnCard',
+                'simpleBusinessName': 'fullBusinessName',
+                'simpleDocumentNumber': 'fullDocumentNumber',
+                
+                // Contact
+                'simpleMobile': 'fullMobile',
+                'simpleHomePhone': 'fullHomePhone',
+                'simpleEmail': 'fullEmail',
+                'simpleLineId': 'fullLineId',
+                
+                // Address
+                'simpleHouseNumber': 'fullHouseNumber',
+                'simpleMoo': 'fullMoo',
+                'simpleAlley': 'fullAlley',
+                'simpleRoad': 'fullRoad',
+                'simpleBuilding': 'fullBuilding',
+                'simpleFloor': 'fullFloor',
+                'simplePostcode': 'fullPostcodeIdCard',
+                'simpleProvince': 'fullProvinceIdCard',
+                'simpleDistrict': 'fullDistrictIdCard',
+                'simpleSubdistrict': 'fullSubdistrictIdCard',
+                
+                // File uploads
+                'simpleIdCardCopy': 'fullIdCardCopy',
+                'simpleBankCardCopy': 'fullBankCardCopy',
+                'simpleBusinessPhoto': 'fullBusinessPhoto'
+            };
+
+            // Sync from simple to full
+            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                const simpleEl = $(`#${simpleId}`);
+                const fullEl = $(`#${fullId}`);
+                
+                if (simpleEl.length && fullEl.length) {
+                    // For select and input elements
+                    if (simpleEl.is('select') || simpleEl.is('input[type="text"], input[type="tel"], input[type="email"]')) {
+                        simpleEl.on('change input', function() {
+                            if (simpleEl.is('select')) {
+                                fullEl.val(simpleEl.val());
+                            } else {
+                                fullEl.val(simpleEl.val());
+                            }
+                        });
+                        
+                        fullEl.on('change input', function() {
+                            if (fullEl.is('select')) {
+                                simpleEl.val(fullEl.val());
+                            } else {
+                                simpleEl.val(fullEl.val());
+                            }
+                        });
+                    }
+                    
+                    // For file inputs
+                    if (simpleEl.is('input[type="file"]')) {
+                        simpleEl.on('change', function() {
+                            const file = this.files[0];
+                            if (file) {
+                                fullEl[0].files = this.files;
+                                // Trigger preview update if exists
+                                const previewId = `#${simpleId.replace('Copy', 'Copy').replace('Photo', 'Photo')}Preview`.replace('simple', 'full');
+                                const previewEl = $(previewId);
+                                if (previewEl.length && file.type.startsWith('image/')) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        previewEl.attr('src', e.target.result).show();
+                                        $(`#${simpleId.replace('simple', 'full')}Preview`).attr('src', e.target.result).show();
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+                        });
+                        
+                        fullEl.on('change', function() {
+                            const file = this.files[0];
+                            if (file) {
+                                simpleEl[0].files = this.files;
+                                // Trigger preview update if exists
+                                const previewId = `#${fullId.replace('Copy', 'Copy').replace('Photo', 'Photo')}Preview`;
+                                const previewEl = $(previewId);
+                                if (previewEl.length && file.type.startsWith('image/')) {
+                                    const reader = new FileReader();
+                                    reader.onload = function(e) {
+                                        previewEl.attr('src', e.target.result).show();
+                                        $(`#${fullId.replace('full', 'simple')}Preview`).attr('src', e.target.result).show();
+                                    };
+                                    reader.readAsDataURL(file);
+                                }
+                            }
+                        });
+                    }
+                }
+            });
+
+            // Sync referrer_side radio buttons between simple and full forms
+            $('input[name="referrer_side"]').on('change', function() {
+                const val = $(this).val();
+                // Find the corresponding referrer_side in the other form/tab and check it
+                $(`input[name="referrer_side"][value="${val}"]`).prop('checked', true);
+                console.log(`Sync referrer_side: ${val}`);
+            });
+
+            // Real-time sync for select elements with change event
+            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                const simpleEl = $(`#${simpleId}`);
+                const fullEl = $(`#${fullId}`);
+                
+                if (simpleEl.length && fullEl.length) {
+                    if (simpleEl.is('select')) {
+                        // When simple changes, update full
+                        simpleEl.on('change', function() {
+                            console.log(`Sync ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
+                            fullEl.val(simpleEl.val()).trigger('change');
+                        });
+                        
+                        // When full changes, update simple
+                        fullEl.on('change', function() {
+                            console.log(`Sync ${fullId} -> ${simpleId}: ${fullEl.val()}`);
+                            simpleEl.val(fullEl.val()).trigger('change');
+                        });
+                    } else if (simpleEl.is('input')) {
+                        // When simple input changes, update full
+                        simpleEl.on('input change', function() {
+                            console.log(`Sync input ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
+                            fullEl.val(simpleEl.val());
+                        });
+                        
+                        // When full input changes, update simple
+                        fullEl.on('input change', function() {
+                            console.log(`Sync input ${fullId} -> ${simpleId}: ${fullEl.val()}`);
+                            simpleEl.val(fullEl.val());
+                        });
+                    }
+                }
+            });
+
+            // Sync tab switching - copy data when switching tabs
+            $('#full-tab').on('shown.bs.tab', function() {
+                // Copy from simple to full when switching to full tab
+                Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                    const simpleEl = $(`#${simpleId}`);
+                    const fullEl = $(`#${fullId}`);
+                    if (simpleEl.length && fullEl.length) {
+                        if (simpleEl.is('select')) {
+                            fullEl.val(simpleEl.val()).trigger('change');
+                        } else if (simpleEl.is('input')) {
+                            fullEl.val(simpleEl.val());
+                        }
+                    }
+                });
+                // Sync referrer_side radio button
+                const referrerSideVal = $('input[name="referrer_side"]:checked').val();
+                if (referrerSideVal) {
+                    $(`#full-tab-pane input[name="referrer_side"][value="${referrerSideVal}"]`).prop('checked', true);
+                }
+            });
+
+            $('#simple-tab').on('shown.bs.tab', function() {
+                // Copy from full to simple when switching to simple tab
+                Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                    const simpleEl = $(`#${simpleId}`);
+                    const fullEl = $(`#${fullId}`);
+                    if (simpleEl.length && fullEl.length) {
+                        if (fullEl.is('select')) {
+                            simpleEl.val(fullEl.val()).trigger('change');
+                        } else if (fullEl.is('input')) {
+                            simpleEl.val(fullEl.val());
+                        }
+                    }
+                });
+                // Sync referrer_side radio button
+                const referrerSideVal = $(`#full-tab-pane input[name="referrer_side"]:checked`).val();
+                if (referrerSideVal) {
+                    $(`input[name="referrer_side"][value="${referrerSideVal}"]`).prop('checked', true);
+                }
+            });
         }
 
         function normalizeDuplicateResult(response, defaultMessage) {

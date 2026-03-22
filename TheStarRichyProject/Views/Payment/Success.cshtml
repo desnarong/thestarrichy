@@ -13,8 +13,8 @@
                     </div>
 
                     <!-- Success Message -->
-                    <h2 class="text-success mb-3">ชำระเงินสำเร็จ!</h2>
-                    <p class="text-muted mb-4">ขอบคุณสำหรับการชำระเงิน</p>
+                    <h2 class="text-success mb-3" data-key="t-payment-success-msg">ชำระเงินสำเร็จ!</h2>
+                    <p class="text-muted mb-4" data-key="t-thank-you-for-payment">ขอบคุณสำหรับการชำระเงิน</p>
 
                     <!-- Transaction Details -->
                     <div class="transaction-details bg-light p-4 rounded mb-4">
@@ -72,18 +72,18 @@
                     <!-- Next Steps -->
                     <div class="alert alert-info">
                         <i class="fa fa-info-circle"></i>
-                        คำสั่งซื้อของคุณกำลังดำเนินการ
+                        <span data-key="t-order-processing">คำสั่งซื้อของคุณกำลังดำเนินการ</span>
                     </div>
 
                     <!-- Action Buttons -->
                     <div class="btn-group-vertical w-100" role="group">
-                        <a href="/Orders/Detail?id=@ViewBag.OrderId" class="btn btn-primary btn-lg mb-2">
+                        <a href="/Orders/Detail?id=@ViewBag.OrderId" class="btn btn-primary btn-lg mb-2" data-key="t-view-order-detail">
                             <i class="fa fa-list"></i> ดูรายละเอียดคำสั่งซื้อ
                         </a>
-                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2">
+                        <a href="/Orders" class="btn btn-outline-secondary btn-lg mb-2" data-key="t-my-orders">
                             <i class="fa fa-shopping-bag"></i> คำสั่งซื้อของฉัน
                         </a>
-                        <a href="/" class="btn btn-outline-primary btn-lg">
+                        <a href="/" class="btn btn-outline-primary btn-lg" data-key="t-back-to-home">
                             <i class="fa fa-home"></i> กลับหน้าหลัก
                         </a>
                     </div>

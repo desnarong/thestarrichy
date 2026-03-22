@@ -40,7 +40,20 @@
       <div class="card-body">
         <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
         <div class="table-responsive">
-          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;"></table>
+          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.82rem;white-space:nowrap;">
+            <style>
+              /* Hover effect - สีเข้มขึ้น */
+              #mainTable tbody tr:hover {
+                background-color: #b2dfdb !important;
+                transition: background-color 0.2s ease;
+              }
+              /* ตารางทั้งหมด - hover สีเทาเข้ม */
+              table.table-hover tbody tr:hover {
+                background-color: #e0e0e0 !important;
+                transition: background-color 0.2s ease;
+              }
+            </style>
+          </table>
         </div>
       </div>
     </div>

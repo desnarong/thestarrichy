@@ -8,7 +8,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberSponserTeamService
     {
-        Task<List<MemberSponsorDto>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync();
     }
     public class ReportMemberSponserTeamService : IReportMemberSponserTeamService
     {
@@ -126,13 +126,13 @@ namespace TheStarRichyApi.Services
             public decimal? NextPosaddRightBalance { get; set; }
         }
 
-        public async Task<List<MemberSponsorDto>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync()
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
             if (string.IsNullOrEmpty(passkey))
             {
-                return new List<MemberSponsorDto> { new MemberSponsorDto { Membercode = "" } };
+                return new List<dynamic>();
             }
 
             string passwordEncode1 = await GetPasskeyAsync("Passkey1");
@@ -141,17 +141,17 @@ namespace TheStarRichyApi.Services
             // Verify Passkey
             if (passkey != passwordEncode1 && passkey != passwordEncode2)
             {
-                return new List<MemberSponsorDto> { new MemberSponsorDto { Membercode = "" } };
+                return new List<dynamic>();
             }
 
             // Get Membercode from JWT
             string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(memberCode))
             {
-                return new List<MemberSponsorDto> { new MemberSponsorDto { Membercode = "" } };
+                return new List<dynamic>();
             }
 
-            var result = new List<MemberSponsorDto>();
+            var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
             try
@@ -160,14 +160,7 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    string query = @"SELECT aa.Membercode, aa.LevelName, aa.DLCode, aa.DLName, aa.RegisterDate,
-                    aa.QualifyDate, aa.SIDE, aa.PositionName, aa.PrestigeRankingEngName, aa.PersonalPV, 
-                    aa.Sidex, aa.PVLeft, aa.PVRight, aa.SponserName1 AS SponserName, aa.Qualify,
-                    aa.LastMonthQualifyPV, aa.PresentMonthQualifyPV, aa.LeftCountActive, aa.RightCountActive, 
-                    aa.Travelpoint1, aa.Travelpoint2, COALESCE(aa.TotalBalance, 0) as TotalBalance,
-                    aa.TotalLeftBalance, aa.TotalRightBalance, aa.NextPosition, 
-                    aa.NextPosaddLeftBalance, aa.NextPosaddRightBalance
-                    FROM [000_Member_SponserTeam] aa (nolock) 
+                    string query = @"SELECT * FROM [000_Member_SponserTeam] aa (nolock) 
                     WHERE aa.Membercode = @Membercode
                     ORDER BY aa.DLCode";
 
@@ -179,38 +172,50 @@ namespace TheStarRichyApi.Services
                         {
                             while (await reader.ReadAsync())
                             {
-                                var row = new MemberSponsorDto
+                                dynamic row = new System.Dynamic.ExpandoObject();
+                                var rowDict = (IDictionary<string, object>)row;
+
+                                // Read each column dynamically
+                                for (int i = 0; i < reader.FieldCount; i++)
                                 {
-                                    Membercode = reader["Membercode"]?.ToString(),
-                                    LevelName = reader["LevelName"]?.ToString(),
-                                    DLCode = reader["DLCode"]?.ToString(),
-                                    DLName = reader["DLName"]?.ToString(),
-                                    RegisterDate = reader["RegisterDate"] as DateTime?,
-                                    QualifyDate = reader["QualifyDate"] as DateTime?,
-                                    SIDE = reader["SIDE"]?.ToString(),
-                                    PositionName = reader["PositionName"]?.ToString(),
-                                    PrestigeRankingEngName = reader["PrestigeRankingEngName"]?.ToString(),
-                                    PersonalPV = reader["PersonalPV"] as decimal?,
-                                    Sidex = reader["Sidex"]?.ToString(),
-                                    PVLeft = reader["PVLeft"] as decimal?,
-                                    PVRight = reader["PVRight"] as decimal?,
-                                    SponserName = reader["SponserName"]?.ToString(),
-                                    Qualify = reader["Qualify"]?.ToString(),
-                                    LastMonthQualifyPV = reader["LastMonthQualifyPV"] as decimal?,
-                                    PresentMonthQualifyPV = reader["PresentMonthQualifyPV"] as decimal?,
-                                    LeftCountActive = reader["LeftCountActive"] as int?,
-                                    RightCountActive = reader["RightCountActive"] as int?,
-                                    Travelpoint1 = reader["Travelpoint1"] as decimal?,
-                                    Travelpoint2 = reader["Travelpoint2"] as decimal?,
-                                    TotalBalance = reader["TotalBalance"] as decimal?,
-                                    TotalLeftBalance = reader["TotalLeftBalance"] as decimal?,
-                                    TotalRightBalance = reader["TotalRightBalance"] as decimal?,
-                                    NextPosition = reader["NextPosition"]?.ToString(),
-                                    NextPosaddLeftBalance = reader["NextPosaddLeftBalance"] as decimal?,
-                                    NextPosaddRightBalance = reader["NextPosaddRightBalance"] as decimal?
-                                };
+                                    string columnName = reader.GetName(i);
+                                    object columnValue = reader.GetValue(i);
+                                    rowDict[columnName] = columnValue;
+                                }
 
                                 result.Add(row);
+                                //var row = new MemberSponsorDto
+                                //{
+                                //    Membercode = reader["Membercode"]?.ToString(),
+                                //    LevelName = reader["LevelName"]?.ToString(),
+                                //    DLCode = reader["DLCode"]?.ToString(),
+                                //    DLName = reader["DLName"]?.ToString(),
+                                //    RegisterDate = reader["RegisterDate"] as DateTime?,
+                                //    QualifyDate = reader["QualifyDate"] as DateTime?,
+                                //    SIDE = reader["SIDE"]?.ToString(),
+                                //    PositionName = reader["PositionName"]?.ToString(),
+                                //    PrestigeRankingEngName = reader["PrestigeRankingEngName"]?.ToString(),
+                                //    PersonalPV = reader["PersonalPV"] as decimal?,
+                                //    Sidex = reader["Sidex"]?.ToString(),
+                                //    PVLeft = reader["PVLeft"] as decimal?,
+                                //    PVRight = reader["PVRight"] as decimal?,
+                                //    SponserName = reader["SponserName"]?.ToString(),
+                                //    Qualify = reader["Qualify"]?.ToString(),
+                                //    LastMonthQualifyPV = reader["LastMonthQualifyPV"] as decimal?,
+                                //    PresentMonthQualifyPV = reader["PresentMonthQualifyPV"] as decimal?,
+                                //    LeftCountActive = reader["LeftCountActive"] as int?,
+                                //    RightCountActive = reader["RightCountActive"] as int?,
+                                //    Travelpoint1 = reader["Travelpoint1"] as decimal?,
+                                //    Travelpoint2 = reader["Travelpoint2"] as decimal?,
+                                //    TotalBalance = reader["TotalBalance"] as decimal?,
+                                //    TotalLeftBalance = reader["TotalLeftBalance"] as decimal?,
+                                //    TotalRightBalance = reader["TotalRightBalance"] as decimal?,
+                                //    NextPosition = reader["NextPosition"]?.ToString(),
+                                //    NextPosaddLeftBalance = reader["NextPosaddLeftBalance"] as decimal?,
+                                //    NextPosaddRightBalance = reader["NextPosaddRightBalance"] as decimal?
+                                //};
+
+                                //result.Add(row);
                             }
                         }
                     }
@@ -219,10 +224,10 @@ namespace TheStarRichyApi.Services
             catch (Exception ex)
             {
                 // Log exception
-                return new List<MemberSponsorDto> { new MemberSponsorDto { Membercode = "", /* ไม่ต้องมี Error property */ } };
+                return new List<dynamic>();
             }
 
-            return result.Count > 0 ? result : new List<MemberSponsorDto> { new MemberSponsorDto { Membercode = "" } };
+            return result.Count > 0 ? result : new List<dynamic>();
         }
     }
 }

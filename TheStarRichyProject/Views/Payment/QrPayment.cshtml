@@ -7,7 +7,7 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow">
                 <div class="card-header bg-primary text-white text-center">
-                    <h3 class="mb-0">
+                    <h3 class="mb-0" data-key="t-scan-qr-payment">
                         <i class="fa fa-qrcode"></i> ชำระเงินผ่าน QR Code
                     </h3>
                 </div>
@@ -42,13 +42,13 @@
                     <!-- คำแนะนำ -->
                     <div class="alert alert-info">
                         <i class="fa fa-info-circle"></i>
-                        กรุณาสแกน QR Code ด้วยแอปพลิเคชันธนาคารของคุณ
+                        <span data-key="t-scan-qr-instruction">กรุณาสแกน QR Code ด้วยแอปพลิเคชันธนาคารของคุณ</span>
                     </div>
 
                     <!-- สถานะ -->
                     <div id="statusAlert" class="alert alert-warning">
                         <i class="fa fa-clock"></i>
-                        <span id="statusText">รอการชำระเงิน...</span>
+                        <span id="statusText" data-key="t-waiting-payment">รอการชำระเงิน...</span>
                     </div>
 
                     <!-- Loading Spinner -->
@@ -63,7 +63,7 @@
                     <form method="post" action="/Payment/Cancel" id="cancelForm" class="mt-4">
                         <input type="hidden" name="transactionId" value="@ViewBag.TransactionId" />
                         <input type="hidden" name="orderId" value="@ViewBag.OrderId" />
-                        <button type="button" class="btn btn-outline-danger" id="btnCancel">
+                        <button type="button" class="btn btn-outline-danger" id="btnCancel" data-key="t-cancel-payment">
                             <i class="fa fa-times"></i> ยกเลิกการชำระเงิน
                         </button>
                     </form>
@@ -73,13 +73,13 @@
             <!-- คำอธิบาย -->
             <div class="card mt-3">
                 <div class="card-body">
-                    <h5 class="card-title">วิธีชำระเงิน</h5>
+                    <h5 class="card-title" data-key="t-payment-method">วิธีชำระเงิน</h5>
                     <ol class="mb-0">
-                        <li>เปิดแอปพลิเคชันธนาคารของคุณ</li>
-                        <li>เลือกเมนู "สแกน QR Code" หรือ "จ่ายเงิน"</li>
-                        <li>สแกน QR Code ที่แสดงด้านบน</li>
-                        <li>ตรวจสอบจำนวนเงินและยืนยันการชำระเงิน</li>
-                        <li>รอระบบตรวจสอบการชำระเงิน (ประมาณ 5-10 วินาที)</li>
+                        <li data-key="t-step-1">เปิดแอปพลิเคชันธนาคารของคุณ</li>
+                        <li data-key="t-step-2">เลือกเมนู "สแกน QR Code" หรือ "จ่ายเงิน"</li>
+                        <li data-key="t-step-3">สแกน QR Code ที่แสดงด้านบน</li>
+                        <li data-key="t-step-4">ตรวจสอบจำนวนเงินและยืนยันการชำระเงิน</li>
+                        <li data-key="t-step-5">รอระบบตรวจสอบการชำระเงิน (ประมาณ 5-10 วินาที)</li>
                     </ol>
                 </div>
             </div>
