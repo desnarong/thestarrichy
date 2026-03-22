@@ -104,14 +104,8 @@
       function pick(o,k,d){if(d===undefined)d='';for(var i=0;i<k.length;i++){if(o!=null&&o[k[i]]!==undefined&&o[k[i]]!==null)return o[k[i]];}return d;}
       function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
       function toNum(v){var n=parseFloat(v);return isNaN(n)?0:n;}
-      function fmt2(v){return toNum(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-      function fmtDate(v) {
-      if (!v) return '-';
-        var d = new Date(v);
-        return isNaN(d.getTime())
-          ? String(v)
-          : d.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
-      }
+      function fmt0(v){return Math.round(toNum(v)).toLocaleString('th-TH');}
+      function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
       function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
       function parseRowDate(v){
@@ -139,7 +133,7 @@
         var val=toNum(pick(rows,[bt.key,bt.key.toLowerCase()],0));
         var fromDate=pick(rows,['FromDate','fromDate']);
         var toDate=pick(rows,['ToDate','toDate']);
-        var num=fmt2(val);
+        var num=fmt0(val);
         if(bt.detail&&val!==0){
           return '<span class="text-primary fw-bold bonus-link" style="cursor:pointer;text-decoration:underline;" data-detail="'+bt.detail+'" data-fromdate="'+esc(fromDate)+'" data-todate="'+esc(toDate)+'">'+num+'</span>';
         }
@@ -193,10 +187,10 @@
           var dateKeys=rtype==='monthly'?['CalcMonth','calcMonth','Calcmonth']:['FromDate','fromDate'];
           rows=filterByDate(rows,dateKeys,from,to);
           var accum=rows.reduce(function(s,r){return s+toNum(pick(r,['NetBonus','netBonus','TotalBonus','totalBonus'],0));},0);
-          $('#totalAccumBonus').text(fmt2(accum));
+          $('#totalAccumBonus').text(fmt0(accum));
           if(rtype==='period'){
             var sf=[['sum_ServicePrice',['ServicePrice','servicePrice']],['sum_TotalBonusAfterExpense',['TotalBonusAfterExpense','totalBonusAfterExpense']],['sum_Tax',['Tax','tax']],['sum_TotalBonusIncudeTax',['TotalBonusIncudeTax','totalBonusIncudeTax']],['sum_WithHoldingTax',['WithHoldingTax','withHoldingTax']],['sum_NetBonus',['NetBonus','netBonus']]];
-            sf.forEach(function(p){var tot=rows.reduce(function(s,r){return s+toNum(pick(r,p[1],0));},0);$('#'+p[0]).text(fmt2(tot)+' บาท');});
+            sf.forEach(function(p){var tot=rows.reduce(function(s,r){return s+toNum(pick(r,p[1],0));},0);$('#'+p[0]).text(fmt0(tot)+' บาท');});
             if(rows.length>0)$('#periodSummarySection').slideDown(200);
           }
           if(mainTbl){mainTbl.destroy();}$('#mainBonusTable').empty();
@@ -232,7 +226,7 @@
             cfg.forEach(function(c){
               var v=pick(r,c.k,'');
               if(c.dt)tbody+='<td class="text-center">'+fmtDate(v)+'</td>';
-              else if(c.num)tbody+='<td class="text-end">'+fmt2(v)+'</td>';
+              else if(c.num)tbody+='<td class="text-end">'+fmt0(v)+'</td>';
               else tbody+='<td>'+esc(String(v))+'</td>';
             });
             tbody+='</tr>';

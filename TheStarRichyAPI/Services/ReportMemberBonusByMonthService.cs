@@ -130,13 +130,12 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT  Membercode,  FromDate, ToDate,  PaymentDate  , TypeofBonus ,SponserBonus,RebateBonus,WeakBonus";
-                    query += ", MatchingBonus ,StrongBonus, AllSaleBonus, MobileBonus,  UnilevelBonus, SpecialBonus,  TotalBonus,  WTHTax,  OtherExpense ";
-                    query += ",ServicePrice ,Coupon ,  BonusatferTax,Coupon ,Remark ,NetBonus, PeriodName ";
-                    query += " FROM [000_Member_bonus_for_mobile]  (nolock) ";
+                    string query = "SELECT [Membercode] ,[CalcMonth] ,[CalcMonth1] ,[SponserBonus] ,[RebateBonus] ,[WeakBonus] ,[MatchingBonus] ," +
+                        "[StrongBonus] ,[AllSaleBonus] ,[MobileBonus] ,[UnilevelBonus] ,[SpecialBonus] ,[TotalBonus], 'รายเดือน/Monthly' AS BonusType " +
+                        "FROM [000_Member_bonus_for_mobile_monthly]  (nolock) ";
  
                     query += " where Membercode = @Membercode";
-                    query += " ORDER BY FromDate desc ,TypeofBonus desc ";
+                    query += " ORDER BY CalcMonth desc ,TypeofBonus desc ";
 
                     using (var command = new SqlCommand(query, con))
                     {

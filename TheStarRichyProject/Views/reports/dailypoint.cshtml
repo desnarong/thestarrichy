@@ -100,8 +100,8 @@ $(function(){
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
-  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function fmtDate(v){if(!v)return'';var d=new Date(v);return isNaN(d.getTime())?String(v):d.toLocaleDateString('th-TH');}
+  function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
+  function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildMainTable(rows){
@@ -115,8 +115,8 @@ $(function(){
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
         '<td class="text-center">'+fmtDate(bd)+'</td>'+
-        '<td class="text-end"><a href="#" class="fw-bold text-success text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'left\');return false;">'+fmt2(lv)+'</a></td>'+
-        '<td class="text-end"><a href="#" class="fw-bold text-primary text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'right\');return false;">'+fmt2(rv)+'</a></td>'+
+        '<td class="text-end"><a href="#" class="fw-bold text-success text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'left\');return false;">'+fmt0(lv)+'</a></td>'+
+        '<td class="text-end"><a href="#" class="fw-bold text-primary text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'right\');return false;">'+fmt0(rv)+'</a></td>'+
         '</tr>';
     });
     tbody+='</tbody>';
@@ -125,7 +125,7 @@ $(function(){
       language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
     var sumL=rows.reduce(function(s,r){return s+num(p(r,['LeftPV','leftPV'],0));},0);
     var sumR=rows.reduce(function(s,r){return s+num(p(r,['RightPV','rightPV'],0));},0);
-    $('#sumLeft').text(fmt2(sumL));$('#sumRight').text(fmt2(sumR));$('#rowCount').text(rows.length);
+    $('#sumLeft').text(fmt0(sumL));$('#sumRight').text(fmt0(sumR));$('#rowCount').text(rows.length);
     $('#msgMain').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' วัน');
   }
 
@@ -151,11 +151,11 @@ $(function(){
           '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
           '<td class="text-center">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
           '<td>'+esc(p(r,['Billtype','billtype','BillType']))+'</td>'+
-          '<td class="text-end fw-bold text-success">'+fmt2(pv)+'</td>'+
+          '<td class="text-end fw-bold text-success">'+fmt0(pv)+'</td>'+
           '</tr>';
       });
       tbody+='</tbody>';
-      var tfoot='<tfoot><tr><td colspan="7" class="text-end fw-bold bg-light">รวมทั้งหมด</td><td class="text-end fw-bold text-success bg-light">'+fmt2(totalPV)+'</td></tr></tfoot>';
+      var tfoot='<tfoot><tr><td colspan="7" class="text-end fw-bold bg-light">รวมทั้งหมด</td><td class="text-end fw-bold text-success bg-light">'+fmt0(totalPV)+'</td></tr></tfoot>';
       $('#detailTable').html(thead+tbody+tfoot);
       detailTbl=$('#detailTable').DataTable({paging:false,ordering:false,searching:false,info:false,
         language:{emptyTable:'ไม่พบข้อมูล'}});

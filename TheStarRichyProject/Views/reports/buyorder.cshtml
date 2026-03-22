@@ -92,9 +92,8 @@ $(function(){
   function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
-  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
-  function fmtDate(v){if(!v)return'';var d=new Date(v);return isNaN(d.getTime())?String(v):d.toLocaleDateString('th-TH');}
+  function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function slipHtml(v){if(!v||String(v).trim()==='')return'';var s=String(v).trim();return'<img class="slip-thumb" src="'+esc(s)+'" onerror="this.style.display=\'none\'" onclick="showImg(\''+esc(s)+'\')">';}
 
@@ -161,8 +160,8 @@ $(function(){
         '<td>'+esc(p(r,['Billtype','billType','billtype']))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['Unit','unit'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['UnitPrice','unitPrice'],0))+'</td>'+
-        '<td class="text-end fw-bold text-success">'+fmt2(p(r,['TotalAmount','totalAmount'],0))+'</td>'+
-        '<td class="text-end text-info fw-semibold">'+fmt2(p(r,['TotalPV','totalPV','TotalPv'],0))+'</td>'+
+        '<td class="text-end fw-bold text-success">'+fmt0(p(r,['TotalAmount','totalAmount'],0))+'</td>'+
+        '<td class="text-end text-info fw-semibold">'+fmt0(p(r,['TotalPV','totalPV','TotalPv'],0))+'</td>'+
         '<td class="text-center">'+esc(p(r,['BillConfirmType','billConfirmType']))+'</td>'+
         '<td class="text-center">'+esc(p(r,['Receive','receive']))+'</td>'+
         '<td class="text-center">'+fmtDate(p(r,['ReceiveDate','receiveDate']))+'</td>'+
@@ -184,7 +183,7 @@ $(function(){
       language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
     var totalAmt=rows.reduce(function(s,r){return s+num(p(r,['TotalAmount','totalAmount'],0));},0);
     var totalPV=rows.reduce(function(s,r){return s+num(p(r,['TotalPV','totalPV','TotalPv'],0));},0);
-    $('#sumAmount').text(fmt2(totalAmt));$('#sumPV').text(fmt2(totalPV));$('#rowCount').text(rows.length);
+    $('#sumAmount').text(fmt0(totalAmt));$('#sumPV').text(fmt0(totalPV));$('#rowCount').text(rows.length);
     $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
   }
 
