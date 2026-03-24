@@ -176,27 +176,68 @@ namespace TheStarRichyProject.Models
         public decimal TotalBV => CartItems.Sum(x => x.PV);
         public decimal ShippingFee()
         {
-            var cartitem = CartItems.FirstOrDefault();
-            if (cartitem != null)
+            if (CartItems == null || CartItems.Count == 0)
+                return 0;
+
+            // Check if any item requires pickup (M01_X46='1') - no delivery fee
+            foreach (var cartItem in CartItems)
             {
-                var product = Products.FirstOrDefault(x => x.ProductId == cartitem.ProductID);
-                if (product != null)
+                var product = Products.FirstOrDefault(x => x.ProductId == cartItem.ProductID);
+                if (product != null && product.M01_X46 == "1")
                 {
-                    // M01_X50='1': ค่าส่งฟรี / M01_X46='1': รับเองที่ศูนย์ ไม่มีค่าส่ง
-                    if (product.M01_X50 == "1" || product.M01_X46 == "1") return 0;
-                    if (product.TypeofFee == "1")
-                    {
-                        if (CartItems.Sum(x => x.PV) > product.CondFee) return 0;
-                        else return product.DeliveryFee1 ?? 0;
-                    }
-                    else
-                    {
-                        if (CartItems.Sum(x => x.SubTotal) > product.CondFee) return 0;
-                        else return product.DeliveryFee1 ?? 0;
-                    }
+                    return 0; // Must pickup - no delivery
                 }
             }
-            return 0;
+
+            // Check if any item has free shipping (M01_X50='1')
+            foreach (var cartItem in CartItems)
+            {
+                var product = Products.FirstOrDefault(x => x.ProductId == cartItem.ProductID);
+                if (product != null && product.M01_X50 == "1")
+                {
+                    return 0; // Free shipping
+                }
+            }
+
+            // Calculate shipping based on first product's rules
+            var firstCartItem = CartItems.FirstOrDefault();
+            if (firstCartItem == null)
+                return 0;
+
+            var firstProduct = Products.FirstOrDefault(x => x.ProductId == firstCartItem.ProductID);
+            if (firstProduct == null)
+                return 0;
+
+            var totalPV = CartItems.Sum(x => x.PV * x.Quantity);
+            var totalAmount = CartItems.Sum(x => x.SubTotal);
+
+            // TypeofFee: 0 = by price, 1 = by PV
+            if (firstProduct.TypeofFee == "1")
+            {
+                // Calculate by PV
+                // CondFee: minimum threshold
+                // If total PV < CondFee, use DeliveryFee1, else use DeliveryFee2
+                if (totalPV < firstProduct.CondFee)
+                {
+                    return firstProduct.DeliveryFee1 ?? 0;
+                }
+                else
+                {
+                    return firstProduct.DeliveryFee2 ?? 0;
+                }
+            }
+            else
+            {
+                // Calculate by price/amount
+                if (totalAmount < firstProduct.CondFee)
+                {
+                    return firstProduct.DeliveryFee1 ?? 0;
+                }
+                else
+                {
+                    return firstProduct.DeliveryFee2 ?? 0;
+                }
+            }
         }
         public int TotalItems => CartItems.Sum(x => x.Quantity);
 

@@ -769,7 +769,14 @@
                     };
                 }
             } else {
-                request.branchCode = $('#branchSelect').val();
+                // Pickup - must select branch
+                const branchCode = $('#branchSelect').val();
+                if (!branchCode) {
+                    Swal.fire('แจ้งเตือน', 'กรุณาเลือกสาขาที่รับสินค้า', 'warning');
+                    btn.prop('disabled', false).text('ดำเนินการชำระเงิน');
+                    return;
+                }
+                request.branchCode = branchCode;
                 request.deliveryAddressType = "Branch";
             }
 

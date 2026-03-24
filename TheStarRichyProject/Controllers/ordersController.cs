@@ -108,25 +108,73 @@ namespace TheStarRichyProject.Controllers
                 if (productList == null || productList.Count == 0)
                     return 0;
 
+                // Check if any item in cart requires pickup only (M01_X46='1')
+                foreach (var cartItem in cartItems)
+                {
+                    var product = productList.FirstOrDefault(p =>
+                        string.Equals(p.ProductId, cartItem.ProductID, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (product != null && product.M01_X46 == "1")
+                    {
+                        // Must pickup - no delivery fee but must pickup at branch
+                        return 0;
+                    }
+                }
+
+                // Check if any item has free shipping (M01_X50='1')
+                foreach (var cartItem in cartItems)
+                {
+                    var product = productList.FirstOrDefault(p =>
+                        string.Equals(p.ProductId, cartItem.ProductID, StringComparison.OrdinalIgnoreCase));
+                    
+                    if (product != null && product.M01_X50 == "1")
+                    {
+                        // Free shipping
+                        return 0;
+                    }
+                }
+
+                // Calculate shipping fee based on first product's rules
                 var firstCartItem = cartItems.FirstOrDefault();
                 if (firstCartItem == null)
                     return 0;
 
-                var product = productList.FirstOrDefault(p =>
+                var firstProduct = productList.FirstOrDefault(p =>
                     string.Equals(p.ProductId, firstCartItem.ProductID, StringComparison.OrdinalIgnoreCase));
 
-                if (product == null)
+                if (firstProduct == null)
                     return 0;
 
                 var totalPV = cartItems.Sum(x => x.PV * x.Quantity);
                 var totalAmount = cartItems.Sum(x => x.Price * x.Quantity);
 
-                if (product.TypeofFee == "1")
+                // TypeofFee: 0 = by price, 1 = by PV
+                if (firstProduct.TypeofFee == "1")
                 {
-                    return totalPV > product.CondFee ? 0 : (product.DeliveryFee1 ?? 0);
+                    // Calculate by PV
+                    // CondFee: minimum threshold
+                    // If total PV < CondFee, use DeliveryFee1, else use DeliveryFee2 (or 0 if not set)
+                    if (totalPV < firstProduct.CondFee)
+                    {
+                        return firstProduct.DeliveryFee1 ?? 0;
+                    }
+                    else
+                    {
+                        return firstProduct.DeliveryFee2 ?? 0;
+                    }
                 }
-
-                return totalAmount > product.CondFee ? 0 : (product.DeliveryFee1 ?? 0);
+                else
+                {
+                    // Calculate by price/amount
+                    if (totalAmount < firstProduct.CondFee)
+                    {
+                        return firstProduct.DeliveryFee1 ?? 0;
+                    }
+                    else
+                    {
+                        return firstProduct.DeliveryFee2 ?? 0;
+                    }
+                }
             }
             catch
             {
@@ -387,15 +435,30 @@ namespace TheStarRichyProject.Controllers
 
                 // ⭐ ตรวจสอบว่ามีสินค้า M01_X46='1' (ต้องรับเอง) ในตะกร้าหรือไม่
                 bool forcePickup = false;
+                bool hasFreeShipping = false;
+                bool hasNonCombinable = false;
                 var productListJson = HttpContext.Session.GetString("ProductList");
                 if (!string.IsNullOrEmpty(productListJson) && cart.Data?.Items?.Any() == true)
                 {
                     var products = JsonSerializer.Deserialize<List<Product>>(productListJson);
                     if (products != null)
+                    {
+                        // M01_X46='1': ต้องรับเองที่ศูนย์เท่านั้น
                         forcePickup = cart.Data.Items.Any(item =>
                             products.FirstOrDefault(p => p.ProductId == item.ProductID)?.M01_X46 == "1");
+                        
+                        // M01_X50='1': ส่งฟรี
+                        hasFreeShipping = cart.Data.Items.Any(item =>
+                            products.FirstOrDefault(p => p.ProductId == item.ProductID)?.M01_X50 == "1");
+                        
+                        // M01_X69='1': ไม่สามารถซื้อร่วมกับรายการอื่นได้ (ตรวจไว้แต่ไม่ต้องทำอะไรพิเศษ)
+                        hasNonCombinable = cart.Data.Items.Any(item =>
+                            products.FirstOrDefault(p => p.ProductId == item.ProductID)?.M01_X69 == "1");
+                    }
                 }
                 ViewBag.ForcePickup = forcePickup;
+                ViewBag.HasFreeShipping = hasFreeShipping;
+                ViewBag.HasNonCombinable = hasNonCombinable;
 
                 // ดึงที่อยู่ที่เคยใช้
                 var addresses = await _orderService.GetMemberAddressesAsync(token, passkey);
@@ -434,6 +497,34 @@ namespace TheStarRichyProject.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     return Json(new { success = false, message = "กรุณา Login ก่อน" });
+                }
+
+                // ⭐ Validate branch selection for pickup orders
+                if (request.DeliveryMethod == "Pickup" && string.IsNullOrEmpty(request.BranchCode))
+                {
+                    return Json(new { success = false, message = "กรุณาเลือกสาขาที่รับสินค้า" });
+                }
+
+                // ⭐ Validate that products with M01_X46='1' are using pickup
+                var productListJson = HttpContext.Session.GetString("ProductList");
+                if (!string.IsNullOrEmpty(productListJson))
+                {
+                    var products = JsonSerializer.Deserialize<List<Product>>(productListJson);
+                    if (products != null)
+                    {
+                        // Get cart items to check
+                        var cart = await _cartService.GetCartAsync(token, passkey);
+                        if (cart?.Data?.Items?.Any() == true)
+                        {
+                            var hasPickupRequired = cart.Data.Items.Any(item =>
+                                products.FirstOrDefault(p => p.ProductId == item.ProductID)?.M01_X46 == "1");
+                            
+                            if (hasPickupRequired && request.DeliveryMethod != "Pickup")
+                            {
+                                return Json(new { success = false, message = "สินค้าบางรายการต้องรับเองที่ศูนย์เท่านั้น" });
+                            }
+                        }
+                    }
                 }
 
                 // 1. ✅ สร้าง Order จาก Cart (Cart จะ Completed ตรงนี้)
@@ -1235,11 +1326,8 @@ namespace TheStarRichyProject.Controllers
 
                 if (result.Success)
                 {
-                    var shippingFee = result.Data.ShippingFee;
-                    if (shippingFee <= 0)
-                    {
-                        shippingFee = CalculateShippingFeeFallback(result.Data.Items);
-                    }
+                    // Always recalculate shipping fee based on product rules
+                    var shippingFee = CalculateShippingFeeFallback(result.Data.Items);
 
                     return Json(new
                     {
