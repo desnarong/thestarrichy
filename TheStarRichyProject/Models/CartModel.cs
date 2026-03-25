@@ -44,8 +44,8 @@ namespace TheStarRichyProject.Models
     {
         public int CartID { get; set; }
         public string MemberCode { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ExpiryDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
+        public DateTime? ExpiryDate { get; set; }
         public string Status { get; set; }
         public decimal TotalAmount { get; set; }
         public decimal TotalPV { get; set; }
