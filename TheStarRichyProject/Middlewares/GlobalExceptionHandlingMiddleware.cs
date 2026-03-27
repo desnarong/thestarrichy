@@ -38,8 +38,8 @@ namespace TheStarRichyProject.Middlewares
                 }
                 else
                 {
-                    // Redirect to error page with session expired flag
-                    context.Response.Redirect("/Home/Error?sessionExpired=true");
+                    // Redirect to login page
+                    context.Response.Redirect("/Auth/Login");
                 }
             }
         }

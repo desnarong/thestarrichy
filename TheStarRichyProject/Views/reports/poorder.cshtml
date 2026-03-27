@@ -5,17 +5,7 @@
 <style>
 .slip-thumb{width:32px;height:32px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid #ddd;}
 </style>
-<div class="modal fade" id="detailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header" style="background:#1a237e;color:#fff;">
-        <h5 class="modal-title"><i class="bx bx-receipt me-2"></i>รายละเอียดบิล</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="detailModalBody"></div>
-    </div>
-  </div>
-</div>
+
 <div class="modal fade" id="imgModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content"><div class="modal-body text-center p-2">
@@ -91,6 +81,24 @@
   </div>
 </div>
 
+<div class="row" id="detailSection" style="display:none;">
+  <div class="col-12">
+    <div class="card shadow-sm border-0" style="border:1px solid #5c6bc0 !important;">
+      <div class="card-header d-flex align-items-center justify-content-between" style="background:#e8eaf6;border-bottom:2px solid #5c6bc0;">
+        <h5 class="mb-0 fw-semibold" style="color:#3949ab;"><i class="bx bx-zoom-in me-2"></i>รายละเอียดบิล: <span id="detailTitle">-</span></h5>
+        <button class="btn btn-sm btn-outline-secondary" id="btnCloseDetail"><i class="bx bx-x me-1"></i>ปิด</button>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-2" id="detailMessage">กำลังโหลดรายละเอียด...</div>
+        <div class="table-responsive">
+          <table id="detailTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.75rem;white-space:nowrap;">
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 $(function(){
   var allRows=[], tbl=null;
@@ -104,8 +112,21 @@ $(function(){
   function slipHtml(v){if(!v||String(v).trim()==='')return'';var s=String(v).trim();return'<img class="slip-thumb" src="'+esc(s)+'" onerror="this.style.display=\'none\'" onclick="showImg(\''+esc(s)+'\')">';}
 
   window.showImg=function(src){$('#imgModalSrc').attr('src',src);new bootstrap.Modal(document.getElementById('imgModal')).show();};
+  
   window.showDetail=function(idx){
     var r=allRows[idx];if(!r)return;
+    $('#detailSection').slideDown(200);
+    $('#detailTitle').text('บิล '+esc(p(r,['BillNo','billNo'])));
+    $('#detailMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+    
+    // Destroy existing DataTable if it exists
+    if($.fn.DataTable.isDataTable('#detailTable')){
+      $('#detailTable').DataTable().destroy();
+    }
+    $('#detailTable').empty();
+    
+    // Create horizontal table layout
+    var thead='<thead class="table-light"><tr>';
     var fields=[
       ['เลขที่ใบเสร็จ','BillNo'],['วันที่','BillDate'],['รหัส Hybrid Gold','HybridGOLDID'],
       ['รหัสนักธุรกิจ','Membercode'],['ชื่อนักธุรกิจ','Membername'],['ประเภทซื้อ','Billtype'],
@@ -113,18 +134,35 @@ $(function(){
       ['ผู้ทำรายการ','Createby'],['การจ่ายเงิน','PaymentType'],
       ['Tracking','TrackingURL'],['ที่อยู่จัดส่ง','DeliveryAddress']
     ];
-    var html='<table class="table table-sm table-bordered"><tbody>';
+    
+    fields.forEach(function(f){
+      thead+='<th class="text-nowrap" style="min-width:110px;font-size:0.73rem;">'+f[0]+'</th>';
+    });
+    thead+='</tr></thead>';
+    
+    // Data row
+    var tbody='<tbody><tr>';
     fields.forEach(function(f){
       var v=r[f[1]]||r[f[1].toLowerCase()]||'';
       if(f[1]==='TrackingURL'&&v)v='<a href="'+esc(v)+'" target="_blank">'+esc(v)+'</a>';
+      else if(f[1]==='BillDate')v=fmtDate(v);
+      else if(f[1]==='TotalAmount'||f[1]==='TotalPV')v=fmt0(v);
       else v=esc(String(v));
-      html+='<tr><th class="bg-light text-nowrap" style="width:140px;">'+f[0]+'</th><td>'+v+'</td></tr>';
+      tbody+='<td class="text-nowrap" style="font-size:0.73rem;">'+v+'</td>';
     });
-    html+='</tbody></table>';
+    tbody+='</tr></tbody>';
+    
+    $('#detailTable').html(thead+tbody);
+    
+    // Initialize DataTable
+    $('#detailTable').DataTable({paging:false,ordering:false,searching:false,info:false,
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล'}});
+    
+    // Add slips section
     var slips='';for(var i=1;i<=5;i++){var sv=r['Slip'+i]||'';if(sv)slips+=slipHtml(sv)+' ';}
-    if(slips)html+='<div class="mt-2"><strong>สลิป:</strong> '+slips+'</div>';
-    $('#detailModalBody').html(html);
-    new bootstrap.Modal(document.getElementById('detailModal')).show();
+    if(slips)$('#detailMessage').after('<div class="mt-2"><strong class="text-primary">สลิปการโอนเงิน:</strong> '+slips+'</div>');
+    
+    $('#detailMessage').removeClass('alert-secondary').addClass('alert-success').text('แสดงข้อมูลเรียบร้อย');
   };
 
   function filterRows(rows){
@@ -192,7 +230,8 @@ $(function(){
   }
 
   $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');loadData();});
+  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');$('#detailSection').hide();loadData();});
+  $('#btnCloseDetail').on('click',function(){$('#detailSection').slideUp(200);});
   loadData();
 });
 </script>

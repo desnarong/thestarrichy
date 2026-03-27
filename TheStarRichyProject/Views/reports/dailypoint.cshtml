@@ -94,21 +94,17 @@
 <script>
 $(function(){
   var mainTbl=null, detailTbl=null;
-  var now=new Date();
-  var firstOfMonth=new Date(now.getFullYear(),now.getMonth(),1).toISOString().substring(0,10);
-  var todayStr=now.toISOString().substring(0,10);
-  $('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);
 
   $('input[name="viewMode"]').on('change',function(){
     if($('#vmDate').is(':checked'))$('#dateRange').show();
-    else{$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);}
+    else{$('#dateRange').hide();$('#fromDate').val('');$('#toDate').val('');}
   });
 
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
-  function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildMainTable(rows){
@@ -175,15 +171,15 @@ $(function(){
   function loadData(){
     $('#msgMain').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
     var isAll=$('#vmAll').is(':checked');
-    var f=isAll?firstOfMonth:$('#fromDate').val();
-    var t=isAll?todayStr:$('#toDate').val();
+    var f=isAll?'':$('#fromDate').val();
+    var t=isAll?'':$('#toDate').val();
     $.get('@Url.Action("GetDailyPointData","reports")',{fromDate:f,toDate:t},function(json){
       buildMainTable(norm(json));
     }).fail(function(){$('#msgMain').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
   }
 
   $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val(firstOfMonth);$('#toDate').val(todayStr);$('#detailPanel').hide();loadData();});
+  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val('');$('#toDate').val('');$('#detailPanel').hide();loadData();});
   loadData();
 });
 </script>

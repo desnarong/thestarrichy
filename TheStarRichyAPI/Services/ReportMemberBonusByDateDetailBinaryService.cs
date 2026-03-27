@@ -164,7 +164,7 @@ namespace TheStarRichyApi.Services
                         }
                         if (!string.IsNullOrWhiteSpace(toDate))
                         {
-                            command.Parameters.AddWithValue("@ToDate", DateTime.Parse(toDate).AddDays(1).AddSeconds(-1));
+                            command.Parameters.AddWithValue("@ToDate", DateTime.Parse(toDate));
                         }
 
                         using (var reader = await command.ExecuteReaderAsync())

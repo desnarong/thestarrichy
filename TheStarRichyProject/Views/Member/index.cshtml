@@ -1084,7 +1084,18 @@
                 $('#user-profile-image').attr('src', member.memberPicture || member.memberPositionPicture || 'N/A');
                 $('#info-copyidcard').attr('src', member.memberIDPicture || 'N/A');
                 $('#info-copybankaccountbook').attr('src', member.memberBookPicture || 'N/A');
-                $('#info-applicationsubmitte').attr('src', '');
+                $('#info-applicationsubmitte').attr('src', member.memberApplicationPicture || 'N/A');
+
+                // Disable upload inputs if documents are already uploaded
+                if (member.memberIDPicture && member.memberIDPicture !== 'N/A') {
+                    $('#info-uploadcopyidcard').prop('disabled', true);
+                }
+                if (member.memberBookPicture && member.memberBookPicture !== 'N/A') {
+                    $('#info-uploadcopybankaccountbook').prop('disabled', true);
+                }
+                if (member.memberApplicationPicture && member.memberApplicationPicture !== 'N/A') {
+                    $('#info-uploadapplicationsubmitte').prop('disabled', true);
+                }
 
                 $('#info-flagsendidcard').prop('checked', (member.memberIDPicture ? true : false));
                 $('#info-flagsendbookbank').prop('checked', (member.memberBookPicture ? true : false));

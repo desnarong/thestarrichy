@@ -563,6 +563,11 @@ $(document).ready(function () {
         } else {
             $('#tableMessage').hide();
             var rows = '';
+            // Debug: Log first row to see available columns
+            if (pageData.length > 0) {
+                console.log('Sample data keys:', Object.keys(pageData[0]));
+                console.log('Sample data first row:', pageData[0]);
+            }
             pageData.forEach(function (m, i) {
                 var qualify   = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
                 var isQualify = qualify.startsWith('yes');
@@ -597,7 +602,7 @@ $(document).ready(function () {
                     '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV ?? 0)   + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft ?? 0)       + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight ?? 0)      + '</td>' +
-                    '<td>'                           + escHtml(m.SponserName ?? m.sponserName ?? m.SponsorName ?? '') + '</td>' +
+                    '<td>'                           + escHtml(m.SponserName ?? m.sponserName ?? m.SponsorName ?? m.sponsorName ?? m.Sponsername1 ?? m.sponsername1 ?? m.Sponsor_Name ?? m.Upline ?? m.upline ?? m.Sponsor ?? m.sponsor ?? '') + '</td>' +
                     '<td class="text-center">'  + qualBadge + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV ?? 0) + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.LastMonthQualifyPV    ?? m.lastMonthQualifyPV ?? 0)    + '</td>' +

@@ -5,17 +5,7 @@
 <style>
 .slip-thumb{width:32px;height:32px;object-fit:cover;border-radius:4px;cursor:pointer;border:1px solid #ddd;}
 </style>
-<div class="modal fade" id="detailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
-    <div class="modal-content">
-      <div class="modal-header" style="background:#4527a0;color:#fff;">
-        <h5 class="modal-title"><i class="bx bx-receipt me-2"></i>รายละเอียดบิล</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-      </div>
-      <div class="modal-body" id="detailModalBody"></div>
-    </div>
-  </div>
-</div>
+
 <div class="modal fade" id="imgModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content"><div class="modal-body text-center p-2">
@@ -100,6 +90,24 @@
   </div>
 </div>
 
+<div class="row" id="detailSection" style="display:none;">
+  <div class="col-12">
+    <div class="card shadow-sm border-0" style="border:1px solid #7e57c2 !important;">
+      <div class="card-header d-flex align-items-center justify-content-between" style="background:#ede7f6;border-bottom:2px solid #7e57c2;">
+        <h5 class="mb-0 fw-semibold" style="color:#5e35b1;"><i class="bx bx-zoom-in me-2"></i>รายละเอียดบิล: <span id="detailTitle">-</span></h5>
+        <button class="btn btn-sm btn-outline-secondary" id="btnCloseDetail"><i class="bx bx-x me-1"></i>ปิด</button>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-secondary py-2 mb-2" id="detailMessage">กำลังโหลดรายละเอียด...</div>
+        <div class="table-responsive">
+          <table id="detailTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.75rem;white-space:nowrap;">
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script>
 $(function(){
   var allRows=[], tbl=null;
@@ -108,13 +116,33 @@ $(function(){
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
-  function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+  function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+  function findPV(r){
+    var keys=['TotalPV','totalPV','TotalPv','totalpv','PV','pv','Total_PV','total_pv','Pv','pV','Total_Pv','total_PV'];
+    for(var i=0;i<keys.length;i++){if(r[keys[i]]!=null)return num(r[keys[i]]);}
+    for(var k in r){if(k.toLowerCase()==='totalpv'||k.toLowerCase()==='pv')return num(r[k]);}
+    return 0;
+  }
   function slipHtml(v){if(!v||String(v).trim()==='')return'';var s=String(v).trim();return'<img class="slip-thumb" src="'+esc(s)+'" onerror="this.style.display=\'none\'" onclick="showImg(\''+esc(s)+'\')">';}
 
   window.showImg=function(src){$('#imgModalSrc').attr('src',src);new bootstrap.Modal(document.getElementById('imgModal')).show();};
+  
   window.showDetail=function(idx){
     var r=allRows[idx];if(!r)return;
+    $('#detailSection').slideDown(200);
+    $('#detailTitle').text('บิล '+esc(p(r,['BillNo','billNo'])));
+    $('#detailMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+    
+    // Destroy existing DataTable if it exists
+    if($.fn.DataTable.isDataTable('#detailTable')){
+      $('#detailTable').DataTable().destroy();
+    }
+    $('#detailTable').empty();
+    
+    // Create horizontal table layout
+    var thead='<thead class="table-light"><tr>';
     var fields=[
       ['เลขที่ใบเสร็จ','BillNo'],['วันที่','BillDate'],['เลขที่อ้างอิง','ReferenceNo'],
       ['รหัส Hybrid Gold','HybridGOLDID'],['เลขที่บิล HOLD','HOLDORDERID'],
@@ -125,22 +153,46 @@ $(function(){
       ['วันหมดอายุบิล','ExpireDate'],['ยอดแจง','PVSaleout'],['คงเหลือ','Remain'],
       ['ผู้ทำรายการ','Createby'],['การจ่ายเงิน','PaymentType'],['Tracking','TrackingURL'],['ที่อยู่จัดส่ง','DeliveryAddress']
     ];
-    var html='<table class="table table-sm table-bordered"><tbody>';
+    
+    fields.forEach(function(f){
+      thead+='<th class="text-nowrap" style="min-width:110px;font-size:0.73rem;">'+f[0]+'</th>';
+    });
+    thead+='</tr></thead>';
+    
+    // Data row
+    var tbody='<tbody><tr>';
     fields.forEach(function(f){
       var v=r[f[1]]||r[f[1].toLowerCase()]||'';
       if(f[1]==='TrackingURL'&&v)v='<a href="'+esc(v)+'" target="_blank">'+esc(v)+'</a>';
+      else if(f[1]==='BillDate'||f[1]==='ReceiveDate'||f[1]==='ExpireDate')v=fmtDate(v);
+      else if(f[1]==='Unit'||f[1]==='UnitPrice'||f[1]==='TotalAmount'||f[1]==='TotalPV'||f[1]==='PVSaleout'||f[1]==='Remain')v=fmt0(v);
       else v=esc(String(v));
-      html+='<tr><th class="bg-light text-nowrap" style="width:140px;">'+f[0]+'</th><td>'+v+'</td></tr>';
+      tbody+='<td class="text-nowrap" style="font-size:0.73rem;">'+v+'</td>';
     });
-    html+='</tbody></table>';
+    tbody+='</tr></tbody>';
+    
+    $('#detailTable').html(thead+tbody);
+    
+    // Initialize DataTable
+    $('#detailTable').DataTable({paging:false,ordering:false,searching:false,info:false,
+      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล'}});
+    
+    // Add slips section
     var slips='';for(var i=1;i<=5;i++){var sv=r['Slip'+i]||'';if(sv)slips+=slipHtml(sv)+' ';}
-    if(slips)html+='<div class="mt-2"><strong>สลิป:</strong> '+slips+'</div>';
-    $('#detailModalBody').html(html);
-    new bootstrap.Modal(document.getElementById('detailModal')).show();
+    if(slips)$('#detailMessage').after('<div class="mt-2"><strong class="text-primary">สลิปการโอนเงิน:</strong> '+slips+'</div>');
+    
+    $('#detailMessage').removeClass('alert-secondary').addClass('alert-success').text('แสดงข้อมูลเรียบร้อย');
   };
 
   function filterRows(rows){
-    var f=$('#fromDate').val(),t=$('#toDate').val();
+    var f=$('#fromDate').val(),t=$('#toDate').val(),ct=$('input[name="checktype"]:checked').val()||'all';
+    // Filter by remain = 0 if checktype is "remain"
+    if(ct==='remain'){
+      rows=rows.filter(function(r){
+        var remain=num(p(r,['Remain','remain'],0));
+        return remain>0;
+      });
+    }
     if(!f&&!t)return rows;
     var from=f?new Date(f):null,to=t?new Date(t+'T23:59:59'):null;
     return rows.filter(function(r){
@@ -177,9 +229,9 @@ $(function(){
         '<td>'+esc(p(r,['ProductSet','productSet']))+'</td>'+
         '<td>'+esc(p(r,['Billtype','billType','billtype']))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['Unit','unit'],0))+'</td>'+
-        '<td class="text-end">'+fmt0(p(r,['UnitPrice','unitPrice'],0))+'</td>'+
-        '<td class="text-end fw-bold text-success">'+fmt0(p(r,['TotalAmount','totalAmount'],0))+'</td>'+
-        '<td class="text-end text-info fw-semibold">'+fmt0(p(r,['TotalPV','totalPV','TotalPv'],0))+'</td>'+
+        '<td class="text-end">'+fmt2(p(r,['UnitPrice','unitPrice','unitprice','Unitprice'],0))+'</td>'+
+        '<td class="text-end fw-bold text-success">'+fmt2(p(r,['TotalPrice','totalPrice','totalprice','Totalprice','TotalAmount','totalAmount','Amount','amount'],0))+'</td>'+
+        '<td class="text-end text-info fw-semibold">'+fmt0(findPV(r))+'</td>'+
         '<td class="text-center">'+esc(p(r,['BillConfirmType','billConfirmType']))+'</td>'+
         '<td class="text-center">'+esc(p(r,['Receive','receive']))+'</td>'+
         '<td class="text-center">'+fmtDate(p(r,['ReceiveDate','receiveDate']))+'</td>'+
@@ -202,9 +254,9 @@ $(function(){
     $('#mainTable').html(thead+tbody);
     tbl=$('#mainTable').DataTable({paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],ordering:true,searching:true,responsive:false,
       language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
-    var totalAmt=rows.reduce(function(s,r){return s+num(p(r,['TotalAmount','totalAmount'],0));},0);
-    var totalPV=rows.reduce(function(s,r){return s+num(p(r,['TotalPV','totalPV','TotalPv'],0));},0);
-    $('#sumAmount').text(fmt0(totalAmt));$('#sumPV').text(fmt0(totalPV));$('#rowCount').text(rows.length);
+    var totalAmt=rows.reduce(function(s,r){return s+num(p(r,['TotalPrice','totalPrice','totalprice','Totalprice','TotalAmount','totalAmount','Amount','amount'],0));},0);
+    var totalPV=rows.reduce(function(s,r){return s+findPV(r);},0);
+    $('#sumAmount').text(fmt2(totalAmt));$('#sumPV').text(fmt0(totalPV));$('#rowCount').text(rows.length);
     $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
   }
 
@@ -217,7 +269,9 @@ $(function(){
   }
 
   $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');$('#ctAll').prop('checked',true);loadData();});
+  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');$('#ctAll').prop('checked',true);$('#detailSection').hide();loadData();});
+  $('#btnCloseDetail').on('click',function(){$('#detailSection').slideUp(200);});
+  $('input[name="checktype"]').on('change',function(){buildTable(filterRows(allRows));});
   loadData();
 });
 </script>

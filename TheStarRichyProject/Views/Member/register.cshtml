@@ -438,11 +438,11 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-position">ตำแหน่ง <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" checked required />
+                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" value="left" checked required />
                                                         <label class="form-check-label" for="referrer_left" data-key="t-referrer-left">ด้านซ้าย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" required />
+                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" value="right" required />
                                                         <label class="form-check-label" for="referrer_right" data-key="t-referrer-right">ด้านขวา</label>
                                                     </div>
                                                 </div>
@@ -1197,8 +1197,10 @@
              // Set position and disable
             if (position === 'left') {
                 $('#positionLeft').prop('checked', true);
+                $('#referrer_left').prop('checked', true);
             } else {
                 $('#positionRight').prop('checked', true);
+                $('#referrer_right').prop('checked', true);
             }
         }
         
@@ -2547,26 +2549,45 @@
                 const val = $(this).val();
                 // Find the corresponding referrer_side in the other form/tab and check it
                 $(`input[name="referrer_side"][value="${val}"]`).prop('checked', true);
+                // Sync with position field (simple form)
+                $(`input[name="position"][value="${val}"]`).prop('checked', true);
                 console.log(`Sync referrer_side: ${val}`);
             });
+
+            // Sync position radio buttons with referrer_side (full form)
+            $('input[name="position"]').on('change', function() {
+                const val = $(this).val();
+                // Sync with referrer_side field (full form)
+                $(`input[name="referrer_side"][value="${val}"]`).prop('checked', true);
+                console.log(`Sync position: ${val}`);
+            });
+
+            // Prevent infinite loop in bidirectional sync
+            let isSyncing = false;
 
             // Real-time sync for select elements with change event
             Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
                 const simpleEl = $(`#${simpleId}`);
                 const fullEl = $(`#${fullId}`);
-                
+
                 if (simpleEl.length && fullEl.length) {
                     if (simpleEl.is('select')) {
                         // When simple changes, update full
                         simpleEl.on('change', function() {
+                            if (isSyncing) return;
+                            isSyncing = true;
                             console.log(`Sync ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
-                            fullEl.val(simpleEl.val()).trigger('change');
+                            fullEl.val(simpleEl.val());
+                            setTimeout(() => { isSyncing = false; }, 0);
                         });
-                        
+
                         // When full changes, update simple
                         fullEl.on('change', function() {
+                            if (isSyncing) return;
+                            isSyncing = true;
                             console.log(`Sync ${fullId} -> ${simpleId}: ${fullEl.val()}`);
-                            simpleEl.val(fullEl.val()).trigger('change');
+                            simpleEl.val(fullEl.val());
+                            setTimeout(() => { isSyncing = false; }, 0);
                         });
                     } else if (simpleEl.is('input')) {
                         // When simple input changes, update full
@@ -2574,7 +2595,7 @@
                             console.log(`Sync input ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
                             fullEl.val(simpleEl.val());
                         });
-                        
+
                         // When full input changes, update simple
                         fullEl.on('input change', function() {
                             console.log(`Sync input ${fullId} -> ${simpleId}: ${fullEl.val()}`);
@@ -2592,16 +2613,17 @@
                     const fullEl = $(`#${fullId}`);
                     if (simpleEl.length && fullEl.length) {
                         if (simpleEl.is('select')) {
-                            fullEl.val(simpleEl.val()).trigger('change');
+                            fullEl.val(simpleEl.val());
                         } else if (simpleEl.is('input')) {
                             fullEl.val(simpleEl.val());
                         }
                     }
                 });
-                // Sync referrer_side radio button
-                const referrerSideVal = $('input[name="referrer_side"]:checked').val();
-                if (referrerSideVal) {
-                    $(`#full-tab-pane input[name="referrer_side"][value="${referrerSideVal}"]`).prop('checked', true);
+                // Sync position/referrer_side radio buttons
+                const positionVal = $('input[name="position"]:checked').val();
+                if (positionVal) {
+                    $(`#full-tab-pane input[name="referrer_side"][value="${positionVal}"]`).prop('checked', true);
+                    $(`#full-tab-pane input[name="position"][value="${positionVal}"]`).prop('checked', true);
                 }
             });
 
@@ -2612,16 +2634,17 @@
                     const fullEl = $(`#${fullId}`);
                     if (simpleEl.length && fullEl.length) {
                         if (fullEl.is('select')) {
-                            simpleEl.val(fullEl.val()).trigger('change');
+                            simpleEl.val(fullEl.val());
                         } else if (fullEl.is('input')) {
                             simpleEl.val(fullEl.val());
                         }
                     }
                 });
-                // Sync referrer_side radio button
+                // Sync referrer_side/position radio buttons
                 const referrerSideVal = $(`#full-tab-pane input[name="referrer_side"]:checked`).val();
                 if (referrerSideVal) {
                     $(`input[name="referrer_side"][value="${referrerSideVal}"]`).prop('checked', true);
+                    $(`input[name="position"][value="${referrerSideVal}"]`).prop('checked', true);
                 }
             });
         }

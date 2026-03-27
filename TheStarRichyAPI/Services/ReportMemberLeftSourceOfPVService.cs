@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberLeftSourceOfPVService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string balanceDate = "");
     }
     public class ReportMemberLeftSourceOfPVService : IReportMemberLeftSourceOfPVService
     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string balanceDate = "")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -125,12 +125,7 @@ namespace TheStarRichyApi.Services
 
             // Get Membercode from JWT
             string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string calcdate = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic>();
-            }
-            if (string.IsNullOrEmpty(calcdate))
             {
                 return new List<dynamic>();
             }
@@ -145,16 +140,24 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT  Membercode,Levelcode,DLCode,DLName,CalculateDate,PV,PercentPayMent,Amount,BillNo,BillDate ";
-                    query += " FROM [000_Member_bonus_Mobile_detail]  (nolock) ";
- 
-                    query += " where Membercode = @Membercode and CalculateDate=@Membercalc";
+                    string query = "SELECT  DLLevel,DLCode,DLName, BillNo,BillDate,Billtype,PV ";
+                    query += " FROM [000_Member_Binary_Left_Source_PV]  (nolock) ";
+
+                    query += " where Membercode = @Membercode";
+                    if (!string.IsNullOrWhiteSpace(balanceDate))
+                    {
+                        query += " and billdate=@balanceDate";
+                    }
                     query += " ORDER BY DLLevel,DLCode ";
+
 
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
-                        command.Parameters.AddWithValue("@Membercalc", calcdate);
+                        if (!string.IsNullOrWhiteSpace(balanceDate))
+                        {
+                            command.Parameters.AddWithValue("@balanceDate", balanceDate);
+                        }
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {

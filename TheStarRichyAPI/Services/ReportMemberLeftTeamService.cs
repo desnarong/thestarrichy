@@ -137,7 +137,7 @@ namespace TheStarRichyApi.Services
                         query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.MemberLeftCode  ";
                     }
                     query += " where aa.Membercode = @Membercode";
-                    query += " ORDER BY aa.MemberLeftCode ";
+                    query += " ORDER BY aa.Level, aa.MemberLeftCode ";
 
                     using (var command = new SqlCommand(query, con))
                     {
@@ -156,7 +156,8 @@ namespace TheStarRichyApi.Services
                                 {
                                     string columnName = reader.GetName(i);
                                     object columnValue = reader.GetValue(i);
-                                    rowDict[columnName] = columnValue;
+                                    if (!rowDict.ContainsKey(columnName))
+                                        rowDict[columnName] = columnValue;
                                 }
 
                                 result.Add(row);

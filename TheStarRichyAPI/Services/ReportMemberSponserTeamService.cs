@@ -162,7 +162,7 @@ namespace TheStarRichyApi.Services
 
                     string query = @"SELECT * FROM [000_Member_SponserTeam] aa (nolock) 
                     WHERE aa.Membercode = @Membercode
-                    ORDER BY aa.DLCode";
+                    ORDER BY aa.Level, aa.DLCode";
 
                     using (var command = new SqlCommand(query, con))
                     {
@@ -180,7 +180,8 @@ namespace TheStarRichyApi.Services
                                 {
                                     string columnName = reader.GetName(i);
                                     object columnValue = reader.GetValue(i);
-                                    rowDict[columnName] = columnValue;
+                                    if (!rowDict.ContainsKey(columnName))
+                                        rowDict[columnName] = columnValue;
                                 }
 
                                 result.Add(row);
