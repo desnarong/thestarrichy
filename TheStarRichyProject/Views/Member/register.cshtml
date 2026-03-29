@@ -369,7 +369,7 @@
                                         <button type="button" id="btnResetSimple" class="btn btn-outline-danger btn-lg">
                                             <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
                                         </button>
-                                        <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg">
+                                        <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg" onclick="$('#simpleRegistrationForm').submit();">
                                             <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
                                         </button>
                                     </div>
@@ -438,12 +438,12 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-position">ตำแหน่ง <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_left" value="left" checked required />
-                                                        <label class="form-check-label" for="referrer_left" data-key="t-referrer-left">ด้านซ้าย</label>
+                                                        <input type="radio" class="form-check-input" name="position" id="fullPositionLeft" value="left" checked required />
+                                                        <label class="form-check-label" for="fullPositionLeft" data-key="t-left">ซ้าย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
-                                                        <input type="radio" class="form-check-input" name="referrer_side" id="referrer_right" value="right" required />
-                                                        <label class="form-check-label" for="referrer_right" data-key="t-referrer-right">ด้านขวา</label>
+                                                        <input type="radio" class="form-check-input" name="position" id="fullPositionRight" value="right" required />
+                                                        <label class="form-check-label" for="fullPositionRight" data-key="t-right">ขวา</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1156,6 +1156,53 @@
         loadFullCountryBusinesses();
         loadFullTitles();
         setFullRegistrationDate();
+
+        // Image preview handlers (simple + full)
+        function handleImagePreview(inputSelector, previewSelector) {
+            $(inputSelector).off('change').on('change', function () {
+                const file = this.files && this.files[0];
+                const preview = $(previewSelector);
+
+                if (!file) {
+                    preview.hide().attr('src', '');
+                    return;
+                }
+
+                if (!file.type.startsWith('image/')) {
+                    toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
+                    $(this).val('');
+                    preview.hide().attr('src', '');
+                    return;
+                }
+
+                const maxBytes = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxBytes) {
+                    toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
+                    $(this).val('');
+                    preview.hide().attr('src', '');
+                    return;
+                }
+
+                // Revoke previous URL if exists
+                if (preview.data('object-url')) {
+                    URL.revokeObjectURL(preview.data('object-url'));
+                }
+
+                const url = URL.createObjectURL(file);
+                preview.data('object-url', url);
+                preview.attr('src', url).show();
+            });
+        }
+
+        // Initialize image preview handlers
+        handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
+        handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
+        handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
+
+        handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
+        handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
+        handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
+        handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
         loadFullBanks();
 
         // Get language from cookie or use default
@@ -1180,7 +1227,6 @@
             $('#fullReferrerCode').val(memberCode).prop('disabled', true);
 
             $('input[name="position"]').prop('disabled', true);
-            $('input[name="referrer_side"]').prop('disabled', true);
 
             // Disable search button
             $('#btnSearchReferrer').prop('disabled', true);
@@ -1386,9 +1432,14 @@
                 $('#simpleProvince, #simpleDistrict, #simpleSubdistrict').prop('disabled', true);
 
                 // 4. ซ่อนรูปภาพ Preview และเคลียร์ไฟล์
-                $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview')
-                    .hide()
-                    .attr('src', '');
+                $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview').each(function() {
+                    const preview = $(this);
+                    if (preview.data('object-url')) {
+                        URL.revokeObjectURL(preview.data('object-url'));
+                        preview.removeData('object-url');
+                    }
+                    preview.hide().attr('src', '');
+                });
                 $('#simpleIdCardCopy, #simpleBankCardCopy, #simpleBusinessPhoto').val('');
 
                 // 5. แจ้งเตือน User และเลื่อนหน้าจอกลับขึ้นด้านบนสุด
@@ -1396,46 +1447,6 @@
                 $('html, body').animate({ scrollTop: $('#simpleRegistrationForm').offset().top - 50 }, 500);
             }
         });
-
-        // Image preview handlers (simple + full)
-        function handleImagePreview(inputSelector, previewSelector) {
-            $(inputSelector).on('change', function () {
-                const file = this.files && this.files[0];
-                const preview = $(previewSelector);
-                if (!file) {
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                if (!file.type.startsWith('image/')) {
-                    toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
-                    $(this).val('');
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                const maxBytes = 5 * 1024 * 1024; // 5MB
-                if (file.size > maxBytes) {
-                    toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
-                    $(this).val('');
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                const url = URL.createObjectURL(file);
-                preview.attr('src', url).show();
-                preview.on('load', function () { URL.revokeObjectURL(url); });
-            });
-        }
-
-        handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
-        handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
-        handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
-
-        handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
-        handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
-        handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
-        handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
 
         //Search referrer
         $('#btnFullSearchReferrer').click(function () {
@@ -2097,7 +2108,7 @@
                 country: $('#fullCountry').val(),
                 countryBusiness: $('#fullCountryBusiness').val(), // เปลี่ยนจาก businessCountry
                 referrerCode: $('#fullReferrerCode').val(),
-                position: $('input[name="referrer_side"]:checked').attr('id') === 'referrer_left' ? 'left' : 'right',
+                position: $('input[name="position"]:checked').val(),
 
                 title: $('#fullTitle').val(),
                 language: $('#fullLanguage').val(),
@@ -2209,11 +2220,16 @@
 
                 $('#fullRegistrationForm')[0].reset();
                 $('#fullRegistrationForm .is-invalid').removeClass('is-invalid');
-                $('#fullRegistrationForm .invalid-feedback-custom').remove(); 
+                $('#fullRegistrationForm .invalid-feedback-custom').remove();
 
-                $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview')
-                    .hide()
-                    .attr('src', '');
+                $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview').each(function() {
+                    const preview = $(this);
+                    if (preview.data('object-url')) {
+                        URL.revokeObjectURL(preview.data('object-url'));
+                        preview.removeData('object-url');
+                    }
+                    preview.hide().attr('src', '');
+                });
 
                 $('#fullIdCardCopy, #fullBankCardCopy, #fullBusinessPhoto, #fullApplicationForm').val('');
 
@@ -2426,7 +2442,6 @@
 
         // Setup synchronization between simple and full registration forms
         function setupFormSync() {
-            console.log('Setting up form sync...');
             
             // Map of corresponding field pairs: { simpleId: fullId }
             const fieldMappings = {
@@ -2470,12 +2485,9 @@
                 'simplePostcode': 'fullPostcodeIdCard',
                 'simpleProvince': 'fullProvinceIdCard',
                 'simpleDistrict': 'fullDistrictIdCard',
-                'simpleSubdistrict': 'fullSubdistrictIdCard',
-                
-                // File uploads
-                'simpleIdCardCopy': 'fullIdCardCopy',
-                'simpleBankCardCopy': 'fullBankCardCopy',
-                'simpleBusinessPhoto': 'fullBusinessPhoto'
+                'simpleSubdistrict': 'fullSubdistrictIdCard'
+
+                // Note: File uploads are handled separately via syncImagePreview
             };
 
             // Sync from simple to full
@@ -2544,22 +2556,11 @@
                 }
             });
 
-            // Sync referrer_side radio buttons between simple and full forms
-            $('input[name="referrer_side"]').on('change', function() {
-                const val = $(this).val();
-                // Find the corresponding referrer_side in the other form/tab and check it
-                $(`input[name="referrer_side"][value="${val}"]`).prop('checked', true);
-                // Sync with position field (simple form)
-                $(`input[name="position"][value="${val}"]`).prop('checked', true);
-                console.log(`Sync referrer_side: ${val}`);
-            });
-
-            // Sync position radio buttons with referrer_side (full form)
+            // Sync position radio buttons between simple and full forms
             $('input[name="position"]').on('change', function() {
                 const val = $(this).val();
-                // Sync with referrer_side field (full form)
-                $(`input[name="referrer_side"][value="${val}"]`).prop('checked', true);
-                console.log(`Sync position: ${val}`);
+                // Find the corresponding position in the other form/tab and check it
+                $(`input[name="position"][value="${val}"]`).prop('checked', true);
             });
 
             // Prevent infinite loop in bidirectional sync
@@ -2576,7 +2577,6 @@
                         simpleEl.on('change', function() {
                             if (isSyncing) return;
                             isSyncing = true;
-                            console.log(`Sync ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
                             fullEl.val(simpleEl.val());
                             setTimeout(() => { isSyncing = false; }, 0);
                         });
@@ -2585,20 +2585,17 @@
                         fullEl.on('change', function() {
                             if (isSyncing) return;
                             isSyncing = true;
-                            console.log(`Sync ${fullId} -> ${simpleId}: ${fullEl.val()}`);
                             simpleEl.val(fullEl.val());
                             setTimeout(() => { isSyncing = false; }, 0);
                         });
                     } else if (simpleEl.is('input')) {
                         // When simple input changes, update full
                         simpleEl.on('input change', function() {
-                            console.log(`Sync input ${simpleId} -> ${fullId}: ${simpleEl.val()}`);
                             fullEl.val(simpleEl.val());
                         });
 
                         // When full input changes, update simple
                         fullEl.on('input change', function() {
-                            console.log(`Sync input ${fullId} -> ${simpleId}: ${fullEl.val()}`);
                             simpleEl.val(fullEl.val());
                         });
                     }
@@ -2619,12 +2616,15 @@
                         }
                     }
                 });
-                // Sync position/referrer_side radio buttons
+                // Sync position radio buttons
                 const positionVal = $('input[name="position"]:checked').val();
                 if (positionVal) {
-                    $(`#full-tab-pane input[name="referrer_side"][value="${positionVal}"]`).prop('checked', true);
                     $(`#full-tab-pane input[name="position"][value="${positionVal}"]`).prop('checked', true);
                 }
+                // Sync image previews
+                syncImagePreview('simpleIdCardCopy', 'fullIdCardCopy', 'fullIdCardPreview');
+                syncImagePreview('simpleBankCardCopy', 'fullBankCardCopy', 'fullBankCardPreview');
+                syncImagePreview('simpleBusinessPhoto', 'fullBusinessPhoto', 'fullBusinessPhotoPreview');
             });
 
             $('#simple-tab').on('shown.bs.tab', function() {
@@ -2640,13 +2640,40 @@
                         }
                     }
                 });
-                // Sync referrer_side/position radio buttons
-                const referrerSideVal = $(`#full-tab-pane input[name="referrer_side"]:checked`).val();
-                if (referrerSideVal) {
-                    $(`input[name="referrer_side"][value="${referrerSideVal}"]`).prop('checked', true);
-                    $(`input[name="position"][value="${referrerSideVal}"]`).prop('checked', true);
+                // Sync position radio buttons
+                const positionVal = $(`#full-tab-pane input[name="position"]:checked`).val();
+                if (positionVal) {
+                    $(`input[name="position"][value="${positionVal}"]`).prop('checked', true);
                 }
+                // Sync image previews
+                syncImagePreview('fullIdCardCopy', 'simpleIdCardCopy', 'simpleIdCardPreview');
+                syncImagePreview('fullBankCardCopy', 'simpleBankCardCopy', 'simpleBankCardPreview');
+                syncImagePreview('fullBusinessPhoto', 'simpleBusinessPhoto', 'simpleBusinessPhotoPreview');
             });
+        }
+
+        function syncImagePreview(sourceId, targetId, targetPreviewId) {
+            const sourceEl = $(`#${sourceId}`)[0];
+            const targetEl = $(`#${targetId}`)[0];
+            const targetPreview = $(`#${targetPreviewId}`);
+
+            if (!sourceEl || !targetEl) return;
+
+            const sourceFile = sourceEl.files && sourceEl.files[0];
+            if (!sourceFile) {
+                targetPreview.hide().attr('src', '');
+                return;
+            }
+
+            const url = URL.createObjectURL(sourceFile);
+
+            // Revoke previous URL if exists
+            if (targetPreview.data('object-url')) {
+                URL.revokeObjectURL(targetPreview.data('object-url'));
+            }
+
+            targetPreview.data('object-url', url);
+            targetPreview.attr('src', url).show();
         }
 
         function normalizeDuplicateResult(response, defaultMessage) {

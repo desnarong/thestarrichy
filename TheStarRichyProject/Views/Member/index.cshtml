@@ -1324,6 +1324,11 @@
                         setTimeout(() => {
                             $(`#info-${prefix}-subdistrict`).val(match.tambon_code);
                             $(`#info-${prefix}-tambonid`).val(addr.tambonId);
+                            
+                            // Disable ID card address fields if all required fields are complete
+                            if (prefix === 'idcard') {
+                                disableIdCardAddressIfComplete(addr, match);
+                            }
                         }, 60);
                     }, 60);
                 }, 60);
@@ -1335,6 +1340,30 @@
             $('#info-inv-companytaxid').val(addr.companyTaxId || '');
             $('#info-inv-branchcode').val(addr.branchCode || '');
             $('#info-inv-branchname').val(addr.branchName || '');
+        }
+    }
+
+    function disableIdCardAddressIfComplete(addr, tambonMatch) {
+        // Check if all required fields are complete
+        var isComplete = !!(
+            addr.houseNumber && addr.houseNumber.trim() !== '' &&
+            addr.zipcode && addr.zipcode.trim() !== '' &&
+            tambonMatch && tambonMatch.province_code && tambonMatch.amphoe_code && tambonMatch.tambon_code
+        );
+
+        if (isComplete) {
+            // Disable all ID card address fields
+            $('#info-idcard-housenumber').prop('disabled', true);
+            $('#info-idcard-moo').prop('disabled', true);
+            $('#info-idcard-alley').prop('disabled', true);
+            $('#info-idcard-road').prop('disabled', true);
+            $('#info-idcard-building').prop('disabled', true);
+            $('#info-idcard-floor').prop('disabled', true);
+            $('#info-idcard-other').prop('disabled', true);
+            $('#info-idcard-zipcode').prop('disabled', true);
+            $('#info-idcard-province').prop('disabled', true);
+            $('#info-idcard-district').prop('disabled', true);
+            $('#info-idcard-subdistrict').prop('disabled', true);
         }
     }
 

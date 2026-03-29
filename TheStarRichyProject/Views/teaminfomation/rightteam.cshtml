@@ -485,20 +485,59 @@ $(document).ready(function () {
     ================================================================ */
     function populateLevelDropdown(data) {
         var levels = [];
+        var levelMap = {}; // Map level name to order value
+
         data.forEach(function (d) {
             var lv = (d.LevelName ?? d.levelName ?? d.Level ?? d.level ?? '').toString().trim();
-            if (lv && levels.indexOf(lv) === -1) levels.push(lv);
+            var order = d.LevelOrder ?? d.levelOrder ?? d.Order ?? d.order ?? d.LevelCode ?? d.levelCode ?? null;
+
+            if (lv && levels.indexOf(lv) === -1) {
+                levels.push(lv);
+                if (order !== null) {
+                    levelMap[lv] = parseFloat(order);
+                }
+            }
         });
+
+        // Sort by order value if available, otherwise by numeric value in name
         levels.sort(function (a, b) {
-            var na = parseInt(a), nb = parseInt(b);
-            if (!isNaN(na) && !isNaN(nb)) return na - nb;
+            var orderA = levelMap[a];
+            var orderB = levelMap[b];
+
+            // If both have order values, use them
+            if (orderA !== undefined && orderB !== undefined) {
+                return orderA - orderB;
+            }
+
+            // Extract numeric part from level names like 'G12', 'G25', 'G8'
+            var numA = extractLevelNumber(a);
+            var numB = extractLevelNumber(b);
+            
+            if (numA !== null && numB !== null) {
+                // If both have numbers, compare numerically
+                if (numA !== numB) return numA - numB;
+                // If numbers are same, compare full string (e.g., G12 vs G12A)
+                return a.localeCompare(b, 'th');
+            }
+
+            // Fallback to locale comparison
             return a.localeCompare(b, 'th');
         });
+
         var sel = $('#levelSelect');
         sel.find('option:not(:first)').remove();
         levels.forEach(function (l) {
             sel.append('<option value="' + escAttr(l) + '">' + escHtml(l) + '</option>');
         });
+    }
+
+    function extractLevelNumber(levelName) {
+        // Extract first number from string like 'G12' -> 12, 'G25' -> 25, 'G8' -> 8
+        var match = levelName.match(/\d+/);
+        if (match) {
+            return parseInt(match[0], 10);
+        }
+        return null;
     }
 
     /* ================================================================

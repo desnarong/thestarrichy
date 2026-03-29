@@ -163,6 +163,115 @@
     </div>
 </div>
 
+<!-- Modals for Income Sources (Mobile Responsive) -->
+<!-- Sponser Bonus Modal -->
+<div class="modal fade" id="sponserModal" tabindex="-1" aria-labelledby="sponserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="sponserModalLabel"><i class="bx bx-user me-2"></i>ค่าแนะนำ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="sponserMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="sponserTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Rebate Bonus Modal -->
+<div class="modal fade" id="rebateModal" tabindex="-1" aria-labelledby="rebateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="rebateModalLabel"><i class="bx bx-wallet me-2"></i>ส่วนตัว</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="rebateMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="rebateTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Binary Bonus Modal -->
+<div class="modal fade" id="binaryModal" tabindex="-1" aria-labelledby="binaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="binaryModalLabel"><i class="bx bx-bar-chart me-2"></i>TMB/จับคู่</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="binaryMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="binaryTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Matching Bonus Modal -->
+<div class="modal fade" id="matchingModal" tabindex="-1" aria-labelledby="matchingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="matchingModalLabel"><i class="bx bx-handicap me-2"></i>แมทชิ่ง</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="matchingMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="matchingTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Bonus Modal -->
+<div class="modal fade" id="mobileModal" tabindex="-1" aria-labelledby="mobileModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="mobileModalLabel"><i class="bx bx-mobile me-2"></i>แจงยอด</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="mobileMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="mobileTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Period Modal -->
+<div class="modal fade" id="periodModal" tabindex="-1" aria-labelledby="periodModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-light">
+                <h5 class="modal-title text-dark" id="periodModalLabel"><i class="bx bx-calendar-check me-2"></i>รอบการจ่าย</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-secondary py-2 mb-2" id="periodMessage">กำลังโหลด...</div>
+                <div class="table-responsive">
+                    <table id="periodTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     $(function(){
       var mainTbl=null,detailTbl=null,allDetailData={};
@@ -249,7 +358,51 @@
 
           if (rtype === 'monthly') {
             return [
-              { title: 'เดือน', data: null, className: 'text-center', render: function(d) { return esc(pick(d, ['CalcMonth1', 'calcMonth1']) || '-'); } }
+              { 
+                title: 'เดือน', 
+                data: null, 
+                className: 'text-center', 
+                render: function(d) { return esc(pick(d, ['CalcMonth1', 'calcMonth1']) || '-'); },
+                type: 'date',
+                render: function(d, type) {
+                  var calcMonth = pick(d, ['CalcMonth1', 'calcMonth1']);
+                  if (!calcMonth) return '-';
+                  
+                  // สำหรับ DataTables sort ให้แปลงเป็น timestamp
+                  if (type === 'sort' || type === 'type') {
+                    // รองรับ format: 01/2025, 1/2025, 01-2025, 2025-01, 202501
+                    var m = String(calcMonth);
+                    var parts = null;
+                    var month, year;
+                    
+                    if (m.includes('/')) {
+                      parts = m.split('/');
+                      month = parseInt(parts[0]);
+                      year = parseInt(parts[1]);
+                    } else if (m.includes('-')) {
+                      parts = m.split('-');
+                      if (parts[0].length === 2) {
+                        month = parseInt(parts[0]);
+                        year = parseInt(parts[1]);
+                      } else {
+                        year = parseInt(parts[0]);
+                        month = parseInt(parts[1]);
+                      }
+                    } else if (/^\d{6}$/.test(m)) {
+                      year = parseInt(m.substring(0, 4));
+                      month = parseInt(m.substring(4, 6));
+                    }
+                    
+                    if (month && year && month >= 1 && month <= 12) {
+                      return new Date(year, month - 1, 1).getTime();
+                    }
+                    return 0;
+                  }
+                  
+                  // สำหรับ display ให้แสดงตามปกติ
+                  return esc(calcMonth);
+                }
+              }
             ].concat(bonusCols);
           }
 
@@ -370,50 +523,104 @@
         };
       }
 
-      function loadDetail(dtype,fromDate,toDate,calcMonth){
-        allDetailData={};
-        var detailLabels={sponser:'ค่าแนะนำ',rebate:'ส่วนตัว',binary:'TMB/จับคู่',matching:'แมทชิ่ง',mobile:'แจงยอด',period:'รอบการจ่าย'};
-        var titleText=detailLabels[dtype]||dtype;
-        if(calcMonth){
-          titleText+=' ('+esc(calcMonth)+')';
-        }else{
-          titleText+=' ('+fmtDate(fromDate)+' - '+fmtDate(toDate)+')';
+      // Helper function to render modal table
+      function renderModalTable(cfg, rows, columns) {
+        var tableId = cfg.tableId;
+        var detailTblVar = tableId + 'Tbl';
+        
+        // Destroy existing DataTable
+        if ($.fn.DataTable.isDataTable(tableId)) {
+          $(tableId).DataTable().destroy();
         }
-        $('#detailTitle').text(titleText);
-        $('#detailSection').show();
-        $('#detailMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+        $(tableId).empty();
+        
+        // Build table HTML
+        var theadHtml = '<thead class="text-center" style="background:#f5f5f5;font-size:.75rem;"><tr>';
+        theadHtml += '<th class="text-center" style="width:40px;">#</th>';
+        columns.forEach(function(c) {
+          theadHtml += '<th class="text-center">' + c.title + '</th>';
+        });
+        theadHtml += '</tr></thead>';
+        
+        var tbody = '<tbody>';
+        rows.forEach(function(r, i) {
+          tbody += '<tr>';
+          tbody += '<td class="text-center">' + (i + 1) + '</td>';
+          columns.forEach(function(c) {
+            var v = pick(r, c.k, '');
+            if (c.dt) {
+              tbody += '<td class="text-center">' + fmtDate(v) + '</td>';
+            } else if (c.num) {
+              tbody += '<td class="text-end">' + (c.fmt === 'fmt0' ? fmt0(v) : fmt2(v)) + '</td>';
+            } else if (c.renderPrefix) {
+              tbody += '<td class="text-center">' + c.renderPrefix + esc(String(v)) + '</td>';
+            } else {
+              tbody += '<td class="text-center">' + esc(String(v)) + '</td>';
+            }
+          });
+          tbody += '</tr>';
+        });
+        tbody += '</tbody>';
+        
+        $(tableId).html(theadHtml + tbody);
+        
+        // Initialize DataTable
+        $(tableId).DataTable({
+          paging: true,
+          pageLength: 25,
+          ordering: true,
+          searching: true,
+          language: {
+            emptyTable: 'ไม่พบข้อมูล',
+            zeroRecords: 'ไม่พบข้อมูล',
+            search: 'ค้นหา:',
+            lengthMenu: 'แสดง _MENU_ รายการ',
+            info: '_START_-_END_ จาก _TOTAL_',
+            paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+          },
+          drawCallback: function() {
+            $(tableId + ' thead th').addClass('text-center');
+          }
+        });
+      }
+
+      // Modal configuration mapping
+      var MODAL_CONFIG = {
+        sponser: { modalId: '#sponserModal', tableId: '#sponserTable', msgId: '#sponserMessage', title: 'ค่าแนะนำ' },
+        rebate: { modalId: '#rebateModal', tableId: '#rebateTable', msgId: '#rebateMessage', title: 'ส่วนตัว' },
+        binary: { modalId: '#binaryModal', tableId: '#binaryTable', msgId: '#binaryMessage', title: 'TMB/จับคู่' },
+        matching: { modalId: '#matchingModal', tableId: '#matchingTable', msgId: '#matchingMessage', title: 'แมทชิ่ง' },
+        mobile: { modalId: '#mobileModal', tableId: '#mobileTable', msgId: '#mobileMessage', title: 'แจงยอด' },
+        period: { modalId: '#periodModal', tableId: '#periodTable', msgId: '#periodMessage', title: 'รอบการจ่าย' }
+      };
+
+      function loadDetail(dtype,fromDate,toDate,calcMonth){
+        var cfg = MODAL_CONFIG[dtype] || MODAL_CONFIG.sponser;
+        var titleText = cfg.title;
+        if(calcMonth){
+          titleText += ' (' + esc(calcMonth) + ')';
+        } else if (fromDate && toDate) {
+          titleText += ' (' + fmtDate(fromDate) + ' - ' + fmtDate(toDate) + ')';
+        }
+        
+        // Update modal title
+        $(cfg.modalId + ' .modal-title').text(titleText);
+        
+        // Show modal
+        var bsModal = new bootstrap.Modal(document.querySelector(cfg.modalId));
+        $(cfg.msgId).removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลด...');
+        bsModal.show();
 
         // สำหรับ period ไม่ต้องเรียก API เพราะใช้ข้อมูลจาก main table
         if(dtype==='period'){
-          var rows=allDetailData.periodRows||[];
-          var cfg=DETAIL_COLS.period||[];
-          if(detailTbl){detailTbl.destroy();}$('#detailBonusTable').empty();
-          var theadHtml='<thead class="text-center" style="background:#e8f5e9;font-size:.78rem;"><tr>'+['#'].concat(cfg.map(function(c){return c.title;})).map(function(c){return'<th class="text-center">'+c+'</th>';}).join('')+'</tr></thead>';
-          var tbody='<tbody>';
-          rows.forEach(function(r,i){
-            tbody+='<tr><td class="text-center">'+(i+1)+'</td>';
-            cfg.forEach(function(c){
-              var v=pick(r,c.k,'');
-              if(c.dt)tbody+='<td class="text-center">'+fmtDate(v)+'</td>';
-              else if(c.num)tbody+='<td class="text-end">'+(c.fmt==='fmt0'?fmt0(v):fmt2(v))+'</td>';
-              else if(c.renderPrefix)tbody+='<td class="text-center">'+c.renderPrefix+esc(String(v))+'</td>';
-              else tbody+='<td class="text-center">'+esc(String(v))+'</td>';
-            });
-            tbody+='</tr>';
-          });
-          tbody+='</tbody>';
-          $('#detailBonusTable').html(theadHtml+tbody);
-          detailTbl=$('#detailBonusTable').DataTable({paging:true,pageLength:25,ordering:true,searching:true,language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}},
-            drawCallback: function() {
-              $('#detailBonusTable thead th').addClass('text-center');
-            }
-          });
-          $('#detailMessage').removeClass('alert-secondary').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+          var rows = allDetailData.periodRows || [];
+          renderModalTable(cfg, rows, DETAIL_COLS.period);
+          $(cfg.msgId).removeClass('alert-secondary').addClass('alert-success').text('พบข้อมูล ' + rows.length + ' รายการ');
           return;
         }
 
         // If calcMonth is provided, convert it to date range
-        var apiFromDate=fromDate,apiToDate=toDate;
+        var apiFromDate = fromDate, apiToDate = toDate;
         if(calcMonth){
           var dateRange=parseCalcMonthToDates(calcMonth);
           if(dateRange){
@@ -422,32 +629,20 @@
           }
         }
 
-        $.ajax({url:'@Url.Action("GetBonusDetail", "reports")',type:'GET',data:{detailType:dtype,fromDate:apiFromDate,toDate:apiToDate},success:function(json){
-          var rows=norm(json);
-          var cfg=DETAIL_COLS[dtype]||[];
-          if(detailTbl){detailTbl.destroy();}$('#detailBonusTable').empty();
-          var theadHtml='<thead class="text-center" style="background:#e8f5e9;font-size:.78rem;"><tr>'+['#'].concat(cfg.map(function(c){return c.title;})).map(function(c){return'<th class="text-center">'+c+'</th>';}).join('')+'</tr></thead>';
-          var tbody='<tbody>';
-          rows.forEach(function(r,i){
-            tbody+='<tr><td class="text-center">'+(i+1)+'</td>';
-            cfg.forEach(function(c){
-              var v=pick(r,c.k,'');
-              if(c.dt)tbody+='<td class="text-center">'+fmtDate(v)+'</td>';
-              else if(c.num)tbody+='<td class="text-end">'+(c.fmt==='fmt0'?fmt0(v):fmt2(v))+'</td>';
-              else if(c.renderPrefix)tbody+='<td class="text-center">'+c.renderPrefix+esc(String(v))+'</td>';
-              else tbody+='<td class="text-center">'+esc(String(v))+'</td>';
-            });
-            tbody+='</tr>';
-          });
-          tbody+='</tbody>';
-          $('#detailBonusTable').html(theadHtml+tbody);
-          detailTbl=$('#detailBonusTable').DataTable({paging:true,pageLength:25,ordering:true,searching:true,language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}},
-            drawCallback: function() {
-              $('#detailBonusTable thead th').addClass('text-center');
-            }
-          });
-          $('#detailMessage').removeClass('alert-secondary').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
-        },error:function(){$('#detailMessage').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงรายละเอียด');}});
+        $.ajax({
+          url: '@Url.Action("GetBonusDetail", "reports")',
+          type: 'GET',
+          data: { detailType: dtype, fromDate: apiFromDate, toDate: apiToDate },
+          success: function(json) {
+            var rows = norm(json);
+            var cols = DETAIL_COLS[dtype] || [];
+            renderModalTable(cfg, rows, cols);
+            $(cfg.msgId).removeClass('alert-secondary').addClass('alert-success').text('พบข้อมูล ' + rows.length + ' รายการ');
+          },
+          error: function() {
+            $(cfg.msgId).removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงรายละเอียด');
+          }
+        });
       }
 
       $(document).on('click','.bonus-link',function(){
@@ -461,7 +656,7 @@
         }
         loadDetail(dtype,from,to,calcMonth);
       });
-      $('#btnCloseDetail').on('click',function(){$('#detailSection').hide();});
+      
       $('#btnSearch').on('click',loadMain);
       $('#btnReset').on('click',function(){$('#rpt_daily').prop('checked',true);$('#fromDate').val('');$('#toDate').val('');loadMain();});
       $('input[name="report_type"]').on('change',function(){
@@ -473,6 +668,31 @@
     });
 </script>
 <style>
+/* Modal responsive styles */
+@@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    .modal-dialog-scrollable {
+        max-height: calc(100vh - 1rem);
+    }
+    .modal-dialog-scrollable .modal-body {
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+    }
+    .modal-header h5 {
+        font-size: 0.95rem;
+    }
+    .table-responsive table {
+        font-size: 0.75rem !important;
+    }
+    .modal-body .alert {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+
 @@media (max-width: 991.98px) {
     .card {
         margin-bottom: 0 !important;

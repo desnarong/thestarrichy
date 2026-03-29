@@ -75,16 +75,22 @@
       </div>
     </div>
   </div>
-  <div class="col-lg-8 mb-3" id="detailPanel" style="display:none;">
-    <div class="card shadow-sm border-0 h-100">
-      <div class="card-header d-flex align-items-center justify-content-between" style="background:#e3f2fd;border-bottom:2px solid #1976d2;">
-        <h6 class="mb-0 fw-semibold" style="color:#0d47a1;"><i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span> <span id="detailSide" class="badge ms-1"></span></h6>
-        <button type="button" class="btn-close" id="btnCloseDetail"></button>
+</div>
+
+<!-- Modal for Detail Points -->
+<div class="modal fade" id="detailPointModal" tabindex="-1" aria-labelledby="detailPointModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-light">
+        <h5 class="modal-title text-dark" id="detailPointModalLabel">
+          <i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span> <span id="detailSide" class="badge ms-1"></span>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
-      <div class="card-body p-0">
-        <div class="alert alert-secondary py-2 mb-0 m-2" id="msgDetail" style="display:none;">กำลังโหลด...</div>
+      <div class="modal-body">
+        <div class="alert alert-secondary py-2 mb-2" id="msgDetail">กำลังโหลด...</div>
         <div class="table-responsive">
-          <table id="detailTable" class="table table-bordered table-sm table-hover mb-0 align-middle" style="font-size:.8rem;"></table>
+          <table id="detailTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.8rem;"></table>
         </div>
       </div>
     </div>
@@ -133,15 +139,20 @@ $(function(){
   }
 
   window.loadDetail=function(balDate,side){
-    $('#detailPanel').show();
-    $('#msgDetail').show().removeClass('alert-danger').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+    // Update modal title
     $('#detailDate').text(fmtDate(balDate));
     $('#detailSide').text(side==='left'?'ซ้าย':'ขวา').css('background',side==='left'?'#43a047':'#1976d2');
+    
+    // Show modal
+    var bsModal = new bootstrap.Modal(document.getElementById('detailPointModal'));
+    $('#msgDetail').removeClass('alert-danger').addClass('alert-secondary').text('กำลังโหลดรายละเอียด...');
+    bsModal.show();
+    
     if(detailTbl){detailTbl.destroy();detailTbl=null;}$('#detailTable').empty();
     var url=side==='left'?'@Url.Action("GetDailyPointSourceLeft","reports")':'@Url.Action("GetDailyPointSourceRight","reports")';
     $.get(url,{balanceDate:balDate},function(json){
       var rows=norm(json);
-      var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);font-size:.78rem;"><tr><th>#</th><th>ชั้นที่</th><th>รหัสนักธุรกิจ</th><th>ชื่อนักธุรกิจ</th><th>เลขที่บิล</th><th>วันที่</th><th>ประเภท</th><th class="text-end">PV</th></tr></thead>';
+      var thead='<thead class="text-center" style="background:#f5f5f5;font-size:.75rem;"><tr><th>#</th><th>ชั้นที่</th><th>รหัสนักธุรกิจ</th><th>ชื่อนักธุรกิจ</th><th>เลขที่บิล</th><th>วันที่</th><th>ประเภท</th><th class="text-end">PV</th></tr></thead>';
       var tbody='<tbody>';
       var totalPV=0;
       rows.forEach(function(r,i){
@@ -162,11 +173,9 @@ $(function(){
       $('#detailTable').html(thead+tbody+tfoot);
       detailTbl=$('#detailTable').DataTable({paging:false,ordering:false,searching:false,info:false,
         language:{emptyTable:'ไม่พบข้อมูล'}});
-      $('#msgDetail').hide();
+      $('#msgDetail').removeClass('alert-secondary').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
     }).fail(function(){$('#msgDetail').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
   };
-
-  $('#btnCloseDetail').on('click',function(){$('#detailPanel').hide();});
 
   function loadData(){
     $('#msgMain').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
@@ -179,10 +188,36 @@ $(function(){
   }
 
   $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val('');$('#toDate').val('');$('#detailPanel').hide();loadData();});
+  $('#btnReset').on('click',function(){$('#vmAll').prop('checked',true);$('#dateRange').hide();$('#fromDate').val('');$('#toDate').val('');loadData();});
   loadData();
 });
 </script>
+<style>
+/* Modal responsive styles */
+@@media (max-width: 768px) {
+    .modal-dialog {
+        margin: 0.5rem;
+        max-width: calc(100% - 1rem);
+    }
+    .modal-dialog-scrollable {
+        max-height: calc(100vh - 1rem);
+    }
+    .modal-dialog-scrollable .modal-body {
+        max-height: calc(100vh - 140px);
+        overflow-y: auto;
+    }
+    .modal-header h5 {
+        font-size: 0.95rem;
+    }
+    .table-responsive table {
+        font-size: 0.75rem !important;
+    }
+    .modal-body .alert {
+        font-size: 0.85rem;
+        padding: 0.5rem;
+    }
+}
+</style>
 @section scripts {
     <script src="~/assets/js/app.js"></script>
 }
