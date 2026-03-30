@@ -4,48 +4,53 @@
 }
 
 <div class="row">
-    <div class="col-md-12 col-lg-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 data-key="t-tax-download">ดาวน์โหลดเอกสารภาษี</h4>
+    <div class="col-12">
+        <div class="card shadow-sm border-0">
+            <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">
+                <i class="bx bx-download fs-4 text-white"></i>
+                <h5 class="mb-0 text-white fw-semibold">ดาวน์โหลดเอกสารภาษี</h5>
             </div>
-            <div class="card-block p-3">
+            <div class="card-body p-4">
                 <!-- ค้นหาเอกสาร -->
                 <div class="mb-4">
-                    <h5 data-key="t-search-documents">ค้นหาเอกสาร</h5>
-                    <div class="form-group row mb-3">
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-document-type">ประเภทเอกสาร :</label>
-                        <div class="col-lg-10 col-md-6">
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="document_type" id="tax_invoice" value="" checked>
-                                <label class="form-check-label" for="tax_invoice" data-key="t-tax-invoice">ใบกำกับภาษี</label>
+                    <h5 class="mb-3 fw-semibold">ค้นหาเอกสาร</h5>
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-semibold">ประเภทเอกสาร</label>
+                            <div class="d-flex gap-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="document_type" id="tax_invoice" value="" checked>
+                                    <label class="form-check-label" for="tax_invoice">ใบกำกับภาษี</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="document_type" id="tax_report" value="">
+                                    <label class="form-check-label" for="tax_report">รายงานสรุปภาษี</label>
+                                </div>
                             </div>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" name="document_type" id="tax_report" value="">
-                                <label class="form-check-label" for="tax_report" data-key="t-tax-report">รายงานสรุปภาษี</label>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-md-3">
+                                    <label for="fromDate" class="form-label fw-semibold">จากวันที่</label>
+                                    <input type="text" class="form-control" id="fromDate" />
+                                </div>
+                                <div class="col-md-3">
+                                    <label for="toDate" class="form-label fw-semibold">ถึงวันที่</label>
+                                    <input type="text" class="form-control" id="toDate" />
+                                </div>
+                                <div class="col-md-2">
+                                    <button class="btn btn-primary w-100" data-key="t-search">ค้นหา</button>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="form-group row mb-3">
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-from-date">จากวันที่ :</label>
-                        <div class="col-lg-3 col-md-6">
-                            <input type="text" class="form-control" value="" />
-                        </div>
-                        <label class="col-lg-2 col-md-4 col-form-label" data-key="t-to-date">ถึงวันที่ :</label>
-                        <div class="col-lg-3 col-md-6">
-                            <input type="text" class="form-control" value="" />
-                        </div>
-                        <div class="col-md-2">
-                            <button class="btn btn-primary" data-key="t-search">ค้นหา</button>
                         </div>
                     </div>
                 </div>
 
                 <!-- รายการเอกสาร -->
                 <div>
-                    <h5 data-key="t-document-list">รายการเอกสาร</h5>
-                    <div class="table-responsive mt-3">
-                        <table id="data-table-responsive" class="table table-striped table-bordered"></table>
+                    <h5 class="mb-3 fw-semibold">รายการเอกสาร</h5>
+                    <div class="table-responsive">
+                        <table id="data-table-responsive" class="table table-striped table-bordered nowrap" style="width:100%"></table>
                     </div>
                 </div>
             </div>
@@ -80,6 +85,5 @@
 </script>
 
 @section scripts{
-    <!-- App js -->
     <script src="~/assets/js/app.js"></script>
 }

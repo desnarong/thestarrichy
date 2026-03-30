@@ -1,15 +1,18 @@
 ﻿@{
-    ViewData["Title"] = "เอกสาร";
+    ViewBag.Title = "Other";
+    ViewBag.pTitle = "เอกสาร";
+    ViewBag.pageTitle = "Other";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
-    <div class="col-md-12 col-lg-12">
+    <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <h4 data-key="t-documents">เอกสาร</h4>
+                <h4 class="mb-1" data-key="t-documents">เอกสาร</h4>
+                <p class="text-muted mb-0" data-key="t-download-documents">ดาวน์โหลดเอกสารที่สำคัญ</p>
             </div>
-            <div class="card-block p-3">
+            <div class="card-body p-4">
                 <!-- begin widget-list -->
                 <div class="widget-list widget-list-rounded">
                     <!-- begin widget-list-item -->
@@ -20,9 +23,9 @@
                         <div class="widget-list-content">
                             <h4 class="widget-list-title" data-key="t-regulation">1. กฎระเบียบ</h4>
                         </div>
-                        <div class="widget-list-action text-nowrap text-right text-muted" data-key="t-off">
+                        <div class="widget-list-action text-nowrap text-muted" data-key="t-off">
                             ปิด
-                            <i class="fas fa-angle-right fa-lg m-l-5"></i>
+                            <i class="fas fa-angle-right fa-lg ms-2"></i>
                         </div>
                     </a>
                     <!-- end widget-list-item -->
@@ -34,9 +37,9 @@
                         <div class="widget-list-content">
                             <h4 class="widget-list-title" data-key="t-hold-application">2. ใบสมัคร hold ยอด</h4>
                         </div>
-                        <div class="widget-list-action text-nowrap text-right text-muted" data-key="t-hold-application-description">
+                        <div class="widget-list-action text-nowrap text-muted" data-key="t-hold-application-description">
                             ใบสมัครขอสิทธิ์ซื้อสินค้าเพื่อแจงยอดภายหลัง
-                            <i class="fas fa-angle-right fa-lg m-l-5"></i>
+                            <i class="fas fa-angle-right fa-lg ms-2"></i>
                         </div>
                     </a>
                     <!-- end widget-list-item -->
@@ -48,6 +51,5 @@
 </div>
 
 @section scripts{
-    <!-- App js -->
     <script src="~/assets/js/app.js"></script>
 }

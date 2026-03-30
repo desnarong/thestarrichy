@@ -460,14 +460,11 @@
                         <a class="dropdown-item" href="@Url.Action("index", "member")">
                             <i class="mdi mdi-account-circle text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-profile">ข้อมูลส่วนตัว</span>
                         </a>
-                        <a class="dropdown-item" href="@Url.Action("Chat", "Apps")">
-                            <i class="mdi mdi-message-text-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-message-noti">ข้อความแจ้งเตือน</span>
-                        </a>
-                        <a class="dropdown-item" href="@Url.Action("KanbanBoard", "Tasks")">
+                        <a class="dropdown-item" href="@Url.Action("taxdownload", "other")">
                             <i class="mdi mdi-calendar-check-outline text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-document-download">ดาวห์โหลดเอกสาร</span>
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="@Url.Action("ProfileSimple", "Pages")">
+                        <a class="dropdown-item" href="@Url.Action("income", "reports")">
                             <div class="row">
                                 <div class="col-6">
                                     <i class="mdi mdi-wallet text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-totalpv">รายได้รวม</span>
@@ -479,7 +476,7 @@
                                 </div>
                             </div>
                         </a>
-                        <a class="dropdown-item" href="@Url.Action("LockScreenBasic", "Authentication")">
+                        <a class="dropdown-item" href="@Url.Action("changepassword", "other")">
                             <i class="mdi mdi-lock text-muted fs-16 align-middle me-1"></i> <span class="align-middle" data-key="t-change-password">เปลี่ยนรหัสผ่าน</span>
                         </a>
                         <a class="dropdown-item" href="@Url.Action("Logout", "Auth")">
