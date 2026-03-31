@@ -734,7 +734,7 @@ namespace TheStarRichyProject.Controllers
             try
             {
                 // 1. กำหนดโฟลเดอร์ที่จะเก็บรูป (เช่น /wwwroot/Images/Slip/)
-                string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Images", "Slip");//, request.OrderID
+                string folderPath = Path.Combine(_config["Imagespath"], "Slip");//, request.OrderID
 
                 if (!Directory.Exists(folderPath))
                 {

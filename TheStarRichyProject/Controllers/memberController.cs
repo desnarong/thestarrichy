@@ -315,8 +315,9 @@ namespace TheStarRichyProject.Controllers
                 string safeMemberCode = string.IsNullOrWhiteSpace(memberCode)
                     ? "unknown"
                     : Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
-
-                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", safeMemberCode);
+                
+                string rootPath = Path.Combine(_config["Imagespath"], "Memberpicture", safeMemberCode);
+                string imagepath  = Path.Combine("Images", "Memberpicture", safeMemberCode);
                 if (!Directory.Exists(rootPath))
                 {
                     Directory.CreateDirectory(rootPath);
@@ -349,7 +350,7 @@ namespace TheStarRichyProject.Controllers
                 apiRequest.AddHeader("X-Passkey", passkey);
                 apiRequest.AddHeader("Authorization", $"Bearer {token}");
                 apiRequest.AddHeader("Accept", "application/json");
-                apiRequest.AddStringBody(JsonConvert.SerializeObject(new { profileImageUrl }), "application/json");
+                apiRequest.AddStringBody(JsonConvert.SerializeObject(new { imagepath }), "application/json");
 
                 var response = await client.ExecuteAsync(apiRequest);
 
@@ -393,7 +394,8 @@ namespace TheStarRichyProject.Controllers
                     ? "unknown"
                     : Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
 
-                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", safeMemberCode);
+                string rootPath = Path.Combine(_config["Imagespath"], "Memberpicture", safeMemberCode);
+                
                 if (!Directory.Exists(rootPath))
                 {
                     Directory.CreateDirectory(rootPath);
@@ -493,7 +495,7 @@ namespace TheStarRichyProject.Controllers
             }
 
             string relativeFolder = destinationFolder
-                .Replace(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "")
+                .Replace(_config["Imagespath"], "Images")
                 .Replace("\\", "/")
                 .TrimStart('/');
 

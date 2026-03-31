@@ -1,16 +1,14 @@
 ﻿@{
-    ViewBag.Title = "Other";
-    ViewBag.pTitle = "เอกสาร";
-    ViewBag.pageTitle = "Other";
+    ViewData["Title"] = "เอกสาร";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row">
     <div class="col-12">
-        <div class="card">
-            <div class="card-header">
-                <h4 class="mb-1" data-key="t-documents">เอกสาร</h4>
-                <p class="text-muted mb-0" data-key="t-download-documents">ดาวน์โหลดเอกสารที่สำคัญ</p>
+        <div class="card shadow-sm border-0">
+            <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">
+                <i class="bx bx-file fs-4 text-white"></i>
+                <h5 class="mb-0 text-white fw-semibold">เอกสาร</h5>
             </div>
             <div class="card-body p-4">
                 <!-- begin widget-list -->
