@@ -1,39 +1,48 @@
 ﻿@{
-    ViewData["Title"] = "รายงานโบนัสรอบการจ่าย";
+    ViewData["Title"] = "รายงานคะแนนท่องเที่ยว";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="row mb-3">
   <div class="col-12">
     <div class="card shadow-sm border-0">
-      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#006064,#00acc1);">
-        <i class="bx bx-wallet-alt fs-4 text-white"></i>
-        <h5 class="mb-0 text-white fw-semibold">รายงานโบนัสรอบการจ่าย</h5>
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#01579b,#039be5);">
+        <i class="bx bx-trip fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานคะแนนท่องเที่ยว</h5>
       </div>
       <div class="card-body py-3">
-        <div class="row g-3 mb-3">
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#e0f7fa;border:2px solid #00acc1 !important;">
-              <div class="text-muted small">โบนัสรวม (ก่อนหัก)</div>
-              <div class="fs-4 fw-bold" style="color:#006064;" id="sumTotalBonus">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+        <!-- Stat Cards -->
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-2" style="background:#e1f5fe;border:2px solid #039be5 !important;">
+              <div class="text-muted" style="font-size:.72rem;">คะแนนซ้ายรวม</div>
+              <div class="fs-5 fw-bold" style="color:#01579b;" id="statLeftPV">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คะแนน</div>
             </div>
           </div>
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#e8f5e9;border:2px solid #43a047 !important;">
-              <div class="text-muted small">โบนัสสุทธิ (NetBonus)</div>
-              <div class="fs-4 fw-bold" style="color:#1b5e20;" id="sumNetBonus">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+          <div class="col-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-2" style="background:#e8f5e9;border:2px solid #43a047 !important;">
+              <div class="text-muted" style="font-size:.72rem;">คะแนนขวารวม</div>
+              <div class="fs-5 fw-bold" style="color:#1b5e20;" id="statRightPV">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คะแนน</div>
             </div>
           </div>
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#fff3e0;border:2px solid #ffa726 !important;">
-              <div class="text-muted small">ค่าธรรมเนียมรวม</div>
-              <div class="fs-4 fw-bold" style="color:#e65100;" id="sumService">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+          <div class="col-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-2" style="background:#fff3e0;border:2px solid #ffa726 !important;">
+              <div class="text-muted" style="font-size:.72rem;">Active ซ้ายรวม</div>
+              <div class="fs-5 fw-bold" style="color:#e65100;" id="statActiveLeft">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คน</div>
+            </div>
+          </div>
+          <div class="col-6 col-md-3">
+            <div class="card border-0 text-center py-2 px-2" style="background:#fce4ec;border:2px solid #e91e63 !important;">
+              <div class="text-muted" style="font-size:.72rem;">Active ขวารวม</div>
+              <div class="fs-5 fw-bold" style="color:#880e4f;" id="statActiveRight">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คน</div>
             </div>
           </div>
         </div>
+        <!-- Filters -->
         <div class="row align-items-end g-2">
           <div class="col-auto">
             <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
@@ -45,7 +54,7 @@
           </div>
           <div class="col-auto align-self-end">
             <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
-            <button class="btn btn-sm" id="btnSearch" style="background:#00acc1;border-color:#00acc1;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+            <button class="btn btn-sm" id="btnSearch" style="background:#039be5;border-color:#039be5;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
           </div>
         </div>
         <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ถ้าไม่ระบุวันที่ จะแสดงข้อมูลทั้งหมด</small>
@@ -54,34 +63,47 @@
   </div>
 </div>
 
+<!-- Main Data Table -->
 <div class="row">
   <div class="col-12">
     <div class="card shadow-sm border-0">
-      <div class="card-header" style="background:#e0f7fa;border-bottom:2px solid #00acc1;">
-        <h5 class="mb-0 fw-semibold" style="color:#006064;"><i class="bx bx-table me-2"></i>รายการโบนัสรอบการจ่าย &nbsp;<span class="badge" style="background:#00acc1;" id="rowCount">0</span></h5>
+      <div class="card-header d-flex align-items-center" style="background:#e1f5fe;border-bottom:2px solid #039be5;">
+        <h5 class="mb-0 fw-semibold" style="color:#01579b;font-size:.9rem;">
+          <i class="bx bx-table me-2"></i>ตารางคะแนนท่องเที่ยวรายเดือน
+          <span class="badge ms-1" style="background:#039be5;" id="rowCount">0</span>
+        </h5>
+        <span class="ms-auto text-muted" style="font-size:.73rem;" id="msgStatus"></span>
       </div>
-      <div class="card-body">
-        <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
-        <div class="table-responsive">
-          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.76rem;white-space:nowrap;">
-            <style>
-              table.table-hover tbody tr:hover {
-                background-color: #e0e0e0 !important;
-                transition: background-color 0.2s ease;
-              }
-            </style>
-          </table>
-        </div>
-        <div id="periodSummary" class="mt-3 pt-3 border-top" style="display:none;">
-          <h6 class="fw-bold mb-2"><i class="bx bx-receipt me-1"></i>สรุปยอดหักค่าใช้จ่าย</h6>
-          <table class="table table-bordered table-sm" style="max-width:480px;">
-            <tbody>
-              <tr><td class="text-muted">ค่าธรรมเนียมดำเนินการ</td><td class="text-end fw-semibold" id="psService">-</td></tr>
-              <tr><td class="text-muted">ยอดหลังหักค่าดำเนินการ</td><td class="text-end fw-semibold" id="psAfterFee">-</td></tr>
-              <tr><td class="text-muted">ภาษี</td><td class="text-end fw-semibold" id="psTax">-</td></tr>
-              <tr><td class="text-muted">โบนัสรวมภาษี</td><td class="text-end fw-semibold" id="psTaxBonus">-</td></tr>
-              <tr><td class="text-muted">ภาษีหัก ณ ที่จ่าย</td><td class="text-end fw-semibold" id="psWithHold">-</td></tr>
-              <tr class="table-success fw-bold"><td>โบนัสสุทธิ (NetBonus)</td><td class="text-end text-success" id="psNet">-</td></tr>
+      <div class="card-body p-2">
+        <div class="table-responsive" style="max-height:72vh;overflow-y:auto;">
+          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.72rem;white-space:nowrap;min-width:1380px;">
+            <thead class="text-center" style="position:sticky;top:0;z-index:2;">
+              <tr style="font-size:.68rem;">
+                <th rowspan="2" style="vertical-align:middle;background:#b3e5fc;color:#01579b;min-width:80px;">เดือน</th>
+                <th colspan="2" style="background:#bbdefb;color:#1565c0;">คะแนนซ้าย / ขวา</th>
+                <th colspan="2" style="background:#c8e6c9;color:#2e7d32;">คะแนนมาใหม่</th>
+                <th colspan="2" style="background:#ffe0b2;color:#bf360c;">สายงานแนะนำตรง</th>
+                <th colspan="2" style="background:#f8bbd0;color:#880e4f;">คะแนนบาลานซ์</th>
+                <th colspan="2" style="background:#e1bee7;color:#4a148c;">Active</th>
+                <th rowspan="2" style="vertical-align:middle;background:#b2dfdb;color:#004d40;min-width:90px;">ตำแหน่งคุณวุฒิ<br>ที่ Qualify</th>
+                <th rowspan="2" style="vertical-align:middle;background:#fff9c4;color:#f57f17;min-width:80px;">คะแนนทีมงาน<br>แนะนำตรง</th>
+                <th rowspan="2" style="vertical-align:middle;background:#dcedc8;color:#33691e;min-width:80px;">การรักษายอด</th>
+              </tr>
+              <tr style="font-size:.67rem;">
+                <th style="background:#e3f2fd;color:#1565c0;">ซ้าย</th>
+                <th style="background:#e3f2fd;color:#0d47a1;">ขวา</th>
+                <th style="background:#e8f5e9;color:#388e3c;">ซ้าย</th>
+                <th style="background:#e8f5e9;color:#1b5e20;">ขวา</th>
+                <th style="background:#fff3e0;color:#e65100;">ซ้าย</th>
+                <th style="background:#fff3e0;color:#bf360c;">ขวา</th>
+                <th style="background:#fce4ec;color:#c2185b;">ซ้าย</th>
+                <th style="background:#fce4ec;color:#880e4f;">ขวา</th>
+                <th style="background:#f3e5f5;color:#7b1fa2;">ซ้าย</th>
+                <th style="background:#f3e5f5;color:#4a148c;">ขวา</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <tr><td colspan="14" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>กำลังโหลดข้อมูล...</td></tr>
             </tbody>
           </table>
         </div>
@@ -90,82 +112,160 @@
   </div>
 </div>
 
+<style>
+  #tableBody tr:hover td { background-color:#e3f8ff !important; transition:background-color .2s ease; }
+  .rank-badge { display:inline-block;padding:.15em .4em;border-radius:.25rem;font-size:.68rem;font-weight:600;color:#fff; }
+</style>
+
 <script>
 $(function(){
-  var tbl=null;
-  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
-  function pick(o,k,d){if(d===undefined)d='';for(var i=0;i<k.length;i++){if(o!=null&&o[k[i]]!==undefined&&o[k[i]]!==null)return o[k[i]];}return d;}
+  var cutData=[], posData=[], loadedCut=false, loadedPos=false;
+
+  function norm(raw){
+    var d=raw;
+    if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}
+    if(d&&Array.isArray(d.data))return d.data;
+    if(d&&Array.isArray(d.result))return d.result;
+    return Array.isArray(d)?d:[];
+  }
+  function g(o,ks,def){
+    if(def===undefined)def='';
+    for(var i=0;i<ks.length;i++){if(o&&o[ks[i]]!==undefined&&o[ks[i]]!==null)return o[ks[i]];}
+    return def;
+  }
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
-  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
-  function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function parseD(v){if(!v)return null;var d=new Date(v);return isNaN(d.getTime())?null:d;}
+  function mKey(v){var d=parseD(v);if(!d)return null;return d.getFullYear()+'-'+(String(d.getMonth()+1).padStart(2,'0'));}
+  var MONTH_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+  function fmtMon(v){var d=parseD(v);if(!d)return String(v||'-');return MONTH_TH[d.getMonth()]+' '+(d.getFullYear()+543);}
 
-  function filterRows(rows){
-    var f=$('#fromDate').val(),t=$('#toDate').val();
-    if(!f&&!t)return rows;
-    var from=f?new Date(f):null,to=t?new Date(t+'T23:59:59'):null;
+  function filterRows(rows, dateKey){
+    var f=$('#fromDate').val(), t=$('#toDate').val();
+    if(!f&&!t) return rows;
+    var from=f?new Date(f):null, to=t?new Date(t+'T23:59:59'):null;
     return rows.filter(function(r){
-      var d=new Date(pick(r,['FromDate','fromDate']));if(isNaN(d.getTime()))return true;
-      if(from&&d<from)return false;if(to&&d>to)return false;return true;
+      var d=parseD(g(r,[dateKey],''));
+      if(!d) return true;
+      if(from&&d<from) return false;
+      if(to&&d>to) return false;
+      return true;
     });
   }
 
-  function buildTable(rows){
-    if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
-    var cols=['#','จากวันที่','ถึงวันที่','วันที่จ่าย','ค่าแนะนำ','ส่วนตัว','TMB/จับคู่','แมทชิ่ง','แจงยอด','พิเศษ','รวม','ค่าดำเนินการ','หลังหักค่าดำเนินการ','ภาษี','รวมภาษี','หัก ณ ที่จ่าย','สุทธิ (Net)'];
-    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e0f7fa,#b2ebf2);font-size:.72rem;"><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join('')+'</tr></thead>';
-    var tbody='<tbody>';
-    rows.forEach(function(r,i){
-      var net=num(pick(r,['NetBonus','netBonus'],0));
-      tbody+='<tr>'+
-        '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center">'+fmtDate(pick(r,['FromDate','fromDate']))+'</td>'+
-        '<td class="text-center">'+fmtDate(pick(r,['ToDate','toDate']))+'</td>'+
-        '<td class="text-center">'+fmtDate(pick(r,['PaymentDate','paymentDate']))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['SponserBonus','sponserBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['RebateBonus','rebateBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['WeakBonus','weakBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['MatchingBonus','matchingBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['MobileBonus','mobileBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['SpecialBonus','specialBonus'],0))+'</td>'+
-        '<td class="text-end fw-bold">'+fmt2(pick(r,['TotalBonus','totalBonus'],0))+'</td>'+
-        '<td class="text-end text-danger">'+fmt2(pick(r,['ServicePrice','servicePrice'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['TotalBonusAfterExpense','totalBonusAfterExpense'],0))+'</td>'+
-        '<td class="text-end text-warning">'+fmt2(pick(r,['Tax','tax'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['TotalBonusIncudeTax','totalBonusIncudeTax'],0))+'</td>'+
-        '<td class="text-end text-warning">'+fmt2(pick(r,['WithHoldingTax','withHoldingTax'],0))+'</td>'+
-        '<td class="text-end fw-bold '+(net>=0?'text-success':'text-danger')+'">'+fmt2(net)+'</td>'+
-        '</tr>';
-    });
-    tbody+='</tbody>';
-    $('#mainTable').html(thead+tbody);
-    tbl=$('#mainTable').DataTable({paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],ordering:true,searching:true,
-      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
-    var sTot=rows.reduce(function(s,r){return s+num(pick(r,['TotalBonus','totalBonus'],0));},0);
-    var sNet=rows.reduce(function(s,r){return s+num(pick(r,['NetBonus','netBonus'],0));},0);
-    var sSvc=rows.reduce(function(s,r){return s+num(pick(r,['ServicePrice','servicePrice'],0));},0);
-    $('#sumTotalBonus').text(fmt2(sTot));$('#sumNetBonus').text(fmt2(sNet));$('#sumService').text(fmt2(sSvc));$('#rowCount').text(rows.length);
-    var sAfter=rows.reduce(function(s,r){return s+num(pick(r,['TotalBonusAfterExpense','totalBonusAfterExpense'],0));},0);
-    var sTax=rows.reduce(function(s,r){return s+num(pick(r,['Tax','tax'],0));},0);
-    var sTaxB=rows.reduce(function(s,r){return s+num(pick(r,['TotalBonusIncudeTax','totalBonusIncudeTax'],0));},0);
-    var sWH=rows.reduce(function(s,r){return s+num(pick(r,['WithHoldingTax','withHoldingTax'],0));},0);
-    $('#psService').text(fmt2(sSvc)+' บาท');$('#psAfterFee').text(fmt2(sAfter)+' บาท');$('#psTax').text(fmt2(sTax)+' บาท');
-    $('#psTaxBonus').text(fmt2(sTaxB)+' บาท');$('#psWithHold').text(fmt2(sWH)+' บาท');$('#psNet').text(fmt2(sNet)+' บาท');
-    if(rows.length>0)$('#periodSummary').show();else$('#periodSummary').hide();
-    $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+  function rankColor(pos){
+    if(!pos||pos==='-'||pos==='0'||pos==='-1') return '#9e9e9e';
+    pos=String(pos).toLowerCase();
+    if(pos.indexOf('crown')>=0)  return '#b71c1c';
+    if(pos.indexOf('triple d')>=0) return '#880e4f';
+    if(pos.indexOf('double d')>=0) return '#4a148c';
+    if(pos.indexOf('executive')>=0) return '#1a237e';
+    if(pos.indexOf('diamond')>=0) return '#1565c0';
+    if(pos.indexOf('emerald')>=0) return '#1b5e20';
+    if(pos.indexOf('sapphire')>=0) return '#006064';
+    if(pos.indexOf('ruby')>=0)   return '#bf360c';
+    if(pos.indexOf('pearl')>=0)  return '#37474f';
+    if(pos.indexOf('platinum')>=0) return '#546e7a';
+    if(pos.indexOf('triple g')>=0) return '#6a1b9a';
+    if(pos.indexOf('double g')>=0) return '#0277bd';
+    if(pos.indexOf('super')>=0)  return '#2e7d32';
+    if(pos.indexOf('gold')>=0)   return '#f9a825';
+    if(pos.indexOf('star')>=0)   return '#1976d2';
+    return '#039be5';
   }
 
-  function loadData(){
-    $('#msg').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
-    var f=$('#fromDate').val(),t=$('#toDate').val();
-    $.get('@Url.Action("GetTravelPointsData","reports")',{fromDate:f,toDate:t},function(json){
-      buildTable(filterRows(norm(json)));
-    }).fail(function(){$('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  function buildTable(){
+    var fCut = filterRows(cutData, 'calculatedate');
+    var fPos = filterRows(posData, 'Baldate');
+
+    // Index position history by YYYY-MM
+    var posMap={};
+    fPos.forEach(function(r){ var k=mKey(g(r,['Baldate','baldate'])); if(k) posMap[k]=r; });
+
+    // Gather all month keys (union of both datasets)
+    var keySet={};
+    fCut.forEach(function(r){ var k=mKey(g(r,['calculatedate'])); if(k) keySet[k]=true; });
+    Object.keys(posMap).forEach(function(k){ keySet[k]=true; });
+    var cutMap={};
+    fCut.forEach(function(r){ var k=mKey(g(r,['calculatedate'])); if(k) cutMap[k]=r; });
+
+    var allKeys=Object.keys(keySet).sort(function(a,b){return b.localeCompare(a);});
+    var html='';
+    var totL=0,totR=0,totAL=0,totAR=0;
+
+    if(allKeys.length===0){
+      html='<tr><td colspan="14" class="text-center text-muted py-4">ไม่พบข้อมูลในช่วงวันที่ที่เลือก</td></tr>';
+    } else {
+      allKeys.forEach(function(k,idx){
+        var c=cutMap[k]||{};
+        var p=posMap[k]||{};
+        var leftPV   = num(g(c,['LeftPV','leftPV'],0));
+        var rightPV  = num(g(c,['RightPV','rightPV'],0));
+        var fwdL     = num(g(c,['FWDLeftPV','fwdLeftPV'],0));
+        var fwdR     = num(g(c,['FWDRightPV','fwdRightPV'],0));
+        var stepPV   = num(g(c,['StepPV','stepPV'],0));
+        var leftPS   = num(g(p,['LeftPS','leftPS'],0));
+        var rightPS  = num(g(p,['RightPS','rightPS'],0));
+        var leftCnt  = num(g(p,['LeftCount','leftCount'],0));
+        var rightCnt = num(g(p,['RightCount','rightCount'],0));
+        var ranking  = g(p,['Ranking','ranking'],'')||g(c,['Memberposition','memberposition'],'');
+        var directTotal = leftPS + rightPS;
+        var dateLabel = '';
+        if(g(c,['calculatedate'])) dateLabel = fmtMon(g(c,['calculatedate']));
+        else if(g(p,['Baldate'])) dateLabel = fmtMon(g(p,['Baldate']));
+        else dateLabel = k;
+
+        var validRanking = ranking && ranking!=='' && ranking!=='0' && ranking!=='-1' && ranking!=='-';
+        var rankBadge = validRanking
+          ? '<span class="rank-badge" style="background:'+rankColor(ranking)+';">'+esc(ranking)+'</span>'
+          : '<span class="text-muted" style="font-size:.68rem;">-</span>';
+
+        var maintHtml = stepPV>0
+          ? '<span class="badge" style="background:#43a047;font-size:.68rem;">'+fmt0(stepPV)+'</span>'
+          : '<span class="text-muted">-</span>';
+
+        totL+=leftPV; totR+=rightPV; totAL+=leftCnt; totAR+=rightCnt;
+        html+='<tr>'+
+          '<td class="text-center fw-semibold" style="color:#01579b;">'+esc(dateLabel)+'</td>'+
+          '<td class="text-end" style="color:#1565c0;">'+fmt0(leftPV)+'</td>'+
+          '<td class="text-end" style="color:#0d47a1;">'+fmt0(rightPV)+'</td>'+
+          '<td class="text-end text-muted">-</td>'+
+          '<td class="text-end text-muted">-</td>'+
+          '<td class="text-end" style="color:#e65100;">'+fmt0(leftPS)+'</td>'+
+          '<td class="text-end" style="color:#bf360c;">'+fmt0(rightPS)+'</td>'+
+          '<td class="text-end" style="color:#c2185b;">'+fmt0(fwdL)+'</td>'+
+          '<td class="text-end" style="color:#880e4f;">'+fmt0(fwdR)+'</td>'+
+          '<td class="text-end" style="color:#7b1fa2;">'+fmt0(leftCnt)+'</td>'+
+          '<td class="text-end" style="color:#4a148c;">'+fmt0(rightCnt)+'</td>'+
+          '<td class="text-center">'+rankBadge+'</td>'+
+          '<td class="text-end fw-semibold" style="color:#f57f17;">'+fmt0(directTotal)+'</td>'+
+          '<td class="text-center">'+maintHtml+'</td>'+
+          '</tr>';
+      });
+    }
+
+    $('#tableBody').html(html);
+    $('#rowCount').text(allKeys.length);
+    $('#statLeftPV').text(fmt0(totL));
+    $('#statRightPV').text(fmt0(totR));
+    $('#statActiveLeft').text(fmt0(totAL));
+    $('#statActiveRight').text(fmt0(totAR));
+    $('#msgStatus').text(allKeys.length>0 ? 'พบ '+allKeys.length+' เดือน' : 'ไม่พบข้อมูล');
   }
 
-  $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');loadData();});
-  loadData();
+  function tryBuild(){ if(loadedCut&&loadedPos) buildTable(); }
+
+  $.get('@Url.Action("GetCutPointData","reports")', function(json){
+    cutData=norm(json); loadedCut=true; tryBuild();
+  }).fail(function(){ cutData=[]; loadedCut=true; tryBuild(); });
+
+  $.get('@Url.Action("GetPositionHistoryData","reports")', function(json){
+    posData=norm(json); loadedPos=true; tryBuild();
+  }).fail(function(){ posData=[]; loadedPos=true; tryBuild(); });
+
+  $('#btnSearch').on('click', buildTable);
+  $('#btnReset').on('click', function(){ $('#fromDate').val(''); $('#toDate').val(''); buildTable(); });
 });
 </script>
 @section scripts{
