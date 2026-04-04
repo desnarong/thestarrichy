@@ -37,15 +37,7 @@
 
         <!-- ── Search bar ───────────────────────────────── -->
         <div class="border rounded p-3 mb-3" style="background:#fafafa;">
-          <div class="d-flex align-items-center justify-content-between mb-2 flex-wrap gap-2">
-            <h6 class="mb-0 fw-semibold">ค้นหาเอกสาร</h6>
-            <div class="d-flex align-items-center gap-3">
-              <span class="text-danger fw-semibold" style="font-size:.78rem;"><i class="bx bx-check-circle me-1"></i>มี API ดึงข้อมูล</span>
-              <a href="javascript:void(0)" id="btnToggleYearly" class="text-danger fw-semibold" style="font-size:.78rem;text-decoration:underline;">
-                <i class="bx bx-calendar me-1"></i>แสดงตารางสรุปเป็นปี
-              </a>
-            </div>
-          </div>
+          <h6 class="mb-0 fw-semibold mb-2">ค้นหาเอกสาร</h6>
           <div class="row g-2 align-items-end">
             <div class="col-auto">
               <label class="form-label mb-1 fw-semibold" style="font-size:.8rem;">ประเภทเอกสาร</label>
@@ -116,20 +108,6 @@
           </div>
         </div>
 
-        <!-- ── Yearly summary ──────────────────────────── -->
-        <div id="sectionYearly" class="d-none mb-3">
-          <h6 class="fw-semibold mb-2 text-danger"><i class="bx bx-calendar me-1"></i>ตารางสรุปเป็นปี</h6>
-          <div class="table-responsive">
-            <table id="tblYearly" class="table table-bordered table-hover table-sm nowrap" style="width:100%;font-size:.8rem;">
-              <thead class="text-center" style="background:linear-gradient(135deg,#e8f5e9,#c8e6c9);">
-                <tr>
-                  <th>ปีภาษี</th><th>จำนวนใบกำกับ</th><th>ยอดรวมใบกำกับ (รวมภาษี)</th>
-                </tr>
-              </thead>
-              <tbody></tbody>
-            </table>
-          </div>
-        </div>
 
       </div>
     </div>
@@ -240,7 +218,7 @@ $(function(){
         $.get('@Url.Action("GetTaxInvoiceData","other")',{fromDate:f,toDate:t},function(json){
             allTax=norm(json);
             dtTax=initDt('tblTaxInvoice',allTax,taxCols,dtTax);
-            if(!$('#sectionYearly').hasClass('d-none'))buildYearly(allTax);
+
         }).fail(function(){
             $('#tblTaxInvoice tbody').html('<tr><td colspan="6" class="text-center text-danger">เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>');
         });
@@ -574,15 +552,6 @@ $(function(){
 
     // ── Events ────────────────────────────────────────────
     $('#btnSearch').on('click', loadData);
-    $('#btnToggleYearly').on('click', function(){
-        var $s=$('#sectionYearly');
-        $s.toggleClass('d-none');
-        if(!$s.hasClass('d-none'))buildYearly(allTax);
-        $(this).html($s.hasClass('d-none')?
-            '<i class="bx bx-calendar me-1"></i>แสดงตารางสรุปเป็นปี':
-            '<i class="bx bx-calendar me-1"></i>ซ่อนตารางสรุปเป็นปี');
-    });
-
     loadData();
 });
 </script>
