@@ -549,9 +549,10 @@ $(function(){
         var el=document.getElementById(docId);
         if(!el){alert('ไม่พบเอกสาร');return;}
         var win=window.open('','_blank','width=950,height=750');
+        if(!win){alert('กรุณาอนุญาตให้เปิด Popup จาก Browser เพื่อพิมพ์/บันทึก PDF');return;}
         win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>เอกสาร</title>');
         win.document.write('<style>');
-        win.document.write('@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@400;700&display=swap");');
+        win.document.write('@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@@400;700&display=swap");');
         win.document.write('body{font-family:"Sarabun",Arial,sans-serif;font-size:.78rem;margin:0;padding:10px;}');
         win.document.write('.doc-wrap{max-width:100%;}');
         win.document.write('.doc-company-logo{width:72px;height:72px;border:2px solid #333;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.65rem;text-align:center;color:#1565c0;}');
