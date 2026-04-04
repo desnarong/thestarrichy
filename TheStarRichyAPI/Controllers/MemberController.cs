@@ -64,6 +64,7 @@ namespace TheStarRichyApi.Controllers
         private readonly IBranchService _branchService;
         private readonly IMemberFavoriteAddressService _memberFavoriteAddressService;
         private readonly IMemberAddressService _memberAddressService;
+        private readonly IReportMemberTaxInvoiceService _reportMemberTaxInvoiceService;
         public MemberController(
             IMemberService memberService,
             IMemberIncomeByPeriodService memberIncomeByPeriodService,
@@ -113,7 +114,8 @@ namespace TheStarRichyApi.Controllers
             IMemberDeliveryAddressService memberDeliveryAddressService,
             IBranchService branchService,
             IMemberFavoriteAddressService memberFavoriteAddressService,
-            IMemberAddressService memberAddressService
+            IMemberAddressService memberAddressService,
+            IReportMemberTaxInvoiceService reportMemberTaxInvoiceService
             )
         {
             _memberService = memberService;
@@ -167,6 +169,7 @@ namespace TheStarRichyApi.Controllers
             _branchService = branchService;
             _memberFavoriteAddressService = memberFavoriteAddressService;
             _memberAddressService = memberAddressService;
+            _reportMemberTaxInvoiceService = reportMemberTaxInvoiceService;
         }
 
         [HttpGet("hello")]
@@ -934,6 +937,36 @@ namespace TheStarRichyApi.Controllers
             catch (Exception)
             {
                 return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
+        /*==================== TAX INVOICE ====================*/
+
+        [HttpGet("reporttaxinvoice")]
+        public async Task<IActionResult> GetReportTaxInvoice([FromQuery] string? fromDate, [FromQuery] string? toDate)
+        {
+            try
+            {
+                var result = await _reportMemberTaxInvoiceService.GetHeaderAsync(fromDate, toDate);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        [HttpGet("reporttaxinvoicedetail")]
+        public async Task<IActionResult> GetReportTaxInvoiceDetail([FromQuery] string? billNo)
+        {
+            try
+            {
+                var result = await _reportMemberTaxInvoiceService.GetDetailAsync(billNo);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
             }
         }
     }

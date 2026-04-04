@@ -107,8 +107,6 @@
                                     <th>ปีภาษี</th>
                                     <th>จำนวนใบกำกับ</th>
                                     <th>ยอดรวมใบกำกับ</th>
-                                    <th>จำนวน 50ทวิ</th>
-                                    <th>ยอดรวม 50ทวิ</th>
                                 </tr>
                             </thead>
                             <tbody></tbody>
@@ -121,10 +119,28 @@
     </div>
 </div>
 
+<!-- Modal: Bill Detail -->
+<div class="modal fade" id="taxDetailModal" tabindex="-1">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header p-0 border-0">
+        <div style="background:#1565c0;width:100%;padding:.5rem 1rem;" class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <i class="bx bx-receipt text-white fs-5"></i>
+            <span class="fw-bold text-white fs-5">ใบกำกับภาษี</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+      </div>
+      <div class="modal-body p-3" id="taxDetailBody"></div>
+    </div>
+  </div>
+</div>
+
 <script>
 $(function(){
-    var dtTax=null, dtWith=null, dtYearly=null;
-    var allTax=[], allWith=[];
+    var dtTax=null, dtYearly=null;
+    var allTax=[];
 
     function norm(raw){
         var d=raw;
@@ -140,19 +156,14 @@ $(function(){
 
     function statusBadge(s){
         if(!s)return'';
-        var cls='bg-secondary';
-        var sl=String(s).toLowerCase();
+        var cls='bg-secondary', sl=String(s).toLowerCase();
         if(sl.indexOf('ยืนยัน')>-1||sl.indexOf('confirm')>-1)cls='bg-success';
         else if(sl.indexOf('รอ')>-1||sl.indexOf('pend')>-1)cls='bg-warning text-dark';
         else if(sl.indexOf('ยกเลิก')>-1||sl.indexOf('cancel')>-1)cls='bg-danger';
         return'<span class="badge '+cls+'">'+esc(s)+'</span>';
     }
-    function dlBtn(url){
-        if(!url)return'<span class="text-muted" style="font-size:.75rem;">ไม่มีไฟล์</span>';
-        return'<a href="'+esc(url)+'" target="_blank" class="btn btn-sm btn-outline-primary py-0 px-2"><i class="bx bx-download me-1"></i>ดาวน์โหลด</a>';
-    }
 
-    function initDt(id,rows,cols,dtRef){
+    function initDt(id, rows, cols, dtRef){
         if(dtRef){dtRef.destroy();}
         var $t=$('#'+id);
         $t.find('tbody').empty();
@@ -160,90 +171,157 @@ $(function(){
             var cells=cols.map(function(fn){return'<td>'+fn(r)+'</td>';}).join('');
             $t.find('tbody').append('<tr>'+cells+'</tr>');
         });
-        var dt=$t.DataTable({
-            paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],
-            ordering:true,searching:true,destroy:true,
+        return $t.DataTable({
+            paging:true, pageLength:25, lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],
+            ordering:true, searching:true, destroy:true,
             language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',
                 lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',
                 paginate:{first:'«',last:'»',next:'›',previous:'‹'}}
         });
-        return dt;
     }
 
     var taxCols=[
-        function(r){return esc(p(r,['DocumentCode','docCode','DocCode','BillNo','billNo']));},
-        function(r){return fmtDate(p(r,['DocumentDate','docDate','DocDate','BillDate','billDate']));},
-        function(r){return esc(p(r,['ReferenceNo','RefNo','refNo','ReferenceNo','BillNo']));},
-        function(r){return esc(p(r,['DocumentType','docType','DocType','Billtype','billtype']));},
-        function(r){return'<span class="fw-bold text-success">'+fmt2(p(r,['TotalAmount','totalAmount','Amount','amount'],0))+'</span>';},
-        function(r){return statusBadge(p(r,['Status','status','BillConfirmType','billConfirmType']));},
-        function(r){return dlBtn(p(r,['DownloadUrl','downloadUrl','FileUrl','fileUrl','Url','url']));}
-    ];
-
-    var withCols=[
-        function(r){return esc(p(r,['DocumentCode','docCode','DocCode','BillNo','billNo']));},
-        function(r){return'<span class="text-danger fw-semibold">'+esc(p(r,['TaxYear','taxYear','Year','year']))+'</span>';},
+        function(r){return esc(p(r,['BillNo','billNo']));},
+        function(r){return fmtDate(p(r,['BillDate','billDate']));},
+        function(r){return esc(p(r,['ReferenceNo','referenceNo']));},
+        function(r){return esc(p(r,['BilltypeCode','billtypeCode','BillTypeCode']));},
         function(r){
-            var f=fmtDate(p(r,['FromDate','fromDate','StartDate','startDate']));
-            var t=fmtDate(p(r,['ToDate','toDate','EndDate','endDate']));
-            return'<span class="text-danger">'+esc(f)+'</span>'+(t?' - <span class="text-danger">'+esc(t)+'</span>':'');
+            var amt=p(r,['Pricebeincludetax','TotalAmount','totalAmount'],0);
+            return'<span class="fw-bold text-success">'+fmt2(amt)+'</span>';
         },
-        function(r){return esc(p(r,['DocumentType','docType','DocType','Billtype','billtype']));},
-        function(r){return'<span class="fw-bold text-success">'+fmt2(p(r,['TotalAmount','totalAmount','Amount',0],0))+'</span>';},
-        function(r){return statusBadge(p(r,['Status','status','BillConfirmType','billConfirmType']));},
-        function(r){return dlBtn(p(r,['DownloadUrl','downloadUrl','FileUrl','fileUrl','Url','url']));}
+        function(r){return statusBadge(p(r,['Status','status','BillConfirmType']));},
+        function(r){
+            var bn=esc(p(r,['BillNo','billNo']));
+            return'<button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="showTaxDetail(\''+bn+'\')"><i class="bx bx-file me-1"></i>รายละเอียด</button>';
+        }
     ];
 
-    function buildYearly(){
-        // Group allTax by year and allWith by year for summary
+    function buildYearly(rows){
         var map={};
-        allTax.forEach(function(r){
-            var d=new Date(p(r,['DocumentDate','docDate','BillDate','billDate']));
-            var yr=isNaN(d.getTime())?'':String(d.getFullYear()+543);
-            if(!map[yr])map[yr]={yr:yr,taxCnt:0,taxAmt:0,withCnt:0,withAmt:0};
-            map[yr].taxCnt++;
-            map[yr].taxAmt+=parseFloat(p(r,['TotalAmount','totalAmount','Amount'],0))||0;
+        rows.forEach(function(r){
+            var d=new Date(p(r,['BillDate','billDate']));
+            var yr=isNaN(d.getTime())?'ไม่ระบุ':String(d.getFullYear()+543);
+            if(!map[yr])map[yr]={yr:yr,cnt:0,amt:0};
+            map[yr].cnt++;
+            map[yr].amt+=parseFloat(p(r,['Pricebeincludetax','TotalAmount','totalAmount'],0))||0;
         });
-        allWith.forEach(function(r){
-            var yr=esc(p(r,['TaxYear','taxYear','Year','year']));
-            if(!map[yr])map[yr]={yr:yr,taxCnt:0,taxAmt:0,withCnt:0,withAmt:0};
-            map[yr].withCnt++;
-            map[yr].withAmt+=parseFloat(p(r,['TotalAmount','totalAmount','Amount'],0))||0;
-        });
-        var rows=Object.values(map).sort(function(a,b){return String(b.yr).localeCompare(String(a.yr));});
+        var yRows=Object.values(map).sort(function(a,b){return String(b.yr).localeCompare(String(a.yr));});
         var yCols=[
             function(r){return'<b>'+esc(r.yr)+'</b>';},
-            function(r){return r.taxCnt;},
-            function(r){return'<span class="text-success fw-bold">'+fmt2(r.taxAmt)+'</span>';},
-            function(r){return r.withCnt;},
-            function(r){return'<span class="text-primary fw-bold">'+fmt2(r.withAmt)+'</span>';}
+            function(r){return r.cnt;},
+            function(r){return'<span class="text-success fw-bold">'+fmt2(r.amt)+'</span>';}
         ];
-        dtYearly=initDt('tblYearly',rows,yCols,dtYearly);
+        dtYearly=initDt('tblYearly', yRows, yCols, dtYearly);
     }
 
     function loadData(){
         var f=$('#fromDate').val(), t=$('#toDate').val();
-        // Placeholder: replace URLs with actual API endpoints when available
-        // e.g. $.get('@Url.Action("GetTaxInvoiceData","other")', {...}, ...)
-        dtTax=initDt('tblTaxInvoice',[],taxCols,dtTax);
-        dtWith=initDt('tblWithhold',[],withCols,dtWith);
-        buildYearly();
+        $('#tblTaxInvoice tbody').html('<tr><td colspan="7" class="text-center text-muted py-3"><i class="bx bx-loader bx-spin me-2"></i>กำลังโหลดข้อมูล...</td></tr>');
+
+        $.get('@Url.Action("GetTaxInvoiceData","other")', {fromDate:f, toDate:t}, function(json){
+            allTax=norm(json);
+            dtTax=initDt('tblTaxInvoice', allTax, taxCols, dtTax);
+            if(!$('#sectionYearly').hasClass('d-none')) buildYearly(allTax);
+        }).fail(function(){
+            $('#tblTaxInvoice tbody').html('<tr><td colspan="7" class="text-center text-danger">เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>');
+        });
+
+        // 50ทวิ — no backend yet, init empty table
+        initDt('tblWithhold', [], [
+            function(r){return'';},function(r){return'';},function(r){return'';},
+            function(r){return'';},function(r){return'';},function(r){return'';},function(r){return'';}
+        ], null);
     }
+
+    window.showTaxDetail = function(billNo){
+        $('#taxDetailBody').html('<div class="text-center py-4"><i class="bx bx-loader bx-spin fs-3 text-primary"></i></div>');
+        new bootstrap.Modal(document.getElementById('taxDetailModal')).show();
+
+        var header = allTax.find(function(r){ return p(r,['BillNo','billNo'])===billNo; })||{};
+
+        $.get('@Url.Action("GetTaxInvoiceDetailData","other")', {billNo:billNo}, function(json){
+            var lines=norm(json);
+
+            var html='<div style="font-family:\'Sarabun\',Arial,sans-serif;font-size:.8rem;">';
+
+            // Company info header
+            html+='<div class="row g-1 mb-2 border rounded p-2" style="background:#f5f5f5;">';
+            html+='<div class="col-md-8">';
+            html+='<div class="fw-bold text-primary">'+esc(p(header,['Companyname','companyname']))+'</div>';
+            html+='<div>'+esc(p(header,['Companyaddress','companyaddress']))+'</div>';
+            html+='<div>โทร: '+esc(p(header,['Companytelephone','companytelephone']))+' | เลขที่ผู้เสียภาษี: '+esc(p(header,['CompanyTaxID','companyTaxID']))+'</div>';
+            html+='</div>';
+            html+='<div class="col-md-4 text-end">';
+            html+='<div class="fw-bold fs-6">ใบกำกับภาษี</div>';
+            html+='<div>เลขที่: <b>'+esc(billNo)+'</b></div>';
+            html+='<div>วันที่: '+fmtDate(p(header,['BillDate','billDate']))+'</div>';
+            html+='<div>อ้างอิง: '+esc(p(header,['ReferenceNo','referenceNo']))+'</div>';
+            html+='</div>';
+            html+='</div>';
+
+            // Customer info
+            html+='<div class="row g-1 mb-2 border rounded p-2">';
+            html+='<div class="col-md-6">';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">ผู้ซื้อ :</span> <b>'+esc(p(header,['CustomerName','customerName']))+'</b></div>';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">รหัสสมาชิก :</span> '+esc(p(header,['Membercode','membercode']))+'</div>';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">เลขที่ผู้เสียภาษี :</span> '+esc(p(header,['CustomerTaxID','customerTaxID']))+'</div>';
+            html+='</div>';
+            html+='<div class="col-md-6">';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">ที่อยู่ :</span> '+esc(p(header,['CustomerAddress','customerAddress']))+'</div>';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">โทร :</span> '+esc(p(header,['CustomerTelephone','customerTelephone']))+'</div>';
+            html+='<div><span class="text-muted" style="font-size:.72rem;">ประเภทชำระ :</span> '+esc(p(header,['PaymentType','paymentType']))+'</div>';
+            html+='</div>';
+            html+='</div>';
+
+            // Product lines table
+            html+='<div class="table-responsive">';
+            html+='<table class="table table-bordered table-sm mb-1" style="font-size:.78rem;">';
+            html+='<thead class="text-center" style="background:#e3f2fd;">';
+            html+='<tr><th>ลำดับ</th><th>รหัสสินค้า</th><th>ชื่อสินค้า</th><th>จำนวน</th><th>หน่วย</th><th>ราคา/หน่วย</th><th>รวม</th><th>PV</th></tr>';
+            html+='</thead><tbody>';
+            lines.forEach(function(ln,i){
+                var total=parseFloat(p(ln,['TotalAmount','totalAmount'],0));
+                var pv=parseFloat(p(ln,['PV','pv'],0));
+                html+='<tr>';
+                html+='<td class="text-center">'+(p(ln,['No','no'],i+1))+'</td>';
+                html+='<td>'+esc(p(ln,['ProductCode','productCode']))+'</td>';
+                html+='<td>'+esc(p(ln,['ProductName','productName']))+'</td>';
+                html+='<td class="text-center">'+p(ln,['Quantity','quantity'])+'</td>';
+                html+='<td class="text-center">'+esc(p(ln,['Unitname','unitname']))+'</td>';
+                html+='<td class="text-end">'+fmt2(p(ln,['PriceperUnit','priceperUnit'],0))+'</td>';
+                html+='<td class="text-end fw-bold text-success">'+fmt2(total)+'</td>';
+                html+='<td class="text-end text-primary">'+fmt2(pv)+'</td>';
+                html+='</tr>';
+            });
+            html+='</tbody></table></div>';
+
+            // Price summary
+            var priceBeforeTax=parseFloat(p(header,['Pricebeforetax','pricebeforetax'],0));
+            var taxFee=parseFloat(p(header,['Taxfee','taxfee'],0));
+            var priceIncTax=parseFloat(p(header,['Pricebeincludetax','pricebeincludetax'],0));
+            var shipping=parseFloat(p(header,['ShippingFee','shippingFee'],0));
+            html+='<div class="row justify-content-end"><div class="col-md-5">';
+            html+='<table class="table table-sm table-bordered" style="font-size:.78rem;">';
+            if(priceBeforeTax) html+='<tr><td>ราคาก่อนภาษี</td><td class="text-end">'+fmt2(priceBeforeTax)+'</td></tr>';
+            if(taxFee)         html+='<tr><td>ภาษีมูลค่าเพิ่ม 7%</td><td class="text-end">'+fmt2(taxFee)+'</td></tr>';
+            if(shipping>0)     html+='<tr><td>ค่าส่ง</td><td class="text-end">'+fmt2(shipping)+'</td></tr>';
+            if(priceIncTax)    html+='<tr class="table-primary fw-bold"><td>ยอดรวมทั้งสิ้น</td><td class="text-end text-success">'+fmt2(priceIncTax)+'</td></tr>';
+            html+='</table></div></div>';
+
+            html+='</div>';
+            $('#taxDetailBody').html(html);
+        }).fail(function(){
+            $('#taxDetailBody').html('<div class="text-center text-danger py-3">เกิดข้อผิดพลาดในการดึงข้อมูล</div>');
+        });
+    };
 
     $('#btnSearch').on('click', loadData);
 
     $('#btnToggleYearly').on('click', function(){
         var $s=$('#sectionYearly');
         $s.toggleClass('d-none');
-        if(!$s.hasClass('d-none')) buildYearly();
-        $(this).text($s.hasClass('d-none') ? 'แสดงตารางสรุปเป็นปี' : 'ซ่อนตารางสรุปเป็นปี');
-    });
-
-    // Scroll to relevant table on radio change
-    $('input[name="document_type"]').on('change', function(){
-        var val=$(this).val();
-        if(val==='tax'){$('#tblTaxInvoice')[0].scrollIntoView({behavior:'smooth',block:'nearest'});}
-        else{$('#tblWithhold')[0].scrollIntoView({behavior:'smooth',block:'nearest'});}
+        if(!$s.hasClass('d-none')) buildYearly(allTax);
+        $(this).html($s.hasClass('d-none')?'<i class="bx bx-calendar me-1"></i>แสดงตารางสรุปเป็นปี':'<i class="bx bx-calendar me-1"></i>ซ่อนตารางสรุปเป็นปี');
     });
 
     loadData();
