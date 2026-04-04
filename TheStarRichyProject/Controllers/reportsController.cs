@@ -374,6 +374,66 @@ namespace TheStarRichyProject.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryBuyerData()
+        {
+            try
+            {
+                var result = await _apiService.GetAsync<dynamic>("/Member/teamnewbuy");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting history buyer data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryRegisterData()
+        {
+            try
+            {
+                var result = await _apiService.GetAsync<dynamic>("/Member/teamnewregister");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting history register data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryQualifyData()
+        {
+            try
+            {
+                var result = await _apiService.GetAsync<dynamic>("/Member/teamtotalpositionranking");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting history qualify data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetHistoryBestSellerData()
+        {
+            try
+            {
+                var result = await _apiService.GetAsync<dynamic>("/Member/teambuyproduct");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting history best seller data");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
         private static string BuildDateQuery(string fromDate, string toDate)
         {
             var parts = new List<string>();

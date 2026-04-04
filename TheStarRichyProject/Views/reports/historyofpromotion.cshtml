@@ -1,39 +1,42 @@
 ﻿@{
-    ViewData["Title"] = "รายงานโบนัสรายวัน";
+    ViewData["Title"] = "รายงานประวัติโปรโมชั่น";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<!-- Filter + Stats Card -->
 <div class="row mb-3">
   <div class="col-12">
     <div class="card shadow-sm border-0">
-      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#bf360c,#ef6c00);">
-        <i class="bx bx-gift fs-4 text-white"></i>
-        <h5 class="mb-0 text-white fw-semibold">รายงานโบนัสรายวัน</h5>
+      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#4a148c,#7b1fa2);">
+        <i class="bx bx-trending-up fs-4 text-white"></i>
+        <h5 class="mb-0 text-white fw-semibold">รายงานประวัติโปรโมชั่น</h5>
       </div>
       <div class="card-body py-3">
-        <div class="row g-3 mb-3">
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#fbe9e7;border:2px solid #ef6c00 !important;">
-              <div class="text-muted small">โบนัสรวมทั้งหมด</div>
-              <div class="fs-4 fw-bold" style="color:#bf360c;" id="sumTotal">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+        <!-- Stats Cards -->
+        <div class="row g-2 mb-3">
+          <div class="col-6 col-md-4">
+            <div class="card border-0 text-center py-2 px-2" style="background:#f3e5f5;border:2px solid #7b1fa2 !important;">
+              <div class="text-muted" style="font-size:.73rem;">ยอดคนซื้อสินค้า</div>
+              <div class="fs-4 fw-bold" style="color:#4a148c;" id="statBuyers">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คน (ในช่วงวันที่)</div>
             </div>
           </div>
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#fff3e0;border:2px solid #ffa726 !important;">
-              <div class="text-muted small">ค่าแนะนำรวม</div>
-              <div class="fs-4 fw-bold" style="color:#e65100;" id="sumSponser">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+          <div class="col-6 col-md-4">
+            <div class="card border-0 text-center py-2 px-2" style="background:#e8f5e9;border:2px solid #388e3c !important;">
+              <div class="text-muted" style="font-size:.73rem;">คนสมัครใหม่ในสายงาน</div>
+              <div class="fs-4 fw-bold" style="color:#1b5e20;" id="statRegisters">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คน (ในช่วงวันที่)</div>
             </div>
           </div>
-          <div class="col-sm-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-3" style="background:#e0f7fa;border:2px solid #00acc1 !important;">
-              <div class="text-muted small">TMB/จับคู่รวม</div>
-              <div class="fs-4 fw-bold" style="color:#006064;" id="sumWeak">-</div>
-              <div class="text-muted" style="font-size:.7rem;">บาท</div>
+          <div class="col-12 col-md-4">
+            <div class="card border-0 text-center py-2 px-2" style="background:#fff3e0;border:2px solid #f57c00 !important;">
+              <div class="text-muted" style="font-size:.73rem;">ยอดคน Qualify ตำแหน่งคุณวุฒิ</div>
+              <div class="fs-4 fw-bold" style="color:#e65100;" id="statQualify">-</div>
+              <div class="text-muted" style="font-size:.65rem;">คน (รวมทั้งหมด)</div>
             </div>
           </div>
         </div>
+        <!-- Filters -->
         <div class="row align-items-end g-2">
           <div class="col-auto">
             <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
@@ -44,8 +47,17 @@
             <input type="date" class="form-control form-control-sm" id="toDate">
           </div>
           <div class="col-auto align-self-end">
+            <label class="form-label mb-1 small fw-semibold d-block">มุมมอง</label>
+            <div class="btn-group btn-group-sm" role="group">
+              <input type="radio" class="btn-check" name="viewMode" id="btnMonthly" value="monthly" autocomplete="off">
+              <label class="btn btn-outline-secondary" for="btnMonthly">รายเดือน</label>
+              <input type="radio" class="btn-check" name="viewMode" id="btnYearly" value="yearly" autocomplete="off" checked>
+              <label class="btn btn-outline-secondary" for="btnYearly">รายปี</label>
+            </div>
+          </div>
+          <div class="col-auto align-self-end">
             <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
-            <button class="btn btn-sm" id="btnSearch" style="background:#ef6c00;border-color:#ef6c00;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
+            <button class="btn btn-sm" id="btnSearch" style="background:#7b1fa2;border-color:#7b1fa2;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
           </div>
         </div>
         <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ถ้าไม่ระบุวันที่ จะแสดงข้อมูลทั้งหมด</small>
@@ -54,22 +66,28 @@
   </div>
 </div>
 
-<div class="row">
+<!-- Summary by period table -->
+<div class="row mb-3">
   <div class="col-12">
     <div class="card shadow-sm border-0">
-      <div class="card-header" style="background:#fbe9e7;border-bottom:2px solid #ef6c00;">
-        <h5 class="mb-0 fw-semibold" style="color:#bf360c;"><i class="bx bx-table me-2"></i>รายการโบนัสรายวัน &nbsp;<span class="badge" style="background:#ef6c00;" id="rowCount">0</span></h5>
+      <div class="card-header" style="background:#f3e5f5;border-bottom:2px solid #7b1fa2;">
+        <h5 class="mb-0 fw-semibold" style="color:#4a148c;font-size:.9rem;">
+          <i class="bx bx-bar-chart-alt-2 me-2"></i>สรุปยอด<span id="viewLabel">รายปี</span>
+        </h5>
       </div>
-      <div class="card-body">
-        <div class="alert alert-secondary py-2 mb-2" id="msg">กำลังโหลดข้อมูล...</div>
+      <div class="card-body p-2">
         <div class="table-responsive">
-          <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;">
-            <style>
-              table.table-hover tbody tr:hover {
-                background-color: #e0e0e0 !important;
-                transition: background-color 0.2s ease;
-              }
-            </style>
+          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.78rem;white-space:nowrap;">
+            <thead class="text-center" style="background:linear-gradient(135deg,#f3e5f5,#ce93d8);font-size:.73rem;">
+              <tr>
+                <th>ช่วงเวลา</th>
+                <th>ยอดคนซื้อสินค้า</th>
+                <th>คนสมัครใหม่</th>
+              </tr>
+            </thead>
+            <tbody id="summaryBody">
+              <tr><td colspan="3" class="text-center text-muted py-2">กำลังโหลดข้อมูล...</td></tr>
+            </tbody>
           </table>
         </div>
       </div>
@@ -77,67 +95,220 @@
   </div>
 </div>
 
+<!-- Two best-seller tables side by side -->
+<div class="row g-3 mb-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header" style="background:#f3e5f5;border-bottom:2px solid #7b1fa2;">
+        <h5 class="mb-0 fw-semibold" style="color:#4a148c;font-size:.9rem;">
+          <i class="bx bx-package me-1"></i>ชุดโปรโมชั่นขายดี
+          <span class="badge ms-1" style="background:#7b1fa2;" id="packageCount">0</span>
+        </h5>
+      </div>
+      <div class="card-body p-2">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.75rem;">
+            <thead class="text-center" style="background:linear-gradient(135deg,#f3e5f5,#ce93d8);font-size:.72rem;">
+              <tr>
+                <th style="width:3rem;">ลำดับ</th>
+                <th>รหัสสินค้า</th>
+                <th>ชื่อสินค้า</th>
+                <th style="width:6rem;">จำนวนที่ขายได้</th>
+              </tr>
+            </thead>
+            <tbody id="packageBody">
+              <tr><td colspan="4" class="text-center text-muted py-2">กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header" style="background:#e3f2fd;border-bottom:2px solid #1976d2;">
+        <h5 class="mb-0 fw-semibold text-primary" style="font-size:.9rem;">
+          <i class="bx bx-store me-1"></i>สินค้าขายดี
+          <span class="badge bg-primary ms-1" id="productCount">0</span>
+        </h5>
+      </div>
+      <div class="card-body p-2">
+        <div class="table-responsive">
+          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.75rem;">
+            <thead class="text-center" style="background:linear-gradient(135deg,#e3f2fd,#90caf9);font-size:.72rem;">
+              <tr>
+                <th style="width:3rem;">ลำดับ</th>
+                <th>รหัสสินค้า</th>
+                <th>ชื่อสินค้า</th>
+                <th style="width:6rem;">จำนวนที่ขายได้</th>
+              </tr>
+            </thead>
+            <tbody id="productBody">
+              <tr><td colspan="4" class="text-center text-muted py-2">กำลังโหลด...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  table.table-hover tbody tr:hover { background-color:#e8eaf6 !important; transition:background-color .2s ease; }
+</style>
+
 <script>
 $(function(){
-  var tbl=null;
-  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
-  function pick(o,k,d){if(d===undefined)d='';for(var i=0;i<k.length;i++){if(o!=null&&o[k[i]]!==undefined&&o[k[i]]!==null)return o[k[i]];}return d;}
-  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
-  function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
-  function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  var buyersData=[], registersData=[], qualifyData=[], productsData=[];
+  var loadedBuyers=false, loadedReg=false, loadedQualify=false, loadedProd=false;
 
-  function filterRows(rows){
-    var f=$('#fromDate').val(),t=$('#toDate').val();
-    if(!f&&!t)return rows;
-    var from=f?new Date(f):null,to=t?new Date(t+'T23:59:59'):null;
+  function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
+  function pick(o,ks,def){def=def===undefined?'':def;for(var i=0;i<ks.length;i++){var v=o&&o[ks[i]];if(v!==undefined&&v!==null)return v;}return def;}
+  function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
+  function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
+  function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+  function parseDate(v){if(!v)return null;var d=new Date(v);return isNaN(d.getTime())?null:d;}
+  function getView(){return $('input[name="viewMode"]:checked').val()||'yearly';}
+
+  function filterByDate(rows, dateKey){
+    var f=$('#fromDate').val(), t=$('#toDate').val();
+    if(!f&&!t) return rows;
+    var from=f?new Date(f):null, to=t?new Date(t+'T23:59:59'):null;
     return rows.filter(function(r){
-      var d=new Date(pick(r,['FromDate','fromDate']));if(isNaN(d.getTime()))return true;
-      if(from&&d<from)return false;if(to&&d>to)return false;return true;
+      var d=parseDate(pick(r,[dateKey]));
+      if(!d) return true;
+      if(from&&d<from) return false;
+      if(to&&d>to) return false;
+      return true;
     });
   }
 
-  function buildTable(rows){
-    if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
-    var cols=['#','จากวันที่','ถึงวันที่','ค่าแนะนำ','ส่วนตัว','TMB/จับคู่','แมทชิ่ง','แจงยอด','พิเศษ','รวม'];
-    var thead='<thead class="text-center" style="background:linear-gradient(135deg,#fbe9e7,#ffccbc);font-size:.73rem;"><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join('')+'</tr></thead>';
-    var tbody='<tbody>';
+  function groupByPeriod(rows, dateKey, mode){
+    var map={};
+    rows.forEach(function(r){
+      var d=parseDate(pick(r,[dateKey]));
+      if(!d) return;
+      var key = mode==='monthly'
+        ? d.getFullYear()+'/'+(String(d.getMonth()+1).padStart(2,'0'))
+        : String(d.getFullYear());
+      map[key]=(map[key]||0)+1;
+    });
+    return map;
+  }
+
+  function buildSummaryTable(){
+    var mode=getView();
+    $('#viewLabel').text(mode==='monthly'?'รายเดือน':'รายปี');
+    var fBuyers=filterByDate(buyersData,'OrderDateTime');
+    var fRegs=filterByDate(registersData,'Regisdatetime');
+    $('#statBuyers').text(fmt0(fBuyers.length));
+    $('#statRegisters').text(fmt0(fRegs.length));
+    var bMap=groupByPeriod(fBuyers,'OrderDateTime',mode);
+    var rMap=groupByPeriod(fRegs,'Regisdatetime',mode);
+    var keys=[...new Set(Object.keys(bMap).concat(Object.keys(rMap)))].sort();
+    var html='';
+    if(keys.length===0){
+      html='<tr><td colspan="3" class="text-center text-muted">ไม่พบข้อมูลในช่วงวันที่ที่เลือก</td></tr>';
+    } else {
+      keys.forEach(function(k){
+        html+='<tr><td class="text-center">'+esc(k)+'</td>'+
+          '<td class="text-end fw-bold" style="color:#4a148c;">'+fmt0(bMap[k]||0)+'</td>'+
+          '<td class="text-end fw-bold" style="color:#1b5e20;">'+fmt0(rMap[k]||0)+'</td></tr>';
+      });
+    }
+    $('#summaryBody').html(html);
+  }
+
+  function buildQualify(){
+    var total=qualifyData.reduce(function(s,r){return s+num(pick(r,['Totalmember','totalmember'],0));},0);
+    $('#statQualify').text(fmt0(total));
+  }
+
+  function buildBestSellers(){
+    var packages=[], products=[];
+    productsData.forEach(function(r){
+      var typeCode=String(pick(r,['TypeOfProductCode','typeofproductcode'],''));
+      if(typeCode==='005'||typeCode==='006'){
+        packages.push(r);
+      } else {
+        products.push(r);
+      }
+    });
+    // fallback: if no type distinction, split by ProductSet field
+    if(packages.length===0 && products.length>0){
+      products=[];
+      productsData.forEach(function(r){
+        var ps=pick(r,['ProductSet','productset'],'');
+        if(ps&&String(ps).trim()!==''){packages.push(r);}
+        else{products.push(r);}
+      });
+    }
+    fillBestSellerTable('packageBody','packageCount',packages);
+    fillBestSellerTable('productBody','productCount',products);
+  }
+
+  function fillBestSellerTable(bodyId, countId, rows){
+    $('#'+countId).text(rows.length);
+    if(rows.length===0){
+      $('#'+bodyId).html('<tr><td colspan="4" class="text-center text-muted">ไม่พบข้อมูล</td></tr>');
+      return;
+    }
+    var html='';
     rows.forEach(function(r,i){
-      tbody+='<tr>'+
+      var code=pick(r,['ProductID','ProductCode','productID','productcode'],'');
+      var name=pick(r,['ProductName','productName','productname'],'');
+      var qty=pick(r,['Quantity','quantity'],0);
+      html+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center">'+fmtDate(pick(r,['FromDate','fromDate']))+'</td>'+
-        '<td class="text-center">'+fmtDate(pick(r,['ToDate','toDate']))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['SponserBonus','sponserBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['RebateBonus','rebateBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['WeakBonus','weakBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['MatchingBonus','matchingBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['MobileBonus','mobileBonus'],0))+'</td>'+
-        '<td class="text-end">'+fmt2(pick(r,['SpecialBonus','specialBonus'],0))+'</td>'+
-        '<td class="text-end fw-bold text-success">'+fmt2(pick(r,['TotalBonus','totalBonus'],0))+'</td>'+
+        '<td>'+esc(code)+'</td>'+
+        '<td>'+esc(name)+'</td>'+
+        '<td class="text-end fw-bold">'+fmt0(qty)+'</td>'+
         '</tr>';
     });
-    tbody+='</tbody>';
-    $('#mainTable').html(thead+tbody);
-    tbl=$('#mainTable').DataTable({paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],ordering:true,searching:true,
-      language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
-    var sumTot=rows.reduce(function(s,r){return s+num(pick(r,['TotalBonus','totalBonus'],0));},0);
-    var sumSp=rows.reduce(function(s,r){return s+num(pick(r,['SponserBonus','sponserBonus'],0));},0);
-    var sumWk=rows.reduce(function(s,r){return s+num(pick(r,['WeakBonus','weakBonus'],0));},0);
-    $('#sumTotal').text(fmt2(sumTot));$('#sumSponser').text(fmt2(sumSp));$('#sumWeak').text(fmt2(sumWk));$('#rowCount').text(rows.length);
-    $('#msg').removeClass('alert-secondary alert-danger').addClass('alert-success').text('พบข้อมูล '+rows.length+' รายการ');
+    $('#'+bodyId).html(html);
   }
 
-  function loadData(){
-    $('#msg').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
-    var f=$('#fromDate').val(),t=$('#toDate').val();
-    $.get('@Url.Action("GetPromotionHistoryData","reports")',{fromDate:f,toDate:t},function(json){
-      buildTable(filterRows(norm(json)));
-    }).fail(function(){$('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');});
+  function tryRefreshSummary(){
+    if(loadedBuyers&&loadedReg) buildSummaryTable();
+  }
+  function tryRefreshQualify(){
+    if(loadedQualify) buildQualify();
+  }
+  function tryRefreshProducts(){
+    if(loadedProd) buildBestSellers();
   }
 
-  $('#btnSearch').on('click',loadData);
-  $('#btnReset').on('click',function(){$('#fromDate').val('');$('#toDate').val('');loadData();});
-  loadData();
+  // Load all data
+  $.get('@Url.Action("GetHistoryBuyerData","reports")', function(json){
+    buyersData=norm(json); loadedBuyers=true; tryRefreshSummary();
+  }).fail(function(){
+    buyersData=[]; loadedBuyers=true; tryRefreshSummary();
+  });
+
+  $.get('@Url.Action("GetHistoryRegisterData","reports")', function(json){
+    registersData=norm(json); loadedReg=true; tryRefreshSummary();
+  }).fail(function(){
+    registersData=[]; loadedReg=true; tryRefreshSummary();
+  });
+
+  $.get('@Url.Action("GetHistoryQualifyData","reports")', function(json){
+    qualifyData=norm(json); loadedQualify=true; tryRefreshQualify();
+  });
+
+  $.get('@Url.Action("GetHistoryBestSellerData","reports")', function(json){
+    productsData=norm(json); loadedProd=true; tryRefreshProducts();
+  }).fail(function(){
+    $('#packageBody').html('<tr><td colspan="4" class="text-center text-danger">เกิดข้อผิดพลาด</td></tr>');
+    $('#productBody').html('<tr><td colspan="4" class="text-center text-danger">เกิดข้อผิดพลาด</td></tr>');
+  });
+
+  $('#btnSearch').on('click', function(){ tryRefreshSummary(); });
+  $('input[name="viewMode"]').on('change', function(){ tryRefreshSummary(); });
+  $('#btnReset').on('click', function(){
+    $('#fromDate').val(''); $('#toDate').val('');
+    $('input[name="viewMode"][value="yearly"]').prop('checked', true);
+    tryRefreshSummary();
+  });
 });
 </script>
 @section scripts{
