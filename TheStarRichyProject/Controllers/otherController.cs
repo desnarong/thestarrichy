@@ -16,6 +16,38 @@ namespace TheStarRichyProject.Controllers
         {
             return View();
         }
+
+        [HttpPost]
+        public async Task<IActionResult> CheckOldPassword([FromBody] CheckPasswordRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.OldPassword))
+                return Ok(new { success = false, message = "กรุณากรอกรหัสผ่านเก่า" });
+            try
+            {
+                var result = await _apiService.PostAsync<dynamic>("/Member/checkoldpassword", new { OldPassword = request.OldPassword });
+                return Ok(result);
+            }
+            catch
+            {
+                return StatusCode(500, new { success = false, message = "ไม่สามารถตรวจสอบรหัสผ่านได้" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.NewPassword))
+                return Ok(new { success = false, message = "กรุณากรอกรหัสผ่านใหม่" });
+            try
+            {
+                var result = await _apiService.PostAsync<dynamic>("/Member/changepassword", new { NewPassword = request.NewPassword });
+                return Ok(result);
+            }
+            catch
+            {
+                return StatusCode(500, new { success = false, message = "ไม่สามารถเปลี่ยนรหัสผ่านได้" });
+            }
+        }
         public IActionResult taxdownload()
         {
             return View();
@@ -58,4 +90,5 @@ namespace TheStarRichyProject.Controllers
             }
         }
     }
-}
+    public class CheckPasswordRequest { public string? OldPassword { get; set; } }
+    public class ChangePasswordRequest { public string? NewPassword { get; set; } }}

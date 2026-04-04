@@ -65,6 +65,7 @@ namespace TheStarRichyApi.Controllers
         private readonly IMemberFavoriteAddressService _memberFavoriteAddressService;
         private readonly IMemberAddressService _memberAddressService;
         private readonly IReportMemberTaxInvoiceService _reportMemberTaxInvoiceService;
+        private readonly IChangePasswordService _changePasswordService;
         public MemberController(
             IMemberService memberService,
             IMemberIncomeByPeriodService memberIncomeByPeriodService,
@@ -115,7 +116,8 @@ namespace TheStarRichyApi.Controllers
             IBranchService branchService,
             IMemberFavoriteAddressService memberFavoriteAddressService,
             IMemberAddressService memberAddressService,
-            IReportMemberTaxInvoiceService reportMemberTaxInvoiceService
+            IReportMemberTaxInvoiceService reportMemberTaxInvoiceService,
+            IChangePasswordService changePasswordService
             )
         {
             _memberService = memberService;
@@ -170,6 +172,7 @@ namespace TheStarRichyApi.Controllers
             _memberFavoriteAddressService = memberFavoriteAddressService;
             _memberAddressService = memberAddressService;
             _reportMemberTaxInvoiceService = reportMemberTaxInvoiceService;
+            _changePasswordService = changePasswordService;
         }
 
         [HttpGet("hello")]
@@ -969,5 +972,43 @@ namespace TheStarRichyApi.Controllers
                 return StatusCode(500, new { message = "Internal server error" });
             }
         }
+
+        /*==================== CHANGE PASSWORD ====================*/
+
+        [HttpPost("checkoldpassword")]
+        public async Task<IActionResult> CheckOldPassword([FromBody] ChangePasswordCheckRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.OldPassword))
+                return BadRequest(new { success = false, message = "กรุณากรอกรหัสผ่านเก่า" });
+            try
+            {
+                var (success, message) = await _changePasswordService.CheckOldPasswordAsync(request.OldPassword);
+                return Ok(new { success, message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
+        [HttpPost("changepassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.NewPassword))
+                return BadRequest(new { success = false, message = "กรุณากรอกรหัสผ่านใหม่" });
+            try
+            {
+                var (success, message) = await _changePasswordService.UpdatePasswordAsync(request.NewPassword);
+                if (success) return Ok(new { success = true, message });
+                return BadRequest(new { success = false, message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
     }
 }
+
+public class ChangePasswordCheckRequest { public string? OldPassword { get; set; } }
+public class ChangePasswordRequest { public string? OldPassword { get; set; } public string? NewPassword { get; set; } }
