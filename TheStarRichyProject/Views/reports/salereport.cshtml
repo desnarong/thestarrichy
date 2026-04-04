@@ -7,15 +7,23 @@
 .slip-icon  { font-size:1.4rem;cursor:pointer;color:#1976d2; }
 </style>
 
-<!-- Modal: Detail -->
+<!-- Modal: Detail (Bill Layout) -->
 <div class="modal fade" id="detailModal" tabindex="-1">
-  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
-      <div class="modal-header" style="background:#1565c0;color:#fff;">
-        <h5 class="modal-title"><i class="bx bx-receipt me-2"></i>รายละเอียดบิล</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <div class="modal-header p-0 border-0">
+        <div style="background:#00c853;width:100%;padding:.5rem 1rem;" class="d-flex align-items-center justify-content-between">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fw-bold text-white fs-5" id="modalBillTitle">ใบส่งของ</span>
+            <span class="text-white" style="font-size:.78rem;">ถ้าขึ้นต้นด้วย BKKO ใช้คำว่า ใบส่งของ / ถ้าขึ้นต้นด้วย R - ใบแจงยอด</span>
+          </div>
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-sm btn-outline-light" id="btnCapture" onclick="captureBill()"><i class="bx bx-camera me-1"></i>บันทึกบิลเป็นรูป</button>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          </div>
+        </div>
       </div>
-      <div class="modal-body" id="detailModalBody"></div>
+      <div class="modal-body p-0" id="detailModalBody"></div>
     </div>
   </div>
 </div>
@@ -98,14 +106,14 @@
 
 <script>
 $(function(){
-  var allRows=[], tbl=null;
+  var allRows=[], buyRows=[], tbl=null;
 
   function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
-  function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+(year+543);}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
   function slipHtml(v){
@@ -116,25 +124,206 @@ $(function(){
 
   window.showImg=function(src){ $('#imgModalSrc').attr('src',src); new bootstrap.Modal(document.getElementById('imgModal')).show(); };
 
+  // Pre-fetch buyorder data once for product lines
+  $.get('@Url.Action("GetBuyOrderData","reports")', function(json){ buyRows=norm(json); });
+
+  function field(label, val, colClass){
+    colClass = colClass||'col-6 col-md-4';
+    return '<div class="'+colClass+' mb-1">'+
+      '<div style="font-size:.7rem;color:#1565c0;text-align:right;padding-right:4px;">'+label+' :</div>'+
+      '<div class="border border-secondary ps-2" style="min-height:1.6rem;font-size:.8rem;background:#fff;padding:.15rem .4rem;">'+esc(String(val||''))+'</div>'+
+      '</div>';
+  }
+
   window.showDetail=function(idx){
     var r=allRows[idx]; if(!r)return;
-    var html='<table class="table table-sm table-bordered"><tbody>';
-    var fields=[
-      ['เลขที่ใบเสร็จ','BillNo'],['วันที่','BillDate'],['รหัส Hybrid Gold','HybridGOLDID'],
-      ['รหัสนักธุรกิจ','Membercode'],['ชื่อนักธุรกิจ','Membername'],['ประเภทซื้อ','Billtype'],
-      ['ยอดเงิน','TotalAmount'],['PV','TotalPV'],['สถานะการรับ','Receive'],['วันที่รับ/ส่ง','ReceiveDate'],
-      ['ผู้ทำรายการ','Createby'],['การจ่ายเงิน','PaymentType'],['Tracking','TrackingURL'],['ที่อยู่จัดส่ง','DeliveryAddress']
-    ];
-    fields.forEach(function(f){
-      var v=r[f[1]]||r[f[1].toLowerCase()]||'';
-      if(f[1]==='TrackingURL'&&v) v='<a href="'+esc(v)+'" target="_blank">'+esc(v)+'</a>';
-      html+='<tr><th class="text-nowrap bg-light" style="width:140px;">'+f[0]+'</th><td>'+esc(String(v))+'</td></tr>';
+    var billNo = p(r,['BillNo','billNo']);
+
+    // Determine bill type label
+    var billNoStr = String(billNo).toUpperCase();
+    var billTypeLabel = billNoStr.startsWith('BKKO')||billNoStr.startsWith('BKK') ? 'ใบส่งของ' : 'ใบแจงยอด';
+    $('#modalBillTitle').text(billTypeLabel);
+    
+    // Product lines for this bill (from buyRows)
+    var lines = buyRows.filter(function(br){ return p(br,['BillNo','billNo'])===billNo; });
+
+    // Build bill document HTML
+    var docHtml = '<div id="billDoc" style="padding:1rem;font-family:\'Sarabun\',Arial,sans-serif;max-width:860px;margin:0 auto;">';
+
+    // ─── Info Grid ───────────────────────────────────────────────────────────
+    docHtml += '<div class="row g-1 mb-1" style="border:1px solid #bbb;">';
+    // Row 1: เลขที่ใบเสร็จ | วันที่ | (spacer) | รหัส Hybrid gold
+    docHtml += '<div class="col-12" style="background:#f5f5f5;">';
+    docHtml += '<div class="row g-0">';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom">';
+    docHtml +=     '<div style="font-size:.68rem;color:#1565c0;text-align:center;">เลขที่ใบเสร็จ :</div>';
+    docHtml +=     '<div class="text-center fw-bold" style="font-size:.82rem;">'+esc(billNo)+'</div>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">วันที่:</span>';
+    docHtml +=     '<span class="border-bottom border-dark flex-fill ps-1" style="font-size:.8rem;">'+fmtDate(p(r,['BillDate','billDate']))+'</span>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom"></div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">รหัส Hybrid gold :</span>';
+    docHtml +=     '<span style="font-size:.8rem;">'+esc(p(r,['HybridGOLDID','hybridGOLDID']))+'</span>';
+    docHtml +=   '</div>';
+    docHtml += '</div>';
+
+    // Row 2: รหัสสมาชิก | ชื่อสมาชิก
+    docHtml += '<div class="row g-0">';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom">';
+    docHtml +=     '<div style="font-size:.68rem;color:#1565c0;text-align:center;">รหัสสมาชิก :</div>';
+    docHtml +=     '<div class="text-center fw-bold" style="font-size:.82rem;">'+esc(p(r,['Membercode','membercode']))+'</div>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-9 p-1 border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">ชื่อสมาชิก :</span>';
+    docHtml +=     '<span class="flex-fill border-bottom border-dark ps-1" style="font-size:.8rem;">'+esc(p(r,['Membername','membername']))+'</span>';
+    docHtml +=   '</div>';
+    docHtml += '</div>';
+
+    // Row 3: จำนวน PV | จำนวนเงิน | ประเภท
+    var totalPV   = num(p(r,['TotalPV','totalPV','TotalPv'],0));
+    var totalAmt  = num(p(r,['TotalAmount','totalAmount'],0));
+    var billType  = p(r,['BillConfirmType','billConfirmType'])||p(r,['Billtype','billtype']);
+    docHtml += '<div class="row g-0">';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">จำนวน PV :</span>';
+    docHtml +=     '<span class="border-bottom border-dark flex-fill ps-1" style="font-size:.8rem;">'+fmt2(totalPV)+'</span>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">จำนวนเงิน :</span>';
+    docHtml +=     '<span class="border-bottom border-dark flex-fill ps-1" style="font-size:.8rem;">'+fmt2(totalAmt)+'</span>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom"></div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">ประเภท :</span>';
+    docHtml +=     '<span class="border border-secondary px-1" style="font-size:.8rem;min-width:80px;">'+esc(billType)+'</span>';
+    docHtml +=   '</div>';
+    docHtml += '</div>';
+
+    // Row 4: ประเภทซื้อ | สถานที่จัดส่ง (textarea-style)
+    var buyTypeLabel = p(r,['Billtype','billtype'])||'';
+    var delivAddr    = p(r,['DeliveryAddress','deliveryAddress'])||'';
+    docHtml += '<div class="row g-0">';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom">';
+    docHtml +=     '<div style="font-size:.68rem;color:#666;">ประเภทซื้อ :</div>';
+    docHtml +=     '<div class="border border-secondary px-1" style="font-size:.8rem;min-height:1.5rem;">'+esc(buyTypeLabel)+'</div>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-9 p-1 border-bottom">';
+    docHtml +=     '<div class="border border-secondary p-1" style="font-size:.8rem;min-height:5rem;white-space:pre-wrap;">'+esc(delivAddr)+'</div>';
+    docHtml +=     '<div style="font-size:.68rem;color:#666;" class="mt-1">สถานที่จัดส่ง :</div>';
+    docHtml +=   '</div>';
+    docHtml += '</div>';
+
+    // Row 5: วันหมดอาย | สถานะ | Tracking number
+    var expire   = p(r,['ExpireDate','expireDate'])||'';
+    var status   = p(r,['Receive','receive'])||'';
+    var tracking = p(r,['TrackingURL','trackingURL'])||'';
+    docHtml += '<div class="row g-0">';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">วันหมดอาย :</span>';
+    docHtml +=     '<span class="border-bottom border-dark flex-fill ps-1" style="font-size:.8rem;">'+esc(expire?fmtDate(expire):'')+'</span>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-3 p-1 border-end border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span style="font-size:.73rem;">สถานะ :</span>';
+    docHtml +=     '<span class="fw-semibold text-success" style="font-size:.8rem;">'+esc(status)+'</span>';
+    docHtml +=   '</div>';
+    docHtml +=   '<div class="col-md-6 p-1 border-bottom d-flex align-items-center gap-2">';
+    docHtml +=     '<span class="fw-bold" style="font-size:.73rem;">Tracking number :</span>';
+    docHtml +=     (tracking ? '<a href="'+esc(tracking)+'" target="_blank" style="font-size:.8rem;">'+esc(tracking)+'</a>' : '<span style="font-size:.8rem;"></span>');
+    docHtml +=   '</div>';
+    docHtml += '</div>';
+
+    docHtml += '</div>'; // close f5f5f5 bg
+    docHtml += '</div>'; // close info grid
+
+    // ─── Product Lines Table ─────────────────────────────────────────────────
+    docHtml += '<div class="table-responsive mt-2">';
+    docHtml += '<table class="table table-bordered table-sm mb-0" style="font-size:.75rem;">';
+    docHtml += '<thead><tr class="text-center" style="background:#e3f2fd;">';
+
+    // Outer header row — grouped
+    var totalLines = lines.length||1;
+    docHtml += '<th rowspan="2" style="vertical-align:middle;width:2.2rem;">ลำดับ</th>';
+    docHtml += '<th colspan="'+totalLines+'" style="text-align:center;">'+totalLines+'</th>';
+    docHtml += '</tr><tr class="text-center" style="background:#e3f2fd;">';
+    docHtml += '<th colspan="'+totalLines+'">&nbsp;</th>';
+    docHtml += '</tr>';
+
+    // Product column headers
+    docHtml += '<tr class="text-center" style="background:#e3f2fd;">';
+    docHtml += '<th></th>';
+    ['รหัสสินค้า','ชื่อสินค้า','จำนวน','หน่วยนับ','ราคา/หน่วย','ราคารวม','PV รวม','รหัสโปรโมชั่น'].forEach(function(h){
+      docHtml += '<th>'+h+'</th>';
     });
-    html+='</tbody></table>';
-    var slips=''; for(var i=1;i<=5;i++){var sv=r['Slip'+i]||'';if(sv)slips+=slipHtml(sv)+' ';}
-    if(slips) html+='<div class="mt-2"><strong>สลิป:</strong> '+slips+'</div>';
-    $('#detailModalBody').html(html);
+    docHtml += '</tr></thead>';
+
+    docHtml += '<tbody>';
+    if(lines.length===0){
+      // fallback — show header data as single line
+      docHtml += '<tr>';
+      docHtml += '<td class="text-center">1</td>';
+      docHtml += '<td>'+esc(p(r,['ProductID','productID'],''))+'</td>';
+      docHtml += '<td>'+esc(p(r,['ProductName','productName'],''))+'</td>';
+      docHtml += '<td class="text-center">'+fmt0(p(r,['Unit','unit'],1))+'</td>';
+      docHtml += '<td class="text-center">'+esc(p(r,['UnitName','unitName'],''))+'</td>';
+      docHtml += '<td class="text-end">'+fmt2(num(p(r,['TotalAmount','totalAmount'],0))/Math.max(1,num(p(r,['Unit','unit'],1))))+'</td>';
+      docHtml += '<td class="text-end fw-bold">'+fmt2(totalAmt)+'</td>';
+      docHtml += '<td class="text-end text-primary">'+fmt2(totalPV)+'</td>';
+      docHtml += '<td>'+esc(p(r,['ProductSet','productSet'],''))+'</td>';
+      docHtml += '</tr>';
+    } else {
+      lines.forEach(function(ln,i){
+        var lineAmt = num(p(ln,['TotalPrice','TotalAmount','UnitPrice'],0));
+        var linePV  = num(p(ln,['PV','pv','TotalPV','totalPV'],0));
+        var lineQty = num(p(ln,['Unit','unit'],1));
+        var unitPr  = num(p(ln,['UnitPrice','unitprice'],0));
+        if(unitPr===0 && lineQty>0) unitPr = lineAmt/lineQty;
+        docHtml += '<tr>';
+        docHtml += '<td class="text-center">'+(i+1)+'</td>';
+        docHtml += '<td>'+esc(p(ln,['ProductID','productID','productId'],''))+'</td>';
+        docHtml += '<td>'+esc(p(ln,['ProductName','productName'],''))+'</td>';
+        docHtml += '<td class="text-center">'+fmt0(lineQty)+'</td>';
+        docHtml += '<td class="text-center">'+esc(p(ln,['Unit','unit','UnitName','unitName'],''))+'</td>';
+        docHtml += '<td class="text-end">'+fmt2(unitPr)+'</td>';
+        docHtml += '<td class="text-end fw-bold text-success">'+fmt2(lineAmt)+'</td>';
+        docHtml += '<td class="text-end text-primary">'+fmt0(linePV)+'</td>';
+        docHtml += '<td>'+esc(p(ln,['ProductSet','productSet'],''))+'</td>';
+        docHtml += '</tr>';
+      });
+    }
+    // Footer totals row
+    var sumLineAmt = lines.reduce(function(s,ln){return s+num(p(ln,['TotalPrice','TotalAmount'],0));},0)||totalAmt;
+    var sumLinePV  = lines.reduce(function(s,ln){return s+num(p(ln,['PV','pv','TotalPV','totalPV'],0));},0)||totalPV;
+    docHtml += '<tr class="table-light fw-bold"><td colspan="6" class="text-end">รวม</td>';
+    docHtml += '<td class="text-end text-success">'+fmt2(sumLineAmt)+'</td>';
+    docHtml += '<td class="text-end text-primary">'+fmt0(sumLinePV)+'</td><td></td></tr>';
+
+    // Page number footer row
+    docHtml += '<tr><td colspan="9" class="text-center" style="font-size:.7rem;background:#f5f5f5;">1</td></tr>';
+    docHtml += '</tbody></table></div>';
+
+    // Slip images
+    var slips=''; for(var i=1;i<=5;i++){var sv=p(r,['Slip'+i,'slip'+i],'');if(sv)slips+=slipHtml(sv)+' ';}
+    if(slips) docHtml += '<div class="mt-2 p-2"><strong>สลิป:</strong><br>'+slips+'</div>';
+
+    docHtml += '</div>'; // close billDoc
+
+    $('#detailModalBody').html(docHtml);
     new bootstrap.Modal(document.getElementById('detailModal')).show();
+  };
+
+  window.captureBill = function(){
+    var el = document.getElementById('billDoc');
+    if(!el){alert('ไม่พบข้อมูลใบเสร็จ');return;}
+    if(typeof html2canvas==='undefined'){alert('html2canvas ไม่พร้อมใช้งาน');return;}
+    html2canvas(el,{scale:2,useCORS:true,background:'#fff'}).then(function(canvas){
+      var link=document.createElement('a');
+      link.download='bill.png';
+      link.href=canvas.toDataURL('image/png');
+      link.click();
+    });
   };
 
   function filterRows(rows){
@@ -179,7 +368,7 @@ $(function(){
         '<td>'+esc(p(r,['PaymentType','paymentType']))+'</td>'+
         '<td class="text-center">'+trackHtml+'</td>'+
         '<td style="max-width:150px;overflow:hidden;text-overflow:ellipsis;">'+esc(p(r,['DeliveryAddress','deliveryAddress']))+'</td>'+
-        '<td class="text-center"><button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="showDetail('+i+')"><i class="bx bx-show"></i></button></td>'+
+        '<td class="text-center"><button class="btn btn-sm btn-outline-primary py-0 px-2" onclick="showDetail('+i+')"><i class="bx bx-file me-1"></i>ใบส่งของ</button></td>'+
         '<td class="text-center">'+slipHtml(p(r,['Slip1','slip1']))+'</td>'+
         '<td class="text-center">'+slipHtml(p(r,['Slip2','slip2']))+'</td>'+
         '<td class="text-center">'+slipHtml(p(r,['Slip3','slip3']))+'</td>'+
@@ -216,4 +405,5 @@ $(function(){
 </script>
 @section scripts {
     <script src="~/assets/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 }
