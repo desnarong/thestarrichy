@@ -43,9 +43,12 @@ namespace TheStarRichyProject.Controllers
         [HttpGet]
         public async Task<IActionResult> GetTaxInvoiceDetailData(string? billNo)
         {
+            if (string.IsNullOrWhiteSpace(billNo))
+                return Ok(new List<object>());
+
             try
             {
-                var endpoint = $"/Member/reporttaxinvoicedetail?billNo={billNo}";
+                var endpoint = $"/Member/reporttaxinvoicedetail?billNo={Uri.EscapeDataString(billNo)}";
                 var result = await _apiService.GetAsync<dynamic>(endpoint);
                 return Ok(result);
             }

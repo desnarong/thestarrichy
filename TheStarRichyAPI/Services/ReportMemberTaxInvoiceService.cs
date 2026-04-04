@@ -112,6 +112,9 @@ namespace TheStarRichyApi.Services
 
         public async Task<List<dynamic>> GetDetailAsync(string? billNo)
         {
+            // billNo is required — never return all rows
+            if (string.IsNullOrWhiteSpace(billNo)) return new List<dynamic>();
+
             string passkey = _httpContextAccessor.HttpContext?.Request.Headers["X-Passkey"] ?? "";
             string pk1 = await GetPasskeyAsync("Passkey1");
             string pk2 = await GetPasskeyAsync("Passkey2");
@@ -129,22 +132,22 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
+                    // Use EXISTS instead of JOIN to avoid row duplication when header has multiple rows per BillNo
                     string query = @"SELECT d.No, d.BillNo, d.ProductCode, d.ProductName,
                         d.Quantity, d.Unitname, d.PriceperUnit, d.TotalAmount, d.TotalPV, d.PV
                         FROM [000_Member_order_tax_invoice_detail] d (nolock)
-                        INNER JOIN [000_Member_Order_Tax_Invoice] h (nolock) ON h.BillNo = d.BillNo
-                        WHERE h.Membercode = @Membercode";
+                        WHERE d.BillNo = @BillNo
+                          AND EXISTS (
+                              SELECT 1 FROM [000_Member_Order_Tax_Invoice] h (nolock)
+                              WHERE h.BillNo = d.BillNo AND h.Membercode = @Membercode
+                          )";
 
-                    if (!string.IsNullOrEmpty(billNo))
-                        query += " AND d.BillNo = @BillNo";
-
-                    query += " ORDER BY d.BillNo, d.No";
+                    query += " ORDER BY d.No";
 
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
-                        if (!string.IsNullOrEmpty(billNo))
-                            command.Parameters.AddWithValue("@BillNo", billNo);
+                        command.Parameters.AddWithValue("@BillNo", billNo);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
