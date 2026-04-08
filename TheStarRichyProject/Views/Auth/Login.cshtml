@@ -180,8 +180,8 @@
                                     </div>
                                 </div>
                                 <div class="p-2 mt-4 d-none" id="systemClosedMessage">
-                                    <div class="alert alert-warning text-center mb-0 fs-5 fw-semibold" role="alert">
-                                        ขออภัย ขณะนี้ระบบปิดให้บริการชั่วคราว
+                                    <div id="bgClosedMessage" class="alert text-center mb-0 fs-5 fw-semibold" role="alert">
+                                        <p id="textClosedMessage"><p/>
                                     </div>
                                 </div>
                             </div>
@@ -331,6 +331,28 @@
                     $('#countdownModal').modal('hide');
                     $('#loginFormContainer').hide();
                     $('#systemClosedMessage').removeClass('d-none');
+                    $('#textClosedMessage').html('Calculate/คำนวณคอมมิชชั่น');
+                    $('#bgClosedMessage').addClass('alert-danger');
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'ปิดให้บริการชั่วคราว',
+                        text: 'ขออภัยในความไม่สะดวก ขณะนี้ระบบปิดให้บริการชั่วคราว กรุณาเข้าใช้งานอีกครั้งภายหลัง',
+                        customClass: {
+                            title: 'fs-4',
+                            htmlContainer: 'fs-5'
+                        },
+                        allowOutsideClick: false,
+                        confirmButtonText: 'รับทราบ'
+                    });
+
+                    return true;
+                } else if (String(closeSystemFlag) === '2') {
+                    $('#countdownModal').modal('hide');
+                    $('#loginFormContainer').hide();
+                    $('#systemClosedMessage').removeClass('d-none');
+                    $('#textClosedMessage').html('Re-organize/ปรับผัง');
+                    $('#bgClosedMessage').addClass('alert-warning');
 
                     Swal.fire({
                         icon: 'warning',

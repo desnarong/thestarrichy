@@ -436,10 +436,11 @@
         $('#mainMessage').removeClass('alert-danger alert-success').addClass('alert-secondary').text('กำลังโหลดข้อมูล...');
         $('#periodSummarySection').hide();$('#detailSection').hide();allDetailData={};
         $.ajax({url:'@Url.Action("GetBonusReport", "reports")',type:'GET',data:{reportType:rtype},success:function(json){
+          
           var rows=norm(json);
           var dateKeys=rtype==='monthly'?['CalcMonth','calcMonth','Calcmonth','CalcMonth1','calcMonth1']:['FromDate','fromDate'];
           rows=filterByDate(rows,dateKeys,from,to);
-          var accum=rows.reduce(function(s,r){return s+toNum(pick(r,['NetBonus','netBonus','TotalBonus','totalBonus'],0));},0);
+          var accum=rows.reduce(function(s,r){return s+toNum(pick(r,['TotalBonus','totalBonus'],0));},0);
           var sponser=rows.reduce(function(s,r){return s+toNum(pick(r,['SponserBonus','sponserBonus'],0));},0);
           var rebate=rows.reduce(function(s,r){return s+toNum(pick(r,['RebateBonus','rebateBonus'],0));},0);
           var weak=rows.reduce(function(s,r){return s+toNum(pick(r,['WeakBonus','weakBonus'],0));},0);

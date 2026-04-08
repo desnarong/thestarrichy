@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheStarRichyProject", "TheS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheStarRichyApi", "TheStarRichyApi\TheStarRichyApi.csproj", "{4386CFCF-631F-48A2-AD60-B8459AAE07E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebService1", "..\WebService1\WebService1.csproj", "{B89DB9B8-4588-4411-9A64-CF5FD812B240}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,10 +21,6 @@ Global
 		{4386CFCF-631F-48A2-AD60-B8459AAE07E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4386CFCF-631F-48A2-AD60-B8459AAE07E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4386CFCF-631F-48A2-AD60-B8459AAE07E3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B89DB9B8-4588-4411-9A64-CF5FD812B240}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B89DB9B8-4588-4411-9A64-CF5FD812B240}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B89DB9B8-4588-4411-9A64-CF5FD812B240}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B89DB9B8-4588-4411-9A64-CF5FD812B240}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
