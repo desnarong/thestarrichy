@@ -8,7 +8,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberBuyHoldOrderService
     {
-        Task<List<dynamic>> GetDisplayAsync();
+        Task<List<dynamic>> GetDisplayAsync(string checktype);
     }
     public class ReportMemberBuyHoldOrderService : IReportMemberBuyHoldOrderService
     {
@@ -106,7 +106,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync()
+        public async Task<List<dynamic>> GetDisplayAsync(string checktype = "all")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -126,13 +126,12 @@ namespace TheStarRichyApi.Services
 
             // Get Membercode from JWT
             string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            string checktype = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(memberCode))
             {
                 return new List<dynamic>();
             }
- 
+
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -145,11 +144,11 @@ namespace TheStarRichyApi.Services
             // string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
             string query = "SELECT * FROM [000_Member_Order_for_mobile]  (nolock) ";
- 
+
                     query += " where Membercode = @Membercode and Billtypecode='3'";
 
-                    //  ดูเฉพาะยอดคงเหลือ //
-                    if (checktype == "1")
+                    // ดูเฉพาะยอดคงเหลือ //
+                    if (checktype == "remain")
                     {
                         query += "  and Remain>0 ";
 
@@ -159,7 +158,7 @@ namespace TheStarRichyApi.Services
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@Membercode", memberCode);
- 
+
 
 
                         using (var reader = await command.ExecuteReaderAsync())

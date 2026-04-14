@@ -245,6 +245,44 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetInvoiceDetail(string billNo)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(billNo))
+                {
+                    return BadRequest(new { success = false, message = "ต้องมีเลขที่บิล" });
+                }
+                var result = await _apiService.GetAsync<dynamic>($"/Member/invoice-detail?billNo={Uri.EscapeDataString(billNo)}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting invoice detail");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPOInvoiceDetail(string billNo)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(billNo))
+                {
+                    return BadRequest(new { success = false, message = "ต้องมีเลขที่บิล" });
+                }
+                var result = await _apiService.GetAsync<dynamic>($"/Member/po-invoice-detail?billNo={Uri.EscapeDataString(billNo)}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting PO invoice detail");
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลได้" });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetBuyHoldData(string fromDate = "", string toDate = "", string checktype = "all")
         {
             try

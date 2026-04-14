@@ -115,16 +115,14 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════
-     Modal: ใบเสร็จรับเงิน / ใบกำกับภาษี / ใบส่งของ
+     Modal: ใบเสร็จรับเงิน / ใบกำกับภาษี
 ═══════════════════════════════════════════════════════════ -->
 <div class="modal fade" id="taxDetailModal" tabindex="-1">
   <div class="modal-dialog modal-xl modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header p-0 border-0">
-        <div style="background:#00c853;width:100%;padding:.45rem 1rem;" class="d-flex align-items-center justify-content-between flex-wrap gap-1">
+        <div style="background:linear-gradient(135deg,#1565c0,#42a5f5);width:100%;padding:.45rem 1rem;" class="d-flex align-items-center justify-content-between flex-wrap gap-1">
           <div class="d-flex align-items-center gap-3 flex-wrap">
-            <span class="text-white" style="font-size:.75rem;opacity:.9;">ขึ้นต้นด้วย <b>BKKO</b> ➜ ใบส่งของ/ใบกำกับภาษี</span>
-            <span class="text-white" style="font-size:.75rem;opacity:.9;">| ขึ้นต้นด้วย <b>R</b> ➜ ใบแจงยอด</span>
             <span class="fw-bold text-white fs-5 ms-2" id="taxModalBillTitle">ใบกำกับภาษี</span>
           </div>
           <div class="d-flex align-items-center gap-2">
@@ -169,6 +167,7 @@ $(function(){
     function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
     function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
     function fmt2(v){var n=parseFloat(v);return isNaN(n)?'0.00':n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
+    function fmt0(v){var n=Math.round(parseFloat(v));return isNaN(n)?'0':n.toLocaleString('th-TH');}
     function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return d.toLocaleDateString('th-TH');}
     function fmtDateFull(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+(d.getFullYear()+543);}
     function p(o,keys,def){def=def===undefined?'':def;for(var i=0;i<keys.length;i++){if(o&&o[keys[i]]!=null)return o[keys[i]];}return def;}
@@ -237,139 +236,270 @@ $(function(){
     // showTaxDetail — ใบเสร็จรับเงิน / ใบกำกับภาษี
     // ══════════════════════════════════════════════════════
     window.showTaxDetail = function(billNo){
-        $('#taxDetailBody').html('<div class="text-center py-5"><i class="bx bx-loader bx-spin fs-2 text-primary"></i></div>');
-        new bootstrap.Modal(document.getElementById('taxDetailModal')).show();
-        var hd=allTax.find(function(r){return p(r,['BillNo','billNo'])===billNo;})||{};
+      $('#taxDetailBody').html('<div class="text-center py-5"><i class="bx bx-loader bx-spin fs-2 text-primary"></i></div>');
+      new bootstrap.Modal(document.getElementById('taxDetailModal')).show();
+      var hd=allTax.find(function(r){return p(r,['BillNo','billNo'])===billNo;})||{};
 
-        $.get('@Url.Action("GetTaxInvoiceDetailData","other")',{billNo:billNo},function(json){
-            var lines=norm(json);
-            
-            var companyName=p(hd,['Companyname','companyname'],'บริษัท เดอะสตาร์ริชชี จำกัด (สำนักงานใหญ่)');
-            var companyAddr=p(hd,['Companyaddress','companyaddress'],'เลขที่ 16/8 หมู่ 4 ตำบลบึงยี่โถ อำเภอธัญบุรี จังหวัดปทุมธานี 12130');
-            var companyTel=p(hd,['Companytelephone','companytelephone'],'021260742');
-            var companyTaxID=p(hd,['CompanyTaxID','companyTaxID'],'0135564012380');
-            var custTitle=p(hd,['CustomerTitle','customerTitle','TitleName','titleName'],'');
-            var custName=p(hd,['CustomerName','customerName'],'');
-            var custFullDisplayName=(custTitle?custTitle+' ':'')+custName;
-            var custAddr=p(hd,['CustomerAddress','customerAddress'],'');
-            var custShipAddr=p(hd,['ShippingAddress','shippingAddress','DeliveryAddress','deliveryAddress'],'');
-            var custTel=p(hd,['CustomerTelephone','customerTelephone'],'');
-            var custTaxID=p(hd,['CustomerTaxID','customerTaxID'],'');
-            var membercode=p(hd,['Membercode','membercode'],'');
-            var createby=p(hd,['Createby','createby'],'');
-            var paymentType=p(hd,['PaymentType','paymentType'],'');
-            var billDate=fmtDateFull(p(hd,['BillDate','billDate']));
-            var refNo=p(hd,['ReferenceNo','referenceNo'],'');
-            var priceBeforeTax=parseFloat(p(hd,['Pricebeforetax','pricebeforetax'],0))||0;
-            var taxFee=parseFloat(p(hd,['Taxfee','taxfee'],0))||0;
-            var priceIncTax=parseFloat(p(hd,['Pricebeincludetax','pricebeincludetax'],0))||0;
-            var shipping=parseFloat(p(hd,['ShippingFee','shippingFee'],0))||0;
-            var totalPV=parseFloat(p(hd,['TotalPV','totalPV'],0))||0;
-            var netTotal=priceIncTax+shipping;
-            var expireDate=fmtDateFull(p(hd,['ExpireDate','expireDate'],''));
-            var trackingNo=p(hd,['TrackingURL','trackingURL','TrackingNo','trackingNo'],'');
-            var orderType=p(hd,['Billtype','billtype','BilltypeCode','billtypeCode','BillConfirmType','billConfirmType'],'');
-            var billNoUpper=String(billNo).toUpperCase();
-            var docTypeLabel=(billNoUpper.indexOf('BKKO')===0||billNoUpper.indexOf('BKK')===0)?'ใบส่งของ/ใบกำกับภาษี':'ใบแจงยอด';
-            $('#taxModalBillTitle').text(docTypeLabel);
+      $.get('@Url.Action("GetTaxInvoiceDetailData","other")',{billNo:billNo},function(json){
+          var lines=norm(json);
+          
+          // ดึงค่าต่างๆ จาก hd
+          var companyName = p(hd,['Companyname','companyname'],'บริษัท เดอะสตาร์ริชชี จำกัด (สำนักงานใหญ่)');
+          var companyAddr = p(hd,['Companyaddress','companyaddress'],'เลขที่ 16/8 หมู่ 4 ตำบลบึงยี่โถ อำเภอธัญบุรี จังหวัดปทุมธานี 12130');
+          var companyTel = p(hd,['Companytelephone','companytelephone'],'021260742');
+          var companyTaxID = p(hd,['CompanyTaxID','companyTaxID'],'0135564012380');
+          var custTitle = p(hd,['CustomerTitle','customerTitle','TitleName','titleName'],'');
+          var custName = p(hd,['CustomerName','customerName'],'');
+          var custFullDisplayName = (custTitle?custTitle+' ':'')+custName;
+          var custAddr = p(hd,['CustomerAddress','customerAddress'],'');
+          var custShipAddr = p(hd,['ShippingAddress','shippingAddress','DeliveryAddress','deliveryAddress'],'');
+          var custTel = p(hd,['CustomerTelephone','customerTelephone'],'0959046161');
+          var custTaxID = p(hd,['CustomerTaxID','customerTaxID'],'1101401956456');
+          var membercode = p(hd,['Membercode','membercode'],'S00001035');
+          var createby = p(hd,['Createby','createby'],'STAFF04');
+          var paymentType = p(hd,['PaymentType','paymentType'],'');
+          var billconfirmType = p(hd,['BillConfirmType','billConfirmType'],'');
+          var receive = p(hd,['Receive','receive'],'');
+          var receiveDate = fmtDateFull(p(hd,['ReceiveDate','receiveDate'],''));
+          var billDate = fmtDateFull(p(hd,['BillDate','billDate']));
+          var refNo = p(hd,['ReferenceNo','referenceNo'],'');
+          var priceBeforeTax = parseFloat(p(hd,['Pricebeforetax','pricebeforetax'],0))||0;
+          var taxFee = parseFloat(p(hd,['Taxfee','taxfee'],0))||0;
+          var priceIncTax = parseFloat(p(hd,['Pricebeincludetax','pricebeincludetax'],0))||0;
+          var shipping = parseFloat(p(hd,['ShippingFee','shippingFee'],0))||0;
+          var totalPV = parseFloat(p(hd,['TotalPV','totalPV'],0))||0;
+          var netTotal = priceIncTax + shipping;
+          var expireDate = fmtDateFull(p(hd,['ExpireDate','expireDate'],''));
+          var trackingNo = p(hd,['TrackingURL','trackingURL','TrackingNo','trackingNo'],'');
+          var orderType = p(hd,['Billtype','billtype','BilltypeCode','billtypeCode','BillConfirmType','billConfirmType'],'');
+          
+          // คำนวณภาษี
+          var dispBefore = priceBeforeTax || (priceIncTax / 1.07);
+          var dispTax = taxFee || (priceIncTax - dispBefore) || 0;
+          var dispInc = priceIncTax || 0;
+          
+          // คำนวณยอดรวมรายการสินค้า
+          var totalLineAmt = 0, totalLinePV = 0;
+          lines.forEach(function(ln){
+              totalLineAmt += parseFloat(p(ln,['TotalAmount','totalAmount','TotalPrice','totalPrice'],0))||0;
+              totalLinePV += parseFloat(p(ln,['PV','pv','TotalPV','totalPV'],0))||0;
+          });
+          
+          // ตัวอักษรจำนวนเงิน
+          var totalAmountText = netTotal || dispInc;
+          var thaiBahtText = numberToThaiBaht(totalAmountText);
+          
+          // ตรวจสอบพาธของโลโก้
+          var logoSrc = '/assets/images/logo_sm2.png';
+          
+          // สร้าง HTML
+          var html = '<style>@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap");</style>';
+          html += '<div id="taxInvoiceDoc" style="font-family:\'Sarabun\',\'Cordia New\',\'CordiaUPC\',\'TH Sarabun New\',Arial,sans-serif;font-size:10pt;background:#fff;color:#000;padding:8mm 9mm;max-width:210mm;margin:0 auto;">';
+          
+          // ── HEADER ─────────────────────────────────────────────────────────
+          html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;border-bottom:2px solid #000;padding-bottom:5px;margin-bottom:8px;">';
+          html += '<div style="display:flex;gap:10px;align-items:center;">';
+          html += '<div style="width:70px;height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#fff;overflow:hidden;">';
+          html += '<img src="'+logoSrc+'" style="max-width:60px;max-height:60px;object-fit:contain;" onerror="this.style.display=\'none\';this.parentElement.innerHTML=\'<div style=\\\'font-size:11pt;font-weight:900;color:#c00;\\\'>STAR</div><div style=\\\'font-size:6pt;font-weight:800;color:#c00;\\\'>Rich</div>\'">';
+          html += '</div>';
+          html += '<div><div style="font-size:14pt;font-weight:700;">'+esc(companyName)+'</div>';
+          html += '<div style="font-size:8pt;color:#222;">'+esc(companyAddr)+'</div>';
+          html += '<div style="font-size:8pt;">TEL: '+esc(companyTel)+' &nbsp; Fax: -</div></div>';
+          html += '</div>';
+          html += '<div style="text-align:right;">';
+          html += '<div style="font-size:16pt;font-weight:800;">ใบเสร็จรับเงิน/ใบกำกับภาษี</div>';
+          html += '<div style="font-size:8pt;">RECEIPT INVOICE / TAX INVOICE</div>';
+          html += '<div style="font-size:8pt;">เลขประจำตัวผู้เสียภาษี &nbsp; '+esc(companyTaxID)+'</div>';
+          html += '<div style="font-size:8pt;">หน้า : 1 / 1</div>';
+          html += '</div></div>';
+          
+          // ── CUSTOMER + DOC INFO ───────────────────────────────────────────
+          html += '<div style="display:flex;justify-content:space-between;margin-bottom:12px;margin-top:6px;">';
+          html += '<div style="flex:1;">';
+          html += '<div style="display:flex;margin-bottom:6px;font-size:10pt;"><span style="font-weight:600;min-width:70px;">รหัสลูกค้า</span><span> : &nbsp;</span><span>'+esc(membercode)+' &nbsp;&nbsp;&nbsp; เลขประจำตัวผู้เสียภาษี : '+esc(custTaxID)+'</span></div>';
+          html += '<div style="display:flex;margin-bottom:6px;font-size:10pt;"><span style="font-weight:600;min-width:70px;">ชื่อ</span><span> : &nbsp;</span><span>'+esc(custFullDisplayName)+'</span></div>';
+          html += '<div style="display:flex;margin-bottom:6px;font-size:10pt;align-items:flex-start;"><span style="font-weight:600;min-width:70px;">ที่อยู่</span><span> : &nbsp;</span><span>'+esc(custAddr || custShipAddr || '')+'</span></div>';
+          html += '<div style="display:flex;margin-bottom:6px;font-size:10pt;"><span style="font-weight:600;min-width:70px;">โทร.</span><span> : &nbsp;</span><span>'+esc(custTel)+'</span></div>';
+          html += '</div>';
+          html += '<div style="text-align:right;min-width:220px;">';
+          html += '<div style="margin-bottom:6px;"><span style="font-size:10pt;font-weight:600;">เลขที่ </span>';
+          html += '<div style="font-weight:700;font-size:10pt;display:inline-block;margin-left:6px;">'+esc(billNo)+'</div></div>';
+          html += '<div style="font-size:10pt;margin:4px 0;">วันที่ &nbsp; '+billDate+'</div>';
+          html += '<div style="margin-top:8px;margin-bottom:4px;">';
+          html += '<span style="font-weight:600;font-size:10pt;">เลขที่อ้างอิง </span>';
+          html += '<span style="font-weight:500;font-size:10pt;">' + esc(refNo) + '</span>';
+          html += '</div>';
+          html += '<div style="margin-top:6px;font-size:9pt;">ผู้ทำรายการ &nbsp; '+esc(createby)+'</div>';
+          html += '</div></div>';
+          
+          // ── PRODUCT TABLE ────────────────────────────────────────────────
+          html += '<table style="width:100%;border-collapse:collapse;margin:10px 0 6px 0;">';
+          html += '<thead>';
+          html += '<tr>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:7%;font-size:10pt;">ลำดับที่</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:10%;font-size:10pt;">รหัสสินค้า</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:38%;font-size:10pt;">รายการสินค้า</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:7%;font-size:10pt;">PV</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:10%;font-size:10pt;">จำนวน</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:13%;font-size:10pt;">ราคา/หน่วย</th>';
+          html += '<th style="border-top:1.5px solid #000;border-bottom:1.5px solid #000;padding:8px 4px;text-align:center;width:13%;font-size:10pt;">ราคารวม</th>';
+          html += '</tr>';
+          html += '</thead>';
+          html += '<tbody>';
+          
+          if(lines.length === 0){
+              html += '<tr><td colspan="7" style="text-align:center;padding:20px;font-size:10pt;">ไม่พบรายการสินค้า</td></tr>';
+          } else {
+              lines.forEach(function(ln, idx){
+                  var qty = parseFloat(p(ln,['Quantity','quantity'],0))||0;
+                  var unit = p(ln,['Unitname','unitname','UnitName'],p(ln,['Unit','unit'],''));
+                  var ppu = parseFloat(p(ln,['PriceperUnit','priceperUnit','UnitPrice','unitprice'],0))||0;
+                  var ltot = parseFloat(p(ln,['TotalAmount','totalAmount','TotalPrice','totalPrice'],0))||0;
+                  var lpv = parseFloat(p(ln,['PV','pv','TotalPV','totalPV'],0))||0;
+                  html += '<tr>';
+                  html += '<td style="padding:6px 4px;text-align:center;font-size:10pt;">'+(idx+1)+'</td>';
+                  html += '<td style="padding:6px 4px;text-align:center;font-size:10pt;">'+esc(p(ln,['ProductCode','productCode','ProductID','productID']))+'</td>';
+                  html += '<td style="padding:6px 4px;font-size:10pt;">'+esc(p(ln,['ProductName','productName']))+'</td>';
+                  html += '<td style="padding:6px 4px;text-align:center;font-size:10pt;">'+fmt0(lpv)+'</td>';
+                  html += '<td style="padding:6px 4px;text-align:center;font-size:10pt;">'+esc(String(qty))+' '+esc(unit)+'</td>';
+                  html += '<td style="padding:6px 4px;text-align:right;padding-right:6px;font-size:10pt;">'+fmt2(ppu)+'</td>';
+                  html += '<td style="padding:6px 4px;text-align:right;padding-right:6px;font-size:10pt;">'+fmt2(ltot)+'</td>';
+                  html += '</tr>';
+              });
+          }
+          
+          // แถวว่าง 13 แถว
+          for(var i=0; i<13; i++){
+              html += '<tr>';
+              html += '<td style="padding:6px 4px;font-size:10pt;">&nbsp;</td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '<td style="padding:6px 4px;font-size:10pt;"></td>';
+              html += '</tr>';
+          }
+          
+          html += '</tbody>';
+          html += '</table>';
+          
+          // ── DELIVERY FEE ───────────────────────────────────────────────────
+          html += '<div style="text-align:right;font-size:10pt;margin:5px 0 2px 0;">ค่าส่ง &nbsp;&nbsp;&nbsp; '+fmt2(shipping)+'</div>';
+          
+          // ── BOTTOM SECTION ─────────────────────────────────────────────────
+          html += '<div style="border-top:2px solid #000;padding-top:8px;margin-top:5px;">';
+          html += '<div style="display:flex;justify-content:space-between;gap:15px;">';
+          
+          // LEFT: Payment details
+          html += '<div style="flex:1;">';
+          html += '<div style="font-weight:700;font-size:10pt;margin-bottom:8px;border-bottom:2px solid #000;padding-bottom:3px;width:100%;">ตัวอักษร &nbsp; '+thaiBahtText+'</div>';
+          
+          html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:6px;">';
+          html += '<span style="font-weight:600;font-size:10pt;">ชำระโดย</span>';
+          html += '<div style="display:inline-flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;"></div><span style="font-size:10pt;">เงินสด</span></div>';
+          html += '<div style="display:inline-flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;"></div><span style="font-size:10pt;">บัตรเครดิต</span></div>';
+          html += '<span style="font-weight:600;font-size:10pt;margin-left:8px;">บัตรเครดิต</span>';
+          html += '<span style="border-bottom:1px solid #333;display:inline-block;min-width:95px;height:14px;"></span>';
+          html += '<span style="font-size:10pt;">เลขที่</span>';
+          html += '<span style="border-bottom:1px solid #333;display:inline-block;min-width:75px;height:14px;"></span>';
+          html += '</div>';
+          
+          html += '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:8px 0 6px 0;">';
+          html += '<div style="display:flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;display:inline-flex;align-items:center;justify-content:center;">X</div><span style="font-size:10pt;">เงินโอน</span></div>';
+          html += '<div style="display:flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;"></div><span style="font-size:10pt;">Cash Voucher</span></div>';
+          html += '<div style="display:flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;"></div><span style="font-size:10pt;">อื่นๆ</span><span style="border-bottom:1px solid #333;min-width:35px;margin-left:4px;"></span></div>';
+          html += '<div style="display:flex;align-items:center;gap:3px;"><div style="width:14px;height:14px;border:1.5px solid #222;"></div><span style="font-size:10pt;">เงินสดและเงินโอน</span></div>';
+          html += '<span style="font-size:10pt;">อ้างอิง</span><span style="border-bottom:1px solid #333;min-width:45px;"></span>';
+          html += '</div>';
+          html += '</div>';
+          
+          // RIGHT: Financial summary
+          html += '<div style="min-width:185px;margin-top:20px;">';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ราคาก่อน VAT</span><span style="text-align:right;">'+fmt2(dispBefore)+'</span></div>';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ภาษีมูลค่าเพิ่ม 7 %</span><span style="text-align:right;">'+fmt2(dispTax)+'</span></div>';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:800;font-size:11pt;"><span>จำนวนเงินสุทธิ</span><span style="text-align:right;">'+fmt2(netTotal || dispInc)+'</span></div>';
+          html += '</div>';
+          
+          html += '</div></div>';
+          
+          // ── REMARK CENTER ──────────────────────────────────────────────────
+          html += '<div style="text-align:center;font-size:8pt;margin-top:8px;">';
+          html += 'ที่อยู่จัดส่ง deestar &nbsp; '+esc(custShipAddr || custAddr || '')+' โทร '+esc(custTel)+'';
+          html += '</div>';
+          html += '<div style="text-align:center;font-size:8pt;margin-top:4px;">';
+          html += 'เอกสารฉบับนี้จะถือว่าสมบูรณ์เมื่อได้รับลายมือชื่อของผู้มีอำนาจและของผู้รับเงินด้านกำกับภาษี &nbsp;&nbsp; รับประกันสินค้าภายใน 7 วัน';
+          html += '</div>';
+          
+          // ── SIGNATURE ──────────────────────────────────────────────────────
+          html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:12px;border-top:1.5px solid #000;padding-top:8px;text-align:center;">';
+          html += '<div><div style="height:32px;border-bottom:1px solid #333;"></div><div style="font-size:8pt;">'+billDate+'</div><div style="font-size:10pt;font-weight:600;">ผู้รับเงิน</div></div>';
+          html += '<div><div style="height:32px;border-bottom:1px solid #333;display:flex;align-items:flex-end;justify-content:center;"><span style="font-weight:600;font-size:10pt;">'+esc(custFullDisplayName)+'</span></div><div style="font-size:10pt;font-weight:600;">ผู้รับสินค้า</div></div>';
+          html += '<div><div style="height:32px;border-bottom:1px solid #333;"></div><div style="font-size:10pt;font-weight:600;">ผู้จ่ายสินค้า</div></div>';
+          html += '</div>';
+          
+          html += '</div>';
+          
+          $('#taxDetailBody').html(html);
+          
+      }).fail(function(){
+          $('#taxDetailBody').html('<div class="text-center text-danger py-3"><i class="bx bx-error-circle fs-3"></i><br>เกิดข้อผิดพลาดในการดึงข้อมูล</div>');
+      });
+  };
 
-            // Number to Thai text (kept for printDoc fallback)
-            var dispBefore=priceBeforeTax||0;
-            if(!dispBefore&&priceIncTax) dispBefore=priceIncTax/1.07;
-            var dispTax=taxFee||(priceIncTax-dispBefore)||0;
-            var dispInc=priceIncTax||0;
-
-            var html='<div id="taxInvoiceDoc" style="font-family:\'Cordia New\',\'CordiaUPC\',\'TH Sarabun New\',Arial,sans-serif;font-size:14pt;background:#fff;color:#000;padding:.8rem 1rem;max-width:860px;margin:0 auto;">';
-
-            // ── Company header + Doc number box ──────────────────────────
-            html+='<table style="width:100%;border-collapse:collapse;margin-bottom:6px;"><tr>';
-            html+='<td style="vertical-align:top;padding-right:12px;">';
-            html+='<div style="font-size:15pt;font-weight:700;color:#1a237e;line-height:1.2;">'+esc(companyName)+'</div>';
-            html+='<div style="font-size:12pt;">'+esc(companyAddr)+'</div>';
-            html+='<div style="font-size:12pt;">โทร: '+esc(companyTel)+'&nbsp;&nbsp; เลขที่ผู้เสียภาษี: '+esc(companyTaxID)+'</div>';
-            html+='</td>';
-            html+='<td style="vertical-align:top;text-align:right;white-space:nowrap;">';
-            html+='<div style="font-size:14pt;font-weight:700;color:#c00;margin-bottom:4px;">'+esc(docTypeLabel)+'</div>';
-            html+='<table style="margin-left:auto;border-collapse:collapse;font-size:12pt;border:1.5px solid #c00;">';
-            html+='<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">เลขที่</td><td style="padding:3px 10px;font-weight:700;color:#1a237e;border-bottom:1px solid #eee;white-space:nowrap;">'+esc(billNo)+'</td></tr>';
-            html+='<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">วันที่</td><td style="padding:3px 10px;border-bottom:1px solid #eee;white-space:nowrap;">'+billDate+'</td></tr>';
-            html+='<tr><td style="text-align:right;padding:3px 8px;color:#555;white-space:nowrap;">อ้างอิง</td><td style="padding:3px 10px;white-space:nowrap;">'+esc(refNo)+'</td></tr>';
-            html+='</table></td>';
-            html+='</tr></table>';
-            html+='<hr style="margin:4px 0;border:0;border-top:1px solid #bbb;">';
-
-            // ── Customer + Shipping/Order info ────────────────────────────
-            html+='<table style="width:100%;border-collapse:collapse;margin-bottom:6px;"><tr>';
-            html+='<td style="vertical-align:top;width:52%;padding-right:12px;border-right:1px solid #ddd;">';
-            html+='<div style="margin-bottom:3px;font-size:13pt;"><span style="color:#555;">ผู้ซื้อ :</span> <b>'+esc(custFullDisplayName)+'</b></div>';
-            html+='<div style="margin-bottom:3px;font-size:13pt;"><span style="color:#555;">รหัสสมาชิก :</span> '+esc(membercode)+'</div>';
-            html+='<div style="border-bottom:1px solid #aaa;min-height:1.4rem;font-size:12pt;padding-bottom:2px;">'+esc(custTaxID||'')+'</div>';
-            html+='</td>';
-            html+='<td style="vertical-align:top;padding-left:12px;">';
-            html+='<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">ที่อยู่จัดส่ง :</span> <span style="border-bottom:1px solid #aaa;display:inline-block;min-width:150px;">'+esc(custShipAddr||custAddr||'')+'</span></div>';
-            html+='<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">โทร :</span> <span style="border-bottom:1px solid #aaa;display:inline-block;min-width:100px;">'+esc(custTel||'')+'</span></div>';
-            html+='<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">ประเภทชำระ :</span> <span style="border:1px solid #888;padding:0 6px;display:inline-block;">'+esc(paymentType||'')+'</span></div>';
-            html+='<div style="font-size:12pt;"><span style="color:#c00;font-weight:600;">ประเภทการสั่ง :</span> <span style="color:#c00;">'+esc(orderType||'topup/hurry active/ hold')+'</span>';
-            if(expireDate) html+=' &nbsp; <span style="color:#555;">วันหมดอายุ :</span> '+esc(expireDate);
-            html+='</div>';
-            html+='</td></tr></table>';
-
-            // ── Product table ─────────────────────────────────────────────
-            html+='<table style="width:100%;border-collapse:collapse;font-size:13pt;border:1px solid #aaa;">';
-            html+='<thead><tr style="background:#e8e8e8;">';
-            var ths=[['ลำดับ','32px','center'],['รหัสสินค้า','90px','left'],['ชื่อสินค้า','','left'],['จำนวน','60px','center'],['หน่วย','60px','center'],['ราคา/หน่วย','95px','right'],['รวม','95px','right'],['PV','75px','right']];
-            ths.forEach(function(h){html+='<th style="border:1px solid #aaa;padding:3px 5px;text-align:'+h[2]+';'+(h[1]?'width:'+h[1]+';':'')+'">'+h[0]+'</th>';});
-            html+='</tr></thead><tbody>';
-            var totalLineAmt=0,totalLinePV=0;
-            if(lines.length===0){
-                html+='<tr><td colspan="8" style="text-align:center;height:40px;color:#999;border:1px solid #eee;">ไม่พบรายการสินค้า</td></tr>';
-            } else {
-                lines.forEach(function(ln,idx){
-                    var qty=p(ln,['Quantity','quantity'],0);
-                    var unit=p(ln,['Unitname','unitname','UnitName'],p(ln,['Unit','unit'],''));
-                    var ppu=parseFloat(p(ln,['PriceperUnit','priceperUnit','UnitPrice','unitprice'],0))||0;
-                    var ltot=parseFloat(p(ln,['TotalAmount','totalAmount','TotalPrice','totalPrice'],0))||0;
-                    var lpv=parseFloat(p(ln,['PV','pv','TotalPV','totalPV'],0))||0;
-                    totalLineAmt+=ltot; totalLinePV+=lpv;
-                    html+='<tr>';
-                    html+='<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+(idx+1)+'</td>';
-                    html+='<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(ln,['ProductCode','productCode','ProductID','productID']))+'</td>';
-                    html+='<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(ln,['ProductName','productName']))+'</td>';
-                    html+='<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(String(qty))+'</td>';
-                    html+='<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(unit)+'</td>';
-                    html+='<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt2(ppu)+'</td>';
-                    html+='<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;font-weight:600;color:#c00;">'+fmt2(ltot)+'</td>';
-                    html+='<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt2(lpv)+'</td>';
-                    html+='</tr>';
-                });
+// ฟังก์ชันแปลงตัวเลขเป็นตัวอักษรภาษาไทย
+function numberToThaiBaht(num) {
+    if (isNaN(num) || num === 0) return 'ศูนย์บาทถ้วน';
+    var thaiNum = ['', 'หนึ่ง', 'สอง', 'สาม', 'สี่', 'ห้า', 'หก', 'เจ็ด', 'แปด', 'เก้า'];
+    var thaiUnit = ['', 'สิบ', 'ร้อย', 'พัน', 'หมื่น', 'แสน', 'ล้าน'];
+    var baht = Math.floor(num);
+    var satang = Math.round((num - baht) * 100);
+    var result = '';
+    
+    if (baht > 0) {
+        var bahtStr = '';
+        var strBaht = baht.toString();
+        for (var i = 0; i < strBaht.length; i++) {
+            var digit = parseInt(strBaht[i]);
+            var pos = strBaht.length - i - 1;
+            if (digit === 1 && pos === 0 && i > 0) {
+                bahtStr += 'เอ็ด';
+            } else if (digit === 2 && pos === 1) {
+                bahtStr += 'ยี่';
+            } else if (digit === 1 && pos === 1) {
+                bahtStr += '';
+            } else if (digit > 0) {
+                bahtStr += thaiNum[digit];
             }
-            var fillRows=Math.max(0,3-lines.length);
-            for(var fi=0;fi<fillRows;fi++) html+='<tr><td colspan="8" style="height:20px;border:1px solid #eee;">&nbsp;</td></tr>';
-            html+='</tbody></table>';
-
-            // ── Footer ────────────────────────────────────────────────────
-            html+='<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:13pt;"><tr>';
-            html+='<td style="vertical-align:top;width:55%;padding-right:10px;border-right:1px solid #ddd;">';
-            html+='<div><span style="color:#555;">รูปแบบ :</span> ส่งปิลไปกับฝลัด / ไม่ส่งปิลไป</div>';
-            html+='<div style="margin-top:3px;"><span style="color:#555;">Tracking number :</span> <span style="border-bottom:1px solid #aaa;display:inline-block;min-width:180px;padding-bottom:1px;">'+esc(trackingNo||'')+'</span></div>';
-            html+='<div style="margin-top:3px;"><span style="color:#555;">หมายเหตุ :</span> ค้างรับ / รับแล้ว-วันที่รับ</div>';
-            html+='<div style="margin-top:3px;"><span style="color:#555;">ผู้ทำรายการ :</span> '+esc(createby||'')+'</div>';
-            html+='<div style="margin-top:3px;"><span style="color:#555;">สถานะ :</span> ยืนยัน/ยังไม่ยืนยัน</div>';
-            html+='</td>';
-            html+='<td style="vertical-align:top;padding-left:10px;">';
-            html+='<table style="width:100%;border-collapse:collapse;font-size:13pt;">';
-            html+='<tr><td style="padding:4px 8px;">ค่าส่ง</td><td style="text-align:right;padding:4px 8px;">'+fmt2(shipping)+'</td></tr>';
-            html+='<tr style="background:#e0f7f4;"><td style="padding:5px 8px;font-weight:700;">ยอดรวมทั้งสิ้น</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;font-size:15pt;">'+fmt2(netTotal||dispInc)+'</td></tr>';
-            html+='<tr style="background:#e0f7f4;margin-top:2px;"><td style="padding:5px 8px;font-weight:700;">PV</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;font-size:15pt;">'+fmt2(totalPV||totalLinePV)+'</td></tr>';
-            html+='</table></td>';
-            html+='</tr></table>';
-            html+='</div>';
-
-            $('#taxDetailBody').html(html);
-        }).fail(function(){
-            $('#taxDetailBody').html('<div class="text-center text-danger py-3"><i class="bx bx-error-circle fs-3"></i><br>เกิดข้อผิดพลาดในการดึงข้อมูล</div>');
-        });
-    };
+            if (digit > 0 && pos > 0) {
+                bahtStr += thaiUnit[pos % 6];
+                if (pos === 6) bahtStr += thaiUnit[6];
+            }
+        }
+        result += bahtStr + 'บาท';
+    }
+    
+    if (satang > 0) {
+        var satangStr = satang.toString();
+        if (satangStr.length === 1) satangStr = '0' + satangStr;
+        var s1 = parseInt(satangStr[0]);
+        var s2 = parseInt(satangStr[1]);
+        if (s1 > 0) {
+            if (s1 === 2) result += 'ยี่';
+            else if (s1 === 1) result += '';
+            else result += thaiNum[s1];
+            result += 'สิบ';
+        }
+        if (s2 > 0) {
+            if (s2 === 1) result += 'เอ็ด';
+            else result += thaiNum[s2];
+        }
+        result += 'สตางค์';
+    } else {
+        result += 'ถ้วน';
+    }
+    return result;
+}
 
     // ══════════════════════════════════════════════════════
     // showWithholdDetail — หนังสือรับรอง 50ทวิ

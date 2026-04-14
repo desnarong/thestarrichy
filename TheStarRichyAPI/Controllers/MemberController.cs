@@ -66,6 +66,8 @@ namespace TheStarRichyApi.Controllers
         private readonly IMemberAddressService _memberAddressService;
         private readonly IReportMemberTaxInvoiceService _reportMemberTaxInvoiceService;
         private readonly IChangePasswordService _changePasswordService;
+        private readonly IReportMemberOrderInvoiceDetailService _reportMemberOrderInvoiceDetailService;
+        private readonly IReportMemberPOOrderInvoiceDetailService _reportMemberPOOrderInvoiceDetailService;
         public MemberController(
             IMemberService memberService,
             IMemberIncomeByPeriodService memberIncomeByPeriodService,
@@ -117,7 +119,9 @@ namespace TheStarRichyApi.Controllers
             IMemberFavoriteAddressService memberFavoriteAddressService,
             IMemberAddressService memberAddressService,
             IReportMemberTaxInvoiceService reportMemberTaxInvoiceService,
-            IChangePasswordService changePasswordService
+            IChangePasswordService changePasswordService,
+            IReportMemberOrderInvoiceDetailService reportMemberOrderInvoiceDetailService,
+            IReportMemberPOOrderInvoiceDetailService reportMemberPOOrderInvoiceDetailService
             )
         {
             _memberService = memberService;
@@ -173,6 +177,8 @@ namespace TheStarRichyApi.Controllers
             _memberAddressService = memberAddressService;
             _reportMemberTaxInvoiceService = reportMemberTaxInvoiceService;
             _changePasswordService = changePasswordService;
+            _reportMemberOrderInvoiceDetailService = reportMemberOrderInvoiceDetailService;
+            _reportMemberPOOrderInvoiceDetailService = reportMemberPOOrderInvoiceDetailService;
         }
 
         [HttpGet("hello")]
@@ -733,11 +739,47 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportbuyholdorder")]
-        public async Task<IActionResult> GetReportMemberBuyHoldOrder()
+        public async Task<IActionResult> GetReportMemberBuyHoldOrder([FromQuery] string checktype = "all")
         {
             try
             {
-                var result = await _reportMemberBuyHoldOrderService.GetDisplayAsync();
+                var result = await _reportMemberBuyHoldOrderService.GetDisplayAsync(checktype);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        [HttpGet("invoice-detail")]
+        public async Task<IActionResult> GetInvoiceDetail([FromQuery] string billNo)
+        {
+            try
+            {
+                var result = await _reportMemberOrderInvoiceDetailService.GetInvoiceDetailAsync(billNo);
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "ไม่พบข้อมูล" });
+                }
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        [HttpGet("po-invoice-detail")]
+        public async Task<IActionResult> GetPOInvoiceDetail([FromQuery] string billNo)
+        {
+            try
+            {
+                var result = await _reportMemberPOOrderInvoiceDetailService.GetPOInvoiceDetailAsync(billNo);
+                if (result == null)
+                {
+                    return NotFound(new { success = false, message = "ไม่พบข้อมูล" });
+                }
                 return Ok(result);
             }
             catch (Exception)

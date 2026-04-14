@@ -186,6 +186,7 @@
                                 <th style="min-width:90px;">คะแนนส่วนตัว</th>
                                 <th style="min-width:85px;">คะแนนซ้าย</th>
                                 <th style="min-width:85px;">คะแนนขวา</th>
+                                <th style="min-width:130px;">รหัสผู้แนะนำ</th>
                                 <th style="min-width:130px;">ผู้แนะนำ</th>
                                 <th style="min-width:90px;">สถานะรักษายอด</th>
                                 <th style="min-width:110px;">รักษายอดเดือนปัจจุบัน</th>
@@ -603,10 +604,10 @@ $(document).ready(function () {
             $('#tableMessage').hide();
             var rows = '';
             // Debug: Log first row to see available columns
-            if (pageData.length > 0) {
+            /*if (pageData.length > 0) {
                 console.log('Sample data keys:', Object.keys(pageData[0]));
                 console.log('Sample data first row:', pageData[0]);
-            }
+            }*/
             pageData.forEach(function (m, i) {
                 var qualify   = ((m.Qualify ?? m.qualify ?? '') + '').toLowerCase().trim();
                 var isQualify = qualify.startsWith('yes');
@@ -641,6 +642,7 @@ $(document).ready(function () {
                     '<td class="text-end">'     + fmtNum(m.PersonalPV   ?? m.personalPV ?? 0)   + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVLeft       ?? m.pvLeft ?? 0)       + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PVRight      ?? m.pvRight ?? 0)      + '</td>' +
+                    '<td>'                           + escHtml(m.SponserCode ?? m.sponserCode ?? m.SponsorCode ?? m.sponsorCode ?? m.Sponsercode ?? m.sponsercode1 ?? m.Sponsor_Code ?? m.Upline ?? m.upline ?? m.Sponsor ?? m.sponsor ?? '') + '</td>' +
                     '<td>'                           + escHtml(m.SponserName ?? m.sponserName ?? m.SponsorName ?? m.sponsorName ?? m.Sponsername1 ?? m.sponsername1 ?? m.Sponsor_Name ?? m.Upline ?? m.upline ?? m.Sponsor ?? m.sponsor ?? '') + '</td>' +
                     '<td class="text-center">'  + qualBadge + '</td>' +
                     '<td class="text-end">'     + fmtNum(m.PresentMonthQualifyPV ?? m.presentMonthQualifyPV ?? 0) + '</td>' +

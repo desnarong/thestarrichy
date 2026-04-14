@@ -581,7 +581,7 @@ $(document).ready(function () {
 
                     tableHtml += `<hr />
                         <div class="col-xl-6">
-                            <h6 class="mb-1"><strong class="text-secondary" data-key="t-nextposition">คุณวุฒิปัจจุบัน</strong></h6>
+                            <h6 class="mb-1"><strong class="text-secondary" data-key="t-nextposition">ตำแหน่งที่จะขึ้น</strong></h6>
                             <div class="alert bg-warning border-warning h6 text-white material-shadow text-center mb-1" role="alert">
                                 <strong>${(item.EstimatePosistion || 'N/A')}</strong>
                             </div>
