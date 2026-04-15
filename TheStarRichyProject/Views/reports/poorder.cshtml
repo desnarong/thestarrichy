@@ -152,20 +152,10 @@ $(function(){
       
       var billMemberType = p(header,['Billmembertype','billmembertype','BillMemberType','billMemberType'],'');
       var billTypeLabel = 'ใบเสร็จรับเงิน/ใบส่งของ';
-      var headerBgColor = '#5c6bc0';
+      var headerBgColor = 'gray';
       var headerTextColor = '#1565c0';
       
-      if(billMemberType === 'ใบเสร็จแจงยอด') {
-        billTypeLabel = 'ใบเสร็จแจงยอด';
-        headerBgColor = '#ff9800';
-        headerTextColor = '#1565c0';
-      } else {
-        billTypeLabel = 'ใบเสร็จรับเงิน/ใบส่งของ';
-        headerBgColor = '#4caf50';
-        headerTextColor = '#1565c0';
-      }
-      
-      $('#modalBillTitle').text(billTypeLabel);
+      $('#modalBillTitle').text(billMemberType);
       $('#modalHeaderBand').css({
         'background': headerBgColor,
         'color': headerTextColor
@@ -386,4 +376,5 @@ $(function(){
 </script>
 @section scripts {
     <script src="~/assets/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 }

@@ -268,26 +268,13 @@ $(function(){
           var priceIncTax = parseFloat(p(hd,['Pricebeincludetax','pricebeincludetax'],0))||0;
           var shipping = parseFloat(p(hd,['ShippingFee','shippingFee'],0))||0;
           var totalPV = parseFloat(p(hd,['TotalPV','totalPV'],0))||0;
-          var netTotal = priceIncTax + shipping;
+
           var expireDate = fmtDateFull(p(hd,['ExpireDate','expireDate'],''));
           var trackingNo = p(hd,['TrackingURL','trackingURL','TrackingNo','trackingNo'],'');
           var orderType = p(hd,['Billtype','billtype','BilltypeCode','billtypeCode','BillConfirmType','billConfirmType'],'');
           
-          // คำนวณภาษี
-          var dispBefore = priceBeforeTax || (priceIncTax / 1.07);
-          var dispTax = taxFee || (priceIncTax - dispBefore) || 0;
-          var dispInc = priceIncTax || 0;
-          
-          // คำนวณยอดรวมรายการสินค้า
-          var totalLineAmt = 0, totalLinePV = 0;
-          lines.forEach(function(ln){
-              totalLineAmt += parseFloat(p(ln,['TotalAmount','totalAmount','TotalPrice','totalPrice'],0))||0;
-              totalLinePV += parseFloat(p(ln,['PV','pv','TotalPV','totalPV'],0))||0;
-          });
-          
           // ตัวอักษรจำนวนเงิน
-          var totalAmountText = netTotal || dispInc;
-          var thaiBahtText = numberToThaiBaht(totalAmountText);
+          var thaiBahtText = numberToThaiBaht(priceIncTax);
           
           // ตรวจสอบพาธของโลโก้
           var logoSrc = '/assets/images/logo_sm2.png';
@@ -416,9 +403,9 @@ $(function(){
           
           // RIGHT: Financial summary
           html += '<div style="min-width:185px;margin-top:20px;">';
-          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ราคาก่อน VAT</span><span style="text-align:right;">'+fmt2(dispBefore)+'</span></div>';
-          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ภาษีมูลค่าเพิ่ม 7 %</span><span style="text-align:right;">'+fmt2(dispTax)+'</span></div>';
-          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:800;font-size:11pt;"><span>จำนวนเงินสุทธิ</span><span style="text-align:right;">'+fmt2(netTotal || dispInc)+'</span></div>';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ราคาก่อน VAT</span><span style="text-align:right;">'+fmt2(priceBeforeTax)+'</span></div>';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:10pt;"><span>ภาษีมูลค่าเพิ่ม 7 %</span><span style="text-align:right;">'+fmt2(taxFee)+'</span></div>';
+          html += '<div style="display:flex;justify-content:space-between;padding:4px 0;font-weight:800;font-size:11pt;"><span>จำนวนเงินสุทธิ</span><span style="text-align:right;">'+fmt2(priceIncTax)+'</span></div>';
           html += '</div>';
           
           html += '</div></div>';
