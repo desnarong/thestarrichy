@@ -79,7 +79,7 @@
                   <th>วันที่เอกสาร</th>
                   <th class="text-danger">เลขที่อ้างอิง</th>
                   <th>ประเภทเอกสาร</th>
-                  <th>ยอดรวม (รวมภาษี)</th>
+                  <th class="text-end">ยอดรวม (รวมภาษี)</th>
                   <th>ดูและดาวน์โหลด</th>
                 </tr>
               </thead>
@@ -98,8 +98,8 @@
                   <th>เลขที่เอกสาร</th>
                   <th class="text-danger">รอบปีภาษี</th>
                   <th class="text-danger">วันที่จ่าย</th>
-                  <th>จำนวนเงินที่จ่าย</th>
-                  <th>ภาษีที่หัก</th>
+                  <th class="text-end">จำนวนเงินที่จ่าย</th>
+                  <th class="text-end">ภาษีที่หัก</th>
                   <th>ดูและดาวน์โหลด</th>
                 </tr>
               </thead>
@@ -168,31 +168,39 @@ $(function(){
     function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
     function fmt2(v){var n=parseFloat(v);return isNaN(n)?'0.00':n.toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
     function fmt0(v){var n=Math.round(parseFloat(v));return isNaN(n)?'0':n.toLocaleString('th-TH');}
-    function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return d.toLocaleDateString('th-TH');}
+    function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+d.getFullYear();}
     function fmtDateFull(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);return String(d.getDate()).padStart(2,'0')+'/'+String(d.getMonth()+1).padStart(2,'0')+'/'+(d.getFullYear()+543);}
     function p(o,keys,def){def=def===undefined?'':def;for(var i=0;i<keys.length;i++){if(o&&o[keys[i]]!=null)return o[keys[i]];}return def;}
 
-    function initDt(id, rows, cols, dtRef){
+    function initDt(id, rows, cols, dtRef, opts){
         if(dtRef){dtRef.destroy();}
         var $t=$('#'+id); $t.find('tbody').empty();
         rows.forEach(function(r){
-            var cells=cols.map(function(fn){return'<td>'+fn(r)+'</td>';}).join('');
+            var cells=cols.map(function(fn){
+                var res=fn(r);
+                if(res!==null && typeof res==='object' && res.order!==undefined){
+                    return'<td data-order="'+res.order+'">'+res.html+'</td>';
+                }
+                return'<td>'+res+'</td>';
+            }).join('');
             $t.find('tbody').append('<tr>'+cells+'</tr>');
         });
-        return $t.DataTable({paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],
+        var cfg={paging:true,pageLength:25,lengthMenu:[[10,25,50,-1],[10,25,50,'ทั้งหมด']],
             ordering:true,searching:true,destroy:true,
             language:{emptyTable:'ไม่พบข้อมูล',zeroRecords:'ไม่พบข้อมูล',search:'ค้นหา:',
                 lengthMenu:'แสดง _MENU_ รายการ',info:'_START_-_END_ จาก _TOTAL_',
-                paginate:{first:'«',last:'»',next:'›',previous:'‹'}}});
+                paginate:{first:'«',last:'»',next:'›',previous:'‹'}}};
+        if(opts && opts.order) cfg.order=opts.order;
+        return $t.DataTable(cfg);
     }
 
     // ── TaxInvoice table columns ──────────────────────────
     var taxCols=[
         function(r){return'<span class="fw-semibold text-primary">'+esc(p(r,['BillNo','billNo']))+'</span>';},
-        function(r){return fmtDate(p(r,['BillDate','billDate']));},
+        function(r){var raw=p(r,['BillDate','billDate']);var d=new Date(raw);var ts=isNaN(d.getTime())?0:d.getTime();return{order:ts,html:fmtDate(raw)};},
         function(r){return esc(p(r,['ReferenceNo','referenceNo']));},
         function(r){return esc(p(r,['BilltypeCode','billtypeCode','BillTypeCode']));},
-        function(r){return'<span class="fw-bold text-success">'+fmt2(p(r,['Pricebeincludetax','TotalAmount','totalAmount'],0))+'</span>';},
+        function(r){return'<div style="text-align:right"><span class="fw-bold text-success">'+fmt2(p(r,['Pricebeincludetax','TotalAmount','totalAmount'],0))+'</span></div>';},
         function(r){
             var bn=esc(p(r,['BillNo','billNo']));
             return'<button class="btn btn-sm btn-primary py-0 px-2" onclick="showTaxDetail(\''+bn+'\')">'+
@@ -223,7 +231,7 @@ $(function(){
         $('#tblTaxInvoice tbody').html('<tr><td colspan="6" class="text-center text-muted py-3"><i class="bx bx-loader bx-spin me-2"></i>กำลังโหลดข้อมูล...</td></tr>');
         $.get('@Url.Action("GetTaxInvoiceData","other")',{fromDate:f,toDate:t},function(json){
             allTax=norm(json);
-            dtTax=initDt('tblTaxInvoice',allTax,taxCols,dtTax);
+            dtTax=initDt('tblTaxInvoice',allTax,taxCols,dtTax,{order:[[1,'desc']]});
 
         }).fail(function(){
             $('#tblTaxInvoice tbody').html('<tr><td colspan="6" class="text-center text-danger">เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>');

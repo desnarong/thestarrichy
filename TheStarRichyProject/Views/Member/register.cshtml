@@ -2766,6 +2766,28 @@
 
         async function sendOTPAndShowInput(formData) {
             try {
+                // ตรวจสอบ SendOTPRegister จาก /Static/system
+                // '0' = เปิดส่ง OTP, '1' = ปิด ข้ามไป register เลย
+                let skipOTP = false;
+                try {
+                    const sysData = await $.get('/Static/system');
+                    const sys = Array.isArray(sysData) ? sysData[0] : sysData;
+                    if (sys && String(sys.SendOTPRegister) === '1') {
+                        skipOTP = true;
+                    }
+                } catch (sysErr) {
+                    console.warn('ไม่สามารถดึงค่า SendOTPRegister ได้, ใช้ค่า default (ส่ง OTP):', sysErr);
+                }
+
+                if (skipOTP) {
+                    // ปิด OTP — register เลยโดยไม่ต้องยืนยัน
+                    window.currentFormData = formData;
+                    window.currentReferenceId = null;
+                    Swal.close();
+                    await finalRegistration(formData, '');
+                    return;
+                }
+
                 const sendOTPResponse = await $.ajax({
                     url: '/ExternalRegistration/SendOTP',
                     method: 'POST',

@@ -446,7 +446,7 @@ namespace TheStarRichyApi.Services
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-                    string query = "SELECT S02_X99 AS Ewalletflag, S02_X115 AS SaleFlag, S02_X117 AS Registerflag, S02_X118 AS PaymentFlag, S02_X40 AS CloseSystemflag FROM S02";
+                    string query = "SELECT S02_X99 AS Ewalletflag, S02_X115 AS SaleFlag, S02_X117 AS Registerflag, S02_X118 AS PaymentFlag, S02_X40 AS CloseSystemflag, SendOTPRegister FROM S02";
 
                     using (var command = new SqlCommand(query, con))
                     {
