@@ -134,9 +134,9 @@
             </div>
             <div class="stats-row">
                 <div class="stat-item">
-                    <div class="stat-value left-card">[L:${formatNumber(modalData.newLeft)}]</div>
+                    <div class="stat-value left-card" data-pv-type="newleft" style="cursor:pointer;text-decoration:underline dotted;">[L:${formatNumber(modalData.newLeft)}]</div>
                     <div class="middle-text">คะแนนมาใหม่</div>
-                    <div class="stat-value right-card">[R:${formatNumber(modalData.newRight)}]</div>
+                    <div class="stat-value right-card" data-pv-type="newright" style="cursor:pointer;text-decoration:underline dotted;">[R:${formatNumber(modalData.newRight)}]</div>
                 </div>
             </div>
             <div class="stats-row">
@@ -568,11 +568,11 @@
             };
 
             html += `
-                <div class="tree-node ${gradientClass} ${cardColorClass} ${useCompactCard ? 'level-last' : ''}" onclick="loadBinaryTeam('${childCode.replace(/'/g, "\\'")}')" title="คลิกเพื่อดูทีม">
+                <div class="tree-node ${gradientClass} ${cardColorClass} ${useCompactCard ? 'level-last' : ''}" title="คลิกเพื่อดูทีม">
                     <button type="button" class="btn btn-light btn-sm node-info-btn" data-modal-key="${infoModalKey}" title="ดูรายละเอียด" onclick="return openNodeInfoModal('${infoModalKey}', event);">
                         <i class="ri-search-line"></i>
                     </button>
-                    <div class="node-main">
+                    <div class="node-main" onclick="loadBinaryTeam('${childCode.replace(/'/g, "\\'")}')" style="cursor:pointer;">
                         <div class="node-avatar">
                             <img src="${memberPicture}" alt="${membername}" class="member-picture">
                             <div class="member-thainame">${memberthaiName}</div>
@@ -595,9 +595,9 @@
                         </div>
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card">[L:${newLeft.toLocaleString()}]</div>
+                                <div class="stat-value left-card" data-pv-type="newleft" style="cursor:pointer;text-decoration:underline dotted;">[L:${newLeft.toLocaleString()}]</div>
                                 <div class="middle-text">คะแนนมาใหม่</div>
-                                <div class="stat-value right-card">[R:${newRight.toLocaleString()}]</div>
+                                <div class="stat-value right-card" data-pv-type="newright" style="cursor:pointer;text-decoration:underline dotted;">[R:${newRight.toLocaleString()}]</div>
                             </div>
                         </div>
                         <div class="stats-row">
@@ -786,7 +786,6 @@
         border-radius: 16px;
         padding: 2px 2px;
         color: #00008B;
-        cursor: pointer;
         transition: all 0.3s ease;
         box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         min-width: 200px;
@@ -1411,6 +1410,163 @@
     }
 </style>
 
+<!-- Detail Point Modal -->
+<div class="modal fade" id="detailPointModal" tabindex="-1" aria-labelledby="detailPointModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content" style="background:#fff; color:#212529;">
+            <div class="modal-header" style="background:#f8f9fa; border-bottom:1px solid #dee2e6;">
+                <h5 class="modal-title text-dark" id="detailPointModalLabel">
+                    <i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span>
+                    <span id="detailSide" class="badge ms-1"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" style="background:#fff; color:#212529;">
+                <div class="alert py-2 mb-2" id="msgDetail"></div>
+                <div class="table-responsive">
+                    <table id="detailTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:0.8rem;width:100%">
+                        <thead class="text-center" style="background:#f5f5f5;font-size:.75rem;">
+                            <tr>
+                                <th>#</th>
+                                <th>ชั้นที่</th>
+                                <th>รหัสนักธุรกิจ</th>
+                                <th>ชื่อนักธุรกิจ</th>
+                                <th>เลขที่บิล</th>
+                                <th>วันที่</th>
+                                <th>ประเภท</th>
+                                <th class="text-end">PV</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailTableBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="7" class="text-end fw-bold bg-light">รวมทั้งหมด</td>
+                                <td class="text-end fw-bold text-success bg-light" id="detailTotal"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
     <script src="~/assets/js/app.js"></script>
+    <script>
+        // ==========================================
+        // Detail Point Modal (newLeft / newRight)
+        // ==========================================
+        (function () {
+            var detailModal = null;
+            var detailDt = null;
+
+            function getTodayIso() {
+                var d = new Date();
+                var y = d.getFullYear();
+                var m = String(d.getMonth() + 1).padStart(2, '0');
+                var day = String(d.getDate()).padStart(2, '0');
+                return y + '-' + m + '-' + day + 'T00:00:00';
+            }
+
+            function fmtDateThai(v) {
+                if (!v) return '';
+                var d = new Date(v);
+                if (isNaN(d.getTime())) return String(v);
+                return String(d.getDate()).padStart(2, '0') + '/' +
+                       String(d.getMonth() + 1).padStart(2, '0') + '/' +
+                       d.getFullYear();
+            }
+
+            async function openDetailModal(side) {
+                if (!detailModal) {
+                    detailModal = new bootstrap.Modal(document.getElementById('detailPointModal'));
+                }
+
+                var todayIso = getTodayIso();
+                var todayDisplay = fmtDateThai(todayIso);
+                var url = side === 'left'
+                    ? '/reports/GetDailyPointSourceLeft?balanceDate=' + encodeURIComponent(todayIso)
+                    : '/reports/GetDailyPointSourceRight?balanceDate=' + encodeURIComponent(todayIso);
+
+                document.getElementById('detailDate').textContent = todayDisplay;
+                var sideEl = document.getElementById('detailSide');
+                if (side === 'left') {
+                    sideEl.textContent = 'ซ้าย';
+                    sideEl.style.background = '#1976d2';
+                } else {
+                    sideEl.textContent = 'ขวา';
+                    sideEl.style.background = '#43a047';
+                }
+                document.getElementById('msgDetail').className = 'alert py-2 mb-2 alert-info';
+                document.getElementById('msgDetail').textContent = 'กำลังโหลด...';
+                document.getElementById('detailTableBody').innerHTML = '';
+                document.getElementById('detailTotal').textContent = '';
+
+                if (detailDt) { try { detailDt.destroy(); } catch(e){} detailDt = null; }
+
+                detailModal.show();
+
+                try {
+                    var res = await fetch(url, { credentials: 'include' });
+                    var data = await res.json();
+                    if (!Array.isArray(data)) data = [];
+
+                    var msgEl = document.getElementById('msgDetail');
+                    if (data.length === 0) {
+                        msgEl.className = 'alert py-2 mb-2 alert-warning';
+                        msgEl.textContent = 'ไม่พบข้อมูลสำหรับวันนี้';
+                    } else {
+                        msgEl.className = 'alert py-2 mb-2 alert-success';
+                        msgEl.textContent = 'พบข้อมูล ' + data.length + ' รายการ';
+                    }
+
+                    var totalPV = 0;
+                    var tbody = document.getElementById('detailTableBody');
+                    var html = '';
+                    data.forEach(function (r, i) {
+                        var pv = parseFloat(r.PV || r.pv || 0);
+                        totalPV += pv;
+                        var pvStr = pv.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+                        html += '<tr>' +
+                            '<td class="text-center">' + (i + 1) + '</td>' +
+                            '<td class="text-center">' + (r.DLLevel || r.dlLevel || '') + '</td>' +
+                            '<td>' + (r.DLCode || r.dlCode || '') + '</td>' +
+                            '<td>' + (r.DLName || r.dlName || '') + '</td>' +
+                            '<td>' + (r.BillNo || r.billNo || '') + '</td>' +
+                            '<td class="text-center">' + fmtDateThai(r.BillDate || r.billDate) + '</td>' +
+                            '<td>' + (r.Billtype || r.billtype || '') + '</td>' +
+                            '<td class="text-end fw-bold text-success">' + pvStr + '</td>' +
+                            '</tr>';
+                    });
+                    tbody.innerHTML = html;
+                    document.getElementById('detailTotal').textContent =
+                        totalPV.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+
+                    if (data.length > 0) {
+                        detailDt = $('#detailTable').DataTable({
+                            paging: false,
+                            searching: true,
+                            info: false,
+                            order: [],
+                            language: { search: 'ค้นหา:', zeroRecords: 'ไม่พบข้อมูล' }
+                        });
+                    }
+                } catch (e) {
+                    document.getElementById('msgDetail').className = 'alert py-2 mb-2 alert-danger';
+                    document.getElementById('msgDetail').textContent = 'เกิดข้อผิดพลาดในการโหลดข้อมูล';
+                }
+            }
+
+            // Event delegation — ใช้ capture phase เพื่อรับ event ก่อน stopPropagation
+            document.addEventListener('click', function (e) {
+                var el = e.target.closest('[data-pv-type]');
+                if (!el) return;
+                e.stopPropagation();
+                var type = el.getAttribute('data-pv-type');
+                if (type === 'newleft') openDetailModal('left');
+                else if (type === 'newright') openDetailModal('right');
+            }, true);
+        })();
+    </script>
 }

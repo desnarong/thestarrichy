@@ -212,11 +212,11 @@ namespace TheStarRichyApi.Services
                 " (((M01_X37 = '2' or M01_X37 = '3') and(M01_X40 = '0' or M01_X40 = '2')   " +
                 "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
                 " and (d.T03_X5 is null or d.T03_X5 = @Membercode) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0)) " +
+                "   and (M01_X52 = 0 or M01_X52 > COALESCE(TotalbuyPerson, 0))) " +
                 "   and " +
                 "   (M01_X37 = '2' or M01_X37 = '3') and(M01_X40 = '0' or M01_X40 = '2')  " +
                 "   and  M01_X58 = '0' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006') " +
-                "   and M01_X53 > 0 and M01_X53 > COALESCE(TotalbuyALL, 0) ";
+                "   and (M01_X53 = 0 or M01_X53 > COALESCE(TotalbuyALL, 0)) ";
                 if (!string.IsNullOrEmpty(groupCode))
                 {
                     if (groupCode != "ALL")
@@ -250,7 +250,7 @@ namespace TheStarRichyApi.Services
                 "   ((M01_X37 = '2' or M01_X37 = '3') and(M01_X40 = '0' or M01_X40 = '2')  " +
                 "   and  M01_X58 = '1' and(TypeOfProductCode = '005'  or TypeOfProductCode = '006')  " +
                 " and(d.T03_X5 = @Membercode and @Registerdate between M01_X59 and M01_X60) " +
-                "   and M01_X52 > 0 and M01_X52 > COALESCE(TotalbuyPerson, 0) ";
+                "   and (M01_X52 = 0 or M01_X52 > COALESCE(TotalbuyPerson, 0)) ";
                 if (!string.IsNullOrEmpty(groupCode))
                 {
                     if (groupCode != "ALL")
