@@ -29,19 +29,31 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetSaleOrderFromHold(string purchaseType, string productCode, string productName, string quantity)
+        public async Task<IActionResult> GetSaleOrderFromHold(string membercode)
         {
             try
             {
-                // เรียก API ตามประเภทการซื้อ
-                var endpoint = purchaseType == "hurry"
-                    ? "/Product/GetProductListForHurry"
-                    : "/Product/GetProductListForHold";
+                if (string.IsNullOrWhiteSpace(membercode))
+                    return BadRequest(new { success = false, message = "กรุณาระบุรหัสสมาชิก" });
 
-                // เรียก API ด้วย parameters
-                var queryString = $"?groupcode=&producttype=&sortorder=&productid={productCode}";
-                var result = await _apiService.GetAsync<dynamic>(endpoint + queryString);
-                
+                var result = await _apiService.GetAsync<dynamic>($"/Member/getsaleorderfromhold?membercode={Uri.EscapeDataString(membercode)}");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FindMemberForSale(string membercode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(membercode))
+                    return Ok(new List<object>());
+
+                var result = await _apiService.GetAsync<dynamic>($"/Product/findmembercodeforsale?memberCode={Uri.EscapeDataString(membercode)}");
                 return Ok(result);
             }
             catch (Exception ex)

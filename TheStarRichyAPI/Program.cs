@@ -43,6 +43,7 @@ builder.Services.AddScoped<IFindUplineBinaryService, FindUplineBinaryService>();
 builder.Services.AddScoped<IFindMemberNameService, FindMemberNameService>();
 builder.Services.AddScoped<IFindMembercodeService, FindMembercodeService>();
 builder.Services.AddScoped<IFindMembercodeForSaleService, FindMembercodeForSaleService>();
+builder.Services.AddScoped<ISaleOrderFromHoldService, SaleOrderFromHoldService>();
 
 // Reports
 builder.Services.AddScoped<IReportMemberDailyPointService, ReportMemberDailyPointService>();

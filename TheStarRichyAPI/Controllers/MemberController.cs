@@ -68,6 +68,7 @@ namespace TheStarRichyApi.Controllers
         private readonly IChangePasswordService _changePasswordService;
         private readonly IReportMemberOrderInvoiceDetailService _reportMemberOrderInvoiceDetailService;
         private readonly IReportMemberPOOrderInvoiceDetailService _reportMemberPOOrderInvoiceDetailService;
+        private readonly ISaleOrderFromHoldService _saleOrderFromHoldService;
         public MemberController(
             IMemberService memberService,
             IMemberIncomeByPeriodService memberIncomeByPeriodService,
@@ -121,7 +122,8 @@ namespace TheStarRichyApi.Controllers
             IReportMemberTaxInvoiceService reportMemberTaxInvoiceService,
             IChangePasswordService changePasswordService,
             IReportMemberOrderInvoiceDetailService reportMemberOrderInvoiceDetailService,
-            IReportMemberPOOrderInvoiceDetailService reportMemberPOOrderInvoiceDetailService
+            IReportMemberPOOrderInvoiceDetailService reportMemberPOOrderInvoiceDetailService,
+            ISaleOrderFromHoldService saleOrderFromHoldService
             )
         {
             _memberService = memberService;
@@ -179,6 +181,7 @@ namespace TheStarRichyApi.Controllers
             _changePasswordService = changePasswordService;
             _reportMemberOrderInvoiceDetailService = reportMemberOrderInvoiceDetailService;
             _reportMemberPOOrderInvoiceDetailService = reportMemberPOOrderInvoiceDetailService;
+            _saleOrderFromHoldService = saleOrderFromHoldService;
         }
 
         [HttpGet("hello")]
@@ -1043,6 +1046,27 @@ namespace TheStarRichyApi.Controllers
                 var (success, message) = await _changePasswordService.UpdatePasswordAsync(request.NewPassword);
                 if (success) return Ok(new { success = true, message });
                 return BadRequest(new { success = false, message });
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "Internal server error" });
+            }
+        }
+
+        /// <summary>
+        /// GET: /Member/getsaleorderfromhold?membercode={membercode}
+        /// ดึงข้อมูลรายการสินค้า Hold ของสมาชิก จาก 000_Member_Order_for_mobile
+        /// </summary>
+        [HttpGet("getsaleorderfromhold")]
+        public async Task<IActionResult> GetSaleOrderFromHold([FromQuery] string membercode)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(membercode))
+                    return BadRequest(new { success = false, message = "กรุณาระบุรหัสสมาชิก" });
+
+                var result = await _saleOrderFromHoldService.GetDisplayAsync(membercode);
+                return Ok(new { success = true, data = result });
             }
             catch (Exception)
             {
