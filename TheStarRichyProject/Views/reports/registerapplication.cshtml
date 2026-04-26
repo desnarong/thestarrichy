@@ -68,6 +68,7 @@ $(function(){
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function isoDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildTable(rows){
@@ -80,8 +81,8 @@ $(function(){
       var rankingDisplay=(rankingVal===''||rankingVal===null||rankingVal===undefined||rankingVal==='0'||rankingVal==='-1')?'No Position':rankingVal;
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center">'+fmtDate(p(r,['Baldate','baldate','BalDate']))+'</td>'+
-        '<td class="text-center">'+fmtDate(p(r,['Baldate1','baldate1','BalDate1']))+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(p(r,['Baldate','baldate','BalDate']))+'">'+fmtDate(p(r,['Baldate','baldate','BalDate']))+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(p(r,['Baldate1','baldate1','BalDate1']))+'">'+fmtDate(p(r,['Baldate1','baldate1','BalDate1']))+'</td>'+
         '<td class="text-end fw-semibold">'+fmt0(p(r,['Balance','balance'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['LeftCount','leftCount'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['RightCount','rightCount'],0))+'</td>'+

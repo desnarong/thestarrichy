@@ -97,6 +97,7 @@ $(function(){
   function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmtDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function isoDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildTable(rows){
@@ -107,7 +108,7 @@ $(function(){
     rows.forEach(function(r,i){
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center">'+fmtDate(p(r,['calculatedate','Calculatedate','CalculateDate']))+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(p(r,['calculatedate','Calculatedate','CalculateDate']))+'">'+fmtDate(p(r,['calculatedate','Calculatedate','CalculateDate']))+'</td>'+
         '<td class="text-center">'+esc(p(r,['Memberposition','memberPosition','memberposition']))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['LeftPV','leftPV'],0))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['RightPV','rightPV'],0))+'</td>'+

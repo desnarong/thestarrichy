@@ -111,6 +111,7 @@ $(function(){
   function num(v){var n=parseFloat(v);return isNaN(n)?0:n;}
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function isoDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildMainTable(rows){
@@ -123,7 +124,7 @@ $(function(){
       var rv=p(r,['RightPV','rightPV'],0);
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center">'+fmtDate(bd)+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(bd)+'">'+fmtDate(bd)+'</td>'+
         '<td class="text-end"><a href="#" class="fw-bold text-success text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'left\');return false;">'+fmt0(lv)+'</a></td>'+
         '<td class="text-end"><a href="#" class="fw-bold text-primary text-decoration-none" onclick="loadDetail(\''+esc(bd)+'\',\'right\');return false;">'+fmt0(rv)+'</a></td>'+
         '</tr>';
@@ -163,7 +164,7 @@ $(function(){
           '<td>'+esc(p(r,['DLCode','dlCode']))+'</td>'+
           '<td>'+esc(p(r,['DLName','dlName']))+'</td>'+
           '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
-          '<td class="text-center">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
+          '<td class="text-center" data-order="'+isoDate(p(r,['BillDate','billDate']))+'">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
           '<td>'+esc(p(r,['Billtype','billtype','BillType']))+'</td>'+
           '<td class="text-end fw-bold text-success">'+fmt0(pv)+'</td>'+
           '</tr>';

@@ -144,9 +144,13 @@ namespace TheStarRichyApi.Services
                     query += " FROM [000_Member_Binary_Left_Source_PV]  (nolock) ";
 
                     query += " where Membercode = @Membercode";
-                    if (!string.IsNullOrWhiteSpace(balanceDate))
+                    if (!string.IsNullOrWhiteSpace(balanceDate) && balanceDate.Contains("T00:00:00"))
                     {
                         query += " and billdate=@balanceDate";
+                    }
+                    else if (!string.IsNullOrWhiteSpace(balanceDate))
+                    {
+                        query += " and billdate>=@balanceDate";
                     }
                     query += " ORDER BY DLLevel,DLCode ";
 

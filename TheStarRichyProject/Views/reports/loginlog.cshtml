@@ -70,6 +70,7 @@ $(function(){
   function norm(raw){var d=raw;if(typeof d==='string'){try{d=JSON.parse(d);}catch(e){return[];}}if(d&&Array.isArray(d.data))return d.data;if(d&&Array.isArray(d.result))return d.result;return Array.isArray(d)?d:[];}
   function p(o,k,d){d=d===undefined?'':d;for(var i=0;i<k.length;i++){if(o&&o[k[i]]!=null)return o[k[i]];}return d;}
   function fmtDateTime(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();var h=String(d.getHours()).padStart(2,'0');var m=String(d.getMinutes()).padStart(2,'0');var s=String(d.getSeconds()).padStart(2,'0');return day+'/'+month+'/'+year+' '+h+':'+m+':'+s;}
+  function isoDateTime(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')+'T'+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
   function buildTable(rows){
@@ -79,7 +80,7 @@ $(function(){
     rows.forEach(function(r,i){
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
-        '<td class="text-center" style="white-space:nowrap;">'+fmtDateTime(p(r,['EntryDatetime','entryDatetime','entryDateTime','Entrydatetime']))+'</td>'+
+        '<td class="text-center" style="white-space:nowrap;" data-order="'+isoDateTime(p(r,['EntryDatetime','entryDatetime','entryDateTime','Entrydatetime']))+'">'+fmtDateTime(p(r,['EntryDatetime','entryDatetime','entryDateTime','Entrydatetime']))+'</td>'+
         '<td>'+esc(p(r,['Message','message']))+'</td>'+
         '<td class="text-center text-monospace">'+esc(p(r,['Computername','computerName','computername','ComputerName']))+'</td>'+
         '</tr>';

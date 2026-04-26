@@ -136,6 +136,7 @@ $(function(){
   function fmt0(v){return Math.round(num(v)).toLocaleString('th-TH');}
   function fmt2(v){return num(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
   function fmtDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+  function isoDate(v){if(!v||typeof v==='object')return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
   function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function findPV(r){
     var keys=['PV','pv','Pv','pV'];
@@ -317,7 +318,7 @@ $(function(){
       tbody+='<tr>'+
         '<td class="text-center">'+(i+1)+'</td>'+
         '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
-        '<td class="text-center">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(p(r,['BillDate','billDate']))+'">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
         '<td>'+esc(p(r,['ReferenceNo','referenceNo']))+'</td>'+
         '<td>'+esc(p(r,['HybridGOLDID','hybridGoldId','hybridGOLDID']))+'</td>'+
         '<td>'+esc(p(r,['HOLDORDERID','holdOrderId','holdOrderID']))+'</td>'+
@@ -331,8 +332,8 @@ $(function(){
         '<td class="text-end text-info fw-semibold">'+fmt0(findPV(r))+'</td>'+
         '<td class="text-center">'+esc(p(r,['BillConfirmType','billConfirmType']))+'</td>'+
         '<td class="text-center">'+esc(p(r,['Receive','receive']))+'</td>'+
-        '<td class="text-center">'+fmtDate(p(r,['ReceiveDate','receiveDate']))+'</td>'+
-        '<td class="text-center text-danger fw-semibold">'+fmtDate(p(r,['ExpireDate','expireDate']))+'</td>'+
+        '<td class="text-center" data-order="'+isoDate(p(r,['ReceiveDate','receiveDate']))+'">'+fmtDate(p(r,['ReceiveDate','receiveDate']))+'</td>'+
+        '<td class="text-center text-danger fw-semibold" data-order="'+isoDate(p(r,['ExpireDate','expireDate']))+'">'+fmtDate(p(r,['ExpireDate','expireDate']))+'</td>'+
         '<td class="text-end">'+fmt0(p(r,['PVSaleout','pvSaleout','pVSaleout'],0))+'</td>'+
         '<td class="text-end fw-bold" style="color:#5e35b1;">'+fmt0(p(r,['Remain','remain'],0))+'</td>'+
         '<td>'+esc(p(r,['Createby','createBy','createby']))+'</td>'+

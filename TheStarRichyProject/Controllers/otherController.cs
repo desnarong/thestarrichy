@@ -73,6 +73,20 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> GetWitholdingTaxData()
+        {
+            try
+            {
+                var result = await _apiService.GetAsync<dynamic>("/Member/reportwitholdingtax");
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลหนังสือรับรองหัก ณ ที่จ่าย (50ทวิ) ได้" });
+            }
+        }
+
+        [HttpGet]
         public async Task<IActionResult> GetTaxInvoiceDetailData(string? billNo)
         {
             if (string.IsNullOrWhiteSpace(billNo))

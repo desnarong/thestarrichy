@@ -282,6 +282,7 @@
       function fmt2(v){return toNum(v).toLocaleString('th-TH',{minimumFractionDigits:2,maximumFractionDigits:2});}
       function fmt0(v){var n=Math.round(toNum(v));return n.toLocaleString('th-TH');}
       function fmtDate(v){if(!v)return'-';var d=new Date(v);if(isNaN(d.getTime()))return String(v);var day=String(d.getDate()).padStart(2,'0');var month=String(d.getMonth()+1).padStart(2,'0');var year=d.getFullYear();return day+'/'+month+'/'+year;}
+      function isoDate(v){if(!v)return'';var d=new Date(v);if(isNaN(d.getTime()))return'';return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
       function esc(s){return s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 
       function parseRowDate(v){
@@ -344,14 +345,13 @@
             return function(d, type) {
               var rawDate = pick(d, fields);
 
-              // ถ้า DataTables ขอข้อมูลไปใช้ในการเรียงลำดับ (sort) ให้ส่งเป็นตัวเลข Timestamp (Milliseconds)
-              if (type === 'sort' || type === 'type') {
-                if (!rawDate) return 0; // ถ้าไม่มีข้อมูล ให้ค่าเป็น 0 (ไปอยู่บนสุดหรือล่างสุด)
+              // รองรับ DataTables ทั้ง v1.x (sort) และ v2.x (order)
+              if (type === 'sort' || type === 'order' || type === 'type') {
+                if (!rawDate) return 0;
                 var dateObj = new Date(rawDate);
                 return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
               }
 
-              // ถ้าเป็นการแสดงผลปกติ (display) ให้ส่งผ่านฟังก์ชัน fmtDate ของคุณ
               return fmtDate(rawDate);
             };
           }
@@ -362,44 +362,35 @@
                 title: 'เดือน', 
                 data: null, 
                 className: 'text-center', 
-                render: function(d) { return esc(pick(d, ['CalcMonth1', 'calcMonth1']) || '-'); },
-                type: 'date',
                 render: function(d, type) {
                   var calcMonth = pick(d, ['CalcMonth1', 'calcMonth1']);
                   if (!calcMonth) return '-';
                   
-                  // สำหรับ DataTables sort ให้แปลงเป็น timestamp
-                  if (type === 'sort' || type === 'type') {
-                    // รองรับ format: 01/2025, 1/2025, 01-2025, 2025-01, 202501
+                  // รองรับ DataTables ทั้ง v1.x (sort) และ v2.x (order)
+                  if (type === 'sort' || type === 'order' || type === 'type') {
+                    // รองรับ format: MM/YYYY, MM-YYYY, YYYY-MM, YYYYMM
                     var m = String(calcMonth);
-                    var parts = null;
                     var month, year;
                     
                     if (m.includes('/')) {
-                      parts = m.split('/');
-                      month = parseInt(parts[0]);
-                      year = parseInt(parts[1]);
+                      var p = m.split('/');
+                      if (p[0].length <= 2) { month = parseInt(p[0]); year = parseInt(p[1]); }
+                      else { year = parseInt(p[0]); month = parseInt(p[1]); }
                     } else if (m.includes('-')) {
-                      parts = m.split('-');
-                      if (parts[0].length === 2) {
-                        month = parseInt(parts[0]);
-                        year = parseInt(parts[1]);
-                      } else {
-                        year = parseInt(parts[0]);
-                        month = parseInt(parts[1]);
-                      }
+                      var p = m.split('-');
+                      if (p[0].length <= 2) { month = parseInt(p[0]); year = parseInt(p[1]); }
+                      else { year = parseInt(p[0]); month = parseInt(p[1]); }
                     } else if (/^\d{6}$/.test(m)) {
                       year = parseInt(m.substring(0, 4));
                       month = parseInt(m.substring(4, 6));
                     }
                     
                     if (month && year && month >= 1 && month <= 12) {
-                      return new Date(year, month - 1, 1).getTime();
+                      return year * 100 + month; // YYYYMM integer - เรียงได้ถูกต้องแน่นอน
                     }
                     return 0;
                   }
                   
-                  // สำหรับ display ให้แสดงตามปกติ
                   return esc(calcMonth);
                 }
               }
@@ -550,7 +541,7 @@
           columns.forEach(function(c) {
             var v = pick(r, c.k, '');
             if (c.dt) {
-              tbody += '<td class="text-center">' + fmtDate(v) + '</td>';
+              tbody += '<td class="text-center" data-order="' + isoDate(v) + '">' + fmtDate(v) + '</td>';
             } else if (c.num) {
               tbody += '<td class="text-end">' + (c.fmt === 'fmt0' ? fmt0(v) : fmt2(v)) + '</td>';
             } else if (c.renderPrefix) {

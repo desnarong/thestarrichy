@@ -72,6 +72,7 @@ builder.Services.AddScoped<IReportMemberBonusByDateDetailMobileService, ReportMe
 builder.Services.AddScoped<IReportMemberBonusByDateDetailMatchingService, ReportMemberBonusByDateDetailMatchingService>();
 builder.Services.AddScoped<IReportMemberBonusByDateDetailBinaryService, ReportMemberBonusByDateDetailBinaryService>();
 builder.Services.AddScoped<IReportMemberTaxInvoiceService, ReportMemberTaxInvoiceService>();
+builder.Services.AddScoped<IReportMemberWitholdingTaxService, ReportMemberWitholdingTaxService>();
 builder.Services.AddScoped<IReportMemberOrderInvoiceDetailService, ReportMemberOrderInvoiceDetailService>();
 builder.Services.AddScoped<IReportMemberPOOrderInvoiceDetailService, ReportMemberPOOrderInvoiceDetailService>();
 builder.Services.AddScoped<IChangePasswordService, ChangePasswordService>();

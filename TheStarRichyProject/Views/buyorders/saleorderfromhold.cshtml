@@ -59,26 +59,19 @@
                     </div>
                     <div class="col-auto ms-4">
                         <label class="form-label mb-1 small fw-semibold">
-                            เลขที่บิลแจง <small class="text-danger">(return ค่าเลขที่บิลมาจาก API ...)</small>
+                            เลขที่บิลแจง
                         </label>
                         <input type="text" class="form-control form-control-sm" id="billNo" style="min-width:180px;" readonly>
                     </div>
                     <div class="col-auto">
                         <label class="form-label mb-1 small fw-semibold">
-                            วันที่แจง <small class="text-muted">default getdate() format dd/mm/yyyy</small>
+                            วันที่แจง
                         </label>
                         <input type="text" class="form-control form-control-sm" id="billDate" style="min-width:130px;" disabled>
                     </div>
                 </div>
-                <div class="mt-2 mb-1">
-                    <div class="p-2 rounded" style="background:#fff9c4;border:1px solid #f9a825;font-size:.8rem;display:inline-block;">
-                        <strong>API : FindMembercodeForSaleService</strong><br>
-                        <span class="text-danger">บังคับใส่รหัสก่อน</span>
-                    </div>
-                </div>
                 <small class="text-muted d-block">
                     <i class="bx bx-info-circle me-1"></i>กรอกข้อมูลเพื่อค้นหา
-                    <span style="color:red;text-decoration:underline;">หรือปล่อยว่างเพื่อดูข้อมูลทั้งหมด</span>
                 </small>
             </div>
         </div>
@@ -92,7 +85,6 @@
                 <h5 class="mb-0 fw-semibold text-primary">
                     <i class="bx bx-table me-2"></i>รายการสินค้า &nbsp;<span class="badge bg-primary" id="rowCount">0</span>
                 </h5>
-                <span class="text-muted small">View : 000_Member_Order_for_mobile</span>
             </div>
             <div class="card-body">
                 <div class="alert alert-secondary py-2 mb-2" id="msg">พบข้อมูล 0 รายการ</div>
@@ -169,26 +161,36 @@ $(function () {
         return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
+    function extractMember(res) {
+        var rows = norm(res);
+        if (rows.length > 0) return rows[0];
+        // { success, data: { ... } } — data เป็น object เดี่ยว
+        if (res && res.data && typeof res.data === 'object' && !Array.isArray(res.data)) return res.data;
+        // object เดี่ยวตรงๆ
+        if (res && typeof res === 'object' && !Array.isArray(res) && (res.DLcode || res.Membercode || res.membercode)) return res;
+        return null;
+    }
+
     // auto-fill ชื่อสมาชิกเมื่อออกจากช่องรหัส
-    $('#memberCode').on('blur', function () {
-        var code = $(this).val().trim();
-        if (!code) { $('#memberName').val(''); return; }
-        $.ajax({
-            url: '/buyorders/FindMemberForSale',
-            type: 'GET',
-            data: { membercode: code },
-            success: function (res) {
-                var rows = norm(res);
-                if (rows.length > 0) {
-                    var name = p(rows[0], ['Membername', 'membername', 'MemberName', 'Name', 'name'], '');
-                    $('#memberName').val(name);
-                } else {
-                    $('#memberName').val('');
-                }
-            },
-            error: function () { $('#memberName').val(''); }
-        });
-    });
+    // $('#memberCode').on('blur', function () {
+    //     var code = $(this).val().trim();
+    //     if (!code) { $('#memberName').val(''); return; }
+    //     $.ajax({
+    //         url: '/buyorders/FindMemberForSale',
+    //         type: 'GET',
+    //         data: { membercode: code },
+    //         success: function (res) {
+    //             var member = extractMember(res);
+    //             if (member) {
+    //                 var name = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
+    //                 $('#memberName').val(name);
+    //             } else {
+    //                 $('#memberName').val('');
+    //             }
+    //         },
+    //         error: function () { $('#memberName').val(''); }
+    //     });
+    // });
 
     function loadData() {
         var membercode = $('#memberCode').val().trim();
@@ -199,36 +201,64 @@ $(function () {
 
         $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
 
+        // Step 1: ตรวจสอบ/ค้นหาสมาชิก
         $.ajax({
-            url: '/buyorders/GetSaleOrderFromHold',
+            url: '/buyorders/FindMemberForSale',
             type: 'GET',
             data: { membercode: membercode },
-            success: function (json) {
-                buildTable(norm(json));
+            success: function (res) {
+                   
+                var member = extractMember(res);
+                         console.log(member);
+                if (!member) {
+                    $('#msg').removeClass('alert-secondary').addClass('alert-warning').text('ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัส');
+                    $('#memberName').val('');
+                    return;
+                }
+                var dlcode = p(member, ['DLcode', 'dlcode', 'DLCode', 'Membercode', 'membercode'], membercode);
+                var dlname = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
+                $('#memberName').val(dlname);
+
+                // Step 2: ดึงข้อมูล Hold Orders
+                $.ajax({
+                    url: '/buyorders/GetSaleOrderFromHold',
+                    type: 'GET',
+                    data: { membercode: dlcode },
+                    success: function (json) {
+                        console.log('[GetSaleOrderFromHold] raw json:', json);
+                        var rows = norm(json);
+                        console.log('[GetSaleOrderFromHold] norm rows:', rows.length, rows);
+                        buildTable(rows);
+                    },
+                    error: function () {
+                        $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');
+                    }
+                });
             },
             error: function () {
-                $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');
+                $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการค้นหาสมาชิก');
             }
         });
     }
 
     function buildTable(rows) {
+        console.log('[buildTable] rows count:', rows.length, 'sample:', rows[0]);
         if (mainTbl) { mainTbl.destroy(); mainTbl = null; }
         $('#mainTable').empty();
 
         var thead = '<thead class="text-center" style="background:#f5f5f5;font-size:.75rem;"><tr>' +
-            '<th style="width:40px;">#<br><small class="text-muted">No</small></th>' +
-            '<th>รหัสสินค้า<br><small class="text-danger">[ProductID]</small></th>' +
-            '<th>ชื่อสินค้า<br><small class="text-danger">[ProductName]</small></th>' +
-            '<th>ราคาขาย<br><small class="text-danger">[UnitPrice]</small></th>' +
-            '<th>จำนวน PV<br><small class="text-danger">[PV]</small></th>' +
-            '<th>จำนวน<br><small><u style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></small></th>' +
-            '<th>รวมเงิน<br><small><u style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></small></th>' +
-            '<th>รวม PV<br><small><u style="color:red;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u></small></th>' +
-            '<th>จำนวนคงเหลือ<br><small class="text-danger">Remain</small></th>' +
-            '<th>เลขที่บิล Hold<br><small class="text-danger">[Billno]</small></th>' +
-            '<th>วันหมดอายุบิล<br><small class="text-danger">[ExpireDate]</small></th>' +
-            '<th>รหัสชุดสินค้า<br><small class="text-danger">[ProductSet]</small></th>' +
+            '<th style="width:40px;">#</th>' +
+            '<th>รหัสสินค้า</th>' +
+            '<th>ชื่อสินค้า</th>' +
+            '<th>ราคาขาย</th>' +
+            '<th>จำนวน PV</th>' +
+            '<th>จำนวน</th>' +
+            '<th>รวมเงิน</th>' +
+            '<th>รวม PV</th>' +
+            '<th>จำนวนคงเหลือ</th>' +
+            '<th>เลขที่บิล Hold</th>' +
+            '<th>วันหมดอายุบิล</th>' +
+            '<th>รหัสชุดสินค้า</th>' +
             '</tr></thead>';
 
         var tbody = '<tbody>';
@@ -320,3 +350,7 @@ $(function () {
 });
 </script>
 
+@section scripts{
+    <script src="~/assets/js/app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+}

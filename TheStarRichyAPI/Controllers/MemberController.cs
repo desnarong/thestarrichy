@@ -65,6 +65,7 @@ namespace TheStarRichyApi.Controllers
         private readonly IMemberFavoriteAddressService _memberFavoriteAddressService;
         private readonly IMemberAddressService _memberAddressService;
         private readonly IReportMemberTaxInvoiceService _reportMemberTaxInvoiceService;
+        private readonly IReportMemberWitholdingTaxService _reportMemberWitholdingTaxService;
         private readonly IChangePasswordService _changePasswordService;
         private readonly IReportMemberOrderInvoiceDetailService _reportMemberOrderInvoiceDetailService;
         private readonly IReportMemberPOOrderInvoiceDetailService _reportMemberPOOrderInvoiceDetailService;
@@ -120,6 +121,7 @@ namespace TheStarRichyApi.Controllers
             IMemberFavoriteAddressService memberFavoriteAddressService,
             IMemberAddressService memberAddressService,
             IReportMemberTaxInvoiceService reportMemberTaxInvoiceService,
+            IReportMemberWitholdingTaxService reportMemberWitholdingTaxService,
             IChangePasswordService changePasswordService,
             IReportMemberOrderInvoiceDetailService reportMemberOrderInvoiceDetailService,
             IReportMemberPOOrderInvoiceDetailService reportMemberPOOrderInvoiceDetailService,
@@ -178,6 +180,7 @@ namespace TheStarRichyApi.Controllers
             _memberFavoriteAddressService = memberFavoriteAddressService;
             _memberAddressService = memberAddressService;
             _reportMemberTaxInvoiceService = reportMemberTaxInvoiceService;
+            _reportMemberWitholdingTaxService = reportMemberWitholdingTaxService;
             _changePasswordService = changePasswordService;
             _reportMemberOrderInvoiceDetailService = reportMemberOrderInvoiceDetailService;
             _reportMemberPOOrderInvoiceDetailService = reportMemberPOOrderInvoiceDetailService;
@@ -1010,6 +1013,20 @@ namespace TheStarRichyApi.Controllers
             try
             {
                 var result = await _reportMemberTaxInvoiceService.GetDetailAsync(billNo);
+                return Ok(result);
+            }
+            catch (Exception)
+            {
+                return StatusCode(500, new { message = "Internal server error" });
+            }
+        }
+
+        [HttpGet("reportwitholdingtax")]
+        public async Task<IActionResult> GetReportWitholdingTax()
+        {
+            try
+            {
+                var result = await _reportMemberWitholdingTaxService.GetHeaderAsync();
                 return Ok(result);
             }
             catch (Exception)
