@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IReportMemberLeftSourceOfPVService
     {
-        Task<List<dynamic>> GetDisplayAsync(string balanceDate = "");
+        Task<List<dynamic>> GetDisplayAsync(string balanceDate = "", string membercode = "");
     }
     public class ReportMemberLeftSourceOfPVService : IReportMemberLeftSourceOfPVService
     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync(string balanceDate = "")
+        public async Task<List<dynamic>> GetDisplayAsync(string balanceDate = "", string membercode = "")
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -124,11 +124,9 @@ namespace TheStarRichyApi.Services
             }
 
             // Get Membercode from JWT
-            string memberCode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(memberCode))
-            {
-                return new List<dynamic>();
-            }
+            if (string.IsNullOrEmpty(membercode))
+                membercode = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var result = new List<dynamic>();
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
 
@@ -138,7 +136,7 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    string Memberpermission = await GetPermissionAsync("M16", memberCode);
+                    string Memberpermission = await GetPermissionAsync("M16", membercode);
 
                     string query = "SELECT  DLLevel,DLCode,DLName, BillNo,BillDate,Billtype,PV ";
                     query += " FROM [000_Member_Binary_Left_Source_PV]  (nolock) ";
@@ -157,7 +155,7 @@ namespace TheStarRichyApi.Services
 
                     using (var command = new SqlCommand(query, con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
+                        command.Parameters.AddWithValue("@Membercode", membercode);
                         if (!string.IsNullOrWhiteSpace(balanceDate))
                         {
                             command.Parameters.AddWithValue("@balanceDate", balanceDate);

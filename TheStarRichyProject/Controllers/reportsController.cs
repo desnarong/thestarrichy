@@ -381,11 +381,11 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDailyPointSourceLeft(string balanceDate = "")
+        public async Task<IActionResult> GetDailyPointSourceLeft(string balanceDate = "", string membercode = "")
         {
             try
             {
-                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}";
+                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}&membercode={membercode}";
                 var result = await _apiService.GetAsync<dynamic>($"/Member/reportleftsourceofpv{qs}");
                 return Ok(result);
             }
@@ -397,11 +397,11 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetDailyPointSourceRight(string balanceDate = "")
+        public async Task<IActionResult> GetDailyPointSourceRight(string balanceDate = "", string membercode = "")
         {
             try
             {
-                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}";
+                var qs = string.IsNullOrWhiteSpace(balanceDate) ? "" : $"?balancedate={Uri.EscapeDataString(balanceDate)}&membercode={membercode}";
                 var result = await _apiService.GetAsync<dynamic>($"/Member/reportrightsourceofpv{qs}");
                 return Ok(result);
             }

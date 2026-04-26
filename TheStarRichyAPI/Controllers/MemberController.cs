@@ -633,11 +633,11 @@ namespace TheStarRichyApi.Controllers
             }
         }
         [HttpGet("reportrightsourceofpv")]
-        public async Task<IActionResult> GetReportMemberRightSourceOfPV([FromQuery] string balanceDate = "")
+        public async Task<IActionResult> GetReportMemberRightSourceOfPV([FromQuery] string balanceDate = "", [FromQuery] string membercode = "")
         {
             try
             {
-                var result = await _reportMemberRightSourceOfPVService.GetDisplayAsync(balanceDate);
+                var result = await _reportMemberRightSourceOfPVService.GetDisplayAsync(balanceDate, membercode);
                 return Ok(result);
             }
             catch (Exception)
@@ -689,11 +689,11 @@ namespace TheStarRichyApi.Controllers
         }
 
         [HttpGet("reportleftsourceofpv")]
-        public async Task<IActionResult> GetReportMemberLeftSourceOfPV([FromQuery] string balanceDate = "")
+        public async Task<IActionResult> GetReportMemberLeftSourceOfPV([FromQuery] string balanceDate = "", [FromQuery] string membercode = "")
         {
             try
             {
-                var result = await _reportMemberLeftSourceOfPVService.GetDisplayAsync(balanceDate);
+                var result = await _reportMemberLeftSourceOfPVService.GetDisplayAsync(balanceDate, membercode);
                 return Ok(result);
             }
             catch (Exception)

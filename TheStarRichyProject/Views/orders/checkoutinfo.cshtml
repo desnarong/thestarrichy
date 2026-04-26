@@ -529,6 +529,26 @@
     </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmSubmitModalLabel">ยืนยันคำสั่งซื้อ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                คุณต้องการยืนยันคำสั่งซื้อหรือไม่?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">ยกเลิก</button>
+                <button type="button" class="btn btn-primary" id="btnConfirmSubmit">
+                    <i class="ri-checkbox-circle-line me-1"></i> ยืนยัน
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <script>
     $(document).ready(function () {
@@ -685,7 +705,12 @@
         applyDeliveryMethodUI($('input[name="deliveryMethod"]:checked').val() === 'Pickup', false);
 
         $('#btnProceedPayment').click(function () {
-            const btn = $(this);
+            $('#confirmSubmitModal').modal('show');
+        });
+
+        $('#btnConfirmSubmit').click(function() {
+            $('#confirmSubmitModal').modal('hide');
+            const btn = $('#btnProceedPayment');
             const paymentMethod = $('input[name="paymentMethod"]:checked').val();
             const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
             const sendInvoice = $('input[name="sendInvoice"]:checked').val();

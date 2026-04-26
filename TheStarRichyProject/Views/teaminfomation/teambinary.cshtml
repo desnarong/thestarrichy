@@ -134,9 +134,9 @@
             </div>
             <div class="stats-row">
                 <div class="stat-item">
-                    <div class="stat-value left-card" data-pv-type="newleft" style="cursor:pointer;text-decoration:underline dotted;">[L:${formatNumber(modalData.newLeft)}]</div>
+                    <div class="stat-value left-card" data-pv-type="newleft" data-membercode="${modalData.membercode}" style="cursor:pointer;text-decoration:underline dotted;">[L:${formatNumber(modalData.newLeft)}]</div>
                     <div class="middle-text">คะแนนมาใหม่</div>
-                    <div class="stat-value right-card" data-pv-type="newright" style="cursor:pointer;text-decoration:underline dotted;">[R:${formatNumber(modalData.newRight)}]</div>
+                    <div class="stat-value right-card" data-pv-type="newright" data-membercode="${modalData.membercode}" style="cursor:pointer;text-decoration:underline dotted;">[R:${formatNumber(modalData.newRight)}]</div>
                 </div>
             </div>
             <div class="stats-row">
@@ -595,9 +595,9 @@
                         </div>
                         <div class="stats-row">
                             <div class="stat-item">
-                                <div class="stat-value left-card" data-pv-type="newleft" style="cursor:pointer;text-decoration:underline dotted;">[L:${newLeft.toLocaleString()}]</div>
+                                <div class="stat-value left-card" data-pv-type="newleft" data-membercode="${childCode}" style="cursor:pointer;text-decoration:underline dotted;">[L:${newLeft.toLocaleString()}]</div>
                                 <div class="middle-text">คะแนนมาใหม่</div>
-                                <div class="stat-value right-card" data-pv-type="newright" style="cursor:pointer;text-decoration:underline dotted;">[R:${newRight.toLocaleString()}]</div>
+                                <div class="stat-value right-card" data-pv-type="newright" data-membercode="${childCode}" style="cursor:pointer;text-decoration:underline dotted;">[R:${newRight.toLocaleString()}]</div>
                             </div>
                         </div>
                         <div class="stats-row">
@@ -1416,7 +1416,7 @@
         <div class="modal-content" style="background:#fff; color:#212529;">
             <div class="modal-header" style="background:#f8f9fa; border-bottom:1px solid #dee2e6;">
                 <h5 class="modal-title text-dark" id="detailPointModalLabel">
-                    <i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span>
+                    <i class="bx bx-detail me-2"></i>รายละเอียดคะแนน: <span id="detailDate"></span> <span id="detailMemberCode"></span>
                     <span id="detailSide" class="badge ms-1"></span>
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -1478,7 +1478,7 @@
                        d.getFullYear();
             }
 
-            async function openDetailModal(side) {
+            async function openDetailModal(side, membercode) {
                 if (!detailModal) {
                     detailModal = new bootstrap.Modal(document.getElementById('detailPointModal'));
                 }
@@ -1486,9 +1486,10 @@
                 var todayIso = getTodayIso();
                 var todayDisplay = fmtDateThai(todayIso);
                 var url = side === 'left'
-                    ? '/reports/GetDailyPointSourceLeft?balanceDate=' + encodeURIComponent(todayIso)
-                    : '/reports/GetDailyPointSourceRight?balanceDate=' + encodeURIComponent(todayIso);
+                    ? '/reports/GetDailyPointSourceLeft?balanceDate=' + encodeURIComponent(todayIso) + '&membercode=' + membercode
+                    : '/reports/GetDailyPointSourceRight?balanceDate=' + encodeURIComponent(todayIso) + '&membercode=' + membercode;
 
+                document.getElementById('detailMemberCode').textContent = membercode;
                 document.getElementById('detailDate').textContent = todayDisplay;
                 var sideEl = document.getElementById('detailSide');
                 if (side === 'left') {
@@ -1564,8 +1565,9 @@
                 if (!el) return;
                 e.stopPropagation();
                 var type = el.getAttribute('data-pv-type');
-                if (type === 'newleft') openDetailModal('left');
-                else if (type === 'newright') openDetailModal('right');
+                var membercode = el.getAttribute('data-membercode');
+                if (type === 'newleft') openDetailModal('left', membercode);
+                else if (type === 'newright') openDetailModal('right', membercode);
             }, true);
         })();
     </script>
