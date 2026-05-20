@@ -1676,6 +1676,12 @@
             }
         });
 
+        $('#simpleSubdistrict').change(function () {
+            const code = $(this).val();
+            const match = masterData.find(item => String(item.tambon_code) === String(code));
+            $('#simpleTambonId').val(match ? match.id : '');
+        });
+
         // --- Full: province/district change handlers (ID card) ---
         $('#fullProvinceIdCard').change(function () {
             const selectedZip = $('#fullPostcodeIdCard').val();

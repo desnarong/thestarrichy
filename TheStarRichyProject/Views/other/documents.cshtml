@@ -11,38 +11,18 @@
                 <h5 class="mb-0 text-white fw-semibold">เอกสาร</h5>
             </div>
             <div class="card-body p-4">
-                <!-- begin widget-list -->
-                <div class="widget-list widget-list-rounded">
-                    <!-- begin widget-list-item -->
-                    <a href="#" class="widget-list-item">
-                        <div class="widget-list-media">
-                            <i class="fas fa-link" style="background-color: var(--vz-warning); color: var(--vz-white);"></i>
-                        </div>
-                        <div class="widget-list-content">
-                            <h4 class="widget-list-title" data-key="t-regulation">1. กฎระเบียบ</h4>
-                        </div>
-                        <div class="widget-list-action text-nowrap text-muted" data-key="t-off">
-                            ปิด
-                            <i class="fas fa-angle-right fa-lg ms-2"></i>
-                        </div>
-                    </a>
-                    <!-- end widget-list-item -->
-                    <!-- begin widget-list-item -->
-                    <a href="#" class="widget-list-item">
-                        <div class="widget-list-media">
-                            <i class="fas fa-link" style="background-color: var(--vz-warning); color: var(--vz-white);"></i>
-                        </div>
-                        <div class="widget-list-content">
-                            <h4 class="widget-list-title" data-key="t-hold-application">2. ใบสมัคร hold ยอด</h4>
-                        </div>
-                        <div class="widget-list-action text-nowrap text-muted" data-key="t-hold-application-description">
-                            ใบสมัครขอสิทธิ์ซื้อสินค้าเพื่อแจงยอดภายหลัง
-                            <i class="fas fa-angle-right fa-lg ms-2"></i>
-                        </div>
-                    </a>
-                    <!-- end widget-list-item -->
+                <div class="table-responsive">
+                    <table id="tblDocuments" class="table table-bordered table-hover table-sm nowrap" style="width:100%;font-size:.85rem;">
+                        <thead class="text-center" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);">
+                            <tr>
+                                <th style="width:5%;">ลำดับ</th>
+                                <th style="width:55%;">รายละเอียด</th>
+                                <th style="width:40%;">ชื่อไฟล์</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
                 </div>
-                <!-- end widget-list -->
             </div>
         </div>
     </div>
@@ -50,4 +30,72 @@
 
 @section scripts{
     <script src="~/assets/js/app.js"></script>
+    <script>
+        $(function(){
+            var dt = null;
+
+            function norm(raw){
+                var d = raw;
+                if(typeof d === 'string'){
+                    try { d = JSON.parse(d); } catch(e) { return []; }
+                }
+                if(d && Array.isArray(d.data)) return d.data;
+                if(d && Array.isArray(d.result)) return d.result;
+                return Array.isArray(d) ? d : [];
+            }
+
+            function esc(s){
+                return s == null ? '' : String(s).replace(/&/g,'&').replace(/</g,'<').replace(/>/g,'>').replace(/"/g,'"');
+            }
+
+            function loadDocuments(){
+                $('#tblDocuments tbody').html('<tr><td colspan="3" class="text-center text-muted py-3"><i class="bx bx-loader bx-spin me-2"></i>กำลังโหลดข้อมูล...</td></tr>');
+
+                $.get('@Url.Action("GetDocuments","other")', function(json){
+                    var rows = norm(json);
+                    var $tbody = $('#tblDocuments tbody');
+                    $tbody.empty();
+
+                    if(rows.length === 0){
+                        $tbody.html('<tr><td colspan="3" class="text-center text-muted py-3">ไม่พบข้อมูลเอกสาร</td></tr>');
+                        return;
+                    }
+
+                    rows.forEach(function(r){
+                        var num = esc(r.Num || '');
+                        var desc = esc(r.Filedescription || '');
+                        var fileName = esc(r.Filelocationname || '');
+
+                        $tbody.append('<tr>' +
+                            '<td class="text-center fw-semibold">' + num + '</td>' +
+                            '<td>' + desc + '</td>' +
+                            '<td>' + fileName + '</td>' +
+                        '</tr>');
+                    });
+
+                    if(dt) { dt.destroy(); }
+                    dt = $('#tblDocuments').DataTable({
+                        paging: true,
+                        pageLength: 25,
+                        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'ทั้งหมด']],
+                        ordering: true,
+                        searching: true,
+                        destroy: true,
+                        language: {
+                            emptyTable: 'ไม่พบข้อมูล',
+                            zeroRecords: 'ไม่พบข้อมูล',
+                            search: 'ค้นหา:',
+                            lengthMenu: 'แสดง _MENU_ รายการ',
+                            info: '_START_-_END_ จาก _TOTAL_',
+                            paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+                        }
+                    });
+                }).fail(function(){
+                    $('#tblDocuments tbody').html('<tr><td colspan="3" class="text-center text-danger py-3">เกิดข้อผิดพลาดในการดึงข้อมูล</td></tr>');
+                });
+            }
+
+            loadDocuments();
+        });
+    </script>
 }

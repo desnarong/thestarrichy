@@ -106,6 +106,9 @@ builder.Services.AddScoped<IBankService, BankService>();
 // Branch Stock
 builder.Services.AddScoped<IBranchStockService, BranchStockService>();
 
+// Document Download
+builder.Services.AddScoped<IDocumentDownloadService, DocumentDownloadService>();
+
 // ================================================================
 
 builder.Services.AddHttpContextAccessor();

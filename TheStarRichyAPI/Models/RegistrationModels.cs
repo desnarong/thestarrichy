@@ -22,6 +22,7 @@ namespace TheStarRichyApi.Models
         public string? LineId { get; set; }
 
         // Optional address fields
+        public int tambonId { get; set; }
         public string? AddressIdCard { get; set; }
         public string? Postcode { get; set; }
         public string? ProvinceCode { get; set; }
@@ -90,6 +91,7 @@ namespace TheStarRichyApi.Models
         public string? ProvinceCode { get; set; }
         public string? DistrictCode { get; set; }
         public string? SubdistrictCode { get; set; }
+        public int tambonId { get; set; }
 
         // Uploaded member pictures
         public List<string>? Memberpic { get; set; }
@@ -115,6 +117,7 @@ namespace TheStarRichyApi.Models
         public string? CurrentProvinceCode { get; set; }
         public string? CurrentDistrictCode { get; set; }
         public string? CurrentSubdistrictCode { get; set; }
+        public int currentTambonId { get; set; }
 
         // Bank Information
         public string? BankCode { get; set; }

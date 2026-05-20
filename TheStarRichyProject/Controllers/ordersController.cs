@@ -27,6 +27,7 @@ namespace TheStarRichyProject.Controllers
         private readonly ICartApiService _cartService;
         private readonly IOrderApiService _orderService;
         private readonly IApiService _apiService;
+        private readonly IBranchStockApiService _branchStockApiService;
 
         public ordersController(
             ILogger<ordersController> logger,
@@ -34,7 +35,8 @@ namespace TheStarRichyProject.Controllers
             IHttpContextAccessor httpContextAccessor,
             ICartApiService cartService,
             IOrderApiService orderService,
-            IApiService apiService)
+            IApiService apiService,
+            IBranchStockApiService branchStockApiService)
         {
             _logger = logger;
             _config = config;
@@ -42,6 +44,7 @@ namespace TheStarRichyProject.Controllers
             _cartService = cartService;
             _orderService = orderService;
             _apiService = apiService;
+            _branchStockApiService = branchStockApiService;
         }
 
         #region Helper Methods
@@ -757,7 +760,7 @@ namespace TheStarRichyProject.Controllers
                     await System.IO.File.WriteAllBytesAsync(filePath, imageBytes);
 
                     // เก็บ Path สั้นๆ ไว้บันทึกลง Database (ถ้าต้องการ)
-                    savedFilePaths.Add($"/Images/Slip/{fileName}");
+                    savedFilePaths.Add($"Images/Slip/{fileName}");
                 }
 
                 // 2. อัปเดตสถานะใน Database
@@ -932,6 +935,7 @@ namespace TheStarRichyProject.Controllers
             }
         }
         #endregion
+
         #region address master
         private async Task<dynamic> GetTitlenameAsyncFromApi()
         {
@@ -957,6 +961,7 @@ namespace TheStarRichyProject.Controllers
             }
         }
         #endregion
+        
         #region address master
         private async Task<dynamic> GetMasterAddressFromApi()
         {
@@ -1307,6 +1312,65 @@ namespace TheStarRichyProject.Controllers
                 });
             }
         }
+        /// <summary>
+        /// API ตรวจสอบว่าสินค้าทั้งหมดในตะกร้ามีในสาขาที่เลือกหรือไม่
+        /// GET: /Orders/CheckBranchStock?branchCode=xxx
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> CheckBranchStock(string branchCode)
+        {
+            try
+            {
+                var token = GetToken();
+                var passkey = GetPasskey();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "กรุณาเข้าสู่ระบบ" });
+                }
+
+                if (string.IsNullOrEmpty(branchCode))
+                {
+                    return Json(new { success = false, message = "กรุณาเลือกสาขา" });
+                }
+
+                // ดึงตะกร้าเพื่อเอาสินค้าทั้งหมด
+                var cart = await _cartService.GetCartAsync(token, passkey);
+                if (cart == null || !cart.Success || cart.Data == null || cart.Data.Items.Count == 0)
+                {
+                    return Json(new { success = false, message = "ไม่พบสินค้าในตะกร้า" });
+                }
+
+                // ดึง ProductCode จาก cart items
+                var productCodes = cart.Data.Items.Select(x => x.ProductCode).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+
+                if (productCodes.Count == 0)
+                {
+                    return Json(new { success = false, message = "ไม่พบรหัสสินค้า" });
+                }
+
+                // เรียก API BranchStock เพื่อตรวจสอบ
+                var result = await _branchStockApiService.CheckStockByBranchAsync(token, passkey, branchCode, productCodes);
+
+                if (result.Success)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        isAllFound = result.Data.IsAllFound,
+                        message = result.Message
+                    });
+                }
+
+                return Json(new { success = false, message = result.Message ?? "ไม่สามารถตรวจสอบสต็อกได้" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking branch stock");
+                return Json(new { success = false, message = "เกิดข้อผิดพลาด: " + ex.Message });
+            }
+        }
+
         #endregion
 
         #region Cart APIs

@@ -19,7 +19,7 @@ namespace TheStarRichyApi.Services
 
         public RegistrationService(IConfiguration configuration, ILogger<RegistrationService> logger, ISMSService smsService)
         {
-            _connectionString = configuration.GetConnectionString("MLMConnectionString") 
+            _connectionString = configuration.GetConnectionString("MLMConnectionString")
                 ?? throw new InvalidOperationException("Connection string 'MLMConnectionString' not found.");
             _configuration = configuration;
             _logger = logger;
@@ -74,7 +74,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)NormalizeString(request.DistrictCode) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)request.tambonId ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
@@ -89,9 +89,9 @@ namespace TheStarRichyApi.Services
                             // Controller already saved images to disk and sent paths
                             // Just serialize the paths as JSON
                             memberPicJson = JsonSerializer.Serialize(request.Memberpic);
-                            
+
                             // Log for debugging
-                            _logger.LogInformation("Memberpic JSON for {DocumentNumber}: {Json}", 
+                            _logger.LogInformation("Memberpic JSON for {DocumentNumber}: {Json}",
                                 request.DocumentNumber, memberPicJson);
                         }
                         else
@@ -140,21 +140,21 @@ namespace TheStarRichyApi.Services
                         var smsManager = new SMSManager(_configuration);
                         // ดึงข้อความต้อนรับจาก config
                         string welcomeMessage = GetWelcomeMessage(newMemberCode);
-                        
+
                         if (!string.IsNullOrEmpty(welcomeMessage))
                         {
                             // ตรวจสอบและแปลงเบอร์โทรให้ถูก format
                             string normalizedPhone = NormalizePhoneNumber(request.Mobile);
                             var smsResult = smsManager.SendMessageExt(welcomeMessage, normalizedPhone);
-                            
+
                             if (!string.IsNullOrEmpty(smsResult) && smsResult != "SMS_DISABLED")
                             {
-                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}", 
+                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}",
                                     normalizedPhone, newMemberCode);
                             }
                             else
                             {
-                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}", 
+                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}",
                                     normalizedPhone, smsManager.ErrorMessage);
                             }
                         }
@@ -233,11 +233,11 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)NormalizeString(request.DistrictCode) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@idaddress_TAMBON_ID", (object)request.tambonId ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_province", (object)NormalizeString(request.ProvinceCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress_zipcode", (object)NormalizeString(request.Postcode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Presentaddress_TAMBON_ID", (object)NormalizeString(GetPresentDistrict(request)) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Presentaddress_TAMBON_ID", (object)request.currentTambonId ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_province", (object)NormalizeString(GetPresentProvince(request)) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Presentaddress_zipcode", (object)NormalizeString(GetPresentZipcode(request)) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@memberpic", (object)BuildMemberPicJson(request) ?? DBNull.Value);
@@ -268,7 +268,7 @@ namespace TheStarRichyApi.Services
                     throw new Exception("ลงทะเบียนในฐานข้อมูลสำเร็จ แต่ไม่ได้รับรหัสสมาชิก (MemberCode) กลับมาจากระบบ");
                 }
 
-                _logger.LogInformation("Full registration successful for {DocumentNumber}. Generated MemberCode: {MemberCode}", 
+                _logger.LogInformation("Full registration successful for {DocumentNumber}. Generated MemberCode: {MemberCode}",
                     request.DocumentNumber, newMemberCode);
 
                 // 📱 ส่ง SMS ต้อนรับ (ถ้ามีเบอร์โทรศัพท์)
@@ -279,21 +279,21 @@ namespace TheStarRichyApi.Services
                         var smsManager = new SMSManager(_configuration);
                         // ดึงข้อความต้อนรับจาก config
                         string welcomeMessage = GetWelcomeMessage(newMemberCode);
-                        
+
                         if (!string.IsNullOrEmpty(welcomeMessage))
                         {
                             // ตรวจสอบและแปลงเบอร์โทรให้ถูก format
                             string normalizedPhone = NormalizePhoneNumber(request.Mobile);
                             var smsResult = smsManager.SendMessageExt(welcomeMessage, normalizedPhone);
-                            
+
                             if (!string.IsNullOrEmpty(smsResult) && smsResult != "SMS_DISABLED")
                             {
-                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}", 
+                                _logger.LogInformation("Welcome SMS sent to {Phone} for MemberCode {MemberCode}",
                                     normalizedPhone, newMemberCode);
                             }
                             else
                             {
-                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}", 
+                                _logger.LogWarning("Failed to send welcome SMS to {Phone}: {Error}",
                                     normalizedPhone, smsManager.ErrorMessage);
                             }
                         }
@@ -344,10 +344,10 @@ namespace TheStarRichyApi.Services
                             {
                                 string? smsWelcome = reader["SMSWelcome"]?.ToString();
                                 string? smsWelcomeEng = reader["SMSWelcomeEng"]?.ToString();
-                                
+
                                 // ตรวจสอบภาษาจาก config หรือใช้ default เป็นภาษาไทย
                                 string? selectedMessage = !string.IsNullOrEmpty(smsWelcome) ? smsWelcome : smsWelcomeEng;
-                                
+
                                 if (!string.IsNullOrEmpty(selectedMessage))
                                 {
                                     // แทนที่รหัสสมาชิกในข้อความ
@@ -355,7 +355,7 @@ namespace TheStarRichyApi.Services
                                     string message = selectedMessage
                                         .Replace("รหัส", "รหัส " + memberCode)
                                         .Replace("Membercode", "Membercode " + memberCode);
-                                    
+
                                     return message;
                                 }
                             }
@@ -367,7 +367,7 @@ namespace TheStarRichyApi.Services
             {
                 _logger.LogError(ex, "Error getting welcome message from config");
             }
-            
+
             return string.Empty;
         }
 
@@ -409,41 +409,42 @@ namespace TheStarRichyApi.Services
         {
             try
             {
-        // Convert to EasyRegistrationRequest and call EasyRegisterAsync
-        var easyRequest = new EasyRegistrationRequest
-        {
-            Country = request.Country,
-            DocumentNumber = request.DocumentNumber,
-            ReferrerCode = request.ReferrerCode,
-            Title = request.Title,
-            IdCardName = request.IdCardName,
-            Mobile = request.Mobile,
-            Email = request.Email,
-            LineId = request.LineId,
-            AddressIdCard = request.AddressIdCard,
-            Postcode = request.Postcode,
-            ProvinceCode = request.ProvinceCode,
-            DistrictCode = request.DistrictCode,
-            SubdistrictCode = request.SubdistrictCode,
-            VerificationMethod = request.VerificationMethod,
-            CountryBusiness = request.CountryBusiness,
-            Position = request.Position,
-            RegistrationDate = request.RegistrationDate,
-            BirthDate = request.BirthDate,
-            BusinessName = request.BusinessName,
-            HomePhone = request.HomePhone,
-            Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
-            ipAddress = request.ipAddress // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
-        };
+                // Convert to EasyRegistrationRequest and call EasyRegisterAsync
+                var easyRequest = new EasyRegistrationRequest
+                {
+                    Country = request.Country,
+                    DocumentNumber = request.DocumentNumber,
+                    ReferrerCode = request.ReferrerCode,
+                    Title = request.Title,
+                    IdCardName = request.IdCardName,
+                    Mobile = request.Mobile,
+                    Email = request.Email,
+                    LineId = request.LineId,
+                    AddressIdCard = request.AddressIdCard,
+                    Postcode = request.Postcode,
+                    ProvinceCode = request.ProvinceCode,
+                    DistrictCode = request.DistrictCode,
+                    SubdistrictCode = request.SubdistrictCode,
+                    VerificationMethod = request.VerificationMethod,
+                    CountryBusiness = request.CountryBusiness,
+                    Position = request.Position,
+                    RegistrationDate = request.RegistrationDate,
+                    BirthDate = request.BirthDate,
+                    BusinessName = request.BusinessName,
+                    HomePhone = request.HomePhone,
+                    Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
+                    ipAddress = request.ipAddress, // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
+                    tambonId = request.tambonId,
+                };
 
-        _logger.LogInformation("External registration from source: {Source}, campaign: {Campaign}", 
-            request.SourcePage, request.CampaignCode);
-        
-        _logger.LogInformation("ExternalRegisterAsync: Memberpic count = {Count}, ipAddress = {Ip}", 
-            request.Memberpic?.Count ?? 0, request.ipAddress);
+                _logger.LogInformation("External registration from source: {Source}, campaign: {Campaign}",
+                    request.SourcePage, request.CampaignCode);
 
-        // Call without current member code (external registration)
-        return await EasyRegisterAsync(easyRequest, null);
+                _logger.LogInformation("ExternalRegisterAsync: Memberpic count = {Count}, ipAddress = {Ip}",
+                    request.Memberpic?.Count ?? 0, request.ipAddress);
+
+                // Call without current member code (external registration)
+                return await EasyRegisterAsync(easyRequest, null);
             }
             catch (Exception ex)
             {
@@ -686,9 +687,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "เลขที่บัตรนี้ไม่สามารถสมัครได้ในขณะนี้ หากมีข้อสงสัยกรุณาติดต่อบริษัท" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "เลขที่บัตรนี้ไม่สามารถสมัครได้ในขณะนี้ หากมีข้อสงสัยกรุณาติดต่อบริษัท"
                                 };
                             }
                         }
@@ -721,12 +723,13 @@ namespace TheStarRichyApi.Services
                             // Get MaxExpireDate from config (default to 365 days if not set)
                             int maxExpireDays = _configuration.GetValue<int>("Registration:MaxExpireDate", 365);
                             DateTime eligibleDate = expireDate.AddDays(maxExpireDays);
-                            
+
                             if (DateTime.Now < eligibleDate)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = $"เลขที่บัตรนี้หมดอายุยังไม่ครบ {maxExpireDays} วัน" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = $"เลขที่บัตรนี้หมดอายุยังไม่ครบ {maxExpireDays} วัน"
                                 };
                             }
                         }
@@ -759,12 +762,13 @@ namespace TheStarRichyApi.Services
                             // Get MaxExpireDate from config (default to 365 days if not set)
                             int maxExpireDays = _configuration.GetValue<int>("Registration:MaxExpireDate", 365);
                             DateTime eligibleDate = resignDate.AddDays(maxExpireDays);
-                            
+
                             if (DateTime.Now < eligibleDate)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = $"เลขที่บัตรนี้ลาออกยังไม่ครบ {maxExpireDays} วัน" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = $"เลขที่บัตรนี้ลาออกยังไม่ครบ {maxExpireDays} วัน"
                                 };
                             }
                         }
@@ -796,9 +800,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "รหัสผู้แนะนำไม่สามารถใช้งานได้กรุณาติดต่อผู้แนะนำ" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "รหัสผู้แนะนำไม่สามารถใช้งานได้กรุณาติดต่อผู้แนะนำ"
                                 };
                             }
                         }
@@ -829,9 +834,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "บัตรประชาชนนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "บัตรประชาชนนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -862,9 +868,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "ชื่อตามบัตรประชาชนนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "ชื่อตามบัตรประชาชนนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -895,9 +902,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "ชื่อทางธุรกิจนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "ชื่อทางธุรกิจนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -928,9 +936,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "เบอร์โทรศัพท์นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "เบอร์โทรศัพท์นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -963,9 +972,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "บัญชีธนาคารนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "บัญชีธนาคารนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -998,9 +1008,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "ชื่อบัญชีธนาคารนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "ชื่อบัญชีธนาคารนี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -1031,9 +1042,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "Email นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "Email นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -1064,9 +1076,10 @@ namespace TheStarRichyApi.Services
                         {
                             if (count > 0)
                             {
-                                return new ValidationResponse { 
-                                    Success = false, 
-                                    Message = "LineID นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง" 
+                                return new ValidationResponse
+                                {
+                                    Success = false,
+                                    Message = "LineID นี้มีในระบบแล้วกรุณาตรวจสอบอีกครั้ง"
                                 };
                             }
                         }
@@ -1100,9 +1113,10 @@ namespace TheStarRichyApi.Services
 
                 if (age < minAge)
                 {
-                    return new ValidationResponse { 
-                        Success = false, 
-                        Message = $"อายุผู้สมัครยังไม่ถึง {minAge} ไม่สามารถสมัครได้" 
+                    return new ValidationResponse
+                    {
+                        Success = false,
+                        Message = $"อายุผู้สมัครยังไม่ถึง {minAge} ไม่สามารถสมัครได้"
                     };
                 }
 
@@ -1161,7 +1175,8 @@ namespace TheStarRichyApi.Services
 
                     _logger.LogInformation("OTP sent and stored successfully for {Phone} with reference {ReferenceId}", request.Phone, referenceId);
 
-                    return new SendOTPResponse {
+                    return new SendOTPResponse
+                    {
                         Success = true,
                         Message = "ส่ง OTP สำเร็จ",
                         ReferenceId = referenceId
@@ -1170,7 +1185,8 @@ namespace TheStarRichyApi.Services
                 else
                 {
                     _logger.LogError("Failed to send OTP SMS to {Phone}: {Error}", request.Phone, smsResult.Message);
-                    return new SendOTPResponse {
+                    return new SendOTPResponse
+                    {
                         Success = false,
                         Message = smsResult.Message
                     };
@@ -1304,45 +1320,47 @@ namespace TheStarRichyApi.Services
                 //    };
                 //}
 
-        // TODO: Proceed with registration using existing ExternalRegisterAsync
-        // But add file URLs if available
-        var externalRequest = new ExternalRegistrationRequest {
-            Country = request.Country,
-            DocumentNumber = request.DocumentNumber,
-            ReferrerCode = request.ReferrerCode,
-            Title = request.Title,
-            IdCardName = request.IdCardName,
-            Mobile = request.Mobile,
-            Email = request.Email,
-            LineId = request.LineId,
-            AddressIdCard = request.AddressIdCard,
-            Postcode = request.Postcode,
-            ProvinceCode = request.ProvinceCode,
-            DistrictCode = request.DistrictCode,
-            SubdistrictCode = request.SubdistrictCode,
-            VerificationMethod = request.VerificationMethod,
-            SourcePage = request.SourcePage,
-            CampaignCode = request.CampaignCode,
-            CountryBusiness = request.CountryBusiness,
-            Position = request.Position,
-            RegistrationDate = request.RegistrationDate,
-            BirthDate = request.BirthDate,
-            BusinessName = request.BusinessName,
-            HomePhone = request.HomePhone,
-            Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
-            ipAddress = request.ipAddress // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
-        };
+                // TODO: Proceed with registration using existing ExternalRegisterAsync
+                // But add file URLs if available
+                var externalRequest = new ExternalRegistrationRequest
+                {
+                    Country = request.Country,
+                    DocumentNumber = request.DocumentNumber,
+                    ReferrerCode = request.ReferrerCode,
+                    Title = request.Title,
+                    IdCardName = request.IdCardName,
+                    Mobile = request.Mobile,
+                    Email = request.Email,
+                    LineId = request.LineId,
+                    AddressIdCard = request.AddressIdCard,
+                    Postcode = request.Postcode,
+                    ProvinceCode = request.ProvinceCode,
+                    DistrictCode = request.DistrictCode,
+                    SubdistrictCode = request.SubdistrictCode,
+                    VerificationMethod = request.VerificationMethod,
+                    SourcePage = request.SourcePage,
+                    CampaignCode = request.CampaignCode,
+                    CountryBusiness = request.CountryBusiness,
+                    Position = request.Position,
+                    RegistrationDate = request.RegistrationDate,
+                    BirthDate = request.BirthDate,
+                    BusinessName = request.BusinessName,
+                    HomePhone = request.HomePhone,
+                    Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
+                    ipAddress = request.ipAddress, // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
+                    tambonId = request.tambonId,
+                };
 
-        _logger.LogInformation("FinalizeRegistration: Memberpic count = {Count}", 
-            request.Memberpic?.Count ?? 0);
-        
-        if (request.Memberpic != null && request.Memberpic.Count > 0)
-        {
-            _logger.LogInformation("FinalizeRegistration: First memberpic path = {Path}", 
-                request.Memberpic.FirstOrDefault());
-        }
+                _logger.LogInformation("FinalizeRegistration: Memberpic count = {Count}",
+                    request.Memberpic?.Count ?? 0);
 
-        return await ExternalRegisterAsync(externalRequest);
+                if (request.Memberpic != null && request.Memberpic.Count > 0)
+                {
+                    _logger.LogInformation("FinalizeRegistration: First memberpic path = {Path}",
+                        request.Memberpic.FirstOrDefault());
+                }
+
+                return await ExternalRegisterAsync(externalRequest);
             }
             catch (Exception ex)
             {

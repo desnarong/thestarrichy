@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using TheStarRichyProject.Helper;
 using TheStarRichyProject.Services;
 
 namespace TheStarRichyProject.Controllers
@@ -6,10 +7,20 @@ namespace TheStarRichyProject.Controllers
     public class otherController : Controller
     {
         private readonly IApiService _apiService;
+        private readonly IDocumentDownloadApiService _documentDownloadApiService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IConfiguration _config;
 
-        public otherController(IApiService apiService)
+        public otherController(
+            IApiService apiService,
+            IDocumentDownloadApiService documentDownloadApiService,
+            IHttpContextAccessor httpContextAccessor,
+            IConfiguration config)
         {
             _apiService = apiService;
+            _documentDownloadApiService = documentDownloadApiService;
+            _httpContextAccessor = httpContextAccessor;
+            _config = config;
         }
 
         public IActionResult changepassword()
@@ -101,6 +112,30 @@ namespace TheStarRichyProject.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { success = false, message = "ไม่สามารถดึงข้อมูลรายละเอียดใบกำกับภาษีได้" });
+            }
+        }
+
+        /// <summary>
+        /// ดึงรายการเอกสารจาก view [000_download]
+        /// GET: /other/GetDocuments
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetDocuments()
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext?.Request.Cookies[CookieHelper.UserKey];
+                var passkey = _config["Api:Passkey"];
+
+                if (string.IsNullOrEmpty(token))
+                    return Unauthorized(new { Success = false, Message = "ไม่พบข้อมูลผู้ใช้" });
+
+                var result = await _documentDownloadApiService.GetAllDocumentsAsync(token, passkey);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Success = false, Message = $"เกิดข้อผิดพลาด: {ex.Message}" });
             }
         }
     }

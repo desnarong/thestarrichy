@@ -65,6 +65,8 @@ builder.Services.AddScoped<IProductApiClient, ProductApiClient>();
 builder.Services.AddScoped<ICartApiService, CartApiService>();
 builder.Services.AddScoped<IOrderApiService, OrderApiService>();
 builder.Services.AddScoped<IApiService, ApiService>();
+builder.Services.AddScoped<IBranchStockApiService, BranchStockApiService>();
+builder.Services.AddScoped<IDocumentDownloadApiService, DocumentDownloadApiService>();
 
 // Add logging for session debugging
 builder.Services.AddLogging();

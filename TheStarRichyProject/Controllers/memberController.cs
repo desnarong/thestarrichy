@@ -173,7 +173,6 @@ namespace TheStarRichyProject.Controllers
                 {
                     var httpClientHandler = new HttpClientHandler
                     {
-                        // ������õ�Ǩ�ͺ��Ѻ�ͧ (����Ѻ���ͺ��ҹ��)
                         ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
                     };
                     return httpClientHandler;
@@ -795,7 +794,7 @@ namespace TheStarRichyProject.Controllers
                                 }
 
                                 // เก็บ Path สั้นๆ ใส่เข้าไปใน Array ใหม่แทน Base64 เดิม
-                                newPathsArray.Add($"/Images/Memberpicture/{fileName}");
+                                newPathsArray.Add($"Images/Memberpicture/{fileName}");
                             }
                             catch (Exception ex)
                             {
