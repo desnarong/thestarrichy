@@ -103,6 +103,9 @@ builder.Services.AddScoped<ICheckwebStatusService, CheckwebStatusService>();
 builder.Services.AddScoped<IStaticService, StaticService>();
 builder.Services.AddScoped<IBankService, BankService>();
 
+// Branch Stock
+builder.Services.AddScoped<IBranchStockService, BranchStockService>();
+
 // ================================================================
 
 builder.Services.AddHttpContextAccessor();

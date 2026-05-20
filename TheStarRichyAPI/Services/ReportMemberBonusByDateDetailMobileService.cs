@@ -146,11 +146,11 @@ namespace TheStarRichyApi.Services
                     
                     if (!string.IsNullOrWhiteSpace(fromDate))
                     {
-                        query += " AND CalculateDate >= @FromDate";
+                        query += " AND BillDate >= @FromDate";
                     }
                     if (!string.IsNullOrWhiteSpace(toDate))
                     {
-                        query += " AND CalculateDate <= @ToDate";
+                        query += " AND BillDate <= @ToDate";
                     }
                     
                     query += " ORDER BY DLLevel,DLCode ";

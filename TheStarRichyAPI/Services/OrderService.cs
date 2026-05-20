@@ -262,6 +262,7 @@ namespace TheStarRichyApi.Services
                                     Status = reader["Status"]?.ToString(),
                                     SendInvoice = Convert.ToInt16(reader["SendBill"]),
                                     BillNo = reader["BillNo"]?.ToString(),
+                                    BillType = reader["BillType"]?.ToString(),
                                     Items = new List<OrderItem>(),
                                     DeliveryInfo = new DeliveryInfo
                                     {
@@ -705,6 +706,7 @@ namespace TheStarRichyApi.Services
         public string Status { get; set; }
         public int SendInvoice { get; set; }
         public string BillNo { get; set; }
+        public string BillType { get; set; }
     }
 
     public class OrderItem

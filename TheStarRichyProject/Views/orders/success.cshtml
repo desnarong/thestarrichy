@@ -4,6 +4,8 @@
     var summary = ViewBag.OrderSummary as TheStarRichyProject.Models.OrderSummaryData;
     var orderID = ViewBag.OrderID as string;
     var billNo = ViewBag.BillNo as string;
+    var orderHistoryUrl = summary?.BillType == 11 ? "/reports/buyhold" : "/reports/buyorder";
+    orderHistoryUrl = summary?.PaymentMethod == "BankTransfer" ? "/reports/poorder" : orderHistoryUrl;
 }
 
 <!-- Custom CSS -->
@@ -330,7 +332,7 @@
                 <a href="/orders/buypersonalorder" class="btn btn-primary btn-action">
                     <i class="fas fa-shopping-cart"></i> สั่งซื้อสินค้าต่อ
                 </a>
-                <a href="/reports/orderhistory" class="btn btn-outline-primary btn-action">
+                <a href="@orderHistoryUrl" class="btn btn-outline-primary btn-action">
                     <i class="fas fa-history"></i> ดูประวัติการสั่งซื้อ
                 </a>
                 <a href="/home/index" class="btn btn-outline-secondary btn-action">

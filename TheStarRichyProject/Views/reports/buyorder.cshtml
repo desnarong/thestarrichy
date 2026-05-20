@@ -173,89 +173,95 @@ $(function(){
       var totalAmount = num(p(header,['TotalAmount','totalAmount'],0));
       var totalPV = num(p(header,['TotalPV','totalPV'],0));
 
-    var billHtml = '<div id="billDoc" class="doc-wrap">';
-    
-    // ── Company header + Doc number box ──────────────────────────
-    billHtml += '<table style="width:100%;border-collapse:collapse;margin-bottom:6px;"><tr>';
-    billHtml += '<td style="vertical-align:top;padding-right:12px;">';
-    billHtml += '<div class="d-flex align-items-center gap-2 mb-1">';
-    billHtml += '<img src="/assets/images/logo_sm2.png" alt="Logo" style="height:50px;width:auto;" onerror="this.style.display=\'none\'">';
-    billHtml += '<div style="font-size:15pt;font-weight:700;color:#1a237e;line-height:1.2;">'+esc(p(header,['Companyname','companyname']))+' (สำนักงานใหญ่)</div>';
-    billHtml += '</div>';
-    billHtml += '<div style="font-size:12pt;">'+esc(p(header,['Companyaddress','companyaddress']))+'</div>';
-    billHtml += '<div style="font-size:12pt;">โทร: '+esc(p(header,['Companytelephone','companytelephone']))+'</div>';
-    billHtml += '</td>';
-    billHtml += '<td style="vertical-align:top;text-align:right;white-space:nowrap;">';
-    billHtml += '<table style="margin-left:auto;border-collapse:collapse;font-size:12pt;">';
-    billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">เลขที่</td><td style="padding:3px 10px;font-weight:700;color:#1a237e;border-bottom:1px solid #eee;white-space:nowrap;">'+esc(billNo)+'</td></tr>';
-    billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">วันที่</td><td style="padding:3px 10px;border-bottom:1px solid #eee;white-space:nowrap;">'+fmtDate(p(header,['BillDate','billDate']))+'</td></tr>';
-    billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;white-space:nowrap;">อ้างอิง</td><td style="padding:3px 10px;white-space:nowrap;">'+esc(p(header,['ReferenceNo','referenceNo']))+'</td></tr>';
-    billHtml += '</table></td>';
-    billHtml += '</tr></table>';
-    billHtml += '<hr style="margin:4px 0;border:0;border-top:1px solid #bbb;">';
+      var billHtml = '<style>@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap");</style>';
+        billHtml += '<div id="billDoc" class="doc-wrap" style="font-family:\'Sarabun\',\'Cordia New\',\'CordiaUPC\',\'TH Sarabun New\',Arial,sans-serif;font-size:10pt;background:#fff;color:#000;margin:0 auto;">';
 
-    // ── Customer + Shipping/Order info ────────────────────────────
-    billHtml += '<table style="width:100%;border-collapse:collapse;margin-bottom:6px;"><tr>';
-    billHtml += '<td style="vertical-align:top;width:52%;padding-right:12px;border-right:1px solid #ddd;">';
-    billHtml += '<div style="margin-bottom:3px;font-size:13pt;"><span style="color:#555;">ผู้ซื้อ :</span> <b>'+esc(p(header,['CustomerName','customerName']))+'</b></div>';
-    billHtml += '<div style="margin-bottom:3px;font-size:13pt;"><span style="color:#555;">รหัสสมาชิก :</span> '+esc(p(header,['Membercode','memberCode']))+'</div>';
-    billHtml += '<div style="margin-bottom:3px;font-size:13pt;"><span style="color:#555;">โทร :</span> '+esc(p(header,['CustomerTelephone','customerTelephone']))+'</div>';
-    billHtml += '</td>';
-    billHtml += '<td style="vertical-align:top;padding-left:12px;">';
-    billHtml += '<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">ที่อยู่จัดส่ง :</span> '+esc(p(header,['DeliveryAddress','deliveryAddress']))+'</div>';
-    billHtml += '<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">ประเภทชำระ :</span> <span style="border:1px solid #888;padding:0 6px;display:inline-block;">'+esc(p(header,['PaymentType','paymentType']))+'</span></div>';
-    billHtml += '<div style="margin-bottom:3px;font-size:12pt;"><span style="color:#555;">ประเภทการสั่ง :</span> '+esc(p(header,['Billtype','billType','billtype']))+'</div>';
-    billHtml += '</td></tr></table>';
+        // ── Title + Company header + Doc number ───────────────────────
+        billHtml += '<table style="width:100%;border-collapse:collapse;margin-bottom:6px;">';
 
-    // ── Product table ─────────────────────────────────────────────
-    billHtml += '<table class="product-table" style="width:100%;border-collapse:collapse;font-size:13pt;border:1px solid #aaa;">';
-    billHtml += '<thead><tr style="background:#e8e8e8;">';
-    var ths=[['ลำดับ','32px','center'],['รหัสสินค้า','90px','left'],['ชื่อสินค้า','','left'],['จำนวน','60px','center'],['หน่วย','60px','center'],['ราคา/หน่วย','95px','right'],['รวม','95px','right'],['PV','75px','right']];
-    ths.forEach(function(h){billHtml+='<th style="border:1px solid #aaa;padding:3px 5px;text-align:'+h[2]+';'+(h[1]?'width:'+h[1]+';':'')+'">'+h[0]+'</th>';});
-    billHtml += '</tr></thead><tbody>';
-    
-    if(billRows.length > 0){
-      billRows.forEach(function(item,i){
-        var qty = num(p(item,['Quantity','quantity','Unit','unit'],1));
-        var unitPrice = num(p(item,['PriceperUnit','priceperUnit','UnitPrice','unitPrice','unitprice'],0));
-        var amount = num(p(item,['TotalAmount','totalAmount','TotalPrice','totalPrice','Amount','amount'],qty*unitPrice));
-        var pv = num(p(item,['PV','pv','TotalPV','totalPV'],0));
         billHtml += '<tr>';
-        billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+(i+1)+'</td>';
-        billHtml += '<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(item,['ProductCode','productCode','ProductID','productID','productId']))+'</td>';
-        billHtml += '<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(item,['ProductName','productName']))+'</td>';
-        billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(String(qty))+'</td>';
-        billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(p(item,['Unitname','unitName','UnitName']))+'</td>';
-        billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt2(unitPrice)+'</td>';
-        billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;font-weight:600;color:#c00;">'+fmt2(amount)+'</td>';
-        billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt0(pv)+'</td>';
-        billHtml += '</tr>';
-      });
-    }
-    
-    billHtml += '</tbody></table>';
+        billHtml += '<td style="vertical-align:top;padding-right:12px;">';
+        billHtml += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">';
+        billHtml += '<img src="/assets/images/logo_sm2.png" alt="Logo" style="height:50px;width:auto;" onerror="this.style.display=\'none\'">';
+        billHtml += '<div style="font-size:13pt;font-weight:700;color:#1a237e;line-height:1.2;">'+esc(p(header,['Companyname','companyname']))+' (สำนักงานใหญ่)</div>';
+        billHtml += '</div>';
+        billHtml += '<div>'+esc(p(header,['Companyaddress','companyaddress']))+'</div>';
+        billHtml += '<div>โทร: '+esc(p(header,['Companytelephone','companytelephone']))+'</div>';
+        billHtml += '</td>';
+        billHtml += '<td style="vertical-align:top;text-align:right;white-space:nowrap;">';
+        billHtml += '<table style="margin-left:auto;border-collapse:collapse;">';
+        billHtml += '<tr><td colspan="2" style="font-size:13pt;font-weight:700;color:#1a237e;line-height:1.2;">ใบเสร็จรับเงิน/ใบส่งของ</td></td></tr>';
+        billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">เลขที่</td><td style="padding:3px 10px;font-weight:700;color:#1a237e;border-bottom:1px solid #eee;white-space:nowrap;">'+esc(billNo)+'</td></tr>';
+        billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;border-bottom:1px solid #eee;white-space:nowrap;">วันที่</td><td style="padding:3px 10px;border-bottom:1px solid #eee;white-space:nowrap;">'+fmtDate(p(header,['BillDate','billDate']))+'</td></tr>';
+        billHtml += '<tr><td style="text-align:right;padding:3px 8px;color:#555;white-space:nowrap;">อ้างอิง</td><td style="padding:3px 10px;white-space:nowrap;">'+esc(p(header,['ReferenceNo','referenceNo']))+'</td></tr>';
+        billHtml += '</table></td>';
+        billHtml += '</tr></table>';
+        billHtml += '<hr style="margin:4px 0;border:0;border-top:1px solid #bbb;">';
 
-    // ── Footer ────────────────────────────────────────────────────
-    billHtml += '<table style="width:100%;border-collapse:collapse;margin-top:6px;font-size:13pt;"><tr>';
-    billHtml += '<td style="vertical-align:top;width:55%;padding-right:10px;border-right:1px solid #ddd;">';
-    billHtml += '<div><span style="color:#555;">รูปแบบ :</span> '+esc(p(header,['Sendbill','sendbill']))+'</div>';
+        // ── Customer info ─────────────────────────────────────────────
+        billHtml += '<table style="width:100%;border-collapse:collapse;margin-bottom:6px;"><tr>';
+        billHtml += '<td style="vertical-align:top;width:68%;padding-right:12px;">';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">ผู้ซื้อ :</span> <b>'+esc(p(header,['CustomerName','customerName']))+'</b></div>';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">รหัสสมาชิก :</span> '+esc(p(header,['Membercode','memberCode']))+'</div>';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">ที่อยู่จัดส่ง :</span> '+esc(p(header,['DeliveryAddress','deliveryAddress']))+'</div>';
+        billHtml += '</td>';
+        billHtml += '<td style="vertical-align:top;padding-left:12px;">';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">ประเภทชำระ :</span> <span style="border:1px solid #888;padding:0 6px;display:inline-block;">'+esc(p(header,['PaymentType','paymentType']))+'</span></div>';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">ประเภทการสั่ง :</span> '+esc(p(header,['Billtype','billType','billtype']))+'</div>';
+        billHtml += '<div style="margin-bottom:3px;"><span style="color:#555;">โทร :</span> '+esc(p(header,['CustomerTelephone','customerTelephone']))+'</div>';
+        billHtml += '</td></tr></table>';
 
-    var tracking = p(header,['TrackingURL','trackingURL']) || '';
-    billHtml += '<div style="margin-top:3px;"><span style="color:#555;">Tracking number :</span> <span style="border-bottom:1px solid #aaa;display:inline-block;min-width:180px;padding-bottom:1px;">'+(tracking?'<a href="'+esc(tracking)+'" target="_blank" style="color:#1565c0;">'+esc(tracking)+'</a>':'-')+'</span></div>';
+        // ── Product table ─────────────────────────────────────────────
+        billHtml += '<table class="product-table" style="width:100%;border-collapse:collapse;border:1px solid #aaa;">';
+        billHtml += '<thead><tr style="background:#e8e8e8;">';
+        var ths=[['ลำดับ','32px','center'],['รหัสสินค้า','90px','left'],['ชื่อสินค้า','','left'],['จำนวน','60px','center'],['หน่วย','60px','center'],['ราคา/หน่วย','95px','right'],['รวม','95px','right'],['PV','75px','right']];
+        ths.forEach(function(h){billHtml+='<th style="border:1px solid #aaa;padding:3px 5px;text-align:'+h[2]+';'+(h[1]?'width:'+h[1]+';':'')+'">'+h[0]+'</th>';});
+        billHtml += '</tr></thead><tbody>';
 
-    billHtml += '<div style="margin-top:3px;"><span style="color:#555;">หมายเหตุ :</span> '+esc(p(header,['Receive','receive']))+' &nbsp;&nbsp; <span style="color:#555;">วันที่รับ :</span> '+fmtDate(p(header,['Receivedate','receiveDate']))+'</div>';
-    billHtml += '<div style="margin-top:3px;"><span style="color:#555;">ผู้ทำรายการ :</span> '+esc(p(header,['Createby','createby']))+'</div>';
-    billHtml += '<div style="margin-top:3px;"><span style="color:#555;">สถานะ :</span> '+esc(p(header,['BillConfirmType','billConfirmType']))+'</div>';
-    billHtml += '</td>';
-    billHtml += '<td style="vertical-align:top;padding-left:10px;">';
-    billHtml += '<table style="width:100%;border-collapse:collapse;font-size:13pt;">';
-    billHtml += '<tr><td style="padding:4px 8px;">ค่าส่ง</td><td style="text-align:right;padding:4px 8px;">'+fmt2(p(header,['ShippingFee','shippingFee'],0))+'</td></tr>';
-    billHtml += '<tr style="background:#e0f7f4;"><td style="padding:5px 8px;font-weight:700;">ยอดรวมทั้งสิ้น</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;font-size:15pt;">'+fmt2(totalAmount)+'</td></tr>';
-    billHtml += '<tr style="background:#e0f7f4;margin-top:2px;"><td style="padding:5px 8px;font-weight:700;">PV</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;font-size:15pt;">'+fmt0(totalPV)+'</td></tr>';
-    billHtml += '</table></td>';
-    billHtml += '</tr></table>';
-    
-    billHtml += '</div>';
+        if(billRows.length > 0){
+          billRows.forEach(function(item,i){
+            var qty = num(p(item,['Quantity','quantity','Unit','unit'],1));
+            var unitPrice = num(p(item,['PriceperUnit','priceperUnit','UnitPrice','unitPrice','unitprice'],0));
+            var amount = num(p(item,['TotalAmount','totalAmount','TotalPrice','totalPrice','Amount','amount'],qty*unitPrice));
+            var pv = num(p(item,['PV','pv','TotalPV','totalPV'],0));
+            billHtml += '<tr>';
+            billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+(i+1)+'</td>';
+            billHtml += '<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(item,['ProductCode','productCode','ProductID','productID','productId']))+'</td>';
+            billHtml += '<td style="border:1px solid #ccc;padding:3px 5px;">'+esc(p(item,['ProductName','productName']))+'</td>';
+            billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(String(qty))+'</td>';
+            billHtml += '<td style="text-align:center;border:1px solid #ccc;padding:3px 4px;">'+esc(p(item,['Unitname','unitName','UnitName']))+'</td>';
+            billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt2(unitPrice)+'</td>';
+            billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt2(amount)+'</td>';
+            billHtml += '<td style="text-align:right;border:1px solid #ccc;padding:3px 5px;">'+fmt0(pv)+'</td>';
+            billHtml += '</tr>';
+          });
+        }
+
+        billHtml += '</tbody></table>';
+
+        // ── Footer ────────────────────────────────────────────────────
+        billHtml += '<table style="width:100%;border-collapse:collapse;margin-top:6px;"><tr>';
+        billHtml += '<td style="vertical-align:top;width:55%;padding-right:10px;border-right:1px solid #ddd;">';
+        billHtml += '<div><span style="color:#555;">รูปแบบ :</span> '+esc(p(header,['Sendbill','sendbill']))+'</div>';
+
+        var tracking = p(header,['TrackingURL','trackingURL']) || '';
+        billHtml += '<div style="margin-top:3px;"><span style="color:#555;">Tracking number :</span> <span style="border-bottom:1px solid #aaa;display:inline-block;min-width:180px;padding-bottom:1px;">'+(tracking?'<a href="'+esc(tracking)+'" target="_blank" style="color:#1565c0;">'+esc(tracking)+'</a>':'-')+'</span></div>';
+
+        billHtml += '<div style="margin-top:3px;"><span style="color:#555;">หมายเหตุ :</span> '+esc(p(header,['Receive','receive']))+' &nbsp;&nbsp; <span style="color:#555;">วันที่รับ :</span> '+fmtDate(p(header,['Receivedate','receiveDate']))+'</div>';
+        billHtml += '<div style="margin-top:3px;"><span style="color:#555;">ผู้ทำรายการ :</span> '+esc(p(header,['Createby','createby']))+'</div>';
+        billHtml += '<div style="margin-top:3px;"><span style="color:#555;">สถานะ :</span> '+esc(p(header,['BillConfirmType','billConfirmType']))+'</div>';
+        billHtml += '</td>';
+        billHtml += '<td style="vertical-align:top;padding-left:10px;">';
+        billHtml += '<table style="width:100%;border-collapse:collapse;">';
+        billHtml += '<tr><td style="padding:4px 8px;">ค่าส่ง</td><td style="text-align:right;padding:4px 8px;">'+fmt2(p(header,['ShippingFee','shippingFee'],0))+'</td></tr>';
+        billHtml += '<tr style="background:#e0f7f4;"><td style="padding:5px 8px;font-weight:700;">ยอดรวมทั้งสิ้น</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;">'+fmt2(totalAmount)+'</td></tr>';
+        billHtml += '<tr style="background:#e0f7f4;"><td style="padding:5px 8px;font-weight:700;">PV</td><td style="text-align:right;padding:5px 10px;font-weight:700;color:#00796b;">'+fmt0(totalPV)+'</td></tr>';
+        billHtml += '</table></td>';
+        billHtml += '</tr></table>';
+
+        billHtml += '</div>';
+
+
 
     var slips = '';
     for(var i=1;i<=5;i++){
@@ -340,26 +346,78 @@ $(function(){
   loadData();
 
   // Print function - moved to window scope
-  window.printDoc = function(elementId){
-    var el = document.getElementById(elementId);
-    if(!el){alert('ไม่พบเอกสาร');return;}
-    
-    var win = window.open('','_blank','width=950,height=750');
-    if(!win){alert('กรุณาอนุญาตให้เปิด Popup จาก Browser เพื่อพิมพ์/บันทึก PDF');return;}
-    
-    win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>เอกสาร</title>');
-    win.document.write('<style>');
-    win.document.write('body{font-family:"Cordia New","CordiaUPC","TH Sarabun New","Sarabun",Arial,sans-serif;font-size:14pt;margin:0;padding:10px;}');
-    win.document.write('table{border-collapse:collapse;width:100%;}td,th{border:none;padding:2px 5px;vertical-align:top;}');
-    win.document.write('.product-table,.product-table td,.product-table th,.product-table thead tr,.product-table tbody tr{border:1px solid #888 !important;}');
-    win.document.write('@@page{margin:10mm;size:A4;}');
-    win.document.write('</style></head><body>');
-    win.document.write(el.outerHTML);
-    win.document.write('<\/body><\/html>');
-    win.document.close();
-    
-    setTimeout(function(){win.focus();win.print();},500);
-  };
+  // Print function — แก้ไขตาม CSS analysis
+    window.printDoc = function(elementId){
+      var el = document.getElementById(elementId);
+      if(!el){alert('ไม่พบเอกสาร');return;}
+
+      var win = window.open('','_blank','width=950,height=750');
+      if(!win){alert('กรุณาอนุญาตให้เปิด Popup จาก Browser เพื่อพิมพ์/บันทึก PDF');return;}
+
+      win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>พิมพ์ใบสั่งซื้อ<\/title>');
+
+      // ★ แก้ไข: เพิ่ม @@import ฟอนต์โดยตรงในหน้า Print (ไม่พึ่งพาหน้าหลัก)
+      win.document.write('<style>');
+      win.document.write('@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap");');
+      win.document.write('');
+
+      // ★ แก้ไข: บังคับพิมพ์สีพื้นหลังและสีอักษร
+      win.document.write('*, body { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; color-adjust: exact !important; }');
+
+      // ★ แก้ไข: ตั้งค่าหน้ากระดาษ พร้อม padding ป้องกันชิดขอบ
+      win.document.write('@@page { margin: 10mm; size: A4; }');
+      win.document.write('body { background: #fff; margin: 0; padding: 0; font-family: "Sarabun", "Cordia New", "CordiaUPC", "TH Sarabun New", Arial, sans-serif; }');
+
+      // ★ แก้ไข: billDoc padding สำหรับหน้าพิมพ์
+      win.document.write('#billDoc { padding: 0 5mm; }');
+
+      // ★ แก้ไข: บังคับเส้นตารางให้เข้มชัดเจน
+      win.document.write('.product-table { border-collapse: collapse !important; width: 100% !important; }');
+      win.document.write('.product-table th, .product-table td { border: 1px solid #888 !important; }');
+
+      // ★ แก้ไข: ป้องกันแถวตารางถูกตัดกลางหน้ากระดาษ
+      win.document.write('.product-table tr { break-inside: avoid; -webkit-region-break-inside: avoid; }');
+
+      // ★ แก้ไข: Flexbox fallback สำหรับหน้า Print
+      win.document.write('div[style*="display:flex"] { display: flex !important; }');
+
+      win.document.write('<\/style><\/head><body>');
+
+      // ใส่เนื้อหาบิล
+      win.document.write(el.outerHTML);
+      win.document.write('<\/body><\/html>');
+      win.document.close();
+
+      // ★ แก้ไข: ใช้ document.fonts.ready แทน setTimeout 800ms
+      //         รอให้ฟอนต์และรูปภาพโหลดเสร็จจริงๆ ก่อนเปิดหน้า Print
+      var ready = Promise.all([
+        // รอฟอนต์ Sarabun โหลดเสร็จ
+        win.document.fonts ? win.document.fonts.ready : Promise.resolve(),
+        // รอรูปภาพทั้งหมดโหลดเสร็จ
+        Promise.all(
+          Array.from(win.document.images).map(function(img){
+            if(img.complete) return Promise.resolve();
+            return new Promise(function(resolve){
+              img.onload = resolve;
+              img.onerror = resolve; // ไม่ block ถ้ารูปโหลดไม่ได้
+            });
+          })
+        )
+      ]);
+
+      ready.then(function(){
+        win.focus();
+        win.print();
+        // win.close(); // เอาคอมเมนต์ออก ถ้าต้องการให้ปิดอัตโนมัติ
+      });
+
+      // Fallback: ถ้า fonts.ready ไม่ทำงาน (เบราว์เซอร์เก่า) ใช้ timeout
+      setTimeout(function(){
+        win.focus();
+        win.print();
+      }, 2000);
+    };
+
 
   $('#btnPrint').on('click',function(){
     printDoc('billDoc');

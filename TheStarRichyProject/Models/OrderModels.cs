@@ -161,6 +161,7 @@ namespace TheStarRichyProject.Models
         public string Status { get; set; }
         public int SendInvoice { get; set; }
         public string BillNo { get; set; }
+        public int BillType { get; set; }
     }
 
     public class OrderItemInfo

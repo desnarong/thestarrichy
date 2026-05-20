@@ -136,6 +136,20 @@
         border-bottom: 1px solid #eff2f7;
         padding: 8px 0;
     }
+
+    .preview-item img:hover {
+        opacity: 0.8;
+        transition: 0.2s;
+    }
+
+    /* ตกแต่งปุ่มปิดใน Modal รูปภาพ */
+    #imagePreviewModal .btn-close {
+        filter: drop-shadow(0 0 2px rgba(0,0,0,0.5));
+        background-color: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        padding: 10px;
+        z-index: 10;
+    }
 </style>
 
 <div class="container-fluid py-4">
@@ -258,10 +272,14 @@
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script>
+    // ประกาศไว้นอก .ready() เพื่อให้ทุกฟังก์ชันเข้าถึงได้
+    let uploadedFiles = [];
+    let orderID = '';
+    let paymentMethod = '';
+
     $(document).ready(function () {
-        let orderID = '@orderID';
-        let paymentMethod = '@summary?.PaymentMethod';
-        let uploadedFiles = [];
+        orderID = '@orderID';
+        paymentMethod = '@summary?.PaymentMethod';
 
         // --- 1. Init Logic ---
         if (paymentMethod === 'PromptPay') {
@@ -271,7 +289,7 @@
         }
 
         // --- 2. Bank Transfer & Slip Logic ---
-        $('#slipInput').on('change', async function(e) {
+        $('#slipInput').on('change', async function (e) {
             const files = Array.from(e.target.files);
             if (uploadedFiles.length + files.length > 5) {
                 Swal.fire('คำเตือน', 'อัปโหลดได้ไม่เกิน 5 รูป', 'warning');
@@ -285,42 +303,8 @@
             $(this).val('');
         });
 
-        async function resizeImage(file, maxSizeKB) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.src = e.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width, height = img.height;
-                        if (width > 1200) { height *= 1200 / width; width = 1200; }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        let q = 0.9, dataUrl = canvas.toDataURL('image/jpeg', q);
-                        while ((dataUrl.length * 0.75) / 1024 > maxSizeKB && q > 0.1) {
-                            q -= 0.1; dataUrl = canvas.toDataURL('image/jpeg', q);
-                        }
-                        resolve(dataUrl);
-                    };
-                };
-            });
-        }
-
-        function renderPreviews() {
-            const container = $('#slipPreviewContainer');
-            container.empty();
-            uploadedFiles.forEach((src, i) => {
-                container.append(`<div class="preview-item"><button type="button" class="remove-preview" onclick="removeSlip(${i})">×</button><img src="${src}"></div>`);
-            });
-        }
-
-        window.removeSlip = (i) => { uploadedFiles.splice(i, 1); renderPreviews(); };
-
         // ยืนยันการส่งสลิป (Bank Transfer)
-        $('#btnSubmitSlip').click(function() {
+        $('#btnSubmitSlip').click(function () {
             if (uploadedFiles.length === 0) {
                 Swal.fire('กรุณาแนบสลิป', 'ต้องมีหลักฐานการโอนอย่างน้อย 1 รูป', 'warning');
                 return;
@@ -328,19 +312,19 @@
             $('#confirmSubmitModal').modal('show');
         });
 
-        $('#btnConfirmSubmit').click(function() {
+        $('#btnConfirmSubmit').click(function () {
             $('#confirmSubmitModal').modal('hide');
             $('#btnSubmitSlip').prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span> กำลังบันทึก...');
 
             $.ajax({
-                url: '/orders/SubmitBankSlip', // ต้องมี Action นี้ใน Controller
+                url: '/orders/SubmitBankSlip',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify({ orderID: orderID, slips: uploadedFiles }),
-                success: function(res) {
-                    if(res.success) {
+                success: function (res) {
+                    if (res.success) {
                         Swal.fire('สำเร็จ', 'บันทึกสลิปเรียบร้อยแล้ว เจ้าหน้าที่จะตรวจสอบยอดเงินให้คุณ', 'success')
-                        .then(() => window.location.href = '/orders/success?orderID=' + orderID);
+                            .then(() => window.location.href = '/orders/success?orderID=' + orderID);
                     } else {
                         Swal.fire('ผิดพลาด', res.message, 'error');
                         $('#btnSubmitSlip').prop('disabled', false).text('ยืนยันการส่งสลิป');
@@ -349,7 +333,7 @@
             });
         });
 
-        // --- 3. PromptPay Logic (Same as before) ---
+        // --- 3. PromptPay Logic ---
         function createPayment(method) {
             $.ajax({
                 url: '/orders/CreatePayment',
@@ -368,7 +352,7 @@
 
         function startPolling(id) {
             setInterval(() => {
-                $.get('/orders/GetPaymentStatus', { paymentId: id }, function(res) {
+                $.get('/orders/GetPaymentStatus', { paymentId: id }, function (res) {
                     if (res.success && (res.status === 'Success' || res.status === 'Paid')) {
                         window.location.href = '/orders/success?orderID=' + orderID;
                     }
@@ -377,12 +361,79 @@
         }
     });
 
+    // ============================
+    // ฟังก์ชันที่ต้องอยู่นอก .ready() ให้ onclick ใน HTML เรียกได้
+    // ============================
+
+    function resizeImage(file, maxSizeKB) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > 1200) {
+                        height *= 1200 / width;
+                        width = 1200;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    let quality = 0.8;
+                    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+
+                    while ((dataUrl.length * 0.75) / 1024 > maxSizeKB && quality > 0.1) {
+                        quality -= 0.1;
+                        dataUrl = canvas.toDataURL('image/jpeg', quality);
+                    }
+                    resolve(dataUrl);
+                };
+            };
+        });
+    }
+
+    // ✅ renderPreviews ตัวเดียว — มีทั้งปุ่มลบและคลิกดูรูปใหญ่
+    function renderPreviews() {
+        const container = $('#slipPreviewContainer');
+        container.empty();
+        uploadedFiles.forEach((src, i) => {
+            container.append(`
+                <div class="preview-item">
+                    <button type="button" class="remove-preview" onclick="removeSlip(event, ${i})">×</button>
+                    <img src="${src}" onclick="viewFullImage('${src}')" style="cursor:pointer;">
+                </div>
+            `);
+        });
+    }
+
+    // ✅ ลบรูป — ใช้ event.stopPropagation() ไม่ให้ชนกับ viewFullImage
+    window.removeSlip = function (event, i) {
+        event.stopPropagation();
+        uploadedFiles.splice(i, 1);
+        renderPreviews();
+    };
+
+    // ✅ ดูรูปใหญ่ใน Modal
+    window.viewFullImage = function (src) {
+        $('#fullPreviewImage').attr('src', src);
+        new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();
+    };
+
     function copyAccNumber() {
         navigator.clipboard.writeText("@paymentBank?.AccountNumber").then(() => {
             Swal.fire({ title: 'คัดลอกแล้ว', icon: 'success', timer: 800, showConfirmButton: false });
         });
     }
 </script>
+
 
 <!-- Confirmation Modal -->
 <div class="modal fade" id="confirmSubmitModal" tabindex="-1" aria-labelledby="confirmSubmitModalLabel" aria-hidden="true">
@@ -404,6 +455,19 @@
         </div>
     </div>
 </div>
+
+<!-- Full Image Preview Modal -->
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0">
+            <div class="modal-body p-0 text-center position-relative">
+                <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+                <img src="" id="fullPreviewImage" class="img-fluid rounded shadow-lg" style="max-height: 90vh;">
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
     <!-- App js -->
     <script src="~/assets/js/app.js"></script>

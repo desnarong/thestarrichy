@@ -49,6 +49,13 @@
                 min-width: 120px;
             }
     }
+
+    @@media (min-width: 768px) {
+        .full-action-bar .btn {
+            min-width: 140px; /* ปรับตัวเลขนี้ตามความเหมาะสม */
+            justify-content: center;
+        }
+    }
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
 <link href="~/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" />
@@ -360,18 +367,32 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="full-action-bar d-print-none">
-                                <div class="container-fluid d-flex justify-content-end align-items-center">
-                                    <div class="d-flex gap-2">
-                                        <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
-                                            <i class="fas fa-home me-2"></i><span data-key="t-back-to-home">กลับหน้าแรก</span>
-                                        </a>
-                                        <button type="button" id="btnResetSimple" class="btn btn-outline-danger btn-lg">
-                                            <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
-                                        </button>
-                                        <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg" onclick="$('#simpleRegistrationForm').submit();">
-                                            <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
-                                        </button>
+                            <div class="full-action-bar d-print-none py-3">
+                                <div class="container-fluid">
+                                    <!-- ใช้ row เพื่อควบคุม Grid -->
+                                    <div class="row g-2 justify-content-md-end">
+            
+                                        <!-- ปุ่มที่ 1: ลงทะเบียน (เต็มแถวบนมือถือ col-12, ขนาดปกติในคอม col-md-auto) -->
+                                        <div class="col-12 col-md-auto order-md-3">
+                                            <button type="button" id="btnSubmitSimple" class="btn btn-primary btn-lg w-100" style="min-width: 140px;" onclick="$('#simpleRegistrationForm').submit();">
+                                                <i class="fas fa-save me-2"></i><span>ลงทะเบียน</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- ปุ่มที่ 2: ยกเลิก (ครึ่งแถวบนมือถือ col-6, ขนาดปกติในคอม col-md-auto) -->
+                                        <div class="col-6 col-md-auto order-md-2">
+                                            <button type="button" id="btnResetSimple" class="btn btn-outline-danger btn-lg w-100" style="min-width: 140px;">
+                                                <i class="fas fa-times me-2"></i><span>ยกเลิก</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- ปุ่มที่ 3: กลับหน้าหลัก (ครึ่งแถวบนมือถือ col-6, ขนาดปกติในคอม col-md-auto) -->
+                                        <div class="col-6 col-md-auto order-md-1">
+                                            <a href="/Home/Index" class="btn btn-outline-secondary btn-lg w-100" style="min-width: 140px;">
+                                                <i class="fas fa-home me-2"></i><span>กลับหน้าหลัก</span>
+                                            </a>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -821,18 +842,31 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="full-action-bar d-print-none">
-                                <div class="container-fluid d-flex justify-content-end align-items-center">
-                                    <div class="d-flex gap-2">
-                                        <a href="/Home/Index" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
-                                            <i class="fas fa-home me-2"></i><span data-key="t-back-to-home">กลับหน้าแรก</span>
-                                        </a>
-                                        <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg">
-                                            <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
-                                        </button>
-                                        <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg">
-                                            <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
-                                        </button>
+                            <div class="full-action-bar d-print-none py-3">
+                                <div class="container-fluid">
+                                    <!-- ใช้ row g-2 เพื่อให้มีระยะห่างระหว่างปุ่ม และชิดขวาในหน้าจอคอม (md) -->
+                                    <div class="row g-2 justify-content-md-end">
+            
+                                        <!-- 1. ปุ่มลงทะเบียน (ปุ่มหลัก): เต็มแถวบนมือถือ / อยู่อันดับสุดท้าย(ขวาสุด) ในคอม -->
+                                        <div class="col-12 col-md-auto order-md-3">
+                                            <button type="button" id="btnSaveFullSticky" class="btn btn-primary btn-lg w-100" style="min-width: 140px;">
+                                                <i class="fas fa-save me-2"></i><span data-key="t-register">ลงทะเบียน</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- 2. ปุ่มยกเลิก: ครึ่งแถวบนมือถือ / อยู่อันดับกลางในคอม -->
+                                        <div class="col-6 col-md-auto order-md-2">
+                                            <button type="button" id="btnCancelFullSticky" class="btn btn-outline-danger btn-lg w-100" style="min-width: 140px;">
+                                                <i class="fas fa-times me-2"></i><span data-key="t-cancel">ยกเลิก</span>
+                                            </button>
+                                        </div>
+
+                                        <!-- 3. ปุ่มกลับหน้าแรก: ครึ่งแถวบนมือถือ / อยู่อันดับแรก(ซ้ายสุด) ในคอม -->
+                                        <div class="col-6 col-md-auto order-md-1">
+                                            <a href="/Home/Index" class="btn btn-outline-secondary btn-lg w-100 d-flex align-items-center justify-content-center" style="min-width: 140px; height: 100%;">
+                                                <i class="fas fa-home me-2"></i><span data-key="t-back-to-home">กลับหน้าแรก</span>
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1791,6 +1825,47 @@
             }
         });
 
+        function escapeHtml(value) {
+            return $('<div>').text(value || '-').html();
+        }
+
+        function getPositionLabel(positionValue) {
+            if (positionValue === 'left') return 'ซ้ายสุด';
+            if (positionValue === 'right') return 'ขวาสุด';
+            return '-';
+        }
+
+        async function showRegisterConfirmPopup(summary) {
+            const referrerCode = summary.referrerCode || '-';
+            const referrerName = summary.referrerName || '-';
+            const positionLabel = getPositionLabel(summary.position);
+
+            const result = await Swal.fire({
+                title: 'ยืนยันการสมัคร',
+                icon: 'warning',
+                html: `
+                    <div class="text-start lh-base">
+                        <div><strong>ผู้แนะนำ :</strong> ${escapeHtml(referrerCode)} <strong class="ms-2">ชื่อ :</strong> ${escapeHtml(referrerName)}</div>
+                        <div><strong>สมัครฝั่ง :</strong> ${escapeHtml(positionLabel)}</div>
+                        <div><strong>ชื่อภาษาไทย :</strong> ${escapeHtml(summary.thaiName)}</div>
+                        <div><strong>ชื่อภาษาอังกฤษ :</strong> ${escapeHtml(summary.englishName)}</div>
+                        <div><strong>เลขที่บัตรประชาชน/Passport :</strong> ${escapeHtml(summary.documentNumber)}</div>
+                        <div><strong>เบอร์โทร :</strong> ${escapeHtml(summary.mobile)}</div>
+                        <hr class="my-2" />
+                        <div class="text-danger fw-semibold">*** กรุณาตรวจสอบสายงาน Upline, ผู้แนะนำ และข้อมูลต่างๆ ให้เรียบร้อยก่อนทำการบันทึก</div>
+                        <div class="text-danger fw-semibold">ทางบริษัทไม่สามารถทำการโอนย้ายสายงานได้</div>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: 'ยืนยันการบันทึก',
+                cancelButtonText: 'ยกเลิก',
+                reverseButtons: true,
+                focusCancel: true
+            });
+
+            return result.isConfirmed;
+        }
+
         // Simple form submission
         $('#simpleRegistrationForm').submit(async function (e) {
             e.preventDefault();
@@ -1897,6 +1972,20 @@
             console.log("ฟอร์มผ่านหรือไม่: ", isValid);
 
             if (isValid) {
+                const isConfirmed = await showRegisterConfirmPopup({
+                    referrerCode: $('#simpleReferrerCode').val(),
+                    referrerName: $('#simpleReferrerName').val(),
+                    position: $('input[name="position"]:checked').val(),
+                    thaiName: $('#simpleFullName').val(),
+                    englishName: $('#simpleBusinessName').val(),
+                    documentNumber: $('#simpleDocumentNumber').val(),
+                    mobile: $('#simpleMobile').val()
+                });
+
+                if (!isConfirmed) {
+                    return;
+                }
+
                 Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
                 // Construct birth date from dropdowns (format: dd-MM-yyyy, CE year)
@@ -2088,6 +2177,20 @@
                     firstError.focus();
                 }
                 toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
+                return;
+            }
+
+            const isConfirmed = await showRegisterConfirmPopup({
+                referrerCode: $('#fullReferrerCode').val(),
+                referrerName: $('#fullReferrerName').val(),
+                position: $('input[name="position"]:checked').val(),
+                thaiName: $('#fullNameOnCard').val(),
+                englishName: $('#fullBusinessName').val(),
+                documentNumber: $('#fullDocumentNumber').val(),
+                mobile: $('#fullMobile').val()
+            });
+
+            if (!isConfirmed) {
                 return;
             }
 

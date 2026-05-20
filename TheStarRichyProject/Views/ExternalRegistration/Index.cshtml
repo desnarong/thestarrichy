@@ -338,18 +338,32 @@
                                 </div>
                             </div>
 
-                            <div class="row mt-4">
+                            <div class="row mt-4 d-print-none">
                                 <div class="col-12">
-                                    <div class="d-flex flex-column flex-md-row justify-content-end gap-3">
-                                        <a href="/" class="btn btn-outline-secondary w-100 w-md-auto" style="align-content: center;">
-                                            <i class="fas fa-home me-2"></i>กลับหน้าแรก
-                                        </a>
-                                        <button type="button" class="btn btn-outline-secondary w-100 w-md-auto" id="btnResetSimple">
-                                            <i class="fas fa-redo me-2"></i>ล้างข้อมูล
-                                        </button>
-                                        <button type="submit" class="btn btn-primary btn-lg w-100 w-md-auto" id="btnSubmitSimple">
-                                            <i class="fas fa-user-plus me-2"></i>ลงทะเบียนทันที
-                                        </button>
+                                    <!-- ใช้ row g-2 เพื่อคุมระยะห่าง และ justify-content-md-end เพื่อชิดขวาในคอม -->
+                                    <div class="row g-2 justify-content-md-end align-items-center">
+            
+                                        <!-- 1. ปุ่มลงทะเบียนทันที (ปุ่มหลัก): เต็มแถวบนมือถือ / ขวาสุดในคอม -->
+                                        <div class="col-12 col-md-auto order-md-3">
+                                            <button type="submit" id="btnSubmitSimple" class="btn btn-primary btn-lg w-100" style="min-width: 160px;">
+                                                <i class="fas fa-user-plus me-2"></i>ลงทะเบียนทันที
+                                            </button>
+                                        </div>
+
+                                        <!-- 2. ปุ่มล้างข้อมูล: ครึ่งแถวบนมือถือ / ตรงกลางในคอม -->
+                                        <div class="col-6 col-md-auto order-md-2">
+                                            <button type="button" id="btnResetSimple" class="btn btn-outline-secondary btn-lg w-100" style="min-width: 140px;">
+                                                <i class="fas fa-redo me-2"></i>ล้างข้อมูล
+                                            </button>
+                                        </div>
+
+                                        <!-- 3. ปุ่มกลับหน้าแรก: ครึ่งแถวบนมือถือ / ซ้ายสุดในคอม -->
+                                        <div class="col-6 col-md-auto order-md-1">
+                                            <a href="/" class="btn btn-outline-secondary btn-lg w-100 d-flex align-items-center justify-content-center" style="min-width: 140px; height: 100%;">
+                                                <i class="fas fa-home me-2"></i>กลับหน้าแรก
+                                            </a>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -948,6 +962,47 @@
                 $('#simpleTambonId').val(match ? match.id : '');
             });
 
+            function escapeHtml(value) {
+                return $('<div>').text(value || '-').html();
+            }
+
+            function getPositionLabel(positionValue) {
+                if (positionValue === 'left') return 'ซ้ายสุด';
+                if (positionValue === 'right') return 'ขวาสุด';
+                return '-';
+            }
+
+            async function showRegisterConfirmPopup(summary) {
+                const referrerCode = summary.referrerCode || '-';
+                const referrerName = summary.referrerName || '-';
+                const positionLabel = getPositionLabel(summary.position);
+
+                const result = await Swal.fire({
+                    title: 'ยืนยันการสมัคร',
+                    icon: 'warning',
+                    html: `
+                        <div class="text-start lh-base">
+                            <div><strong>ผู้แนะนำ :</strong> ${escapeHtml(referrerCode)} <strong class="ms-2">ชื่อ :</strong> ${escapeHtml(referrerName)}</div>
+                            <div><strong>สมัครฝั่ง :</strong> ${escapeHtml(positionLabel)}</div>
+                            <div><strong>ชื่อภาษาไทย :</strong> ${escapeHtml(summary.thaiName)}</div>
+                            <div><strong>ชื่อภาษาอังกฤษ :</strong> ${escapeHtml(summary.englishName)}</div>
+                            <div><strong>เลขที่บัตรประชาชน/Passport :</strong> ${escapeHtml(summary.documentNumber)}</div>
+                            <div><strong>เบอร์โทร :</strong> ${escapeHtml(summary.mobile)}</div>
+                            <hr class="my-2" />
+                            <div class="text-danger fw-semibold">*** กรุณาตรวจสอบสายงาน Upline, ผู้แนะนำ และข้อมูลต่างๆ ให้เรียบร้อยก่อนทำการบันทึก</div>
+                            <div class="text-danger fw-semibold">ทางบริษัทไม่สามารถทำการโอนย้ายสายงานได้</div>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'ยืนยันการบันทึก',
+                    cancelButtonText: 'ยกเลิก',
+                    reverseButtons: true,
+                    focusCancel: true
+                });
+
+                return result.isConfirmed;
+            }
+
             // 5. Simple form submission
             $('#simpleRegistrationForm').submit(async function (e) {
                 e.preventDefault();
@@ -1055,7 +1110,21 @@
                 if (!validateLineId()) { isValid = false; }
 
                 if (isValid) {
-                    performValidationAndRegister(); // ย้ายการทำงานไปที่ฟังก์ชันนี้เพื่อความสะอาด
+                    const isConfirmed = await showRegisterConfirmPopup({
+                        referrerCode: $('#referrerCode').val(),
+                        referrerName: $('#referrerName').val(),
+                        position: $('input[name="position"]:checked').val(),
+                        thaiName: $('#idCardName').val(),
+                        englishName: $('#businessName').val(),
+                        documentNumber: $('#documentNumber').val(),
+                        mobile: $('#mobile').val()
+                    });
+
+                    if (!isConfirmed) {
+                        return;
+                    }
+
+                    await performValidationAndRegister(); // ย้ายการทำงานไปที่ฟังก์ชันนี้เพื่อความสะอาด
                 } else {
                     const firstError = $('.is-invalid, .validation-error').first();
                     if (firstError.length > 0) {

@@ -143,10 +143,7 @@ namespace TheStarRichyApi.Services
                     //string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
 
-                    string query = "SELECT  BillNo,BillDate,Membercode,Membername,ReferenceNo,HybridGOLDID,ExpireDate ";
-                    query += "  ,TotalPV,TotalAmount,BillConfirmType,Createby,Receive,ReceiveDate,PaymentType ";
-                    query += "  ,TrackingURL,Slip1,Slip2,Slip3,Slip4,Slip5,Billtype,BillReceiveType,DeliveryAddress";
-                    query += " FROM [000_Member_PO_Order_for_mobile]  (nolock) ";
+                    string query = "SELECT * FROM [000_Member_PO_Order_for_mobile]  (nolock) ";
                     query += " where Createby = @Membercode or HybridGOLDID= @Membercode or Membercode= @Membercode   ";
 
                     query += " ORDER BY Create_date desc,BillNo desc  ";

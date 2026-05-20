@@ -311,8 +311,7 @@
         var fromDate=pick(rows,['FromDate','fromDate']);
         var toDate=pick(rows,['ToDate','toDate']);
         var calcMonth=pick(rows,['CalcMonth1','calcMonth1','CalcMonth','calcMonth']);
-        // ใช้ fmt0 สำหรับรอบการจ่าย, fmt2 สำหรับรายวันและรายเดือน
-        var num=rtype==='period'?fmt0(val):fmt2(val);
+        var num=fmt2(val);
         // SpecialBonus และ TotalBonus - ไม่มีลิงค์
         if(bt.key==='SpecialBonus'||bt.key==='TotalBonus'){
           return num;
@@ -341,20 +340,26 @@
           });
 
           // ฟังก์ชันตัวช่วยสำหรับ Render วันที่ให้รองรับการ Sort
-          function renderDateSortable(fields) {
-            return function(d, type) {
-              var rawDate = pick(d, fields);
+      function renderDateSortable(fields) {
+          return function(d, type) {
+            var rawDate = pick(d, fields);
 
-              // รองรับ DataTables ทั้ง v1.x (sort) และ v2.x (order)
-              if (type === 'sort' || type === 'order' || type === 'type') {
-                if (!rawDate) return 0;
-                var dateObj = new Date(rawDate);
-                return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
-              }
+            // ตรวจสอบว่าถ้า rawDate เป็น object (เช่น {}) ให้ถือว่าเป็นค่าว่าง
+            if (typeof rawDate === 'object' && rawDate !== null) {
+              rawDate = '';
+            }
+            
+            // รองรับ DataTables ทั้ง v1.x (sort) และ v2.x (order)
+            if (type === 'sort' || type === 'order' || type === 'type') {
+              if (!rawDate) return 0;
+              var dateObj = new Date(rawDate);
+              return isNaN(dateObj.getTime()) ? 0 : dateObj.getTime();
+            }
 
-              return fmtDate(rawDate);
-            };
-          }
+            // ถ้า rawDate เป็น null/undefined จากการดักข้างบน fmtDate จะแสดงเป็นค่าว่างให้เอง
+            return fmtDate(rawDate);
+          };
+        }
 
           if (rtype === 'monthly') {
             return [
@@ -470,11 +475,11 @@
 
       var DETAIL_URL_MAP={sponser:'sponser',rebate:'rebate',binary:'binary',matching:'matching',mobile:'mobile'};
       var DETAIL_COLS={
-        sponser:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['DLCode','dlCode','Membercode','memberCode'],renderPrefix:'G'},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['CalculateDate','calculateDate','BillDate','billDate'],dt:true}],
-        rebate:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['CalculateDate','calculateDate','BillDate','billDate'],dt:true}],
+        sponser:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['DLCode','dlCode','Membercode','memberCode'],renderPrefix:'G'},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
+        rebate:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
         binary:[{title:'วันที่',k:['CalculateDate','calculateDate'],dt:true},{title:'คะแนนซ้าย',k:['LeftPV','leftPV'],num:true,fmt:'fmt0'},{title:'คะแนนขวา',k:['RightPV','rightPV'],num:true,fmt:'fmt0'},{title:'ตัดซ้าย',k:['CalcLeftPV','calcLeftPV'],num:true,fmt:'fmt0'},{title:'ตัดขวา',k:['CalcRightPV','calcRightPV'],num:true,fmt:'fmt0'},{title:'% คำนวณ Weak',k:['weak','Weak'],num:true,fmt:'fmt0'},{title:'% คำนวณ Strong',k:['strong','Strong'],num:true,fmt:'fmt0'},{title:'รายได้ Weak',k:['TMBBonus','tmbBonus'],num:true,fmt:'fmt2'},{title:'รายได้ Strong',k:['StrongBonus','strongBonus'],num:true,fmt:'fmt2'},{title:'รายได้ Binary',k:['BinaryBonus','binaryBonus'],num:true,fmt:'fmt2'}],
         matching:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'รายได้',k:['Income','income'],num:true,fmt:'fmt2'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'แมทชิ่งโบนัส',k:['Amount','amount'],num:true,fmt:'fmt2'}],
-        mobile:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNo','billNo','BillNO']},{title:'วันที่',k:['CalculateDate','calculateDate','BillDate','billDate'],dt:true}],
+        mobile:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNo','billNo','BillNO']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
         period:[{title:'จากวันที่',k:['FromDate','fromDate'],dt:true},{title:'ถึงวันที่',k:['ToDate','toDate'],dt:true},{title:'รอบการจ่าย',k:['PaymentDate','paymentDate'],dt:true},{title:'ประเภท',k:['TypeofBonus','typeofBonus','BonusType','bonusType']},{title:'ค่าดำเนินการ',k:['ServicePrice','servicePrice'],num:true,fmt:'fmt2'},{title:'โบนัสหลังหัก',k:['TotalBonusAfterExpense','totalBonusAfterExpense'],num:true,fmt:'fmt2'},{title:'ภาษี',k:['Tax','tax'],num:true,fmt:'fmt2'},{title:'โบนัสรวมภาษี',k:['TotalBonusIncudeTax','totalBonusIncudeTax'],num:true,fmt:'fmt2'},{title:'ภาษีหัก ณ ที่จ่าย',k:['WithHoldingTax','withHoldingTax'],num:true,fmt:'fmt2'},{title:'โบนัสสุทธิ',k:['NetBonus','netBonus'],num:true,fmt:'fmt2'}]
       };
 
@@ -616,8 +621,8 @@
         if(calcMonth){
           var dateRange=parseCalcMonthToDates(calcMonth);
           if(dateRange){
-            apiFromDate=dateRange.from;
-            apiToDate=dateRange.to;
+            apiFromDate=dateRange.from.split('T')[0];
+            apiToDate=dateRange.to.split('T')[0];
           }
         }
 
