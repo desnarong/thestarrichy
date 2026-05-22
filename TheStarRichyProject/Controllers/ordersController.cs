@@ -1289,11 +1289,7 @@ namespace TheStarRichyProject.Controllers
 
                 if (centers != null)
                 {
-                    return Json(new
-                    {
-                        success = true,
-                        data = centers
-                    });
+                    return Json(centers);
                 }
 
                 return Json(new

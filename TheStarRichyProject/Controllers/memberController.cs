@@ -618,7 +618,7 @@ namespace TheStarRichyProject.Controllers
                                     continue;
                                 }
 
-                                newPathsArray.Add($"/Images/Memberpicture/{fileName}");
+                                newPathsArray.Add($"Images/Memberpicture/{fileName}");
                             }
                             catch (Exception ex)
                             {

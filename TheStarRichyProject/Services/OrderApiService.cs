@@ -352,7 +352,7 @@ namespace TheStarRichyProject.Services
             try
             {
                 var client = CreateClient();
-                var request = new RestRequest($"/Product/findcenter/{centercode}", Method.Get);
+                var request = new RestRequest($"/Product/findcenter?centerCode={centercode}", Method.Get);
                 request.AddHeader("Authorization", $"Bearer {token}");
                 request.AddHeader("X-Passkey", passkey);
 

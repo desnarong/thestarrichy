@@ -60,16 +60,19 @@
                         $tbody.html('<tr><td colspan="3" class="text-center text-muted py-3">ไม่พบข้อมูลเอกสาร</td></tr>');
                         return;
                     }
-
                     rows.forEach(function(r){
-                        var num = esc(r.Num || '');
-                        var desc = esc(r.Filedescription || '');
-                        var fileName = esc(r.Filelocationname || '');
+                        var num = esc(r.num || '');
+                        var desc = esc(r.filedescription || '');
+                        var fileUrl = esc(r.filelocationname || '');
 
                         $tbody.append('<tr>' +
-                            '<td class="text-center fw-semibold">' + num + '</td>' +
-                            '<td>' + desc + '</td>' +
-                            '<td>' + fileName + '</td>' +
+                        '<td class="text-center fw-semibold">' + num + '</td>' +
+                        '<td>' + desc + '</td>' +
+                        '<td class="text-center">' +
+                        '<a href="' + fileUrl + '" target="_blank" style="color: #dc3545; font-size: 1.5rem;" title="' + desc + '">' +
+                        '<i class="bx bxs-file-pdf"></i>' +
+                        '</a>' +
+                        '</td>' +
                         '</tr>');
                     });
 

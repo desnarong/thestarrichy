@@ -1255,8 +1255,8 @@
                         if (response.success && response.data) {
                             // ⭐ บันทึก Center
                             selectedCenter = {
-                                centerCode: response.data.dlCode || memberCode,
-                                centerName: response.data.dlName || '-'
+                                centerCode: response.data.centerID || memberCode,
+                                centerName: response.data.centerName || '-'
                             };
                             sessionStorage.setItem('selectedCenter', JSON.stringify(selectedCenter));
 

@@ -706,7 +706,7 @@ namespace TheStarRichyProject.Controllers
                                 }
 
                                 // เก็บ Path ลง Array ใหม่
-                                newPathsArray.Add($"/Images/Memberpicture/{fileName}");
+                                newPathsArray.Add($"Images/Memberpicture/{fileName}");
                                 
                                 // Log สำหรับ debugging
                                 _logger.LogInformation("Saved image: {FileName} for document {DocNumber}", fileName, docNumber);
