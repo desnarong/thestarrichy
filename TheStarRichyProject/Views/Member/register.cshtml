@@ -922,1352 +922,1003 @@
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
-    // ==========================================
-    // GLOBAL VALIDATION FUNCTIONS (Moved outside document.ready to fix ReferenceError)
-    // ==========================================
-    function validateSimpleFullName() {
-        const val = ($('#simpleFullName').val() || "").trim();
-        const errorTarget = $('#simpleIdCardNameValidation');
-        if (!val) {
-            errorTarget.text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
-            return false;
-        }
-        if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
-            errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
-            return false;
-        }
-        if (val.length < 2 || val.length > 100) {
-            errorTarget.text('ชื่อต้องมีความยาว 2-100 ตัวอักษร').addClass('validation-error');
-            return false;
-        }
-        errorTarget.text('').removeClass('validation-error');
+// ==========================================
+// GLOBAL VALIDATION FUNCTIONS (Moved outside document.ready to fix ReferenceError)
+// ==========================================
+function validateSimpleFullName() {
+    const val = ($('#simpleFullName').val() || "").trim();
+    const errorTarget = $('#simpleIdCardNameValidation');
+    if (!val) {
+        errorTarget.text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
+        return false;
+    }
+    if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
+        errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
+        return false;
+    }
+    if (val.length < 2 || val.length > 100) {
+        errorTarget.text('ชื่อต้องมีความยาว 2-100 ตัวอักษร').addClass('validation-error');
+        return false;
+    }
+    errorTarget.text('').removeClass('validation-error');
+    return true;
+}
+
+function validateSimpleBusinessName() {
+    const val = ($('#simpleBusinessName').val() || "").trim();
+    if (!val) {
+        $('#simpleBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
+        return false;
+    }
+    if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
+        $('#simpleBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
+        return false;
+    }
+    $('#simpleBusinessNameValidation').text('').removeClass('validation-error');
+    return true;
+}
+
+function validateSimpleMobile() {
+    const val = ($('#simpleMobile').val() || "").trim();
+    if (!val) {
+        $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
+        return false;
+    }
+    if (!/^0\d{9}$/.test(val)) {
+        $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
+        return false;
+    }
+    $('#mobileValidation').text('').removeClass('validation-error');
+    return true;
+}
+
+function validateFullNameOnCard() {
+    const val = ($('#fullNameOnCard').val() || "").trim();
+    if (!val) {
+        $('#fullNameOnCardValidation').text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
+        return false;
+    }
+    if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
+        $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
+        return false;
+    }
+    $('#fullNameOnCardValidation').text('').removeClass('validation-error');
+    return true;
+}
+
+function validateFullBusinessName() {
+    const val = ($('#fullBusinessName').val() || "").trim();
+    if (!val) {
+        $('#fullBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
+        return false;
+    }
+    if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
+        $('#fullBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
+        return false;
+    }
+    $('#fullBusinessNameValidation').text('').removeClass('validation-error');
+    return true;
+}
+
+function validateFullMobile() {
+    const val = ($('#fullMobile').val() || "").trim();
+    if (!val) {
+        $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
+        return false;
+    }
+    if (!/^0\d{9}$/.test(val)) {
+        $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
+        return false;
+    }
+    $('#fullMobileValidation').text('').removeClass('validation-error');
+    return true;
+}
+
+function validateSimpleEmail() {
+    const email = ($('#simpleEmail').val() || "").trim();
+    const validationEl = $('#emailValidation');
+    const inputEl = $('#simpleEmail');
+    
+    inputEl.removeClass('is-invalid');
+    validationEl.text('').removeClass('validation-error');
+    
+    if (!email) {
         return true;
     }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+        inputEl.addClass('is-invalid');
+        validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
+        return false;
+    }
+    return true;
+}
 
-    function validateSimpleBusinessName() {
-        const val = ($('#simpleBusinessName').val() || "").trim();
-        if (!val) {
-            $('#simpleBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
-            return false;
-        }
-        if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
-            $('#simpleBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
-            return false;
-        }
-        $('#simpleBusinessNameValidation').text('').removeClass('validation-error');
+function validateFullEmail() {
+    const email = ($('#fullEmail').val() || "").trim();
+    const validationEl = $('#fullEmailValidation');
+    const inputEl = $('#fullEmail');
+    
+    inputEl.removeClass('is-invalid');
+    validationEl.text('').removeClass('validation-error');
+    
+    if (!email) {
         return true;
     }
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+        inputEl.addClass('is-invalid');
+        validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
+        return false;
+    }
+    return true;
+}
 
-    function validateSimpleMobile() {
-        const val = ($('#simpleMobile').val() || "").trim();
-        if (!val) {
-            $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
-            return false;
-        }
-        if (!/^0\d{9}$/.test(val)) {
-            $('#mobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
-            return false;
-        }
-        $('#mobileValidation').text('').removeClass('validation-error');
+function validateSimpleLineId() {
+    const lineId = ($('#simpleLineId').val() || "").trim();
+    const validationEl = $('#lineIdValidation');
+    const inputEl = $('#simpleLineId');
+    
+    inputEl.removeClass('is-invalid');
+    validationEl.text('').removeClass('validation-error');
+    
+    if (!lineId) {
         return true;
     }
+    const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
+    if (!lineIdRegex.test(lineId)) {
+        inputEl.addClass('is-invalid');
+        validationEl.text('Line ID สามารถใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และเครื่องหมาย _ . - เท่านั้น').addClass('validation-error');
+        return false;
+    }
+    if (lineId.length < 4 || lineId.length > 20) {
+        inputEl.addClass('is-invalid');
+        validationEl.text('Line ID ต้องมีความยาว 4-20 ตัวอักษร').addClass('validation-error');
+        return false;
+    }
+    return true;
+}
 
-    function validateFullNameOnCard() {
-        const val = ($('#fullNameOnCard').val() || "").trim();
-        if (!val) {
-            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อบนบัตร').addClass('validation-error');
-            return false;
-        }
-        if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
-            // แนะนำให้ปรับข้อความแจ้งเตือนด้วย เพื่อให้ผู้ใช้รู้ว่าใส่ตัวเลขได้แล้ว
-            $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
-            return false;
-        }
-        $('#fullNameOnCardValidation').text('').removeClass('validation-error');
+function validateFullLineId() {
+    const lineId = ($('#fullLineId').val() || "").trim();
+    const inputEl = $('#fullLineId');
+    
+    inputEl.removeClass('is-invalid');
+    
+    if (!lineId) {
         return true;
     }
-
-    function validateFullBusinessName() {
-        const val = ($('#fullBusinessName').val() || "").trim();
-        if (!val) {
-            $('#fullBusinessNameValidation').text('กรุณากรอกชื่อธุรกิจ').addClass('validation-error');
-            return false;
-        }
-        if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(val)) {
-            $('#fullBusinessNameValidation').text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
-            return false;
-        }
-        $('#fullBusinessNameValidation').text('').removeClass('validation-error');
-        return true;
+    const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
+    if (!lineIdRegex.test(lineId)) {
+        inputEl.addClass('is-invalid');
+        return false;
     }
-
-    function validateFullMobile() {
-        const val = ($('#fullMobile').val() || "").trim();
-        if (!val) {
-            $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ').addClass('validation-error');
-            return false;
-        }
-        if (!/^0\d{9}$/.test(val)) {
-            $('#fullMobileValidation').text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
-            return false;
-        }
-        $('#fullMobileValidation').text('').removeClass('validation-error');
-        return true;
+    if (lineId.length < 4 || lineId.length > 20) {
+        inputEl.addClass('is-invalid');
+        return false;
     }
+    return true;
+}
 
-    function validateSimpleEmail() {
-        const email = ($('#simpleEmail').val() || "").trim();
-        const validationEl = $('#emailValidation');
-        const inputEl = $('#simpleEmail');
-        
-        inputEl.removeClass('is-invalid');
-        validationEl.text('').removeClass('validation-error');
-        
-        if (!email) {
-            return true;
-        }
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(email)) {
-            inputEl.addClass('is-invalid');
-            validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
-            return false;
-        }
-        return true;
+function validateThaiID(id) {
+    if (!id || id.length !== 13) return false;
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+        sum += parseInt(id.charAt(i)) * (13 - i);
     }
+    let checkDigit = (11 - (sum % 11)) % 10;
+    return checkDigit === parseInt(id.charAt(12));
+}
 
-    function validateFullEmail() {
-        const email = ($('#fullEmail').val() || "").trim();
-        const validationEl = $('#fullEmailValidation');
-        const inputEl = $('#fullEmail');
-        
-        inputEl.removeClass('is-invalid');
-        validationEl.text('').removeClass('validation-error');
-        
-        if (!email) {
-            return true;
-        }
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        if (!emailRegex.test(email)) {
-            inputEl.addClass('is-invalid');
-            validationEl.text('รูปแบบอีเมลไม่ถูกต้อง (เช่น user@example.com)').addClass('validation-error');
-            return false;
-        }
-        return true;
-    }
+// ==========================================
+// IP ADDRESS FUNCTIONS
+// ==========================================
+let clientIpAddress = '0';
 
-    function validateSimpleLineId() {
-        const lineId = ($('#simpleLineId').val() || "").trim();
-        const validationEl = $('#lineIdValidation');
-        const inputEl = $('#simpleLineId');
-        
-        inputEl.removeClass('is-invalid');
-        validationEl.text('').removeClass('validation-error');
-        
-        if (!lineId) {
-            return true;
-        }
-        // Line ID validation: allow alphanumeric, underscores, dots, hyphens
-        const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
-        if (!lineIdRegex.test(lineId)) {
-            inputEl.addClass('is-invalid');
-            validationEl.text('Line ID สามารถใช้ได้เฉพาะตัวอักษรภาษาอังกฤษ ตัวเลข และเครื่องหมาย _ . - เท่านั้น').addClass('validation-error');
-            return false;
-        }
-        if (lineId.length < 4 || lineId.length > 20) {
-            inputEl.addClass('is-invalid');
-            validationEl.text('Line ID ต้องมีความยาว 4-20 ตัวอักษร').addClass('validation-error');
-            return false;
-        }
-        return true;
-    }
-
-    function validateFullLineId() {
-        const lineId = ($('#fullLineId').val() || "").trim();
-        const inputEl = $('#fullLineId');
-        
-        inputEl.removeClass('is-invalid');
-        
-        if (!lineId) {
-            return true;
-        }
-        // Line ID validation: allow alphanumeric, underscores, dots, hyphens
-        const lineIdRegex = /^[a-zA-Z0-9_.-]+$/;
-        if (!lineIdRegex.test(lineId)) {
-            inputEl.addClass('is-invalid');
-            return false;
-        }
-        if (lineId.length < 4 || lineId.length > 20) {
-            inputEl.addClass('is-invalid');
-            return false;
-        }
-        return true;
-    }
-
-    function validateThaiID(id) {
-        if (!id || id.length !== 13) return false;
-        let sum = 0;
-        for (let i = 0; i < 12; i++) {
-            sum += parseInt(id.charAt(i)) * (13 - i);
-        }
-        let checkDigit = (11 - (sum % 11)) % 10;
-        return checkDigit === parseInt(id.charAt(12));
-    }
-
-    // ==========================================
-    // IP ADDRESS FUNCTIONS
-    // ==========================================
-    let clientIpAddress = '0'; // Default value
-
-    async function getClientIP() {
+async function getClientIP() {
+    try {
         try {
-            // First try to get IP from server-side endpoint (most accurate)
+            const response = await fetch('/ExternalRegistration/GetClientIP');
+            if (response.ok) {
+                const data = await response.json();
+                if (data.success && data.ip) {
+                    clientIpAddress = data.ip;
+                    console.log('Client IP detected from server:', clientIpAddress);
+                    return clientIpAddress;
+                }
+            }
+        } catch (e) {
+            console.log('Server-side IP detection failed:', e.message);
+        }
+
+        const services = [
+            'https://api.ipify.org?format=json',
+            'https://api64.ipify.org?format=json',
+            'https://ipinfo.io/json'
+        ];
+
+        for (const service of services) {
             try {
-                const response = await fetch('/ExternalRegistration/GetClientIP');
+                const response = await fetch(service, { timeout: 3000 });
                 if (response.ok) {
                     const data = await response.json();
-                    if (data.success && data.ip) {
+                    if (data.ip) {
                         clientIpAddress = data.ip;
-                        console.log('Client IP detected from server:', clientIpAddress);
+                        console.log('Client IP detected from public service:', clientIpAddress);
                         return clientIpAddress;
                     }
                 }
             } catch (e) {
-                console.log('Server-side IP detection failed:', e.message);
+                console.log(`IP service ${service} failed:`, e.message);
+                continue;
             }
-
-            // Fallback: Try public IP detection services
-            const services = [
-                'https://api.ipify.org?format=json',
-                'https://api64.ipify.org?format=json',
-                'https://ipinfo.io/json'
-            ];
-
-            for (const service of services) {
-                try {
-                    const response = await fetch(service, { timeout: 3000 });
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.ip) {
-                            clientIpAddress = data.ip;
-                            console.log('Client IP detected from public service:', clientIpAddress);
-                            return clientIpAddress;
-                        }
-                    }
-                } catch (e) {
-                    console.log(`IP service ${service} failed:`, e.message);
-                    continue;
-                }
-            }
-
-            console.warn('Could not detect client IP, using default');
-            return '0';
-        } catch (error) {
-            console.error('Error getting client IP:', error);
-            return '0';
         }
+
+        console.warn('Could not detect client IP, using default');
+        return '0';
+    } catch (error) {
+        console.error('Error getting client IP:', error);
+        return '0';
+    }
+}
+
+// ==========================================
+// DOCUMENT READY
+// ==========================================
+$(document).ready(async function () {
+    let masterData = [];
+
+    clientIpAddress = await getClientIP();
+    loadMasterAddresses();
+
+    loadSimpleCountries();
+    loadSimpleCountryBusinesses();
+    loadSimpleTitles();
+    setSimpleRegistrationDate();
+
+    loadFullCountries();
+    loadFullCountryBusinesses();
+    loadFullTitles();
+    setFullRegistrationDate();
+    loadFullBanks();
+
+    // ✅ ปรับแก้ฟังก์ชัน Preview รูปให้ใช้ FileReader รองรับ Vivo เสถียร 100%
+    function handleImagePreview(inputSelector, previewSelector) {
+        $(inputSelector).off('change').on('change', function () {
+            const file = this.files && this.files[0];
+            const preview = $(previewSelector);
+
+            if (!file) {
+                preview.hide().attr('src', '');
+                return;
+            }
+
+            if (!file.type.startsWith('image/')) {
+                toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
+                $(this).val('');
+                preview.hide().attr('src', '');
+                return;
+            }
+
+            const maxBytes = 5 * 1024 * 1024; // 5MB
+            if (file.size > maxBytes) {
+                toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
+                $(this).val('');
+                preview.hide().attr('src', '');
+                return;
+            }
+
+            // บีบอัดหน่วยความจำระดับเบราเซอร์และเขียนสตรีม Base64 ลงตรงๆ ทันที
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                preview.attr('src', e.target.result);
+                // หน่วงเวลาเล็กน้อยเพื่อให้ระบบ WebView ของแอนดรอยด์จัดสรรขนาด Layout กางออกทัน
+                setTimeout(() => {
+                    preview.show();
+                }, 50);
+            };
+            reader.onerror = function() {
+                toastr.error('ไม่สามารถอ่านไฟล์รูปภาพได้');
+                preview.hide().attr('src', '');
+            };
+            reader.readAsDataURL(file);
+        });
     }
 
-    // ==========================================
-    // DOCUMENT READY
-    // ==========================================
-    $(document).ready(async function () {
-        let masterData = [];
+    // Initialize image preview handlers
+    handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
+    handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
+    handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
 
-        // Get client IP address on page load
-        clientIpAddress = await getClientIP();
+    handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
+    handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
+    handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
+    handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
 
-        // Load master address data
-        loadMasterAddresses();
+    var currentLang = '@currentLang';
+    var today = new Date();
+    var currentYearCE = today.getFullYear();
+    var currentYearBE = currentYearCE + 543;
 
-        // --- Load data for simple registration (from ExternalRegistration example) ---
-        loadSimpleCountries();
-        loadSimpleCountryBusinesses();
-        loadSimpleTitles();
-        setSimpleRegistrationDate();
-
-        // Load full-registration lists (same APIs as simple)
-        loadFullCountries();
-        loadFullCountryBusinesses();
-        loadFullTitles();
-        setFullRegistrationDate();
-
-        // Image preview handlers (simple + full)
-        function handleImagePreview(inputSelector, previewSelector) {
-            $(inputSelector).off('change').on('change', function () {
-                const file = this.files && this.files[0];
-                const preview = $(previewSelector);
-
-                if (!file) {
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                if (!file.type.startsWith('image/')) {
-                    toastr.error('รองรับเฉพาะไฟล์รูปเท่านั้น (jpg, png, gif)');
-                    $(this).val('');
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                const maxBytes = 5 * 1024 * 1024; // 5MB
-                if (file.size > maxBytes) {
-                    toastr.error('ขนาดไฟล์ต้องไม่เกิน 5MB');
-                    $(this).val('');
-                    preview.hide().attr('src', '');
-                    return;
-                }
-
-                // Revoke previous URL if exists
-                if (preview.data('object-url')) {
-                    URL.revokeObjectURL(preview.data('object-url'));
-                }
-
-                const url = URL.createObjectURL(file);
-                preview.data('object-url', url);
-                preview.attr('src', url).show();
-            });
+    var urlParams = new URLSearchParams(window.location.search);
+    var referrerId = urlParams.get('id');
+    
+    if (referrerId && referrerId.length > 1) {
+        var lastChar = referrerId.slice(-1).toUpperCase();
+        var memberCode = '';
+        var position = '';
+        if (lastChar === 'L' || lastChar === 'R') {
+            memberCode = referrerId.slice(0, -1);
+            position = (lastChar === 'L') ? 'left' : 'right';
         }
 
-        // Initialize image preview handlers
-        handleImagePreview('#simpleIdCardCopy', '#simpleIdCardPreview');
-        handleImagePreview('#simpleBankCardCopy', '#simpleBankCardPreview');
-        handleImagePreview('#simpleBusinessPhoto', '#simpleBusinessPhotoPreview');
+        $('#simpleReferrerCode').val(memberCode).prop('disabled', true);
+        $('#fullReferrerCode').val(memberCode).prop('disabled', true);
+        $('input[name="position"]').prop('disabled', true);
+        $('#btnSearchReferrer').prop('disabled', true);
+        $('#btnFullSearchReferrer').prop('disabled', true);
 
-        handleImagePreview('#fullIdCardCopy', '#fullIdCardPreview');
-        handleImagePreview('#fullBankCardCopy', '#fullBankCardPreview');
-        handleImagePreview('#fullBusinessPhoto', '#fullBusinessPhotoPreview');
-        handleImagePreview('#fullApplicationForm', '#fullApplicationFormPreview');
-        loadFullBanks();
+        setTimeout(function() { $('#btnSearchReferrer').trigger('click'); }, 500);
+        setTimeout(function() { $('#btnFullSearchReferrer').trigger('click'); }, 500);
 
-        // Get language from cookie or use default
-        var currentLang = '@currentLang';
+        if (position === 'left') {
+            $('#positionLeft').prop('checked', true);
+            $('#fullPositionLeft').prop('checked', true);
+        } else {
+            $('#positionRight').prop('checked', true);
+            $('#fullPositionRight').prop('checked', true);
+        }
+    }
+    
+    initializeDateDropdowns();
+    setupFormSync();
+    console.log('Form sync initialized');
+
+    function initializeDateDropdowns() {
+        var isThaiLang = (currentLang === 'th');
+        var yearOffset = isThaiLang ? 543 : 0;
+        var thaiMonths = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
         
-        // Calculate date 18 years ago for age restriction
-        var today = new Date();
-        var currentYearCE = today.getFullYear();
-        var currentYearBE = currentYearCE + 543;
-
-        var urlParams = new URLSearchParams(window.location.search);
-        var referrerId = urlParams.get('id');
-        // Check if ends with L or R
-        if (referrerId && referrerId.length > 1) {
-            var lastChar = referrerId.slice(-1).toUpperCase();
-            if (lastChar === 'L' || lastChar === 'R') {
-                memberCode = referrerId.slice(0, -1);
-                position = (lastChar === 'L') ? 'left' : 'right';
-            }
-
-            $('#simpleReferrerCode').val(memberCode).prop('disabled', true);
-            $('#fullReferrerCode').val(memberCode).prop('disabled', true);
-
-            $('input[name="position"]').prop('disabled', true);
-
-            // Disable search button
-            $('#btnSearchReferrer').prop('disabled', true);
-            $('#fullReferrerCode').prop('disabled', true);
-
-            setTimeout(function() {
-                    $('#btnSearchReferrer').trigger('click');
-                }, 500);
-
-                setTimeout(function() {
-                    $('#fullReferrerCode').trigger('click');
-                }, 500);
-
-             // Set position and disable
-            if (position === 'left') {
-                $('#positionLeft').prop('checked', true);
-                $('#referrer_left').prop('checked', true);
-            } else {
-                $('#positionRight').prop('checked', true);
-                $('#referrer_right').prop('checked', true);
-            }
+        // --- Simple Registration Date ---
+        var simpleRegDay = $('#simpleRegDay');
+        simpleRegDay.empty().append('<option value="">วัน</option>');
+        for (var d = 1; d <= 31; d++) {
+            simpleRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
         }
         
-        
-        
-        // Initialize date dropdowns based on language
-        initializeDateDropdowns();
-
-        // Setup form synchronization
-        setupFormSync();
-
-        console.log('Form sync initialized');
-
-        // Function to initialize date dropdowns with proper year range
-        function initializeDateDropdowns() {
-            // Determine if using Thai (พ.ศ.) or English (ค.ศ.) year format
-            var isThaiLang = (currentLang === 'th');
-            var yearOffset = isThaiLang ? 543 : 0;
-            
-            // === Simple Registration Date ===
-            // Populate days (1-31)
-            var simpleRegDay = $('#simpleRegDay');
-            simpleRegDay.empty().append('<option value="">วัน</option>');
-            for (var d = 1; d <= 31; d++) {
-                simpleRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
-            }
-            
-            // Populate months (Thai names)
-            var simpleRegMonth = $('#simpleRegMonth');
-            var thaiMonths = ['', 'มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
-            simpleRegMonth.empty().append('<option value="">เดือน</option>');
-            for (var m = 1; m <= 12; m++) {
-                simpleRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
-            }
-            
-            // Populate years (range: 100 years ago to current year)
-            var simpleRegYear = $('#simpleRegYear');
-            simpleRegYear.empty().append('<option value="">ปี</option>');
-            var startYear = currentYearCE + yearOffset;
-            var endYear = currentYearCE + yearOffset;
-            for (var y = endYear; y >= startYear; y--) {
-                simpleRegYear.append('<option value="' + y + '">' + y + '</option>');
-            }
-            
-            // Set default to current date
-            simpleRegDay.val(String(today.getDate()).padStart(2, '0'));
-            simpleRegMonth.val(today.getMonth() + 1);
-            simpleRegYear.val(currentYearCE + yearOffset);
-            
-            // === Simple Birth Date (with 18+ restriction) ===
-            var simpleBirthDay = $('#simpleBirthDay');
-            simpleBirthDay.empty().append('<option value="">วัน</option>');
-            for (var d = 1; d <= 31; d++) {
-                simpleBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
-            }
-            
-            var simpleBirthMonth = $('#simpleBirthMonth');
-            simpleBirthMonth.empty().append('<option value="">เดือน</option>');
-            for (var m = 1; m <= 12; m++) {
-                simpleBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
-            }
-            
-            var simpleBirthYear = $('#simpleBirthYear');
-            simpleBirthYear.empty().append('<option value="">ปี</option>');
-            // For birth year: 18-100 years ago
-            var minBirthYearCE = currentYearCE - 100;
-            var maxBirthYearCE = currentYearCE - 18; // Must be at least 18 years old
-            for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
-                simpleBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
-            }
-            
-            // === Full Registration Date ===
-            startYear = currentYearCE + yearOffset;
-            endYear = currentYearCE + yearOffset;
-            var fullRegDay = $('#fullRegDay');
-            fullRegDay.empty().append('<option value="">วัน</option>');
-            for (var d = 1; d <= 31; d++) {
-                fullRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
-            }
-            
-            var fullRegMonth = $('#fullRegMonth');
-            fullRegMonth.empty().append('<option value="">เดือน</option>');
-            for (var m = 1; m <= 12; m++) {
-                fullRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
-            }
-            
-            var fullRegYear = $('#fullRegYear');
-            fullRegYear.empty().append('<option value="">ปี</option>');
-            for (var y = endYear; y >= startYear; y--) {
-                fullRegYear.append('<option value="' + (y) + '">' + (y) + '</option>');
-            }
-            
-            // Set default to current date
-            fullRegDay.val(String(today.getDate()).padStart(2, '0'));
-            fullRegMonth.val(today.getMonth() + 1);
-            fullRegYear.val(currentYearCE + yearOffset);
-                        
-            // === Full Birth Date (with 18+ restriction) ===
-            var fullBirthDay = $('#fullBirthDay');
-            fullBirthDay.empty().append('<option value="">วัน</option>');
-            for (var d = 1; d <= 31; d++) {
-                fullBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
-            }
-            
-            var fullBirthMonth = $('#fullBirthMonth');
-            fullBirthMonth.empty().append('<option value="">เดือน</option>');
-            for (var m = 1; m <= 12; m++) {
-                fullBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
-            }
-            
-            var fullBirthYear = $('#fullBirthYear');
-            fullBirthYear.empty().append('<option value="">ปี</option>');
-            for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
-                fullBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
-            }
+        var simpleRegMonth = $('#simpleRegMonth');
+        simpleRegMonth.empty().append('<option value="">เดือน</option>');
+        for (var m = 1; m <= 12; m++) {
+            simpleRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
         }
         
-        // Validation: Check age when birth date dropdowns change
-        $('#simpleBirthDay, #simpleBirthMonth, #simpleBirthYear, #fullBirthDay, #fullBirthMonth, #fullBirthYear').on('change', function() {
-            var isSimple = $(this).attr('id').startsWith('simple');
-            var daySel = isSimple ? '#simpleBirthDay' : '#fullBirthDay';
-            var monthSel = isSimple ? '#simpleBirthMonth' : '#fullBirthMonth';
-            var yearSel = isSimple ? '#simpleBirthYear' : '#fullBirthYear';
-            
-            var day = parseInt($(daySel).val());
-            var month = parseInt($(monthSel).val());
-            var yearBE = parseInt($(yearSel).val());
-            
-            if (!day || !month || !yearBE) return;
-            
-            // Convert BE to CE for age calculation
-            var yearCE = yearBE;
-            if (currentLang === 'th' && yearBE > 2400) {
-                yearCE = yearBE - 543;
-            }
-            
-            var birthDate = new Date(yearCE, month - 1, day);
-            var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
-            
-            if (age < 18) {
-                toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
-                $(yearSel).val('');
-            }
-        });
+        var simpleRegYear = $('#simpleRegYear');
+        simpleRegYear.empty().append('<option value="">ปี</option>');
+        var startYear = currentYearCE + yearOffset;
+        var endYear = currentYearCE + yearOffset;
+        for (var y = endYear; y >= startYear; y--) {
+            simpleRegYear.append('<option value="' + y + '">' + y + '</option>');
+        }
+        
+        simpleRegDay.val(String(today.getDate()).padStart(2, '0'));
+        simpleRegMonth.val(today.getMonth() + 1);
+        simpleRegYear.val(currentYearCE + yearOffset);
+        
+        // --- Simple Birth Date ---
+        var simpleBirthDay = $('#simpleBirthDay');
+        simpleBirthDay.empty().append('<option value="">วัน</option>');
+        for (var d = 1; d <= 31; d++) {
+            simpleBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+        }
+        
+        var simpleBirthMonth = $('#simpleBirthMonth');
+        simpleBirthMonth.empty().append('<option value="">เดือน</option>');
+        for (var m = 1; m <= 12; m++) {
+            simpleBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+        }
+        
+        var simpleBirthYear = $('#simpleBirthYear');
+        simpleBirthYear.empty().append('<option value="">ปี</option>');
+        var minBirthYearCE = currentYearCE - 100;
+        var maxBirthYearCE = currentYearCE - 18;
+        for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
+            simpleBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
+        }
+        
+        // --- Full Registration Date ---
+        var fullRegDay = $('#fullRegDay');
+        fullRegDay.empty().append('<option value="">วัน</option>');
+        for (var d = 1; d <= 31; d++) {
+            fullRegDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+        }
+        
+        var fullRegMonth = $('#fullRegMonth');
+        fullRegMonth.empty().append('<option value="">เดือน</option>');
+        for (var m = 1; m <= 12; m++) {
+            fullRegMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+        }
+        
+        var fullRegYear = $('#fullRegYear');
+        fullRegYear.empty().append('<option value="">ปี</option>');
+        for (var y = endYear; y >= startYear; y--) {
+            fullRegYear.append('<option value="' + y + '">' + y + '</option>');
+        }
+        
+        fullRegDay.val(String(today.getDate()).padStart(2, '0'));
+        fullRegMonth.val(today.getMonth() + 1);
+        fullRegYear.val(currentYearCE + yearOffset);
+        
+        // --- Full Birth Date ---
+        var fullBirthDay = $('#fullBirthDay');
+        fullBirthDay.empty().append('<option value="">วัน</option>');
+        for (var d = 1; d <= 31; d++) {
+            fullBirthDay.append('<option value="' + String(d).padStart(2, '0') + '">' + d + '</option>');
+        }
+        
+        var fullBirthMonth = $('#fullBirthMonth');
+        fullBirthMonth.empty().append('<option value="">เดือน</option>');
+        for (var m = 1; m <= 12; m++) {
+            fullBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
+        }
+        
+        var fullBirthYear = $('#fullBirthYear');
+        fullBirthYear.empty().append('<option value="">ปี</option>');
+        for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
+            fullBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
+        }
+    }
+    
+    $('#simpleBirthDay, #simpleBirthMonth, #simpleBirthYear, #fullBirthDay, #fullBirthMonth, #fullBirthYear').on('change', function() {
+        var isSimple = $(this).attr('id').startsWith('simple');
+        var daySel = isSimple ? '#simpleBirthDay' : '#fullBirthDay';
+        var monthSel = isSimple ? '#simpleBirthMonth' : '#fullBirthMonth';
+        var yearSel = isSimple ? '#simpleBirthYear' : '#fullBirthYear';
+        
+        var day = parseInt($(daySel).val());
+        var month = parseInt($(monthSel).val());
+        var yearBE = parseInt($(yearSel).val());
+        
+        if (!day || !month || !yearBE) return;
+        
+        var yearCE = yearBE;
+        if (currentLang === 'th' && yearBE > 2400) {
+            yearCE = yearBE - 543;
+        }
+        
+        var birthDate = new Date(yearCE, month - 1, day);
+        var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
+        
+        if (age < 18) {
+            toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+            $(yearSel).val('');
+        }
+    });
 
-        // Switch to full registration tab
-        $('#btnSwitchToFull').click(function () {
-            $('#full-tab').tab('show');
-        });
+    $('#btnSwitchToFull').click(function () {
+        $('#full-tab').tab('show');
+    });
 
-        // Reset simple form
-        $('#btnResetSimple').click(function () {
-            if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
-                const selectedRegDay = $('#simpleRegDay').val();
-                const selectedRegMonth = $('#simpleRegMonth').val();
-                const selectedRegYear = $('#simpleRegYear').val();
+    // Reset simple form
+    $('#btnResetSimple').click(function () {
+        if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
+            const selectedRegDay = $('#simpleRegDay').val();
+            const selectedRegMonth = $('#simpleRegMonth').val();
+            const selectedRegYear = $('#simpleRegYear').val();
 
-                // 1. ล้างข้อมูลทุกช่องในฟอร์มกลับเป็นค่าเริ่มต้น
-                $('#simpleRegistrationForm')[0].reset();
+            $('#simpleRegistrationForm')[0].reset();
 
-                // คงค่าวันที่สมัครเดิมไว้แม้กดล้างข้อมูล
-                $('#simpleRegDay').val(selectedRegDay);
-                $('#simpleRegMonth').val(selectedRegMonth);
-                $('#simpleRegYear').val(selectedRegYear);
+            $('#simpleRegDay').val(selectedRegDay);
+            $('#simpleRegMonth').val(selectedRegMonth);
+            $('#simpleRegYear').val(selectedRegYear);
 
-                // 2. ล้างขอบแดงแจ้งเตือนและข้อความ Error ทั้งหมด
-                $('#simpleRegistrationForm .is-invalid').removeClass('is-invalid');
-                $('#documentValidationMessage').html(''); 
+            $('#simpleRegistrationForm .is-invalid').removeClass('is-invalid');
+            $('#documentValidationMessage').html(''); 
+            $('#simpleIdCardNameValidation, #simpleBusinessNameValidation, #mobileValidation, #emailValidation, #lineIdValidation').html('');
 
-                // (เผื่อมีข้อความ Validation อื่นๆ ที่คุณดักไว้)
-                $('#simpleIdCardNameValidation, #simpleBusinessNameValidation, #mobileValidation, #emailValidation, #lineIdValidation').html('');
-
-                // 3. จัดการ Dropdown ที่อยู่ 
-                if (typeof resetAddressDropdowns === 'function') {
-                    resetAddressDropdowns();
-                } else {
-                    $('#simpleProvince').html('<option value="" data-key="t-waiting-postcode">-- รอผลจากรหัสไปรษณีย์ --</option>');
-                    $('#simpleDistrict').html('<option value="" data-key="t-select-district">-- เลือกอำเภอ --</option>');
-                    $('#simpleSubdistrict').html('<option value="" data-key="t-select-subdistrict">-- เลือกตำบล --</option>');
-                }
-
-                // 🔒 สำคัญ: บังคับ Disable Dropdown จังหวัด/อำเภอ/ตำบล กลับไปเหมือนเดิม
-                $('#simpleProvince, #simpleDistrict, #simpleSubdistrict').prop('disabled', true);
-
-                // 4. ซ่อนรูปภาพ Preview และเคลียร์ไฟล์
-                $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview').each(function() {
-                    const preview = $(this);
-                    if (preview.data('object-url')) {
-                        URL.revokeObjectURL(preview.data('object-url'));
-                        preview.removeData('object-url');
-                    }
-                    preview.hide().attr('src', '');
-                });
-                $('#simpleIdCardCopy, #simpleBankCardCopy, #simpleBusinessPhoto').val('');
-
-                // 5. แจ้งเตือน User และเลื่อนหน้าจอกลับขึ้นด้านบนสุด
-                toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
-                $('html, body').animate({ scrollTop: $('#simpleRegistrationForm').offset().top - 50 }, 500);
-            }
-        });
-
-        //Search referrer
-        $('#btnFullSearchReferrer').click(function () {
-            const referrerCode = $('#fullReferrerCode').val();
-            if (referrerCode) {
-                // Call API to find referrer
-            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
-                    .done(function(response) {
-                        if (response.success) {
-                            $('#fullReferrerName').val(response.memberName);
-                            toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
-                        } else {
-                            $('#fullReferrerName').val('');
-                            toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
-                        }
-                    })
-                    .fail(function() {
-                        $('#fullReferrerName').val('');
-                        toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-                    });
-            } else {
-                toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
-            }
-        });
-
-        // Search referrer
-        $('#btnSearchReferrer').click(function () {
-            const referrerCode = $('#simpleReferrerCode').val();
-            if (referrerCode) {
-                // Call API to find referrer
-            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
-                    .done(function(response) {
-                        if (response.success) {
-                            $('#simpleReferrerName').val(response.memberName);
-                            toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
-                        } else {
-                            $('#simpleReferrerName').val('');
-                            toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
-                        }
-                    })
-                    .fail(function() {
-                        $('#simpleReferrerName').val('');
-                        toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
-                    });
-            } else {
-                toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
-            }
-        });
-
-        $('#simpleDocumentNumber, #fullDocumentNumber').on('input', function() {
-            // โค้ดด้านในเหมือนเดิมทุกอย่างครับ
-            // เปลี่ยนแค่ตอนอ้างอิงไอดี error message ให้เช็คว่ากำลังพิมพ์ช่องไหนอยู่
-
-            const isSimple = $(this).attr('id') === 'simpleDocumentNumber';
-            const errorTarget = isSimple ? '#documentValidationMessage' : '#fullDocumentValidationMessage';
-            const countryVal = isSimple ? $('#simpleCountry').val() : $('#fullCountry').val();
-
-            if (countryVal === '66') {
-                let docNumber = $(this).val().replace(/[^0-9]/g, '');
-
-                if (docNumber.length > 13) docNumber = docNumber.substring(0, 13);
-                $(this).val(docNumber);
-
-                $(this).removeClass('is-invalid is-valid');
-                $(errorTarget).html('');
-                $(this).next('.invalid-feedback-custom').remove(); // เผื่อของฟอร์มเต็มที่ Generate ขึ้นมา
-
-                if (!docNumber) return;
-
-                if (docNumber.length < 13 || (docNumber.length === 13 && !validateThaiID(docNumber))) {
-                    $(this).addClass('is-invalid');
-                    $(errorTarget).html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
-                }
-                else if (docNumber.length === 13 && validateThaiID(docNumber)) {
-                    $(this).addClass('is-valid');
-                    $(errorTarget).html('');
-                }
-            }
-        });
-
-        // --- New input filters & validators (simple + full) ---
-        // Strip '-' and spaces while typing for document numbers
-        /*$('#simpleDocumentNumber, #fullDocumentNumber').on('input', function () {
-            this.value = this.value.replace(/[-\s]/g, '');
-        });*/
-
-        // Allow only digits for phone inputs (keeps leading 0)
-        $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone').on('input', function () {
-            this.value = this.value.replace(/\D/g, '');
-        });
-
-        // Email input handlers (validate as user types)
-        $('#simpleEmail').on('input', validateSimpleEmail);
-        $('#fullEmail').on('input', validateFullEmail);
-
-        // Auto-copy name-on-card -> business name (only if user hasn't edited business name)
-        $('#simpleFullName').on('input', function() {
-            if (!$('#simpleBusinessName').data('userEdited')) {
-                $('#simpleBusinessName').val($(this).val());
-                validateSimpleBusinessName();
-            }
-            validateSimpleFullName();
-        });
-        $('#simpleBusinessName').on('input', function(){ 
-            $(this).data('userEdited', true); 
-            validateSimpleBusinessName(); 
-        });
-
-        $('#fullNameOnCard').on('input', function() {
-            if (!$('#fullBusinessName').data('userEdited')) {
-                $('#fullBusinessName').val($(this).val());
-            }
-            // Auto-populate bank account name with name from ID card
-            $('#fullBankAccountName').val($(this).val());
-            validateFullNameOnCard();
-        });
-        $('#fullBusinessName').on('input', function(){ $(this).data('userEdited', true); validateFullBusinessName(); });
-
-        // Zipcode input for address lookup
-        $('#simplePostcode').on('input', function() {
-            var selectedZip = $(this).val();
             resetAddressDropdowns();
+            $('#simpleProvince, #simpleDistrict, #simpleSubdistrict').prop('disabled', true);
 
-            if (selectedZip.length === 5) {
-                // Filter data by zipcode
-                var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+            // ✅ เปลี่ยนมาล้างรูปแบบปลอดภัย ป้องกันแคชหน่วยความจำใน Vivo ค้าง
+            $('#simpleIdCardPreview, #simpleBankCardPreview, #simpleBusinessPhotoPreview').hide().attr('src', '');
+            $('#simpleIdCardCopy, #simpleBankCardCopy, #simpleBusinessPhoto').val('');
 
-                if (filteredData.length > 0) {
-                    // Get unique provinces
-                    var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+            toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
+            $('html, body').animate({ scrollTop: $('#simpleRegistrationForm').offset().top - 50 }, 500);
+        }
+    });
 
-                    // Create province options
-                    $('#simpleProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
-                    $.each(uniqueProvinces, function(index, item) {
-                        $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
-                    });
-                    $('#simpleProvince').prop('disabled', false);
-
-                    // Auto select if only one province
-                    if (uniqueProvinces.length === 1) {
-                        $('#simpleProvince').val(uniqueProvinces[0].province_code).trigger('change');
+    // Search referrer
+    $('#btnFullSearchReferrer').click(function () {
+        const referrerCode = $('#fullReferrerCode').val();
+        if (referrerCode) {
+            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+                .done(function(response) {
+                    if (response.success) {
+                        $('#fullReferrerName').val(response.memberName);
+                        toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
+                    } else {
+                        $('#fullReferrerName').val('');
+                        toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
                     }
-                }
-            }
-        });
-
-        // Province change
-        $('#simpleProvince').change(function() {
-            var selectedZip = $('#simplePostcode').val();
-            var selectedProvCode = $(this).val();
-
-            resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
-            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-
-            if (selectedProvCode) {
-                var filteredData = masterData.filter(item =>
-                    item.zipcode === selectedZip &&
-                    item.province_code == selectedProvCode
-                );
-
-                var uniqueDistricts = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
-
-                $.each(uniqueDistricts, function(index, item) {
-                    $('#simpleDistrict').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+                })
+                .fail(function() {
+                    $('#fullReferrerName').val('');
+                    toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
                 });
-                $('#simpleDistrict').prop('disabled', false);
+        } else {
+            toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+        }
+    });
 
-                if (uniqueDistricts.length === 1) {
-                    $('#simpleDistrict').val(uniqueDistricts[0].amphoe_code).trigger('change');
-                }
-            }
-        });
-
-        // District change
-        $('#simpleDistrict').change(function() {
-            var selectedZip = $('#simplePostcode').val();
-            var selectedProvCode = $('#simpleProvince').val();
-            var selectedDistrictCode = $(this).val();
-
-            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-
-            if (selectedDistrictCode) {
-                var filteredData = masterData.filter(item =>
-                    item.zipcode === selectedZip &&
-                    item.province_code == selectedProvCode &&
-                    item.amphoe_code == selectedDistrictCode
-                );
-
-                $.each(filteredData, function(index, item) {
-                    $('#simpleSubdistrict').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
-                });
-                $('#simpleSubdistrict').prop('disabled', false);
-            }
-        });
-
-        $('#simpleSubdistrict').change(function () {
-            const code = $(this).val();
-            const match = masterData.find(item => String(item.tambon_code) === String(code));
-            $('#simpleTambonId').val(match ? match.id : '');
-        });
-
-        // --- Full: province/district change handlers (ID card) ---
-        $('#fullProvinceIdCard').change(function () {
-            const selectedZip = $('#fullPostcodeIdCard').val();
-            const selectedProv = $(this).val();
-
-            resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-
-            if (selectedProv) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
-                const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
-                districts.forEach(d => $('#fullDistrictIdCard').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
-                $('#fullDistrictIdCard').prop('disabled', false);
-
-                if (districts.length === 1) {
-                    $('#fullDistrictIdCard').val(districts[0].amphoe_code).trigger('change');
-                }
-            }
-        });
-
-        $('#fullDistrictIdCard').change(function () {
-            const selectedZip = $('#fullPostcodeIdCard').val();
-            const prov = $('#fullProvinceIdCard').val();
-            const district = $(this).val();
-
-            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-            if (district) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
-                filtered.forEach(item => $('#fullSubdistrictIdCard').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
-                $('#fullSubdistrictIdCard').prop('disabled', false);
-            }
-        });
-
-        // Update fullTambonId when fullSubdistrictIdCard changes
-        $('#fullSubdistrictIdCard').change(function () {
-            const code = $(this).val();
-            const match = masterData.find(item => String(item.tambon_code) === String(code));
-            $('#fullTambonId').val(match ? match.id : '');
-        });
-
-        // --- Full: province/district change handlers (Current address) ---
-        $('#fullCurrentProvince').change(function () {
-            const selectedZip = $('#fullCurrentPostcode').val();
-            const selectedProv = $(this).val();
-
-            resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-
-            if (selectedProv) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
-                const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
-                districts.forEach(d => $('#fullCurrentDistrict').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
-                $('#fullCurrentDistrict').prop('disabled', false);
-
-                if (districts.length === 1) {
-                    $('#fullCurrentDistrict').val(districts[0].amphoe_code).trigger('change');
-                }
-            }
-        });
-
-        $('#fullCurrentDistrict').change(function () {
-            const selectedZip = $('#fullCurrentPostcode').val();
-            const prov = $('#fullCurrentProvince').val();
-            const district = $(this).val();
-
-            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-            if (district) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
-                filtered.forEach(item => $('#fullCurrentSubdistrict').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
-                $('#fullCurrentSubdistrict').prop('disabled', false);
-            }
-        });
-
-        // Update fullCurrentTambonId when fullCurrentSubdistrict changes
-        $('#fullCurrentSubdistrict').change(function () {
-            const code = $(this).val();
-            const match = masterData.find(item => String(item.tambon_code) === String(code));
-            $('#fullCurrentTambonId').val(match ? match.id : '');
-        });
-
-        // Populate province/district/subdistrict when user types postcode (Full - ID card)
-        $('#fullPostcodeIdCard').on('input', function () {
-            const selectedZip = $(this).val();
-            resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
-            resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-
-            if (selectedZip.length === 5) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip);
-                if (filtered.length > 0) {
-                    const provinces = getUniqueList(filtered, 'province_code', 'province');
-                    $('#fullProvinceIdCard').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
-                    provinces.forEach(p => $('#fullProvinceIdCard').append(`<option value="${p.province_code}">${p.province}</option>`));
-                    $('#fullProvinceIdCard').prop('disabled', false);
-
-                    if (provinces.length === 1) {
-                        $('#fullProvinceIdCard').val(provinces[0].province_code).trigger('change');
+    $('#btnSearchReferrer').click(function () {
+        const referrerCode = $('#simpleReferrerCode').val();
+        if (referrerCode) {
+            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+                .done(function(response) {
+                    if (response.success) {
+                        $('#simpleReferrerName').val(response.memberName);
+                        toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
+                    } else {
+                        $('#simpleReferrerName').val('');
+                        toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
                     }
+                })
+                .fail(function() {
+                    $('#simpleReferrerName').val('');
+                    toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
+                });
+        } else {
+            toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+        }
+    });
+
+    $('#simpleDocumentNumber, #fullDocumentNumber').on('input', function() {
+        const isSimple = $(this).attr('id') === 'simpleDocumentNumber';
+        const errorTarget = isSimple ? '#documentValidationMessage' : '#fullDocumentValidationMessage';
+        const countryVal = isSimple ? $('#simpleCountry').val() : $('#fullCountry').val();
+
+        if (countryVal === '66') {
+            let docNumber = $(this).val().replace(/[^0-9]/g, '');
+
+            if (docNumber.length > 13) docNumber = docNumber.substring(0, 13);
+            $(this).val(docNumber);
+
+            $(this).removeClass('is-invalid is-valid');
+            $(errorTarget).html('');
+            $(this).next('.invalid-feedback-custom').remove();
+
+            if (!docNumber) return;
+
+            if (docNumber.length < 13 || (docNumber.length === 13 && !validateThaiID(docNumber))) {
+                $(this).addClass('is-invalid');
+                $(errorTarget).html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
+            }
+            else if (docNumber.length === 13 && validateThaiID(docNumber)) {
+                $(this).addClass('is-valid');
+                $(errorTarget).html('');
+            }
+        }
+    });
+
+    $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone').on('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+    });
+
+    $('#simpleEmail').on('input', validateSimpleEmail);
+    $('#fullEmail').on('input', validateFullEmail);
+
+    $('#simpleFullName').on('input', function() {
+        if (!$('#simpleBusinessName').data('userEdited')) {
+            $('#simpleBusinessName').val($(this).val());
+            validateSimpleBusinessName();
+        }
+        validateSimpleFullName();
+    });
+    $('#simpleBusinessName').on('input', function(){ 
+        $(this).data('userEdited', true); 
+        validateSimpleBusinessName(); 
+    });
+
+    $('#fullNameOnCard').on('input', function() {
+        if (!$('#fullBusinessName').data('userEdited')) {
+            $('#fullBusinessName').val($(this).val());
+        }
+        $('#fullBankAccountName').val($(this).val());
+        validateFullNameOnCard();
+    });
+    $('#fullBusinessName').on('input', function(){ $(this).data('userEdited', true); validateFullBusinessName(); });
+
+    // Zipcode input for address lookup
+    $('#simplePostcode').on('input', function() {
+        var selectedZip = $(this).val();
+        resetAddressDropdowns();
+
+        if (selectedZip.length === 5) {
+            var filteredData = masterData.filter(item => item.zipcode === selectedZip);
+
+            if (filteredData.length > 0) {
+                var uniqueProvinces = getUniqueList(filteredData, 'province_code', 'province');
+
+                $('#simpleProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
+                $.each(uniqueProvinces, function(index, item) {
+                    $('#simpleProvince').append('<option value="' + item.province_code + '">' + item.province + '</option>');
+                });
+                $('#simpleProvince').prop('disabled', false);
+
+                if (uniqueProvinces.length === 1) {
+                    $('#simpleProvince').val(uniqueProvinces[0].province_code).trigger('change');
                 }
             }
-        });
+        }
+    });
 
-        // Populate province/district/subdistrict when user types postcode (Full - Current address)
-        $('#fullCurrentPostcode').on('input', function () {
-            const selectedZip = $(this).val();
+    $('#simpleProvince').change(function() {
+        var selectedZip = $('#simplePostcode').val();
+        var selectedProvCode = $(this).val();
+
+        resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+        resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+
+        if (selectedProvCode) {
+            var filteredData = masterData.filter(item =>
+                item.zipcode === selectedZip &&
+                item.province_code == selectedProvCode
+            );
+
+            var uniqueDistricts = getUniqueList(filteredData, 'amphoe_code', 'amphoe');
+
+            $.each(uniqueDistricts, function(index, item) {
+                $('#simpleDistrict').append('<option value="' + item.amphoe_code + '">' + item.amphoe + '</option>');
+            });
+            $('#simpleDistrict').prop('disabled', false);
+
+            if (uniqueDistricts.length === 1) {
+                $('#simpleDistrict').val(uniqueDistricts[0].amphoe_code).trigger('change');
+            }
+        }
+    });
+
+    $('#simpleDistrict').change(function() {
+        var selectedZip = $('#simplePostcode').val();
+        var selectedProvCode = $('#simpleProvince').val();
+        var selectedDistrictCode = $(this).val();
+
+        resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+
+        if (selectedDistrictCode) {
+            var filteredData = masterData.filter(item =>
+                item.zipcode === selectedZip &&
+                item.province_code == selectedProvCode &&
+                item.amphoe_code == selectedDistrictCode
+            );
+
+            $.each(filteredData, function(index, item) {
+                $('#simpleSubdistrict').append('<option value="' + item.tambon_code + '">' + item.tambon + '</option>');
+            });
+            $('#simpleSubdistrict').prop('disabled', false);
+        }
+    });
+
+    $('#simpleSubdistrict').change(function () {
+        const code = $(this).val();
+        const match = masterData.find(item => String(item.tambon_code) === String(code));
+        $('#simpleTambonId').val(match ? match.id : '');
+    });
+
+    $('#fullProvinceIdCard').change(function () {
+        const selectedZip = $('#fullPostcodeIdCard').val();
+        const selectedProv = $(this).val();
+
+        resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+        resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+
+        if (selectedProv) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
+            const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
+            districts.forEach(d => $('#fullDistrictIdCard').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
+            $('#fullDistrictIdCard').prop('disabled', false);
+
+            if (districts.length === 1) {
+                $('#fullDistrictIdCard').val(districts[0].amphoe_code).trigger('change');
+            }
+        }
+    });
+
+    $('#fullDistrictIdCard').change(function () {
+        const selectedZip = $('#fullPostcodeIdCard').val();
+        const prov = $('#fullProvinceIdCard').val();
+        const district = $(this).val();
+
+        resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+        if (district) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
+            filtered.forEach(item => $('#fullSubdistrictIdCard').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
+            $('#fullSubdistrictIdCard').prop('disabled', false);
+        }
+    });
+
+    $('#fullSubdistrictIdCard').change(function () {
+        const code = $(this).val();
+        const match = masterData.find(item => String(item.tambon_code) === String(code));
+        $('#fullTambonId').val(match ? match.id : '');
+    });
+
+    $('#fullCurrentProvince').change(function () {
+        const selectedZip = $('#fullCurrentPostcode').val();
+        const selectedProv = $(this).val();
+
+        resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+        resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+        if (selectedProv) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == selectedProv);
+            const districts = getUniqueList(filtered, 'amphoe_code', 'amphoe');
+            districts.forEach(d => $('#fullCurrentDistrict').append(`<option value="${d.amphoe_code}">${d.amphoe}</option>`));
+            $('#fullCurrentDistrict').prop('disabled', false);
+
+            if (districts.length === 1) {
+                $('#fullCurrentDistrict').val(districts[0].amphoe_code).trigger('change');
+            }
+        }
+    });
+
+    $('#fullCurrentDistrict').change(function () {
+        const selectedZip = $('#fullCurrentPostcode').val();
+        const prov = $('#fullCurrentProvince').val();
+        const district = $(this).val();
+
+        resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+        if (district) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip && item.province_code == prov && item.amphoe_code == district);
+            filtered.forEach(item => $('#fullCurrentSubdistrict').append(`<option value="${item.tambon_code}">${item.tambon}</option>`));
+            $('#fullCurrentSubdistrict').prop('disabled', false);
+        }
+    });
+
+    $('#fullCurrentSubdistrict').change(function () {
+        const code = $(this).val();
+        const match = masterData.find(item => String(item.tambon_code) === String(code));
+        $('#fullCurrentTambonId').val(match ? match.id : '');
+    });
+
+    $('#fullPostcodeIdCard').on('input', function () {
+        const selectedZip = $(this).val();
+        resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
+        resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+        resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+
+        if (selectedZip.length === 5) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip);
+            if (filtered.length > 0) {
+                const provinces = getUniqueList(filtered, 'province_code', 'province');
+                $('#fullProvinceIdCard').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
+                provinces.forEach(p => $('#fullProvinceIdCard').append(`<option value="${p.province_code}">${p.province}</option>`));
+                $('#fullProvinceIdCard').prop('disabled', false);
+
+                if (provinces.length === 1) {
+                    $('#fullProvinceIdCard').val(provinces[0].province_code).trigger('change');
+                }
+            }
+        }
+    });
+
+    $('#fullCurrentPostcode').on('input', function () {
+        const selectedZip = $(this).val();
+        resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+        resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+        resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+        if (selectedZip.length === 5) {
+            const filtered = masterData.filter(item => item.zipcode === selectedZip);
+            if (filtered.length > 0) {
+                const provinces = getUniqueList(filtered, 'province_code', 'province');
+                $('#fullCurrentProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
+                provinces.forEach(p => $('#fullCurrentProvince').append(`<option value="${p.province_code}">${p.province}</option>`));
+                $('#fullCurrentProvince').prop('disabled', false);
+
+                if (provinces.length === 1) {
+                    $('#fullCurrentProvince').val(provinces[0].province_code).trigger('change');
+                }
+            }
+        }
+    });
+
+    $('#fullUseIdCardAddress').change(function () {
+        if ($(this).is(':checked')) {
+            ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
+                $(`#fullCurrent${f}`).val($(`#full${f}`).val() || '')
+            );
+
+            $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
+            $('#fullCurrentProvince').val($('#fullProvinceIdCard').val()).trigger('change');
+            $('#fullCurrentDistrict').val($('#fullDistrictIdCard').val()).trigger('change');
+            $('#fullCurrentSubdistrict').val($('#fullSubdistrictIdCard').val());
+            $('#fullCurrentTambonId').val($('#fullTambonId').val() || '');
+        } else {
+            ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
+                $(`#fullCurrent${f}`).val('')
+            );
+            $('#fullCurrentPostcode').val('');
+            $('#fullCurrentTambonId').val('');
             resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
             resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
             resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+        }
+    });
 
-            if (selectedZip.length === 5) {
-                const filtered = masterData.filter(item => item.zipcode === selectedZip);
-                if (filtered.length > 0) {
-                    const provinces = getUniqueList(filtered, 'province_code', 'province');
-                    $('#fullCurrentProvince').empty().append('<option value="" data-key="t-select-province">-- เลือกจังหวัด --</option>');
-                    provinces.forEach(p => $('#fullCurrentProvince').append(`<option value="${p.province_code}">${p.province}</option>`));
-                    $('#fullCurrentProvince').prop('disabled', false);
+    function escapeHtml(value) {
+        return $('<div>').text(value || '-').html();
+    }
 
-                    if (provinces.length === 1) {
-                        $('#fullCurrentProvince').val(provinces[0].province_code).trigger('change');
-                    }
-                }
-            }
+    function getPositionLabel(positionValue) {
+        if (positionValue === 'left') return 'ซ้ายสุด';
+        if (positionValue === 'right') return 'ขวาสุด';
+        return '-';
+    }
+
+    async function showRegisterConfirmPopup(summary) {
+        const referrerCode = summary.referrerCode || '-';
+        const referrerName = summary.referrerName || '-';
+        const positionLabel = getPositionLabel(summary.position);
+
+        const result = await Swal.fire({
+            title: 'ยืนยันการสมัคร',
+            icon: 'warning',
+            html: `
+                <div class="text-start lh-base">
+                    <div><strong>ผู้แนะนำ :</strong> ${escapeHtml(referrerCode)} <strong class="ms-2">ชื่อ :</strong> ${escapeHtml(referrerName)}</div>
+                    <div><strong>สมัครฝั่ง :</strong> ${escapeHtml(positionLabel)}</div>
+                    <div><strong>ชื่อภาษาไทย :</strong> ${escapeHtml(summary.thaiName)}</div>
+                    <div><strong>ชื่อภาษาอังกฤษ :</strong> ${escapeHtml(summary.englishName)}</div>
+                    <div><strong>เลขที่บัตรประชาชน/Passport :</strong> ${escapeHtml(summary.documentNumber)}</div>
+                    <div><strong>เบอร์โทร :</strong> ${escapeHtml(summary.mobile)}</div>
+                    <hr class="my-2" />
+                    <div class="text-danger fw-semibold">*** กรุณาตรวจสอบสายงาน Upline, ผู้แนะนำ และข้อมูลต่างๆ ให้เรียบร้อยก่อนทำการบันทึก</div>
+                    <div class="text-danger fw-semibold">ทางบริษัทไม่สามารถทำการโอนย้ายสายงานได้</div>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันการบันทึก',
+            cancelButtonText: 'ยกเลิก',
+            reverseButtons: true,
+            focusCancel: true
         });
 
-        // When checkbox 'ใช้ที่อยู่ตามบัตร' is toggled copy/clear current address fields
-        $('#fullUseIdCardAddress').change(function () {
-            if ($(this).is(':checked')) {
-                // Copy granular address fields
-                ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
-                    $(`#fullCurrent${f}`).val($(`#full${f}`).val() || '')
-                );
+        return result.isConfirmed;
+    }
 
-                $('#fullCurrentPostcode').val($('#fullPostcodeIdCard').val()).trigger('input');
-                $('#fullCurrentProvince').val($('#fullProvinceIdCard').val()).trigger('change');
-                $('#fullCurrentDistrict').val($('#fullDistrictIdCard').val()).trigger('change');
-                $('#fullCurrentSubdistrict').val($('#fullSubdistrictIdCard').val());
-                $('#fullCurrentTambonId').val($('#fullTambonId').val() || '');
-            } else {
-                ['HouseNumber', 'Moo', 'Alley', 'Road', 'Building', 'Floor'].forEach(f =>
-                    $(`#fullCurrent${f}`).val('')
-                );
-                $('#fullCurrentPostcode').val('');
-                $('#fullCurrentTambonId').val('');
-                resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-                resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-            }
-        });
+    // Simple form submission
+    $('#simpleRegistrationForm').submit(async function (e) {
+        e.preventDefault();
+        let isValid = true;
 
-        function escapeHtml(value) {
-            return $('<div>').text(value || '-').html();
-        }
-
-        function getPositionLabel(positionValue) {
-            if (positionValue === 'left') return 'ซ้ายสุด';
-            if (positionValue === 'right') return 'ขวาสุด';
-            return '-';
-        }
-
-        async function showRegisterConfirmPopup(summary) {
-            const referrerCode = summary.referrerCode || '-';
-            const referrerName = summary.referrerName || '-';
-            const positionLabel = getPositionLabel(summary.position);
-
-            const result = await Swal.fire({
-                title: 'ยืนยันการสมัคร',
-                icon: 'warning',
-                html: `
-                    <div class="text-start lh-base">
-                        <div><strong>ผู้แนะนำ :</strong> ${escapeHtml(referrerCode)} <strong class="ms-2">ชื่อ :</strong> ${escapeHtml(referrerName)}</div>
-                        <div><strong>สมัครฝั่ง :</strong> ${escapeHtml(positionLabel)}</div>
-                        <div><strong>ชื่อภาษาไทย :</strong> ${escapeHtml(summary.thaiName)}</div>
-                        <div><strong>ชื่อภาษาอังกฤษ :</strong> ${escapeHtml(summary.englishName)}</div>
-                        <div><strong>เลขที่บัตรประชาชน/Passport :</strong> ${escapeHtml(summary.documentNumber)}</div>
-                        <div><strong>เบอร์โทร :</strong> ${escapeHtml(summary.mobile)}</div>
-                        <hr class="my-2" />
-                        <div class="text-danger fw-semibold">*** กรุณาตรวจสอบสายงาน Upline, ผู้แนะนำ และข้อมูลต่างๆ ให้เรียบร้อยก่อนทำการบันทึก</div>
-                        <div class="text-danger fw-semibold">ทางบริษัทไม่สามารถทำการโอนย้ายสายงานได้</div>
-                    </div>
-                `,
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยันการบันทึก',
-                cancelButtonText: 'ยกเลิก',
-                reverseButtons: true,
-                focusCancel: true
-            });
-
-            return result.isConfirmed;
-        }
-
-        // Simple form submission
-        $('#simpleRegistrationForm').submit(async function (e) {
-            e.preventDefault();
-
-            let isValid = true;
-
-            // ==========================================
-            // 1. Basic validation (ค้นหาตัวที่บังคับกรอก)
-            // ==========================================
-            const requiredFields = $(this).find('input[required], select[required], textarea[required]');
-
-            requiredFields.each(function () {
-                const field = $(this);
-
-                if (field.is(':radio') || field.is(':checkbox')) {
-                    const name = field.attr('name');
-                    if ($('input[name="' + name + '"]:checked').length === 0) {
-                        $('input[name="' + name + '"]').addClass('is-invalid');
-                        isValid = false;
-                    } else {
-                        $('input[name="' + name + '"]').removeClass('is-invalid');
-                    }
-                }
-                else {
-                    const val = $.trim(field.val());
-                    if (!val) {
-                        field.addClass('is-invalid');
-                        isValid = false;
-                    } else {
-                        field.removeClass('is-invalid');
-                    }
-                }
-            });
-
-            // ==========================================
-            // 2. Validate Thai ID (บัตร ปชช.)
-            // ==========================================
-            // แก้ไข: ใช้ || "" ป้องกัน error
-            const docNumber = ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, '');
-            if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
-                $('#simpleDocumentNumber').addClass('is-invalid');
-                $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
-                isValid = false;
-                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
-            }
-
-            // ==========================================
-            // 3. Validate Address (บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง)
-            // ==========================================
-            const addressFields = ['#simpleHouseNumber', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
-            let addressComplete = true;
-
-            addressFields.forEach(fieldId => {
-                if (!$.trim($(fieldId).val())) {
-                    $(fieldId).addClass('is-invalid');
-                    addressComplete = false;
+        const requiredFields = $(this).find('input[required], select[required], textarea[required]');
+        requiredFields.each(function () {
+            const field = $(this);
+            if (field.is(':radio') || field.is(':checkbox')) {
+                const name = field.attr('name');
+                if ($('input[name="' + name + '"]:checked').length === 0) {
+                    $('input[name="' + name + '"]').addClass('is-invalid');
+                    isValid = false;
                 } else {
-                    $(fieldId).removeClass('is-invalid');
+                    $('input[name="' + name + '"]').removeClass('is-invalid');
                 }
-            });
-
-            if (!addressComplete) {
-                toastr.error('กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน');
-                isValid = false;
             }
-
-            // ==========================================
-            // 4. Validate Birth Date (วันเกิด)
-            // ==========================================
-            ['#simpleBirthDay', '#simpleBirthMonth', '#simpleBirthYear'].forEach(sel => {
-                if (!$(sel).val()) $(sel).addClass('is-invalid');
-                else $(sel).removeClass('is-invalid');
-            });
-
-            const sBirthDay = $('#simpleBirthDay').val();
-            const sBirthMonth = $('#simpleBirthMonth').val();
-            const sBirthYear = $('#simpleBirthYear').val();
-
-            if (!sBirthDay || !sBirthMonth || !sBirthYear) {
-                toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
-                isValid = false;
-            } else {
-                var yearCE = parseInt(sBirthYear);
-                if (currentLang === 'th' && yearCE > 2500) yearCE -= 543;
-                var sAge = Math.floor((today - new Date(yearCE, parseInt(sBirthMonth) - 1, parseInt(sBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
-                if (sAge < 18) {
-                    $('#simpleBirthYear').addClass('is-invalid');
-                    toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+            else {
+                const val = $.trim(field.val());
+                if (!val) {
+                    field.addClass('is-invalid');
                     isValid = false;
+                } else {
+                    field.removeClass('is-invalid');
                 }
-            }
-
-            // ==========================================
-            // 5. แสดงผลลัพธ์และส่งข้อมูล
-            // ==========================================
-
-            // Additional content validation (name/business/mobile/email/lineId)
-            if (!validateSimpleFullName()) { isValid = false; }
-            if (!validateSimpleBusinessName()) { isValid = false; }
-            if (!validateSimpleEmail()) { isValid = false; }
-            if (!validateSimpleMobile()) { isValid = false; }
-            if (!validateSimpleLineId()) { isValid = false; }
-
-            console.log("ฟอร์มผ่านหรือไม่: ", isValid);
-
-            if (isValid) {
-                const isConfirmed = await showRegisterConfirmPopup({
-                    referrerCode: $('#simpleReferrerCode').val(),
-                    referrerName: $('#simpleReferrerName').val(),
-                    position: $('input[name="position"]:checked').val(),
-                    thaiName: $('#simpleFullName').val(),
-                    englishName: $('#simpleBusinessName').val(),
-                    documentNumber: $('#simpleDocumentNumber').val(),
-                    mobile: $('#simpleMobile').val()
-                });
-
-                if (!isConfirmed) {
-                    return;
-                }
-
-                Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-                // Construct birth date from dropdowns (format: dd-MM-yyyy, CE year)
-                var simpleBirthDay = $('#simpleBirthDay').val();
-                var simpleBirthMonth = $('#simpleBirthMonth').val();
-                var simpleBirthYear = $('#simpleBirthYear').val();
-                // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
-                var simpleBirthYearCE = parseInt(simpleBirthYear);
-                if (currentLang === 'th' && simpleBirthYearCE > 2400) simpleBirthYearCE -= 543;
-                var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear ? String(simpleBirthYearCE) + '-' + 
-                String(simpleBirthMonth).padStart(2, '0') + '-' +  String(simpleBirthDay).padStart(2, '0') : '';
-
-                const formData = {
-                    country: $('#simpleCountry').val(),
-                    countryBusiness: $('#simpleCountryBusiness').val(), // เพิ่ม: ประเทศธุรกิจ
-                    documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''),
-                    referrerCode: $('#simpleReferrerCode').val(),
-                    position: $('input[name="position"]:checked').val(), // เพิ่ม: ตำแหน่งสายงาน
-                    title: $('select[name="simpleTitle"]').val(),
-                    idCardName: $('#simpleFullName').val(), // เปลี่ยนชื่อจาก fullName เป็น idCardName
-                    birthDate: simpleBirthDateStr, // วันเกิดจาก dropdown
-                    businessName: $('#simpleBusinessName').val(),
-                    mobile: $('#simpleMobile').val(),
-                    homePhone: $('#simpleHomePhone').val(), // เพิ่ม: เบอร์บ้าน
-                    email: $('#simpleEmail').val(),
-                    lineId: $('#simpleLineId').val(),
-                    addressIdCard: [$('#simpleHouseNumber').val(), $('#simpleMoo').val() ? 'หมู่ ' + $('#simpleMoo').val() : '', $('#simpleAlley').val() ? 'ซ.' + $('#simpleAlley').val() : '', $('#simpleRoad').val() ? 'ถ.' + $('#simpleRoad').val() : '', $('#simpleBuilding').val(), $('#simpleFloor').val() ? 'ชั้น ' + $('#simpleFloor').val() : ''].filter(Boolean).join(' '),
-                    houseNumber: $('#simpleHouseNumber').val(),
-                    moo: $('#simpleMoo').val(),
-                    alley: $('#simpleAlley').val(),
-                    road: $('#simpleRoad').val(),
-                    building: $('#simpleBuilding').val(),
-                    floor: $('#simpleFloor').val(),
-                    postcode: $('#simplePostcode').val(),
-                    provinceCode: $('#simpleProvince').val(),
-                    districtCode: $('#simpleDistrict').val(),
-                    subdistrictCode: $('#simpleSubdistrict').val(),
-                    tambonId: parseInt($('#simpleTambonId').val()) || null,
-                    ipAddress: clientIpAddress
-                };
-
-                try {
-                    const checks = [
-                        checkDuplicateIDCard(formData.documentNumber),
-                        checkDuplicateTelephone(formData.mobile),
-                        checkDuplicateEmail(formData.email),
-                        checkDuplicateIDCardName(formData.idCardName),
-                        checkDuplicateBusinessName(formData.businessName)
-                    ];
-
-                    const results = await Promise.all(checks);
-                    const failed = results.find(r => r && r.success === false);
-                    if (failed) {
-                        Swal.fire('ไม่สามารถสมัครได้', failed.message || 'พบข้อมูลซ้ำในระบบ', 'error');
-                        return;
-                    }
-
-                    // ถ้าผ่านหมด -> ค่อยเรียกส่ง OTP
-                    Swal.close();
-                    console.log("sample ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
-                    await sendOTPAndShowInput(formData);
-
-                } catch (err) {
-                    console.error(err);
-                    const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
-                    Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
-                }
-            } else {
-                // เลื่อนจอไปหาจุดที่ผิดที่แรกให้ User
-                const firstError = $('.is-invalid').first();
-                if (firstError.length > 0) {
-                    $('html, body').animate({ scrollTop: firstError.closest('.form-group').offset().top - 100 }, 500);
-                    firstError.focus();
-                }
-                toastr.error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
             }
         });
 
-        // โบนัส: ซ่อนแจ้งเตือนตอน User เริ่มแก้ข้อผิดพลาด
-        $('#simpleRegistrationForm').on('input change', 'input, select, textarea', function() {
-            
-            const id = $(this).attr('id');
-            if (id !== 'simpleDocumentNumber') {
-                $('#documentValidationMessage').html('');
-                $(this).removeClass('is-invalid');
-            }
-            if (id === 'simpleFullName') {
-                $('#simpleIdCardNameValidation').text('');
-            }
-            if (id === 'simpleBusinessName') {
-                $('#simpleBusinessNameValidation').text('');
-                $('#simpleBusinessName').data('userEdited', true);
-            }
-            if (id === 'simpleMobile') {
-                $('#mobileValidation').text('');
-            }
-            if (id === 'simpleEmail') {
-                $('#emailValidation').text('');
+        const docNumber = ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, '');
+        if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+            $('#simpleDocumentNumber').addClass('is-invalid');
+            $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
+            isValid = false;
+            toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+        }
+
+        const addressFields = ['#simpleHouseNumber', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
+        let addressComplete = true;
+        addressFields.forEach(fieldId => {
+            if (!$.trim($(fieldId).val())) {
+                $(fieldId).addClass('is-invalid');
+                addressComplete = false;
+            } else {
+                $(fieldId).removeClass('is-invalid');
             }
         });
 
-        // Full form submission — run same duplicate checks + OTP flow as Simple/ExternalRegistration
-        $('#fullRegistrationForm').submit(async function (e) {
-            e.preventDefault();
+        if (!addressComplete) {
+            toastr.error('กรุณากรอกข้อมูลที่อยู่ตามบัตรให้ครบถ้วน');
+            isValid = false;
+        }
 
-            let isValid = true;
+        ['#simpleBirthDay', '#simpleBirthMonth', '#simpleBirthYear'].forEach(sel => {
+            if (!$(sel).val()) $(sel).addClass('is-invalid');
+            else $(sel).removeClass('is-invalid');
+        });
 
-            const requiredFields = $(this).find('input[required], select[required], textarea[required]');
+        const sBirthDay = $('#simpleBirthDay').val();
+        const sBirthMonth = $('#simpleBirthMonth').val();
+        const sBirthYear = $('#simpleBirthYear').val();
 
-            requiredFields.each(function () {
-                const field = $(this);
-
-                if (field.is(':radio') || field.is(':checkbox')) {
-                    const name = field.attr('name');
-                    if ($('#fullRegistrationForm input[name="' + name + '"]:checked').length === 0) {
-                        $('#fullRegistrationForm input[name="' + name + '"]').addClass('is-invalid');
-                        isValid = false;
-                    } else {
-                        $('#fullRegistrationForm input[name="' + name + '"]').removeClass('is-invalid');
-                    }
-                }
-                else {
-                    const val = $.trim(field.val());
-                    if (!val) {
-                        field.addClass('is-invalid');
-                        isValid = false;
-                    } else {
-                        field.removeClass('is-invalid');
-                    }
-                }
-            });
-
-            // ==========================================
-            // 2. ตรวจสอบความถูกต้องของบัตรประชาชน
-            // ==========================================
-            const citizenInput = $('#fullDocumentNumber');
-            // แก้ไข: ใช้ || "" ป้องกัน error
-            const docNumber = (citizenInput.val() || "").replace(/[- ]/g, '');
-
-            if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
-                citizenInput.addClass('is-invalid');
-
-                if (citizenInput.next('.invalid-feedback-custom').length === 0) {
-                    citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</small>');
-                }
-
+        if (!sBirthDay || !sBirthMonth || !sBirthYear) {
+            toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+            isValid = false;
+        } else {
+            var yearCE = parseInt(sBirthYear);
+            if (currentLang === 'th' && yearCE > 2500) yearCE -= 543;
+            var sAge = Math.floor((today - new Date(yearCE, parseInt(sBirthMonth) - 1, parseInt(sBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
+            if (sAge < 18) {
+                $('#simpleBirthYear').addClass('is-invalid');
+                toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
                 isValid = false;
-                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
-            } else {
-                citizenInput.next('.invalid-feedback-custom').remove();
             }
+        }
 
-            // ==========================================
-            // 3. Validate Birth Date (วันเกิด)
-            // ==========================================
-            ['#fullBirthDay', '#fullBirthMonth', '#fullBirthYear'].forEach(sel => {
-                if (!$(sel).val()) $(sel).addClass('is-invalid');
-                else $(sel).removeClass('is-invalid');
-            });
+        if (!validateSimpleFullName()) { isValid = false; }
+        if (!validateSimpleBusinessName()) { isValid = false; }
+        if (!validateSimpleEmail()) { isValid = false; }
+        if (!validateSimpleMobile()) { isValid = false; }
+        if (!validateSimpleLineId()) { isValid = false; }
 
-            const fBirthDay = $('#fullBirthDay').val();
-            const fBirthMonth = $('#fullBirthMonth').val();
-            const fBirthYear = $('#fullBirthYear').val();
+        console.log("ฟอร์มผ่านหรือไม่: ", isValid);
 
-            if (!fBirthDay || !fBirthMonth || !fBirthYear) {
-                toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
-                isValid = false;
-            } else {
-                var fYearCE = parseInt(fBirthYear);
-                if (currentLang === 'th' && fYearCE > 2500) fYearCE -= 543;
-                var fAge = Math.floor((today - new Date(fYearCE, parseInt(fBirthMonth) - 1, parseInt(fBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
-                if (fAge < 18) {
-                    $('#fullBirthYear').addClass('is-invalid');
-                    toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
-                    isValid = false;
-                }
-            }
-
-            // Additional content validation (name/business/mobile)
-            if (!validateFullNameOnCard()) { $('#fullNameOnCard').addClass('is-invalid'); isValid = false; }
-            if (!validateFullBusinessName()) { $('#fullBusinessName').addClass('is-invalid'); isValid = false; }
-            if (!validateFullEmail()) { $('#fullEmail').addClass('is-invalid'); isValid = false; }
-            if (!validateFullMobile()) { $('#fullMobile').addClass('is-invalid'); isValid = false; }
-
-            if (!isValid) {
-                const firstError = $('#fullRegistrationForm .is-invalid').first();
-                if (firstError.length > 0) {
-                    $('html, body').animate({ scrollTop: firstError.closest('.form-group, .row').offset().top - 100 }, 500);
-                    firstError.focus();
-                }
-                toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
-                return;
-            }
-
+        if (isValid) {
             const isConfirmed = await showRegisterConfirmPopup({
-                referrerCode: $('#fullReferrerCode').val(),
-                referrerName: $('#fullReferrerName').val(),
+                referrerCode: $('#simpleReferrerCode').val(),
+                referrerName: $('#simpleReferrerName').val(),
                 position: $('input[name="position"]:checked').val(),
-                thaiName: $('#fullNameOnCard').val(),
-                englishName: $('#fullBusinessName').val(),
-                documentNumber: $('#fullDocumentNumber').val(),
-                mobile: $('#fullMobile').val()
+                thaiName: $('#simpleFullName').val(),
+                englishName: $('#simpleBusinessName').val(),
+                documentNumber: $('#simpleDocumentNumber').val(),
+                mobile: $('#simpleMobile').val()
             });
 
-            if (!isConfirmed) {
-                return;
-            }
+            if (!isConfirmed) return;
 
             Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            // Construct birth date from dropdowns (format: dd-MM-yyyy, CE year)
-            var fullBirthDay = $('#fullBirthDay').val();
-            var fullBirthMonth = $('#fullBirthMonth').val();
-            var fullBirthYear = $('#fullBirthYear').val();
-            // ถ้าภาษาไทย year เป็น พ.ศ. → แปลงเป็น ค.ศ. ก่อนส่ง API
-            var fullBirthYearCE = parseInt(fullBirthYear);
-            if (currentLang === 'th' && fullBirthYearCE > 2400) fullBirthYearCE -= 543;
-            var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear ? String(fullBirthYearCE) + '-' + 
-                String(fullBirthMonth).padStart(2, '0') + '-' + String(fullBirthDay).padStart(2, '0') : '';
+            var simpleBirthDay = $('#simpleBirthDay').val();
+            var simpleBirthMonth = $('#simpleBirthMonth').val();
+            var simpleBirthYear = $('#simpleBirthYear').val();
+            var simpleBirthYearCE = parseInt(simpleBirthYear);
+            if (currentLang === 'th' && simpleBirthYearCE > 2400) simpleBirthYearCE -= 543;
+            var simpleBirthDateStr = simpleBirthDay && simpleBirthMonth && simpleBirthYear ? String(simpleBirthYearCE) + '-' + 
+            String(simpleBirthMonth).padStart(2, '0') + '-' +  String(simpleBirthDay).padStart(2, '0') : '';
 
             const formData = {
-                _origin: 'full',
-                country: $('#fullCountry').val(),
-                countryBusiness: $('#fullCountryBusiness').val(), // เปลี่ยนจาก businessCountry
-                referrerCode: $('#fullReferrerCode').val(),
+                country: $('#simpleCountry').val(),
+                countryBusiness: $('#simpleCountryBusiness').val(),
+                documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''),
+                referrerCode: $('#simpleReferrerCode').val(),
                 position: $('input[name="position"]:checked').val(),
-
-                title: $('#fullTitle').val(),
-                language: $('#fullLanguage').val(),
-                idCardName: $('#fullNameOnCard').val() || '', // เปลี่ยนจาก nameOnCard
-                businessName: $('#fullBusinessName').val() || '',
-                birthDate: fullBirthDateStr, // วันเกิดจาก dropdown
-                documentNumber: docNumber, // เปลี่ยนจาก citizenNumber
-                mobile: $('#fullMobile').val() || '',
-                homePhone: $('#fullHomePhone').val() || '', // เพิ่ม: เบอร์บ้าน
-                email: $('#fullEmail').val() || '',
-                lineId: $('#fullLineId').val() || '', // เพิ่ม: Line ID
-                spouseName: $('#fullSpouseName').val() || '', // เพิ่ม: ชื่อคู่สมรส
-
-                // Bank Information
-                bankCode: $('#fullBank').val(), // เปลี่ยนจาก bank
-                bankAccountNumber: $('#fullBankAccountNumber').val() || '', // ดึงจาก HTML ที่เพิ่ม ID แล้ว
-                bankAccountName: $('#fullBankAccountName').val() || '',
-                bankBranch: $('#fullBankBranch').val() || '',
-                beneficiary: $('#fullBeneficiary').val() || '', // เพิ่ม: ผู้รับผลประโยชน์
-                beneficiaryCardNumber: $('#fullBeneficiaryCardNumber').val() || '', // เพิ่ม: เลขบัตรผู้รับผลประโยชน์
-
-                // Address (ID card) -> เปลี่ยน Key ไม่ให้มีคำว่า IdCard ห้อยท้าย (ให้ตรงกับ Model)
-                addressIdCard: [$('#fullHouseNumber').val(), $('#fullMoo').val() ? 'หมู่ ' + $('#fullMoo').val() : '', $('#fullAlley').val() ? 'ซ.' + $('#fullAlley').val() : '', $('#fullRoad').val() ? 'ถ.' + $('#fullRoad').val() : '', $('#fullBuilding').val(), $('#fullFloor').val() ? 'ชั้น ' + $('#fullFloor').val() : ''].filter(Boolean).join(' '),
-                houseNumber: $('#fullHouseNumber').val(),
-                moo: $('#fullMoo').val(),
-                alley: $('#fullAlley').val(),
-                road: $('#fullRoad').val(),
-                building: $('#fullBuilding').val(),
-                floor: $('#fullFloor').val(),
-                postcode: $('#fullPostcodeIdCard').val(),
-                provinceCode: $('#fullProvinceIdCard').val(),
-                districtCode: $('#fullDistrictIdCard').val(),
-                subdistrictCode: $('#fullSubdistrictIdCard').val(),
-                tambonId: parseInt($('#fullTambonId').val()) || null,
-
-                // Current / contact address
-                useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
-                currentAddress: [$('#fullCurrentHouseNumber').val(), $('#fullCurrentMoo').val() ? 'หมู่ ' + $('#fullCurrentMoo').val() : '', $('#fullCurrentAlley').val() ? 'ซ.' + $('#fullCurrentAlley').val() : '', $('#fullCurrentRoad').val() ? 'ถ.' + $('#fullCurrentRoad').val() : '', $('#fullCurrentBuilding').val(), $('#fullCurrentFloor').val() ? 'ชั้น ' + $('#fullCurrentFloor').val() : ''].filter(Boolean).join(' '),
-                currentHouseNumber: $('#fullCurrentHouseNumber').val(),
-                currentMoo: $('#fullCurrentMoo').val(),
-                currentAlley: $('#fullCurrentAlley').val(),
-                currentRoad: $('#fullCurrentRoad').val(),
-                currentBuilding: $('#fullCurrentBuilding').val(),
-                currentFloor: $('#fullCurrentFloor').val(),
-                currentPostcode: $('#fullCurrentPostcode').val(),
-                currentProvinceCode: $('#fullCurrentProvince').val(),
-                currentDistrictCode: $('#fullCurrentDistrict').val(),
-                currentSubdistrictCode: $('#fullCurrentSubdistrict').val(),
-                currentTambonId: parseInt($('#fullCurrentTambonId').val()) || null,
-
+                title: $('select[name="simpleTitle"]').val(),
+                idCardName: $('#simpleFullName').val(),
+                birthDate: simpleBirthDateStr,
+                businessName: $('#simpleBusinessName').val(),
+                mobile: $('#simpleMobile').val(),
+                homePhone: $('#simpleHomePhone').val(),
+                email: $('#simpleEmail').val(),
+                lineId: $('#simpleLineId').val(),
+                addressIdCard: [$('#simpleHouseNumber').val(), $('#simpleMoo').val() ? 'หมู่ ' + $('#simpleMoo').val() : '', $('#simpleAlley').val() ? 'ซ.' + $('#simpleAlley').val() : '', $('#simpleRoad').val() ? 'ถ.' + $('#simpleRoad').val() : '', $('#simpleBuilding').val(), $('#simpleFloor').val() ? 'ชั้น ' + $('#simpleFloor').val() : ''].filter(Boolean).join(' '),
+                houseNumber: $('#simpleHouseNumber').val(),
+                moo: $('#simpleMoo').val(),
+                alley: $('#simpleAlley').val(),
+                road: $('#simpleRoad').val(),
+                building: $('#simpleBuilding').val(),
+                floor: $('#simpleFloor').val(),
+                postcode: $('#simplePostcode').val(),
+                provinceCode: $('#simpleProvince').val(),
+                districtCode: $('#simpleDistrict').val(),
+                subdistrictCode: $('#simpleSubdistrict').val(),
+                tambonId: parseInt($('#simpleTambonId').val()) || null,
                 ipAddress: clientIpAddress
             };
 
@@ -2287,732 +1938,785 @@
                     return;
                 }
 
-                Swal.close(); 
-                console.log("full ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
-                await sendOTPAndShowInput(formData); // หากเปิดใช้งาน OTP ให้เอาคอมเม้นต์บรรทัดนี้ออก
+                Swal.close();
+                console.log("sample ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
+                await sendOTPAndShowInput(formData);
 
             } catch (err) {
                 console.error(err);
                 const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
                 Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
             }
-        });
-
-        // โบนัส UX: ทันทีที่ User เริ่มแก้ไขช่องที่ผิด ให้เอาสีแดงแจ้งเตือนออกอัตโนมัติ
-        $('#fullRegistrationForm').on('input change', 'input, select, textarea', function() {
-            const id = $(this).attr('id');
-
-            // ✅ ยกเว้นช่องเลขบัตร ปชช. ของฟอร์มเต็ม ไม่ให้ลบคลาส is-invalid อัตโนมัติ
-            if (id !== 'fullDocumentNumber') {
-                $(this).removeClass('is-invalid');
+        } else {
+            const firstError = $('.is-invalid').first();
+            if (firstError.length > 0) {
+                $('html, body').animate({ scrollTop: firstError.closest('.form-group').offset().top - 100 }, 500);
+                firstError.focus();
             }
+            toastr.error('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน');
+        }
+    });
 
-            // (ส่วนของ fullDocumentNumber เราตัดทิ้งไปได้เลยครับ ให้ Event Real-time ของมันจัดการเอง)
+    $('#simpleRegistrationForm').on('input change', 'input, select, textarea', function() {
+        const id = $(this).attr('id');
+        if (id !== 'simpleDocumentNumber') {
+            $('#documentValidationMessage').html('');
+            $(this).removeClass('is-invalid');
+        }
+        if (id === 'simpleFullName') { $('#simpleIdCardNameValidation').text(''); }
+        if (id === 'simpleBusinessName') {
+            $('#simpleBusinessNameValidation').text('');
+            $('#simpleBusinessName').data('userEdited', true);
+        }
+        if (id === 'simpleMobile') { $('#mobileValidation').text(''); }
+        if (id === 'simpleEmail') { $('#emailValidation').text(''); }
+    });
 
-            if (id === 'fullNameOnCard') {
-                $('#fullNameOnCardValidation').text('').removeClass('validation-error');
-            }
-            if (id === 'fullBusinessName') {
-                $('#fullBusinessNameValidation').text('').removeClass('validation-error');
-            }
-            if (id === 'fullMobile') {
-                $('#fullMobileValidation').text('');
-            }
-            if (id === 'fullEmail') {
-                $('#fullEmailValidation').text('');
-            }
-        });
+    // Full form submission
+    $('#fullRegistrationForm').submit(async function (e) {
+        e.preventDefault();
+        let isValid = true;
 
-        // Cancel / Reset full registration
-        $('#btnCancelFull, #btnCancelFullSticky').click(function () {
-            if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
-
-                $('#fullRegistrationForm')[0].reset();
-                $('#fullRegistrationForm .is-invalid').removeClass('is-invalid');
-                $('#fullRegistrationForm .invalid-feedback-custom').remove();
-
-                $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview').each(function() {
-                    const preview = $(this);
-                    if (preview.data('object-url')) {
-                        URL.revokeObjectURL(preview.data('object-url'));
-                        preview.removeData('object-url');
-                    }
-                    preview.hide().attr('src', '');
-                });
-
-                $('#fullIdCardCopy, #fullBankCardCopy, #fullBusinessPhoto, #fullApplicationForm').val('');
-
-                resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
-                resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
-                resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-                resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
-                resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
-
-                $('#fullProvinceIdCard, #fullDistrictIdCard, #fullSubdistrictIdCard, #fullCurrentProvince, #fullCurrentDistrict, #fullCurrentSubdistrict').prop('disabled', true);
-
-                $('#fullUseIdCardAddress').prop('checked', true).trigger('change');
-
-                toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
-                $('html, body').animate({ scrollTop: 0 }, 500);
-            }
-        });
-
-        // Sticky-action buttons wiring
-        $('#btnSaveFullSticky').click(function () {
-            $('#fullRegistrationForm').submit();
-        });
-        $('#btnCancelFullSticky').click(function () {
-            $('#btnCancelFull').trigger('click');
-        });
-
-        // Add required field styling
-        $('.required').each(function () {
-            const label = $(this);
-            const text = label.text();
-            if (!text.includes('*')) {
-                label.html(text + ' <span class="text-danger">*</span>');
-            }
-        });
-
-        // Helper functions
-        function loadMasterAddresses() {
-            $.get('/orders/GetMasterAddress', function(res) {
-                if (typeof res === 'string') {
-                    try { res = JSON.parse(res); } catch (e) {
-                        console.error("JSON Error", e);
-                        toastr.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้');
-                        return;
-                    }
-                }
-
-                if (!Array.isArray(res)) {
-                    if (res.data && Array.isArray(res.data)) {
-                        masterData = res.data;
-                    } else if (res.result && Array.isArray(res.result)) {
-                        masterData = res.result;
-                    } else {
-                        masterData = [];
-                    }
+        const requiredFields = $(this).find('input[required], select[required], textarea[required]');
+        requiredFields.each(function () {
+            const field = $(this);
+            if (field.is(':radio') || field.is(':checkbox')) {
+                const name = field.attr('name');
+                if ($('#fullRegistrationForm input[name="' + name + '"]:checked').length === 0) {
+                    $('#fullRegistrationForm input[name="' + name + '"]').addClass('is-invalid');
+                    isValid = false;
                 } else {
-                    masterData = res;
+                    $('#fullRegistrationForm input[name="' + name + '"]').removeClass('is-invalid');
                 }
-
-                console.log("Loaded " + masterData.length + " rows of address data");
-                $('#simplePostcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
-
-                if (masterData.length === 0) {
-                    toastr.warning('ไม่พบข้อมูลที่อยู่ในระบบ');
+            }
+            else {
+                const val = $.trim(field.val());
+                if (!val) {
+                    field.addClass('is-invalid');
+                    isValid = false;
+                } else {
+                    field.removeClass('is-invalid');
                 }
-            }).fail(function() {
-                toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์เพื่อโหลดข้อมูลที่อยู่');
-                console.error("Failed to load master address data");
-            });
+            }
+        });
+
+        const citizenInput = $('#fullDocumentNumber');
+        const docNumber = (citizenInput.val() || "").replace(/[- ]/g, '');
+
+        if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+            citizenInput.addClass('is-invalid');
+            if (citizenInput.next('.invalid-feedback-custom').length === 0) {
+                citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</small>');
+            }
+            isValid = false;
+            toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+        } else {
+            citizenInput.next('.invalid-feedback-custom').remove();
         }
 
-        function setSimpleRegistrationDate() {
-            const d = new Date();
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const yearBE = d.getFullYear()
+        ['#fullBirthDay', '#fullBirthMonth', '#fullBirthYear'].forEach(sel => {
+            if (!$(sel).val()) $(sel).addClass('is-invalid');
+            else $(sel).removeClass('is-invalid');
+        });
 
-            const formattedDateBE = `${day}-${month}-${yearBE}`;
-            $('#simpleRegistrationDate').val(formattedDateBE);
+        const fBirthDay = $('#fullBirthDay').val();
+        const fBirthMonth = $('#fullBirthMonth').val();
+        const fBirthYear = $('#fullBirthYear').val();
+
+        if (!fBirthDay || !fBirthMonth || !fBirthYear) {
+            toastr.error('กรุณาเลือกวันเกิดให้ครบถ้วน');
+            isValid = false;
+        } else {
+            var fYearCE = parseInt(fBirthYear);
+            if (currentLang === 'th' && fYearCE > 2500) fYearCE -= 543;
+            var fAge = Math.floor((today - new Date(fYearCE, parseInt(fBirthMonth) - 1, parseInt(fBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
+            if (fAge < 18) {
+                $('#fullBirthYear').addClass('is-invalid');
+                toastr.error('อายุต้องมากกว่า 18 ปี จึงสามารถสมัครสมาชิกได้');
+                isValid = false;
+            }
         }
 
-        function loadSimpleCountries() {
-            $.get('/ExternalRegistration/GetCountries').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
-                data.forEach(item => {
-                    $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                });
-            }).fail(() => {});
+        if (!validateFullNameOnCard()) { $('#fullNameOnCard').addClass('is-invalid'); isValid = false; }
+        if (!validateFullBusinessName()) { $('#fullBusinessName').addClass('is-invalid'); isValid = false; }
+        if (!validateFullEmail()) { $('#fullEmail').addClass('is-invalid'); isValid = false; }
+        if (!validateFullMobile()) { $('#fullMobile').addClass('is-invalid'); isValid = false; }
+
+        if (!isValid) {
+            const firstError = $('#fullRegistrationForm .is-invalid').first();
+            if (firstError.length > 0) {
+                $('html, body').animate({ scrollTop: firstError.closest('.form-group, .row').offset().top - 100 }, 500);
+                firstError.focus();
+            }
+            toastr.error('กรุณากรอกฟิลด์ที่จำเป็นในแบบฟอร์มเต็มให้ครบถ้วน');
+            return;
         }
 
-        function loadSimpleCountryBusinesses() {
-            $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
-                data.forEach(item => {
-                    $('#simpleCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                });
-            }).fail(() => {});
-        }
+        const isConfirmed = await showRegisterConfirmPopup({
+            referrerCode: $('#fullReferrerCode').val(),
+            referrerName: $('#fullReferrerName').val(),
+            position: $('input[name="position"]:checked').val(),
+            thaiName: $('#fullNameOnCard').val(),
+            englishName: $('#fullBusinessName').val(),
+            documentNumber: $('#fullDocumentNumber').val(),
+            mobile: $('#fullMobile').val()
+        });
 
-        function loadSimpleTitles() {
-            $.get('/orders/GetTitlename').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#simpleTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
-                data.forEach(item => {
-                    $('#simpleTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
-                });
-            }).fail(() => {
-                $('#simpleTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
-            });
-        }
+        if (!isConfirmed) return;
 
-        function setFullRegistrationDate() {
-            const d = new Date();
-            const day = String(d.getDate()).padStart(2, '0');
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            const yearBE = d.getFullYear()
+        Swal.fire({ title: 'กำลังตรวจสอบข้อมูล...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
 
-            const formattedDateBE = `${day}-${month}-${yearBE}`;
-            $('#fullRegistrationDate').val(formattedDateBE);
-        }
+        var fullBirthDay = $('#fullBirthDay').val();
+        var fullBirthMonth = $('#fullBirthMonth').val();
+        var fullBirthYear = $('#fullBirthYear').val();
+        var fullBirthYearCE = parseInt(fullBirthYear);
+        if (currentLang === 'th' && fullBirthYearCE > 2400) fullBirthYearCE -= 543;
+        var fullBirthDateStr = fullBirthDay && fullBirthMonth && fullBirthYear ? String(fullBirthYearCE) + '-' + 
+            String(fullBirthMonth).padStart(2, '0') + '-' + String(fullBirthDay).padStart(2, '0') : '';
 
-        function loadFullCountries() {
-            $.get('/ExternalRegistration/GetCountries').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
-                data.forEach(item => {
-                    $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                });
-            }).fail(() => {});
-        }
+        const formData = {
+            _origin: 'full',
+            country: $('#fullCountry').val(),
+            countryBusiness: $('#fullCountryBusiness').val(),
+            referrerCode: $('#fullReferrerCode').val(),
+            position: $('input[name="position"]:checked').val(),
+            title: $('#fullTitle').val(),
+            language: $('#fullLanguage').val(),
+            idCardName: $('#fullNameOnCard').val() || '',
+            businessName: $('#fullBusinessName').val() || '',
+            birthDate: fullBirthDateStr,
+            documentNumber: docNumber,
+            mobile: $('#fullMobile').val() || '',
+            homePhone: $('#fullHomePhone').val() || '',
+            email: $('#fullEmail').val() || '',
+            lineId: $('#fullLineId').val() || '',
+            spouseName: $('#fullSpouseName').val() || '',
+            bankCode: $('#fullBank').val(),
+            bankAccountNumber: $('#fullBankAccountNumber').val() || '',
+            bankAccountName: $('#fullBankAccountName').val() || '',
+            bankBranch: $('#fullBankBranch').val() || '',
+            beneficiary: $('#fullBeneficiary').val() || '',
+            beneficiaryCardNumber: $('#fullBeneficiaryCardNumber').val() || '',
+            addressIdCard: [$('#fullHouseNumber').val(), $('#fullMoo').val() ? 'หมู่ ' + $('#fullMoo').val() : '', $('#fullAlley').val() ? 'ซ.' + $('#fullAlley').val() : '', $('#fullRoad').val() ? 'ถ.' + $('#fullRoad').val() : '', $('#fullBuilding').val(), $('#fullFloor').val() ? 'ชั้น ' + $('#fullFloor').val() : ''].filter(Boolean).join(' '),
+            houseNumber: $('#fullHouseNumber').val(),
+            moo: $('#fullMoo').val(),
+            alley: $('#fullAlley').val(),
+            road: $('#fullRoad').val(),
+            building: $('#fullBuilding').val(),
+            floor: $('#fullFloor').val(),
+            postcode: $('#fullPostcodeIdCard').val(),
+            provinceCode: $('#fullProvinceIdCard').val(),
+            districtCode: $('#fullDistrictIdCard').val(),
+            subdistrictCode: $('#fullSubdistrictIdCard').val(),
+            tambonId: parseInt($('#fullTambonId').val()) || null,
+            useIdCardAddress: $('#fullUseIdCardAddress').is(':checked'),
+            currentAddress: [$('#fullCurrentHouseNumber').val(), $('#fullCurrentMoo').val() ? 'หมู่ ' + $('#fullCurrentMoo').val() : '', $('#fullCurrentAlley').val() ? 'ซ.' + $('#fullCurrentAlley').val() : '', $('#fullCurrentRoad').val() ? 'ถ.' + $('#fullCurrentRoad').val() : '', $('#fullCurrentBuilding').val(), $('#fullCurrentFloor').val() ? 'ชั้น ' + $('#fullCurrentFloor').val() : ''].filter(Boolean).join(' '),
+            currentHouseNumber: $('#fullCurrentHouseNumber').val(),
+            currentMoo: $('#fullCurrentMoo').val(),
+            currentAlley: $('#fullCurrentAlley').val(),
+            currentRoad: $('#fullCurrentRoad').val(),
+            currentBuilding: $('#fullCurrentBuilding').val(),
+            currentFloor: $('#fullCurrentFloor').val(),
+            currentPostcode: $('#fullCurrentPostcode').val(),
+            currentProvinceCode: $('#fullCurrentProvince').val(),
+            currentDistrictCode: $('#fullCurrentDistrict').val(),
+            currentSubdistrictCode: $('#fullCurrentSubdistrict').val(),
+            currentTambonId: parseInt($('#fullCurrentTambonId').val()) || null,
+            ipAddress: clientIpAddress
+        };
 
-        function loadFullCountryBusinesses() {
-            $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
-                data.forEach(item => {
-                    $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
-                });
-            }).fail(() => {});
-        }
+        try {
+            const checks = [
+                checkDuplicateIDCard(formData.documentNumber),
+                checkDuplicateTelephone(formData.mobile),
+                checkDuplicateEmail(formData.email),
+                checkDuplicateIDCardName(formData.idCardName),
+                checkDuplicateBusinessName(formData.businessName)
+            ];
 
-        function loadFullTitles() {
-            $.get('/orders/GetTitlename').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
-                data.forEach(item => {
-                    $('#fullTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
-                });
-            }).fail(() => {
-                $('#fullTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
-            });
-        }
-
-        function loadFullBanks() {
-            $.get('/Member/GetBanks').done(res => {
-                let data = (typeof res === 'string') ? JSON.parse(res) : res;
-                data = Array.isArray(data) ? data : (data.data || []);
-                $('#fullBank').empty().append('<option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>');
-                data.forEach(item => {
-                    const code = item.M17_PX1;
-                    const name = item.Thainame;
-                    $('#fullBank').append(`<option value="${code}">${name}</option>`);
-                });
-            }).fail(() => {});
-        }
-
-        function readFilesAsBase64(selectors) {
-            return Promise.all(selectors.map(sel => {
-                return new Promise(resolve => {
-                    const input = $(sel)[0];
-                    if (!input || !input.files || input.files.length === 0) return resolve(null);
-                    const file = input.files[0];
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const s = (e.target.result || '').toString();
-                        const parts = s.split(',');
-                        resolve(parts.length > 1 ? parts[1] : parts[0]);
-                    };
-                    reader.onerror = function () { resolve(null); };
-                    reader.readAsDataURL(file);
-                });
-            })).then(results => results.filter(r => r));
-        }
-
-        function getUniqueList(data, codeKey, nameKey) {
-            var seen = new Set();
-            return data.filter(item => {
-                var k = item[codeKey];
-                return seen.has(k) ? false : seen.add(k);
-            }).sort((a, b) => a[nameKey].localeCompare(b[nameKey]));
-        }
-
-        function resetDropdown(selector, defaultText) {
-            $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
-        }
-
-        function resetAddressDropdowns() {
-            resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
-            resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
-            resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
-        }
-
-        // Setup synchronization between simple and full registration forms
-        function setupFormSync() {
-            
-            // Map of corresponding field pairs: { simpleId: fullId }
-            const fieldMappings = {
-                // Country & Business
-                'simpleCountry': 'fullCountry',
-                'simpleCountryBusiness': 'fullCountryBusiness',
-                
-                // Referrer
-                'simpleReferrerCode': 'fullReferrerCode',
-                'simpleReferrerName': 'fullReferrerName',
-                
-                // Registration Date
-                'simpleRegDay': 'fullRegDay',
-                'simpleRegMonth': 'fullRegMonth',
-                'simpleRegYear': 'fullRegYear',
-                
-                // Birth Date
-                'simpleBirthDay': 'fullBirthDay',
-                'simpleBirthMonth': 'fullBirthMonth',
-                'simpleBirthYear': 'fullBirthYear',
-                
-                // Personal Info
-                'simpleTitle': 'fullTitle',
-                'simpleFullName': 'fullNameOnCard',
-                'simpleBusinessName': 'fullBusinessName',
-                'simpleDocumentNumber': 'fullDocumentNumber',
-                
-                // Contact
-                'simpleMobile': 'fullMobile',
-                'simpleHomePhone': 'fullHomePhone',
-                'simpleEmail': 'fullEmail',
-                'simpleLineId': 'fullLineId',
-                
-                // Address
-                'simpleHouseNumber': 'fullHouseNumber',
-                'simpleMoo': 'fullMoo',
-                'simpleAlley': 'fullAlley',
-                'simpleRoad': 'fullRoad',
-                'simpleBuilding': 'fullBuilding',
-                'simpleFloor': 'fullFloor',
-                'simplePostcode': 'fullPostcodeIdCard',
-                'simpleProvince': 'fullProvinceIdCard',
-                'simpleDistrict': 'fullDistrictIdCard',
-                'simpleSubdistrict': 'fullSubdistrictIdCard'
-
-                // Note: File uploads are handled separately via syncImagePreview
-            };
-
-            // Sync from simple to full
-            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
-                const simpleEl = $(`#${simpleId}`);
-                const fullEl = $(`#${fullId}`);
-                
-                if (simpleEl.length && fullEl.length) {
-                    // For select and input elements
-                    if (simpleEl.is('select') || simpleEl.is('input[type="text"], input[type="tel"], input[type="email"]')) {
-                        simpleEl.on('change input', function() {
-                            if (simpleEl.is('select')) {
-                                fullEl.val(simpleEl.val());
-                            } else {
-                                fullEl.val(simpleEl.val());
-                            }
-                        });
-                        
-                        fullEl.on('change input', function() {
-                            if (fullEl.is('select')) {
-                                simpleEl.val(fullEl.val());
-                            } else {
-                                simpleEl.val(fullEl.val());
-                            }
-                        });
-                    }
-                    
-                    // For file inputs
-                    if (simpleEl.is('input[type="file"]')) {
-                        simpleEl.on('change', function() {
-                            const file = this.files[0];
-                            if (file) {
-                                fullEl[0].files = this.files;
-                                // Trigger preview update if exists
-                                const previewId = `#${simpleId.replace('Copy', 'Copy').replace('Photo', 'Photo')}Preview`.replace('simple', 'full');
-                                const previewEl = $(previewId);
-                                if (previewEl.length && file.type.startsWith('image/')) {
-                                    const reader = new FileReader();
-                                    reader.onload = function(e) {
-                                        previewEl.attr('src', e.target.result).show();
-                                        $(`#${simpleId.replace('simple', 'full')}Preview`).attr('src', e.target.result).show();
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                            }
-                        });
-                        
-                        fullEl.on('change', function() {
-                            const file = this.files[0];
-                            if (file) {
-                                simpleEl[0].files = this.files;
-                                // Trigger preview update if exists
-                                const previewId = `#${fullId.replace('Copy', 'Copy').replace('Photo', 'Photo')}Preview`;
-                                const previewEl = $(previewId);
-                                if (previewEl.length && file.type.startsWith('image/')) {
-                                    const reader = new FileReader();
-                                    reader.onload = function(e) {
-                                        previewEl.attr('src', e.target.result).show();
-                                        $(`#${fullId.replace('full', 'simple')}Preview`).attr('src', e.target.result).show();
-                                    };
-                                    reader.readAsDataURL(file);
-                                }
-                            }
-                        });
-                    }
-                }
-            });
-
-            // Sync position radio buttons between simple and full forms
-            $('input[name="position"]').on('change', function() {
-                const val = $(this).val();
-                // Find the corresponding position in the other form/tab and check it
-                $(`input[name="position"][value="${val}"]`).prop('checked', true);
-            });
-
-            // Prevent infinite loop in bidirectional sync
-            let isSyncing = false;
-
-            // Real-time sync for select elements with change event
-            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
-                const simpleEl = $(`#${simpleId}`);
-                const fullEl = $(`#${fullId}`);
-
-                if (simpleEl.length && fullEl.length) {
-                    if (simpleEl.is('select')) {
-                        // When simple changes, update full
-                        simpleEl.on('change', function() {
-                            if (isSyncing) return;
-                            isSyncing = true;
-                            fullEl.val(simpleEl.val());
-                            setTimeout(() => { isSyncing = false; }, 0);
-                        });
-
-                        // When full changes, update simple
-                        fullEl.on('change', function() {
-                            if (isSyncing) return;
-                            isSyncing = true;
-                            simpleEl.val(fullEl.val());
-                            setTimeout(() => { isSyncing = false; }, 0);
-                        });
-                    } else if (simpleEl.is('input')) {
-                        // When simple input changes, update full
-                        simpleEl.on('input change', function() {
-                            fullEl.val(simpleEl.val());
-                        });
-
-                        // When full input changes, update simple
-                        fullEl.on('input change', function() {
-                            simpleEl.val(fullEl.val());
-                        });
-                    }
-                }
-            });
-
-            // Sync tab switching - copy data when switching tabs
-            $('#full-tab').on('shown.bs.tab', function() {
-                // Copy from simple to full when switching to full tab
-                Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
-                    const simpleEl = $(`#${simpleId}`);
-                    const fullEl = $(`#${fullId}`);
-                    if (simpleEl.length && fullEl.length) {
-                        if (simpleEl.is('select')) {
-                            fullEl.val(simpleEl.val());
-                        } else if (simpleEl.is('input')) {
-                            fullEl.val(simpleEl.val());
-                        }
-                    }
-                });
-                // Sync position radio buttons
-                const positionVal = $('input[name="position"]:checked').val();
-                if (positionVal) {
-                    $(`#full-tab-pane input[name="position"][value="${positionVal}"]`).prop('checked', true);
-                }
-                // Sync image previews
-                syncImagePreview('simpleIdCardCopy', 'fullIdCardCopy', 'fullIdCardPreview');
-                syncImagePreview('simpleBankCardCopy', 'fullBankCardCopy', 'fullBankCardPreview');
-                syncImagePreview('simpleBusinessPhoto', 'fullBusinessPhoto', 'fullBusinessPhotoPreview');
-            });
-
-            $('#simple-tab').on('shown.bs.tab', function() {
-                // Copy from full to simple when switching to simple tab
-                Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
-                    const simpleEl = $(`#${simpleId}`);
-                    const fullEl = $(`#${fullId}`);
-                    if (simpleEl.length && fullEl.length) {
-                        if (fullEl.is('select')) {
-                            simpleEl.val(fullEl.val());
-                        } else if (fullEl.is('input')) {
-                            simpleEl.val(fullEl.val());
-                        }
-                    }
-                });
-                // Sync position radio buttons
-                const positionVal = $(`#full-tab-pane input[name="position"]:checked`).val();
-                if (positionVal) {
-                    $(`input[name="position"][value="${positionVal}"]`).prop('checked', true);
-                }
-                // Sync image previews
-                syncImagePreview('fullIdCardCopy', 'simpleIdCardCopy', 'simpleIdCardPreview');
-                syncImagePreview('fullBankCardCopy', 'simpleBankCardCopy', 'simpleBankCardPreview');
-                syncImagePreview('fullBusinessPhoto', 'simpleBusinessPhoto', 'simpleBusinessPhotoPreview');
-            });
-        }
-
-        function syncImagePreview(sourceId, targetId, targetPreviewId) {
-            const sourceEl = $(`#${sourceId}`)[0];
-            const targetEl = $(`#${targetId}`)[0];
-            const targetPreview = $(`#${targetPreviewId}`);
-
-            if (!sourceEl || !targetEl) return;
-
-            const sourceFile = sourceEl.files && sourceEl.files[0];
-            if (!sourceFile) {
-                targetPreview.hide().attr('src', '');
+            const results = await Promise.all(checks);
+            const failed = results.find(r => r && r.success === false);
+            if (failed) {
+                Swal.fire('ไม่สามารถสมัครได้', failed.message || 'พบข้อมูลซ้ำในระบบ', 'error');
                 return;
             }
 
-            const url = URL.createObjectURL(sourceFile);
+            Swal.close(); 
+            console.log("full ฟอร์มผ่านการตรวจสอบซ้ำทั้งหมดแล้ว, กำลังไปขั้นตอน OTP");
+            await sendOTPAndShowInput(formData);
 
-            // Revoke previous URL if exists
-            if (targetPreview.data('object-url')) {
-                URL.revokeObjectURL(targetPreview.data('object-url'));
-            }
-
-            targetPreview.data('object-url', url);
-            targetPreview.attr('src', url).show();
-        }
-
-        function normalizeDuplicateResult(response, defaultMessage) {
-            const parsed = (typeof response === 'string') ? JSON.parse(response) : response;
-
-            if (!parsed || typeof parsed !== 'object') {
-                return { success: true, message: '' };
-            }
-
-            if (typeof parsed.success === 'boolean') {
-                return {
-                    success: parsed.success,
-                    message: parsed.message || (parsed.success ? '' : defaultMessage)
-                };
-            }
-
-            if (typeof parsed.isDuplicate === 'boolean') {
-                return {
-                    success: !parsed.isDuplicate,
-                    message: parsed.isDuplicate ? (parsed.message || defaultMessage) : ''
-                };
-            }
-
-            if (typeof parsed.exists === 'boolean') {
-                return {
-                    success: !parsed.exists,
-                    message: parsed.exists ? (parsed.message || defaultMessage) : ''
-                };
-            }
-
-            return { success: true, message: '' };
-        }
-
-        // --- Duplicate checks ---
-        async function checkDuplicateIDCard(id) {
-            try {
-                const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
-                return normalizeDuplicateResult(response, 'เลขบัตรประชาชนนี้มีในระบบแล้ว');
-            } catch (error) {
-                console.error('Error checking duplicate ID card:', error);
-                return { success: true };
-            }
-        }
-
-        async function checkDuplicateTelephone(phone) {
-            try {
-                const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
-                return normalizeDuplicateResult(response, 'เบอร์โทรศัพท์มือถือมีในระบบแล้ว');
-            } catch (error) {
-                console.error('Error checking duplicate telephone:', error);
-                return { success: true };
-            }
-        }
-
-        async function checkDuplicateEmail(email) {
-            if (!email) return { success: true, message: '' };
-            try {
-                const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
-                return normalizeDuplicateResult(response, 'อีเมลนี้มีในระบบแล้ว');
-            } catch (error) {
-                console.error('Error checking duplicate email:', error);
-                return { success: true };
-            }
-        }
-
-        async function checkDuplicateIDCardName(name) {
-            try {
-                const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
-                return normalizeDuplicateResult(response, 'ชื่อตามบัตรนี้มีในระบบแล้ว');
-            } catch (error) {
-                console.error('Error checking duplicate ID card name:', error);
-                return { success: true };
-            }
-        }
-
-        async function checkDuplicateBusinessName(name) {
-            try {
-                const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
-                return normalizeDuplicateResult(response, 'ชื่อธุรกิจนี้มีในระบบแล้ว');
-            } catch (error) {
-                console.error('Error checking duplicate business name:', error);
-                return { success: true };
-            }
-        }
-
-        // --- OTP logic ---
-        let countdownInterval;
-        window.currentFormData = null;
-        window.currentReferenceId = null;
-
-        async function sendOTPAndShowInput(formData) {
-            try {
-                // ตรวจสอบ SendOTPRegister จาก /Static/system
-                // '0' = เปิดส่ง OTP, '1' = ปิด ข้ามไป register เลย
-                let skipOTP = false;
-                try {
-                    const sysData = await $.get('/Static/system');
-                    const sys = Array.isArray(sysData) ? sysData[0] : sysData;
-                    if (sys && String(sys.SendOTPRegister) === '1') {
-                        skipOTP = true;
-                    }
-                } catch (sysErr) {
-                    console.warn('ไม่สามารถดึงค่า SendOTPRegister ได้, ใช้ค่า default (ส่ง OTP):', sysErr);
-                }
-
-                if (skipOTP) {
-                    // ปิด OTP — register เลยโดยไม่ต้องยืนยัน
-                    window.currentFormData = formData;
-                    window.currentReferenceId = null;
-                    Swal.close();
-                    await finalRegistration(formData, '');
-                    return;
-                }
-
-                const sendOTPResponse = await $.ajax({
-                    url: '/ExternalRegistration/SendOTP',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ phone: formData.mobile, method: 'sms' })
-                });
-
-                if (sendOTPResponse && sendOTPResponse.success) {
-                    window.currentFormData = formData;
-                    window.currentReferenceId = sendOTPResponse.referenceId;
-
-                    $('#otpPhoneNumber').text(formData.mobile);
-                    $('#otpInput').val('').removeClass('is-invalid');
-                    $('#otpError').text('');
-
-                    const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
-                    otpModal.show();
-                    startResendCountdown();
-                    Swal.close();
-                } else {
-                    Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
-                }
-            } catch (e) {
-                console.error('SendOTP error:', e);
-                const errMsg = (e.responseJSON && e.responseJSON.message) || e.responseText || e.message || 'ไม่สามารถส่ง OTP ได้';
-                Swal.fire('ส่ง OTP ไม่สำเร็จ', errMsg, 'error');
-            }
-        }
-
-        function startResendCountdown() {
-            let countdown = 30;
-            const btn = $('#resendOTPBtn');
-            btn.prop('disabled', true);
-            clearInterval(countdownInterval);
-
-            countdownInterval = setInterval(() => {
-                btn.find('small').text(`ส่งรหัสใหม่ (${countdown})`);
-                countdown--;
-                if (countdown < 0) {
-                    clearInterval(countdownInterval);
-                    btn.prop('disabled', false).find('small').text('ส่งรหัสใหม่');
-                }
-            }, 1000);
-        }
-
-        $('#otpInput').on('input', function () {
-            this.value = this.value.replace(/\D/g, '');
-            $('#verifyOTPBtn').prop('disabled', this.value.length < 0);
-        });
-
-        $('#verifyOTPBtn').click(async function () {
-            const otp = $('#otpInput').val();
-            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
-
-            try {
-                const verifyResponse = await $.ajax({
-                    url: '/ExternalRegistration/VerifyOTP',
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ phone: window.currentFormData.mobile, otp: otp, referenceId: window.currentReferenceId })
-                });
-
-                if (verifyResponse && verifyResponse.isValid) {
-                    bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
-                    await finalRegistration(window.currentFormData, otp);
-                } else {
-                    $('#otpInput').addClass('is-invalid');
-                    $('#otpError').text('รหัส OTP ไม่ถูกต้อง');
-                    $(this).prop('disabled', false).html('ยืนยัน');
-                }
-            } catch (e) {
-                bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
-                await finalRegistration(window.currentFormData, otp);
-            }
-        });
-
-        async function finalRegistration(formData, otp) {
-            Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
-
-            const selectors = (formData && formData._origin === 'full')
-                ? ['#fullIdCardCopy', '#fullBankCardCopy', '#fullApplicationForm', '#fullBusinessPhoto']
-                : ['#simpleIdCardCopy', '#simpleBankCardCopy', '#simpleBusinessPhoto'];
-
-            const memberpics = await readFilesAsBase64(selectors);
-
-            const registrationData = {
-                ...formData,
-                verificationMethod: 'otp',
-                otp: otp,
-                referenceId: window.currentReferenceId,
-                memberpic: memberpics
-            };
-
-            try {
-                const targetUrl = (formData && formData._origin === 'full') ? 'FullFinalizeRegistration' : 'FinalizeRegistration';
-                const response = await $.ajax({
-                    url: targetUrl,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify(registrationData)
-                });
-
-                const data = (typeof response === 'string') ? JSON.parse(response) : response;
-                if (data && data.success) {
-                    Swal.fire('สำเร็จ', `ลงทะเบียนเรียบร้อย Member Code: ${data.memberCode}`, 'success')
-                        .then(() => location.reload());
-                } else {
-                    Swal.fire('ไม่สำเร็จ', (data && data.message) || 'เกิดข้อผิดพลาด', 'error');
-                }
-            } catch (err) {
-                console.error(err);
-                const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'ไม่สามารถบันทึกข้อมูลได้';
-                Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
-            }
+        } catch (err) {
+            console.error(err);
+            const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'เกิดข้อผิดพลาดในการตรวจสอบข้อมูล';
+            Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
         }
     });
+
+    $('#fullRegistrationForm').on('input change', 'input, select, textarea', function() {
+        const id = $(this).attr('id');
+        if (id !== 'fullDocumentNumber') {
+            $(this).removeClass('is-invalid');
+        }
+        if (id === 'fullNameOnCard') { $('#fullNameOnCardValidation').text('').removeClass('validation-error'); }
+        if (id === 'fullBusinessName') { $('#fullBusinessNameValidation').text('').removeClass('validation-error'); }
+        if (id === 'fullMobile') { $('#fullMobileValidation').text(''); }
+        if (id === 'fullEmail') { $('#fullEmailValidation').text(''); }
+    });
+
+    // Cancel / Reset full registration
+    $('#btnCancelFull, #btnCancelFullSticky').click(function () {
+        if (confirm('คุณต้องการยกเลิกและล้างข้อมูลการลงทะเบียนหรือไม่?')) {
+            $('#fullRegistrationForm')[0].reset();
+            $('#fullRegistrationForm .is-invalid').removeClass('is-invalid');
+            $('#fullRegistrationForm .invalid-feedback-custom').remove();
+
+            // ✅ ล้างรูปแบบปลอดภัย ไม่ให้เกิดอาการภาพค้างในแคชของ Vivo Browser
+            $('#fullIdCardPreview, #fullBankCardPreview, #fullBusinessPhotoPreview, #fullApplicationFormPreview').hide().attr('src', '');
+            $('#fullIdCardCopy, #fullBankCardCopy, #fullBusinessPhoto, #fullApplicationForm').val('');
+
+            resetDropdown('#fullProvinceIdCard', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#fullDistrictIdCard', '-- เลือกอำเภอ --');
+            resetDropdown('#fullSubdistrictIdCard', '-- เลือกตำบล --');
+            resetDropdown('#fullCurrentProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+            resetDropdown('#fullCurrentDistrict', '-- เลือกอำเภอ --');
+            resetDropdown('#fullCurrentSubdistrict', '-- เลือกตำบล --');
+
+            $('#fullProvinceIdCard, #fullDistrictIdCard, #fullSubdistrictIdCard, #fullCurrentProvince, #fullCurrentDistrict, #fullCurrentSubdistrict').prop('disabled', true);
+            $('#fullUseIdCardAddress').prop('checked', true).trigger('change');
+
+            toastr.info('ล้างข้อมูลเรียบร้อยแล้ว');
+            $('html, body').animate({ scrollTop: 0 }, 500);
+        }
+    });
+
+    $('#btnSaveFullSticky').click(function () { $('#fullRegistrationForm').submit(); });
+    $('#btnCancelFullSticky').click(function () { $('#btnCancelFull').trigger('click'); });
+
+    $('.required').each(function () {
+        const label = $(this);
+        const text = label.text();
+        if (!text.includes('*')) {
+            label.html(text + ' <span class="text-danger">*</span>');
+        }
+    });
+
+    function loadMasterAddresses() {
+        $.get('/orders/GetMasterAddress', function(res) {
+            if (typeof res === 'string') {
+                try { res = JSON.parse(res); } catch (e) {
+                    console.error("JSON Error", e);
+                    toastr.error('ไม่สามารถโหลดข้อมูลที่อยู่ได้');
+                    return;
+                }
+            }
+
+            if (!Array.isArray(res)) {
+                if (res.data && Array.isArray(res.data)) { masterData = res.data; }
+                else if (res.result && Array.isArray(res.result)) { masterData = res.result; }
+                else { masterData = []; }
+            } else {
+                masterData = res;
+            }
+
+            console.log("Loaded " + masterData.length + " rows of address data");
+            $('#simplePostcode').prop('disabled', false).attr('placeholder', 'กรอกรหัสไปรษณีย์ 5 หลัก');
+            if (masterData.length === 0) { toastr.warning('ไม่พบข้อมูลที่อยู่ในระบบ'); }
+        }).fail(function() {
+            toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์เพื่อโหลดข้อมูลที่อยู่');
+        });
+    }
+
+    function setSimpleRegistrationDate() {
+        const d = new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const yearBE = d.getFullYear();
+        $('#simpleRegistrationDate').val(`${day}-${month}-${yearBE}`);
+    }
+
+    function loadSimpleCountries() {
+        $.get('/ExternalRegistration/GetCountries').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#simpleCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
+            data.forEach(item => {
+                $('#simpleCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+            });
+        });
+    }
+
+    function loadSimpleCountryBusinesses() {
+        $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#simpleCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
+            data.forEach(item => {
+                $('#simpleCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+            });
+        });
+    }
+
+    function loadSimpleTitles() {
+        $.get('/orders/GetTitlename').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#simpleTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
+            data.forEach(item => {
+                $('#simpleTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
+            });
+        }).fail(() => {
+            $('#simpleTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
+        });
+    }
+
+    function setFullRegistrationDate() {
+        const d = new Date();
+        const day = String(d.getDate()).padStart(2, '0');
+        const month = String(d.getMonth() + 1).padStart(2, '0');
+        const yearBE = d.getFullYear();
+        $('#fullRegistrationDate').val(`${day}-${month}-${yearBE}`);
+    }
+
+    function loadFullCountries() {
+        $.get('/ExternalRegistration/GetCountries').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#fullCountry').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
+            data.forEach(item => {
+                $('#fullCountry').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+            });
+        });
+    }
+
+    function loadFullCountryBusinesses() {
+        $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#fullCountryBusiness').empty().append('<option value="" data-key="t-select">-- เลือก --</option>');
+            data.forEach(item => {
+                $('#fullCountryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
+            });
+        });
+    }
+
+    function loadFullTitles() {
+        $.get('/orders/GetTitlename').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#fullTitle').empty().append('<option value="" data-key="t-select-title">-- เลือกคำนำหน้า --</option>');
+            data.forEach(item => {
+                $('#fullTitle').append(`<option value="${item.M15_PX1}">${item.Thainame || item.THAINAME}</option>`);
+            });
+        }).fail(() => {
+            $('#fullTitle').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
+        });
+    }
+
+    function loadFullBanks() {
+        $.get('/Member/GetBanks').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#fullBank').empty().append('<option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>');
+            data.forEach(item => {
+                $('#fullBank').append(`<option value="${item.M17_PX1}">${item.Thainame}</option>`);
+            });
+        });
+    }
+
+    function readFilesAsBase64(selectors) {
+        return Promise.all(selectors.map(sel => {
+            return new Promise(resolve => {
+                const input = $(sel)[0];
+                if (!input || !input.files || input.files.length === 0) return resolve(null);
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const s = (e.target.result || '').toString();
+                    const parts = s.split(',');
+                    resolve(parts.length > 1 ? parts[1] : parts[0]);
+                };
+                reader.onerror = function () { resolve(null); };
+                reader.readAsDataURL(file);
+            });
+        })).then(results => results.filter(r => r));
+    }
+
+    function getUniqueList(data, codeKey, nameKey) {
+        var seen = new Set();
+        return data.filter(item => {
+            var k = item[codeKey];
+            return seen.has(k) ? false : seen.add(k);
+        }).sort((a, b) => a[nameKey].localeCompare(b[nameKey]));
+    }
+
+    function resetDropdown(selector, defaultText) {
+        $(selector).empty().append('<option value="">' + defaultText + '</option>').prop('disabled', true);
+    }
+
+    function resetAddressDropdowns() {
+        resetDropdown('#simpleProvince', '-- รอผลจากรหัสไปรษณีย์ --');
+        resetDropdown('#simpleDistrict', '-- เลือกอำเภอ --');
+        resetDropdown('#simpleSubdistrict', '-- เลือกตำบล --');
+    }
+
+    // Setup synchronization between simple and full registration forms
+    function setupFormSync() {
+        const fieldMappings = {
+            'simpleCountry': 'fullCountry',
+            'simpleCountryBusiness': 'fullCountryBusiness',
+            'simpleReferrerCode': 'fullReferrerCode',
+            'simpleReferrerName': 'fullReferrerName',
+            'simpleRegDay': 'fullRegDay',
+            'simpleRegMonth': 'fullRegMonth',
+            'simpleRegYear': 'fullRegYear',
+            'simpleBirthDay': 'fullBirthDay',
+            'simpleBirthMonth': 'fullBirthMonth',
+            'simpleBirthYear': 'fullBirthYear',
+            'simpleTitle': 'fullTitle',
+            'simpleFullName': 'fullNameOnCard',
+            'simpleBusinessName': 'fullBusinessName',
+            'simpleDocumentNumber': 'fullDocumentNumber',
+            'simpleMobile': 'fullMobile',
+            'simpleHomePhone': 'fullHomePhone',
+            'simpleEmail': 'fullEmail',
+            'simpleLineId': 'fullLineId',
+            'simpleHouseNumber': 'fullHouseNumber',
+            'simpleMoo': 'fullMoo',
+            'simpleAlley': 'fullAlley',
+            'simpleRoad': 'fullRoad',
+            'simpleBuilding': 'fullBuilding',
+            'simpleFloor': 'fullFloor',
+            'simplePostcode': 'fullPostcodeIdCard',
+            'simpleProvince': 'fullProvinceIdCard',
+            'simpleDistrict': 'fullDistrictIdCard',
+            'simpleSubdistrict': 'fullSubdistrictIdCard'
+        };
+
+        // Sync inputs real-time
+        Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+            const simpleEl = $(`#${simpleId}`);
+            const fullEl = $(`#${fullId}`);
+            
+            if (simpleEl.length && fullEl.length) {
+                if (simpleEl.is('select') || simpleEl.is('input[type="text"], input[type="tel"], input[type="email"]')) {
+                    simpleEl.on('change input', function() { fullEl.val(simpleEl.val()); });
+                    fullEl.on('change input', function() { simpleEl.val(fullEl.val()); });
+                }
+                
+                if (simpleEl.is('input[type="file"]')) {
+                    simpleEl.on('change', function() {
+                        const file = this.files[0];
+                        if (file) {
+                            fullEl[0].files = this.files;
+                            const targetPreviewId = `#${simpleId.replace('Photo', 'Photo')}Preview`.replace('simple', 'full');
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                $(targetPreviewId).attr('src', e.target.result);
+                                setTimeout(() => { $(targetPreviewId).show(); }, 50);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                    
+                    fullEl.on('change', function() {
+                        const file = this.files[0];
+                        if (file) {
+                            simpleEl[0].files = this.files;
+                            const targetPreviewId = `#${fullId.replace('Photo', 'Photo')}Preview`.replace('full', 'simple');
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                $(targetPreviewId).attr('src', e.target.result);
+                                setTimeout(() => { $(targetPreviewId).show(); }, 50);
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    });
+                }
+            }
+        });
+
+        $('input[name="position"]').on('change', function() {
+            const val = $(this).val();
+            $(`input[name="position"][value="${val}"]`).prop('checked', true);
+        });
+
+        let isSyncing = false;
+        Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+            const simpleEl = $(`#${simpleId}`);
+            const fullEl = $(`#${fullId}`);
+
+            if (simpleEl.length && fullEl.length && simpleEl.is('select')) {
+                simpleEl.on('change', function() {
+                    if (isSyncing) return;
+                    isSyncing = true;
+                    fullEl.val(simpleEl.val());
+                    setTimeout(() => { isSyncing = false; }, 0);
+                });
+
+                fullEl.on('change', function() {
+                    if (isSyncing) return;
+                    isSyncing = true;
+                    simpleEl.val(fullEl.val());
+                    setTimeout(() => { isSyncing = false; }, 0);
+                });
+            }
+        });
+
+        // ✅ ปรับแก้ระบบซิงค์ข้าม Tab ให้ดึง Base64 Data URL ตรงๆ ไม่ผ่าน createObjectURL
+        $('#full-tab').on('shown.bs.tab', function() {
+            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                const simpleEl = $(`#${simpleId}`);
+                const fullEl = $(`#${fullId}`);
+                if (simpleEl.length && fullEl.length) {
+                    fullEl.val(simpleEl.val());
+                }
+            });
+            const positionVal = $('input[name="position"]:checked').val();
+            if (positionVal) {
+                $(`#full-tab-pane input[name="position"][value="${positionVal}"]`).prop('checked', true);
+            }
+            syncImagePreview('simpleIdCardPreview', 'fullIdCardPreview');
+            syncImagePreview('simpleBankCardPreview', 'fullBankCardPreview');
+            syncImagePreview('simpleBusinessPhotoPreview', 'fullBusinessPhotoPreview');
+        });
+
+        $('#simple-tab').on('shown.bs.tab', function() {
+            Object.entries(fieldMappings).forEach(([simpleId, fullId]) => {
+                const simpleEl = $(`#${simpleId}`);
+                const fullEl = $(`#${fullId}`);
+                if (simpleEl.length && fullEl.length) {
+                    simpleEl.val(fullEl.val());
+                }
+            });
+            const positionVal = $(`#full-tab-pane input[name="position"]:checked`).val();
+            if (positionVal) {
+                $(`input[name="position"][value="${positionVal}"]`).prop('checked', true);
+            }
+            syncImagePreview('fullIdCardPreview', 'simpleIdCardPreview');
+            syncImagePreview('fullBankCardPreview', 'simpleBankCardPreview');
+            syncImagePreview('fullBusinessPhotoPreview', 'simpleBusinessPhotoPreview');
+        });
+    }
+
+    // ✅ ฟังก์ชันซิงค์รูปพรีวิวข้ามแท็บที่เสถียรที่สุด โดยดึงผ่านค่า src โดยตรง
+    function syncImagePreview(sourcePreviewId, targetPreviewId) {
+        const sourceSrc = $(`#${sourcePreviewId}`).attr('src');
+        const targetPreview = $(`#${targetPreviewId}`);
+        
+        if (sourceSrc && sourceSrc.startsWith('data:image')) {
+            targetPreview.attr('src', sourceSrc);
+            setTimeout(() => { targetPreview.show(); }, 50);
+        } else {
+            targetPreview.hide().attr('src', '');
+        }
+    }
+
+    function normalizeDuplicateResult(response, defaultMessage) {
+        const parsed = (typeof response === 'string') ? JSON.parse(response) : response;
+        if (!parsed || typeof parsed !== 'object') return { success: true, message: '' };
+
+        if (typeof parsed.success === 'boolean') {
+            return { success: parsed.success, message: parsed.message || (parsed.success ? '' : defaultMessage) };
+        }
+        if (typeof parsed.isDuplicate === 'boolean') {
+            return { success: !parsed.isDuplicate, message: parsed.isDuplicate ? (parsed.message || defaultMessage) : '' };
+        }
+        if (typeof parsed.exists === 'boolean') {
+            return { success: !parsed.exists, message: parsed.exists ? (parsed.message || defaultMessage) : '' };
+        }
+        return { success: true, message: '' };
+    }
+
+    async function checkDuplicateIDCard(id) {
+        try {
+            const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
+            return normalizeDuplicateResult(response, 'เลขบัตรประชาชนนี้มีในระบบแล้ว');
+        } catch (error) {
+            return { success: true };
+        }
+    }
+
+    async function checkDuplicateTelephone(phone) {
+        try {
+            const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
+            return normalizeDuplicateResult(response, 'เบอร์โทรศัพท์มือถือมีในระบบแล้ว');
+        } catch (error) {
+            return { success: true };
+        }
+    }
+
+    async function checkDuplicateEmail(email) {
+        if (!email) return { success: true, message: '' };
+        try {
+            const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
+            return normalizeDuplicateResult(response, 'อีเมลนี้มีในระบบแล้ว');
+        } catch (error) {
+            return { success: true };
+        }
+    }
+
+    async function checkDuplicateIDCardName(name) {
+        try {
+            const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
+            return normalizeDuplicateResult(response, 'ชื่อตามบัตรนี้มีในระบบแล้ว');
+        } catch (error) {
+            return { success: true };
+        }
+    }
+
+    async function checkDuplicateBusinessName(name) {
+        try {
+            const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
+            return normalizeDuplicateResult(response, 'ชื่อธุรกิจนี้มีในระบบแล้ว');
+        } catch (error) {
+            return { success: true };
+        }
+    }
+
+    // OTP logic
+    let countdownInterval;
+    window.currentFormData = null;
+    window.currentReferenceId = null;
+
+    async function sendOTPAndShowInput(formData) {
+        try {
+            let skipOTP = false;
+            try {
+                const sysData = await $.get('/Static/system');
+                const sys = Array.isArray(sysData) ? sysData[0] : sysData;
+                if (sys && String(sys.SendOTPRegister) === '1') {
+                    skipOTP = true;
+                }
+            } catch (sysErr) {
+                console.warn('ไม่สามารถดึงค่า SendOTPRegister ได้, ใช้ค่า default (ส่ง OTP):', sysErr);
+            }
+
+            if (skipOTP) {
+                window.currentFormData = formData;
+                window.currentReferenceId = null;
+                Swal.close();
+                await finalRegistration(formData, '');
+                return;
+            }
+
+            const sendOTPResponse = await $.ajax({
+                url: '/ExternalRegistration/SendOTP',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ phone: formData.mobile, method: 'sms' })
+            });
+
+            if (sendOTPResponse && sendOTPResponse.success) {
+                window.currentFormData = formData;
+                window.currentReferenceId = sendOTPResponse.referenceId;
+
+                $('#otpPhoneNumber').text(formData.mobile);
+                $('#otpInput').val('').removeClass('is-invalid');
+                $('#otpError').text('');
+
+                const otpModal = new bootstrap.Modal(document.getElementById('otpModal'));
+                otpModal.show();
+                startResendCountdown();
+                Swal.close();
+            } else {
+                Swal.fire('ส่ง OTP ไม่สำเร็จ', (sendOTPResponse && sendOTPResponse.message) || 'ไม่สามารถส่งรหัสได้', 'error');
+            }
+        } catch (e) {
+            console.error('SendOTP error:', e);
+            const errMsg = (e.responseJSON && e.responseJSON.message) || e.responseText || e.message || 'ไม่สามารถส่ง OTP ได้';
+            Swal.fire('ส่ง OTP ไม่สำเร็จ', errMsg, 'error');
+        }
+    }
+
+    function startResendCountdown() {
+        let countdown = 30;
+        const btn = $('#resendOTPBtn');
+        btn.prop('disabled', true);
+        clearInterval(countdownInterval);
+
+        countdownInterval = setInterval(() => {
+            btn.find('small').text(`ส่งรหัสใหม่ (${countdown})`);
+            countdown--;
+            if (countdown < 0) {
+                clearInterval(countdownInterval);
+                btn.prop('disabled', false).find('small').text('ส่งรหัสใหม่');
+            }
+        }, 1000);
+    }
+
+    $('#otpInput').on('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+        $('#verifyOTPBtn').prop('disabled', this.value.length < 6);
+    });
+
+    $('#verifyOTPBtn').click(async function () {
+        const otp = $('#otpInput').val();
+        if (otp.length < 6) return;
+        
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+
+        try {
+            const verifyResponse = await $.ajax({
+                url: '/ExternalRegistration/VerifyOTP',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ phone: window.currentFormData.mobile, otp: otp, referenceId: window.currentReferenceId })
+            });
+
+            if (verifyResponse && verifyResponse.isValid) {
+                bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
+                await finalRegistration(window.currentFormData, otp);
+            } else {
+                $('#otpInput').addClass('is-invalid');
+                $('#otpError').text('รหัส OTP ไม่ถูกต้อง');
+                $(this).prop('disabled', false).html('ยืนยัน');
+            }
+        } catch (e) {
+            bootstrap.Modal.getInstance(document.getElementById('otpModal')).hide();
+            await finalRegistration(window.currentFormData, otp);
+        }
+    });
+
+    async function finalRegistration(formData, otp) {
+        Swal.fire({ title: 'กำลังบันทึกข้อมูล...', didOpen: () => Swal.showLoading() });
+
+        const selectors = (formData && formData._origin === 'full')
+            ? ['#fullIdCardCopy', '#fullBankCardCopy', '#fullApplicationForm', '#fullBusinessPhoto']
+            : ['#simpleIdCardCopy', '#simpleBankCardCopy', '#simpleBusinessPhoto'];
+
+        const memberpics = await readFilesAsBase64(selectors);
+
+        const registrationData = {
+            ...formData,
+            verificationMethod: 'otp',
+            otp: otp,
+            referenceId: window.currentReferenceId,
+            memberpic: memberpics
+        };
+
+        try {
+            const targetUrl = (formData && formData._origin === 'full') ? 'FullFinalizeRegistration' : 'FinalizeRegistration';
+            const response = await $.ajax({
+                url: targetUrl,
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(registrationData)
+            });
+
+            const data = (typeof response === 'string') ? JSON.parse(response) : response;
+            if (data && data.success) {
+                Swal.fire('สำเร็จ', `ลงทะเบียนเรียบร้อย Member Code: ${data.memberCode}`, 'success')
+                    .then(() => location.reload());
+            } else {
+                Swal.fire('ไม่สำเร็จ', (data && data.message) || 'เกิดข้อผิดพลาด', 'error');
+            }
+        } catch (err) {
+            console.error(err);
+            const errMsg = (err.responseJSON && err.responseJSON.message) || err.responseText || err.message || 'ไม่สามารถบันทึกข้อมูลได้';
+            Swal.fire('เกิดข้อผิดพลาด', errMsg, 'error');
+        }
+    }
+});
 </script>
 @section scripts {
 <script src="~/assets/js/app.js"></script>

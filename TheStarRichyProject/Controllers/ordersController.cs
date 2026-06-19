@@ -1338,7 +1338,7 @@ namespace TheStarRichyProject.Controllers
                 }
 
                 // ดึง ProductCode จาก cart items
-                var productCodes = cart.Data.Items.Select(x => x.ProductCode).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
+                var productCodes = cart.Data.Items.Select(x => x.ProductID).Where(x => !string.IsNullOrEmpty(x)).Distinct().ToList();
 
                 if (productCodes.Count == 0)
                 {
@@ -1363,6 +1363,119 @@ namespace TheStarRichyProject.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking branch stock");
+                return Json(new { success = false, message = "เกิดข้อผิดพลาด: " + ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// API ตรวจสอบรายละเอียดสินค้าในสาขา - แสดงว่าสินค้าไหนมี/ไม่มี
+        /// ถ้า CheckBranchStock พบว่ามีครบก็คืน success=true
+        /// ถ้าไม่ครบ จะดึงรายการสินค้าทั้งหมดของสาขา แล้วเทียบกับตะกร้า
+        /// GET: /Orders/GetBranchStockDetail?branchCode=xxx
+        /// </summary>
+        [HttpGet]
+        public async Task<IActionResult> GetBranchStockDetail(string branchCode)
+        {
+            try
+            {
+                var token = GetToken();
+                var passkey = GetPasskey();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "กรุณาเข้าสู่ระบบ" });
+                }
+
+                if (string.IsNullOrEmpty(branchCode))
+                {
+                    return Json(new { success = false, message = "กรุณาเลือกสาขา" });
+                }
+
+                // ดึงตะกร้าเพื่อเอาสินค้าทั้งหมด
+                var cart = await _cartService.GetCartAsync(token, passkey);
+                if (cart == null || !cart.Success || cart.Data == null || cart.Data.Items.Count == 0)
+                {
+                    return Json(new { success = false, message = "ไม่พบสินค้าในตะกร้า" });
+                }
+
+                // ดึง ProductCode จาก cart items
+                var cartProductCodes = cart.Data.Items
+                    .Select(x => new { x.ProductID, x.ProductName, x.Quantity })
+                    .ToList();
+
+                var distinctProductCodes = cartProductCodes
+                    .Select(x => x.ProductID)
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Distinct()
+                    .ToList();
+
+                if (distinctProductCodes.Count == 0)
+                {
+                    return Json(new { success = false, message = "ไม่พบรหัสสินค้า" });
+                }
+
+                // Step 1: เรียก CheckBranchStock ก่อน ถ้าสำเร็จและมีครบ ก็จบ
+                var checkResult = await _branchStockApiService.CheckStockByBranchAsync(token, passkey, branchCode, distinctProductCodes);
+
+                if (checkResult.Success && checkResult.Data != null && checkResult.Data.IsAllFound)
+                {
+                    return Json(new
+                    {
+                        success = true,
+                        isAllFound = true,
+                        message = "สินค้าทั้งหมดมีอยู่ในสาขาที่เลือก",
+                        products = cartProductCodes.Select(c => new
+                        {
+                            productCode = c.ProductID,
+                            productName = c.ProductName,
+                            quantity = c.Quantity,
+                            inStock = true,
+                            statusText = "มีสินค้า"
+                        }).ToList()
+                    });
+                }
+
+                // Step 2: ถ้า CheckBranchStock ไม่ครบ ให้ดึงสินค้าทั้งหมดของสาขามาเทียบ
+                var branchStockResult = await _branchStockApiService.GetStockByBranchAsync(token, passkey, branchCode);
+
+                if (!branchStockResult.Success)
+                {
+                    return Json(new
+                    {
+                        success = false,
+                        message = branchStockResult.Message ?? "ไม่สามารถดึงข้อมูลสต็อกของสาขาได้"
+                    });
+                }
+
+                // สร้าง Set ของ ProductCode ที่มีในสาขา
+                var branchProductCodes = new HashSet<string>(
+                    branchStockResult.Data?.Select(s => s.ProductCode) ?? new List<string>(),
+                    StringComparer.OrdinalIgnoreCase
+                );
+
+                // เทียบกับสินค้าในตะกร้า
+                var productStatusList = cartProductCodes.Select(c => new
+                {
+                    productCode = c.ProductID,
+                    productName = c.ProductName,
+                    quantity = c.Quantity,
+                    inStock = branchProductCodes.Contains(c.ProductID),
+                    statusText = branchProductCodes.Contains(c.ProductID) ? "มีสินค้า" : "ไม่มีสินค้า"
+                }).ToList();
+
+                var allFound = productStatusList.All(p => p.inStock);
+
+                return Json(new
+                {
+                    success = true,
+                    isAllFound = allFound,
+                    message = allFound ? "สินค้าทั้งหมดมีอยู่ในสาขาที่เลือก" : "สินค้าบางรายการไม่มีอยู่ในสาขาที่เลือก",
+                    products = productStatusList
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting branch stock detail");
                 return Json(new { success = false, message = "เกิดข้อผิดพลาด: " + ex.Message });
             }
         }

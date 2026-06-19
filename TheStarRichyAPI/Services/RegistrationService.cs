@@ -46,7 +46,7 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@CountryCode", (object)NormalizeString(request.Country) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@BusinessCountryCode", (object)NormalizeString(request.CountryBusiness) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Sponsercode", (object)NormalizeString(request.ReferrerCode) ?? DBNull.Value);
-                        command.Parameters.AddWithValue("@Uplinecode", DBNull.Value);
+                        command.Parameters.AddWithValue("@Uplinecode", (object)NormalizeString(request.UplineCode) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@Side", (object)MapSide(request.Position) ?? DBNull.Value);
 
                         // 💡 ใช้วันที่ปัจจุบันถ้าไม่ได้ส่งมา

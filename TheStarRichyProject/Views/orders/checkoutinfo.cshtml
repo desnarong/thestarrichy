@@ -704,6 +704,67 @@
 
         applyDeliveryMethodUI($('input[name="deliveryMethod"]:checked').val() === 'Pickup', false);
 
+        // เมื่อเปลี่ยนสาขา ให้ตรวจสอบสต็อกสินค้า
+        $('#branchSelect').on('change', function () {
+            const branchCode = $(this).val();
+            const branchName = $('option:selected', this).text();
+            if (!branchCode) return;
+            
+            const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
+            if (deliveryMethod !== 'Pickup') return;
+            
+            // ถ้าเป็นสำนักงานใหญ่ (BKK0) ไม่ต้องตรวจสอบสต็อก
+            if (branchCode.toUpperCase() === 'BKK0') return;
+            
+            // แสดง loading
+            Swal.fire({
+                title: 'กำลังตรวจสอบสต็อกสินค้า...',
+                text: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // เรียก API ตรวจสอบรายละเอียดสต็อก
+            $.get('/Orders/GetBranchStockDetail', { branchCode: branchCode })
+                .done(function (response) {
+                        Swal.close();
+                        if (response.isAllFound) {
+                            // มีสินค้าครบทุกอย่าง - แจ้งเตือนและดำเนินการต่อได้
+                        } else {
+                            // สินค้าไม่ครบ - แสดงรายละเอียดว่าสินค้าไหนมี/ไม่มี
+                            let productListHtml = '<div class="text-start" style="max-height: 350px; overflow-y: auto;">';
+
+                            $.each(response.products, function (i, product) {
+                                if (!product.inStock) {
+                                    productListHtml += `
+                                        <div class="border rounded p-2 mb-2 bg-light">
+                                            <div><span class="text-muted">รหัสสินค้า</span> &nbsp;<strong>${product.productCode}</strong></div>
+                                            <div><span class="text-muted">ชื่อสินค้า</span> &nbsp;<strong>${product.productName || '-'}</strong></div>
+                                            <div class="text-danger">❌ ไม่มีในจุดกระจายสินค้า &nbsp;<strong>${branchName}</strong></div>
+                                        </div>`;
+                                }
+                            });
+
+                            productListHtml += '</div>';
+
+                            Swal.fire({
+                                title: '',
+                                html: '<div class="mb-3 text-muted">สินค้าบางรายการไม่มีอยู่ในสาขาที่เลือก<br>กรุณาเลือกสาขาอื่นหรือเปลี่ยนวิธีจัดส่ง</div>' + productListHtml,
+                                icon: 'warning',
+                                confirmButtonText: 'ตกลง',
+                                width: 500
+                            });
+                        }
+                })
+                .fail(function () {
+                    Swal.close();
+                    Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+                });
+        });
+
         $('#btnProceedPayment').click(function () {
             const deliveryMethod = $('input[name="deliveryMethod"]:checked').val();
             
@@ -720,6 +781,12 @@
                 return;
             }
             
+            // ถ้าเป็นสำนักงานใหญ่ (BKK0) ไม่ต้องตรวจสอบสต็อก ดำเนินการต่อได้เลย
+            if (branchCode.toUpperCase() === 'BKK0') {
+                $('#confirmSubmitModal').modal('show');
+                return;
+            }
+            
             // แสดง loading
             Swal.fire({
                 title: 'กำลังตรวจสอบสต็อกสินค้า...',
@@ -730,33 +797,74 @@
                     Swal.showLoading();
                 }
             });
-            
-            // เรียก API เช็คสต็อก
-            $.get('/Orders/CheckBranchStock', { branchCode: branchCode })
+
+            const branchName = $('option:selected', '#branchSelect').text();
+
+            // เรียก API ตรวจสอบรายละเอียดสต็อก
+            $.get('/Orders/GetBranchStockDetail', { branchCode: branchCode })
                 .done(function (response) {
-                    Swal.close();
-                    
-                    if (response.success) {
+                        Swal.close();
                         if (response.isAllFound) {
-                            // มีสินค้าครบทุกอย่าง
+                            // มีสินค้าครบทุกอย่าง - แจ้งเตือนและดำเนินการต่อได้
                             $('#confirmSubmitModal').modal('show');
                         } else {
-                            // สินค้าไม่ครบ
+                            // สินค้าไม่ครบ - แสดงรายละเอียดว่าสินค้าไหนมี/ไม่มี
+                            let productListHtml = '<div class="text-start" style="max-height: 350px; overflow-y: auto;">';
+
+                            $.each(response.products, function (i, product) {
+                                if (!product.inStock) {
+                                    productListHtml += `
+                                        <div class="border rounded p-2 mb-2 bg-light">
+                                            <div><span class="text-muted">รหัสสินค้า</span> &nbsp;<strong>${product.productCode}</strong></div>
+                                            <div><span class="text-muted">ชื่อสินค้า</span> &nbsp;<strong>${product.productName || '-'}</strong></div>
+                                            <div class="text-danger">❌ ไม่มีในจุดกระจายสินค้า &nbsp;<strong>${branchName}</strong></div>
+                                        </div>`;
+                                }
+                            });
+
+                            productListHtml += '</div>';
+
                             Swal.fire({
-                                title: 'ไม่มีสินค้า ณ จุดนัดรับนี้',
-                                text: 'สินค้าบางรายการไม่มีอยู่ในสาขาที่เลือก กรุณาเลือกสาขาอื่นหรือเปลี่ยนวิธีจัดส่ง',
+                                title: '',
+                                html: '<div class="mb-3 text-muted">สินค้าบางรายการไม่มีอยู่ในสาขาที่เลือก<br>กรุณาเลือกสาขาอื่นหรือเปลี่ยนวิธีจัดส่ง</div>' + productListHtml,
                                 icon: 'warning',
-                                confirmButtonText: 'ตกลง'
+                                confirmButtonText: 'ตกลง',
+                                width: 500
                             });
                         }
-                    } else {
-                        Swal.fire('ผิดพลาด', response.message || 'ไม่สามารถตรวจสอบสต็อกได้', 'error');
-                    }
                 })
                 .fail(function () {
                     Swal.close();
                     Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
-                });
+            });
+
+            
+            // เรียก API เช็คสต็อก
+            // $.get('/Orders/CheckBranchStock', { branchCode: branchCode })
+            //     .done(function (response) {
+            //         Swal.close();
+                    
+            //         if (response.success) {
+            //             if (response.isAllFound) {
+            //                 // มีสินค้าครบทุกอย่าง
+            //                 $('#confirmSubmitModal').modal('show');
+            //             } else {
+            //                 // สินค้าไม่ครบ
+            //                 Swal.fire({
+            //                     title: 'ไม่มีสินค้า ณ จุดนัดรับนี้',
+            //                     text: 'สินค้าบางรายการไม่มีอยู่ในสาขาที่เลือก กรุณาเลือกสาขาอื่นหรือเปลี่ยนวิธีจัดส่ง',
+            //                     icon: 'warning',
+            //                     confirmButtonText: 'ตกลง'
+            //                 });
+            //             }
+            //         } else {
+            //             Swal.fire('ผิดพลาด', response.message || 'ไม่สามารถตรวจสอบสต็อกได้', 'error');
+            //         }
+            //     })
+            //     .fail(function () {
+            //         Swal.close();
+            //         Swal.fire('ผิดพลาด', 'ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้', 'error');
+            //     });
         });
 
         $('#btnConfirmSubmit').click(function() {

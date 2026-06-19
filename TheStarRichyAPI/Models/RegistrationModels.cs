@@ -21,6 +21,8 @@ namespace TheStarRichyApi.Models
 
         public string? LineId { get; set; }
 
+        public string? UplineCode { get; set; }
+
         // Optional address fields
         public int tambonId { get; set; }
         public string? AddressIdCard { get; set; }

@@ -291,16 +291,38 @@
         // --- 2. Bank Transfer & Slip Logic ---
         $('#slipInput').on('change', async function (e) {
             const files = Array.from(e.target.files);
+        
             if (uploadedFiles.length + files.length > 5) {
                 Swal.fire('คำเตือน', 'อัปโหลดได้ไม่เกิน 5 รูป', 'warning');
+                $(this).val('');
                 return;
             }
-            for (let file of files) {
-                const resized = await resizeImage(file, 300);
-                uploadedFiles.push(resized);
+
+            // แสดง Loading เผื่อกรณีไฟล์ใหญ่ มือถือจะทำงานหนัก
+            Swal.showLoading();
+
+            try {
+                // ปรับแก้ลูปให้ปลอดภัยและเสถียรขึ้นบน Mobile WebView
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const resized = await resizeImage(file, 300);
+                    if (resized && resized !== "data:,") {
+                        uploadedFiles.push(resized);
+                    }
+                }
+            
+                // เคลียร์ค่า Input ทันทีเพื่อเปิดโอกาสให้กดเลือกรูปเดิมซ้ำได้
+                $(this).val('');
+            
+                // ปิด Loading และสั่งแสดงผล
+                Swal.close();
+                renderPreviews();
+            
+            } catch (error) {
+                Swal.close();
+                console.error("Processing image failed: ", error);
+                Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถประมวลผลรูปภาพนี้ได้ กรุณาลองใหม่อีกครั้ง', 'error');
             }
-            renderPreviews();
-            $(this).val('');
         });
 
         // ยืนยันการส่งสลิป (Bank Transfer)
@@ -362,11 +384,10 @@
     });
 
     // ============================
-    // ฟังก์ชันที่ต้องอยู่นอก .ready() ให้ onclick ใน HTML เรียกได้
+    // ฟังก์ชันภายนอก .ready()
     // ============================
 
     function resizeImage(file, maxSizeKB) {
-        // ปรับขยับเพิ่มขนาดขั้นต่ำที่เหมาะสมให้กับ iOS ไม่ให้บีบอัดหนักจนพัง
         const targetSizeKB = maxSizeKB < 300 ? 500 : maxSizeKB;
 
         return new Promise((resolve, reject) => {
@@ -376,13 +397,11 @@
                 const img = new Image();
                 img.src = e.target.result;
 
-                // ต้องรอให้รูปภาพโหลดลง Memory เสร็จสมบูรณ์ชัวร์ๆ ก่อน (สำคัญมากสำหรับ iOS)
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     let width = img.width;
                     let height = img.height;
 
-                    // จำกัดความกว้างสูงสุดให้เหมาะสม สลิปโอนเงินไม่ต้องกว้างเกินไป
                     const MAX_WIDTH = 1000;
                     if (width > MAX_WIDTH) {
                         height *= MAX_WIDTH / width;
@@ -397,47 +416,48 @@
                     let quality = 0.85;
                     let dataUrl = canvas.toDataURL('image/jpeg', quality);
 
-                    // ปรับลูปการบีบอัดไม่ให้ทำงานหนักเกินไปจน Safari สั่งแครช
-                    while ((dataUrl.length * 0.75) / 1024 > targetSizeKB && quality > 0.2) {
-                        quality -= 0.1;
+                    // ปรับเงื่อนไขลูปไม่ให้ถี่เกินไป ป้องกันเครื่องค้างบนแอนดรอยด์รุ่นสเปกต่ำ
+                    while ((dataUrl.length * 0.75) / 1024 > targetSizeKB && quality > 0.3) {
+                        quality -= 0.15; // เพิ่ม Step การบีบลดเพื่อลดภาระลูปทำงานซ้ำ
                         dataUrl = canvas.toDataURL('image/jpeg', quality);
                     }
                 
                     resolve(dataUrl);
                  };
 
-                img.onerror = (err) => {
-                    reject(err);
-                };
+                img.onerror = (err) => reject(err);
             };
-            reader.onerror = (err) => {
-                reject(err);
-            };
+            reader.onerror = (err) => reject(err);
         });
     }
 
-    // ✅ renderPreviews ตัวเดียว — มีทั้งปุ่มลบและคลิกดูรูปใหญ่
     function renderPreviews() {
         const container = $('#slipPreviewContainer');
         container.empty();
+    
         uploadedFiles.forEach((src, i) => {
             container.append(`
                 <div class="preview-item">
                     <button type="button" class="remove-preview" onclick="removeSlip(event, ${i})">×</button>
-                    <img src="${src}" onclick="viewFullImage('${src}')" style="cursor:pointer;">
+                    <img src="" id="img-preview-${i}" onclick="viewFullImage('${src}')" style="cursor:pointer; display:none;">
                 </div>
             `);
+
+            // บังคับการวาดรูปด้วยการเว้นจังหวะสั้นๆ (แก้ปัญหาภาพไม่ Render บน Vivo Browser)
+            setTimeout(() => {
+                const imgEl = $(`#img-preview-${i}`);
+                imgEl.attr('src', src);
+                imgEl.show(); // ค่อยๆ สั่งแสดงผลเมื่อ Src ถูกบันทึกเรียบร้อยแล้ว
+            }, 50);
         });
     }
 
-    // ✅ ลบรูป — ใช้ event.stopPropagation() ไม่ให้ชนกับ viewFullImage
     window.removeSlip = function (event, i) {
         event.stopPropagation();
         uploadedFiles.splice(i, 1);
         renderPreviews();
     };
 
-    // ✅ ดูรูปใหญ่ใน Modal
     window.viewFullImage = function (src) {
         $('#fullPreviewImage').attr('src', src);
         new bootstrap.Modal(document.getElementById('imagePreviewModal')).show();

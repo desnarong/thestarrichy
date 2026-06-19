@@ -416,7 +416,6 @@
             </div>
         </div>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script>
         // ==========================================
@@ -432,7 +431,6 @@
                 return false;
             }
 
-            // แก้ไข: ลบ double backslash ออก ใช้ \u0E00-\u0E7F ปกติ
             if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(name)) {
                 validationEl.text('กรุณากรอกชื่อเป็นภาษาไทยหรืออังกฤษเท่านั้น').addClass('validation-error');
                 return false;
@@ -457,7 +455,6 @@
                 return false;
             }
 
-            // แก้ไข: ลบ double backslash ออก
             if (!/^[\u0E00-\u0E7Fa-zA-Z0-9\s.\-&(),]+$/.test(name)) {
                 validationEl.text('ชื่อธุรกิจมีอักขระที่ไม่ได้รับอนุญาต').addClass('validation-error');
                 return false;
@@ -521,7 +518,6 @@
                 return false;
             }
 
-            // แก้ไข: ลบ double backslash ออก ใช้ \d
             if (!/^0\d{9}$/.test(mobile)) {
                 validationEl.text('กรุณากรอกเบอร์โทรศัพท์มือถือ 10 หลัก (ขึ้นต้นด้วย 0)').addClass('validation-error');
                 return false;
@@ -605,11 +601,10 @@
         // ==========================================
         // IP ADDRESS FUNCTIONS
         // ==========================================
-        let clientIpAddress = '0'; // Default value
+        let clientIpAddress = '0';
 
         async function getClientIP() {
             try {
-                // First try to get IP from server-side endpoint (most accurate)
                 try {
                     const response = await fetch('/ExternalRegistration/GetClientIP');
                     if (response.ok) {
@@ -624,7 +619,6 @@
                     console.log('Server-side IP detection failed:', e.message);
                 }
 
-                // Fallback: Try public IP detection services
                 const services = [
                     'https://api.ipify.org?format=json',
                     'https://api64.ipify.org?format=json',
@@ -662,26 +656,21 @@
         $(document).ready(async function () {
             let masterData = [];
 
-            // Get client IP address on page load
             clientIpAddress = await getClientIP();
 
-            // 1. Initial Data Loading
             loadCountries();
             loadCountryBusinesses();
             loadTitles();
             loadMasterAddresses(); 
             setRegistrationDate();
             
-            // Check for referrer ID from URL query parameter
             var urlParams = new URLSearchParams(window.location.search);
             var referrerId = urlParams.get('id');
             
             if (referrerId) {
-                // Extract member code and position
                 var memberCode = referrerId;
                 var position = 'left';
                 
-                // Check if ends with L or R
                 if (referrerId.length > 1) {
                     var lastChar = referrerId.slice(-1).toUpperCase();
                     if (lastChar === 'L' || lastChar === 'R') {
@@ -690,13 +679,9 @@
                     }
                 }
                 
-                // Set referrer code and disable
                 $('#referrerCode').val(memberCode).prop('disabled', true);
-                
-                // Disable search button
                 $('#btnSearchReferrer').prop('disabled', true);
                 
-                // Set position and disable
                 if (position === 'left') {
                     $('#positionLeft').prop('checked', true);
                 } else {
@@ -704,20 +689,17 @@
                 }
                 $('input[name="position"]').prop('disabled', true);
                 
-                // Auto search referrer after a short delay to ensure DOM is ready
                 setTimeout(function() {
                     $('#btnSearchReferrer').trigger('click');
                 }, 500);
             }
 
-            // Initialize reg day dropdown
             var regDaySelect = $('#regDay');
             regDaySelect.empty().append('<option value="">วัน</option>');
             for (var d = 1; d <= 31; d++) {
                 regDaySelect.append(`<option value="${d}">${d}</option>`);
             }
             
-            // Initialize reg month dropdown
             var regMonthSelect = $('#regMonth');
             regMonthSelect.empty().append('<option value="">เดือน</option>');
             var monthNames = ['มกราคม', 'กุมภาพันธ์', 'มีนาคม', 'เมษายน', 'พฤษภาคม', 'มิถุนายน', 'กรกฎาคม', 'สิงหาคม', 'กันยายน', 'ตุลาคม', 'พฤศจิกายน', 'ธันวาคม'];
@@ -725,7 +707,6 @@
                 regMonthSelect.append(`<option value="${m}">${monthNames[m-1]}</option>`);
             }
             
-            // Initialize reg year dropdown
             var regYearSelect = $('#regYear');
             var today = new Date();
             var currentYearBE = today.getFullYear() + 543;
@@ -734,22 +715,18 @@
                 regYearSelect.append(`<option value="${y}">${y}</option>`);
             }
             
-            // Set initial registration date to today
             $('#regDay').val(today.getDate());
             $('#regMonth').val(today.getMonth() + 1);
             $('#regYear').val(currentYearBE);
             $('#registrationDate').val(`${String(today.getDate()).padStart(2, '0')}-${String(today.getMonth() + 1).padStart(2, '0')}-${currentYearBE}`);
             
-            // Initialize birth day dropdown
             var birthDaySelect = $('#birthDay');
             birthDaySelect.empty().append('<option value="">วัน</option>');
             for (var d = 1; d <= 31; d++) {
                 birthDaySelect.append(`<option value="${d}">${d}</option>`);
             }
             
-            // Initialize birth year dropdown (พ.ศ.) - age 18 to 100
             var birthYearSelect = $('#birthYear');
-            var currentYearBE = today.getFullYear() + 543;
             var minAgeYearBE = currentYearBE - 18;
             var maxAgeYearBE = currentYearBE - 100;
             
@@ -758,7 +735,6 @@
                 birthYearSelect.append(`<option value="${y}">${y}</option>`);
             }
             
-            // Validation: Check age when year or month changes
             function validateBirthAge() {
                 var day = $('#birthDay').val();
                 var month = $('#birthMonth').val();
@@ -766,7 +742,6 @@
                 
                 if (!day || !month || !yearBE) return true;
                 
-                // Convert BE to CE for age calculation
                 var yearCE = parseInt(yearBE) - 543;
                 var birthDate = new Date(yearCE, parseInt(month) - 1, parseInt(day));
                 var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
@@ -780,12 +755,7 @@
             
             $('#birthDay, #birthMonth, #birthYear').on('change', validateBirthAge);
 
-            // 2. Event Listeners - Basic Inputs
             $('#idCardName').on('input', function() {
-                // if (!$('#businessName').val()) {
-                //     $('#businessName').val($(this).val());
-                //     validateBusinessName(); 
-                // }
                 if (!$('#businessName').data('userEdited')) {
                     $('#businessName').val($(this).val());
                     validateBusinessName();
@@ -794,33 +764,22 @@
             });
 
             $('#documentNumber').on('blur', function() {
-                // แก้ไข: ใช้ || "" เพื่อป้องกัน error
                 const docNumber = ($(this).val() || "").replace(/[- ]/g, '');
 
-                // 2. ล้างข้อความ Error เก่าออกก่อนเสมอเมื่อเริ่มเช็คใหม่
                 $(this).removeClass('is-invalid');
                 $('#documentValidationMessage').html('');
 
-                // 3. ถ้าไม่ได้กรอกอะไรเลย ให้ข้ามไป (ไม่ต้องเช็ค)
                 if (!docNumber) return;
 
-                // 4. เช็คว่าเข้าข่าย "บัตรประชาชนไทย" หรือไม่? (เป็นตัวเลขล้วน และยาว 13 หลักเป๊ะ)
                 if (/^[0-9]{13}$/.test(docNumber)) {
-
-                    // เอาเลข 13 หลักไปเข้าสูตรคำนวณ
                     if (!validateThaiID(docNumber)) {
-                        // พิมพ์ 13 หลัก แต่สูตรคำนวณบอกว่า "บัตรปลอม/พิมพ์ผิด"
                         $(this).addClass('is-invalid');
-                        $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
+                        $('#documentValidation').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
                         toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
                     } else {
-                        // ✅ UX เสริม: ถ้าบัตรถูกต้อง ให้เติมขีด (-) จัด Format อัตโนมัติ (x-xxxx-xxxxx-xx-x)
                         $(this).val(docNumber);
+                        $('#documentValidation').html('');
                     }
-
-                } else {
-                    // 5. กรณีพิมพ์มาไม่ถึง 13 หลัก หรือมีตัวอักษรภาษาอังกฤษผสม (เช่น Passport)
-                    // ถือว่าเป็นเอกสารประเภทอื่น และปล่อยผ่าน
                 }
             });
 
@@ -833,7 +792,6 @@
             $('#email').on('input', validateEmail);
             $('#lineId').on('input', validateLineId);
 
-            // 3. Search Referrer
             $('#btnSearchReferrer').click(function () {
                 const referrerCode = $('#referrerCode').val();
                 if (referrerCode) {
@@ -854,9 +812,9 @@
                 }
             });
 
-            // --- Image preview handlers ---
+            // ✅ ปรับเปลี่ยนฟังก์ชันประมวลผลพรีวิวรูปภาพมาใช้ FileReader (แก้ปัญหารูปขาว/รูปไม่ติดบน Vivo)
             function handleImagePreview(inputSelector, previewSelector) {
-                $(inputSelector).on('change', function () {
+                $(inputSelector).off('change').on('change', function () {
                     const file = this.files && this.files[0];
                     const preview = $(previewSelector);
                     if (!file) {
@@ -879,9 +837,19 @@
                         return;
                     }
 
-                    const url = URL.createObjectURL(file);
-                    preview.attr('src', url).show();
-                    preview.on('load', function () { URL.revokeObjectURL(url); });
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        preview.attr('src', e.target.result);
+                        // ปรับ Delay เพื่อสยบบั๊กโครงสร้าง DOM ค้างบนเบราว์เซอร์ Vivo
+                        setTimeout(() => {
+                            preview.show();
+                        }, 50);
+                    };
+                    reader.onerror = function() {
+                        toastr.error('ไม่สามารถโหลดภาพขึ้นระบบพรีวิวได้');
+                        preview.hide().attr('src', '');
+                    };
+                    reader.readAsDataURL(file);
                 });
             }
 
@@ -889,7 +857,7 @@
             handleImagePreview('#bankCardCopy', '#bankCardPreview');
             handleImagePreview('#businessPhoto', '#businessPhotoPreview');
 
-            // 4. Address Logic
+            // Address Logic
             $('#simplePostcode').on('input', function() {
                 var selectedZip = $(this).val();
                 resetAddressDropdowns();
@@ -955,7 +923,6 @@
                 }
             });
 
-            // Update simpleTambonId when subdistrict changes
             $('#simpleSubdistrict').change(function () {
                 const code = $(this).val();
                 const match = masterData.find(item => String(item.tambon_code) === String(code));
@@ -1003,20 +970,15 @@
                 return result.isConfirmed;
             }
 
-            // 5. Simple form submission
+            // Simple form submission
             $('#simpleRegistrationForm').submit(async function (e) {
                 e.preventDefault();
-
                 let isValid = true;
 
-                // ==========================================
-                // 1. Basic validation (ค้นหาตัวที่บังคับกรอก)
-                // ==========================================
                 const requiredFields = $(this).find('input[required], select[required], textarea[required]');
                 
                 requiredFields.each(function () {
                     const field = $(this);
-
                     if (field.is(':radio') || field.is(':checkbox')) {
                         const name = field.attr('name');
                         if ($('input[name="' + name + '"]:checked').length === 0) {
@@ -1037,20 +999,10 @@
                     }
                 });
 
-                // ==========================================
-                // 2. Validate Thai ID (บัตร ปชช.) จาก id="documentNumber"
-                // ==========================================
-                // ในไฟล์นี้ ID ของ input คือ documentNumber ไม่ใช่ simpleDocumentNumber
-                const docNumber = ($('#documentNumber').val() || "").replace(/[- ]/g, '');
-                
-                // ใช้ฟังก์ชันที่ปรับปรุงแล้ว แทนการเช็คซ้ำซ้อน
                 if (!validateDocumentNumber()) {
                     isValid = false;
                 }
 
-                // ==========================================
-                // 3. Validate Address (บังคับกรอกที่อยู่ตามบัตรให้ครบทุกช่อง)
-                // ==========================================
                 const addressFields = ['#simpleHouseNumber', '#simplePostcode', '#simpleProvince', '#simpleDistrict', '#simpleSubdistrict'];
                 let addressComplete = true;
 
@@ -1068,9 +1020,6 @@
                     isValid = false;
                 }
 
-                // ==========================================
-                // 4. Validate Registration Date (วันที่สมัคร)
-                // ==========================================
                 var regDay = $('#regDay').val();
                 var regMonth = $('#regMonth').val();
                 var regYear = $('#regYear').val();
@@ -1080,9 +1029,6 @@
                     isValid = false;
                 }
                 
-                // ==========================================
-                // 5. Validate Birth Date (วันเกิด)
-                // ==========================================
                 var birthDay = $('#birthDay').val();
                 var birthMonth = $('#birthMonth').val();
                 var birthYear = $('#birthYear').val();
@@ -1100,9 +1046,6 @@
                     isValid = false;
                 }
                 
-                // ==========================================
-                // 5. แสดงผลลัพธ์และส่งข้อมูล
-                // ==========================================
                 if (!validateIdCardName()) { isValid = false; }
                 if (!validateBusinessName()) { isValid = false; }
                 if (!validateEmail()) { isValid = false; }
@@ -1120,11 +1063,9 @@
                         mobile: $('#mobile').val()
                     });
 
-                    if (!isConfirmed) {
-                        return;
-                    }
+                    if (!isConfirmed) return;
 
-                    await performValidationAndRegister(); // ย้ายการทำงานไปที่ฟังก์ชันนี้เพื่อความสะอาด
+                    await performValidationAndRegister();
                 } else {
                     const firstError = $('.is-invalid, .validation-error').first();
                     if (firstError.length > 0) {
@@ -1135,7 +1076,7 @@
                 }
             });
 
-            // 6. Reset Form
+            // Reset Form
             $('#btnResetSimple').click(function () {
                 const selectedRegDay = $('#regDay').val();
                 const selectedRegMonth = $('#regMonth').val();
@@ -1144,7 +1085,6 @@
                 $('#simpleRegistrationForm')[0].reset();
                 $('#referrerName').val('');
 
-                // คงค่าวันที่สมัครเดิมไว้แม้กดล้างข้อมูล
                 $('#regDay').val(selectedRegDay);
                 $('#regMonth').val(selectedRegMonth);
                 $('#regYear').val(selectedRegYear);
@@ -1153,6 +1093,7 @@
                 $('.text-danger:not(.required .text-danger), .text-success, .validation-error').text('').css('color', ''); 
                 $('input, select, textarea').removeClass('is-invalid');
                 
+                // ✅ สั่งล้างรูปแบบปลอดภัยเพื่อคืนสิทธิ์ RAM ให้เว็บแอปพลิเคชัน
                 $('#idCardPreview, #bankCardPreview, #businessPhotoPreview').hide().attr('src', '');
                 $('#idCardCopy, #bankCardCopy, #businessPhoto').val('');
                 
@@ -1160,19 +1101,16 @@
                 $('html, body').animate({ scrollTop: 0 }, 500);
             });
 
-            // --- Helper Functions ---
             function collectFormData() {
-                // Combine birth day, month, year into birthDate (format: dd-MM-yyyy for Thai/BE)
                 var birthDay = $('#birthDay').val();
                 var birthMonth = $('#birthMonth').val();
                 var birthYearBE = $('#birthYear').val();
                 
-                // Format as dd-MM-yyyy (CE year — แปลงจาก พ.ศ. → ค.ศ. ก่อนส่ง API)
                 var birthDate = '';
                 if (birthDay && birthMonth && birthYearBE) {
                     var dayStr = String(birthDay).padStart(2, '0');
                     var monthStr = String(birthMonth).padStart(2, '0');
-                    var birthYearCE = parseInt(birthYearBE) - 543; // พ.ศ. → ค.ศ.
+                    var birthYearCE = parseInt(birthYearBE) - 543;
                     birthDate = `${birthYearCE}-${monthStr}-${dayStr}`;
                 }
 
@@ -1190,7 +1128,6 @@
                     homePhone: $('#homePhone').val(),
                     email: $('#email').val(),
                     lineId: $('#lineId').val(),
-
                     addressIdCard: [$('#simpleHouseNumber').val(), $('#simpleMoo').val() ? 'หมู่ ' + $('#simpleMoo').val() : '', $('#simpleAlley').val() ? 'ซ.' + $('#simpleAlley').val() : '', $('#simpleRoad').val() ? 'ถ.' + $('#simpleRoad').val() : '', $('#simpleBuilding').val(), $('#simpleFloor').val() ? 'ชั้น ' + $('#simpleFloor').val() : ''].filter(Boolean).join(' '),
                     houseNumber: $('#simpleHouseNumber').val(),
                     moo: $('#simpleMoo').val(),
@@ -1237,15 +1174,12 @@
                 }
             }
 
-            // --- OTP Logic ---
             let countdownInterval;
             window.currentFormData = null;
             window.currentReferenceId = null;
 
             async function sendOTPAndShowInput(formData) {
                 try {
-                    // ตรวจสอบ SendOTPRegister จาก /Static/system
-                    // '0' = เปิดส่ง OTP, '1' = ปิด ข้ามไป register เลย
                     let skipOTP = false;
                     try {
                         const sysData = await $.get('/Static/system');
@@ -1258,7 +1192,6 @@
                     }
 
                     if (skipOTP) {
-                        // ปิด OTP — register เลยโดยไม่ต้องยืนยัน
                         window.currentFormData = formData;
                         window.currentReferenceId = null;
                         Swal.close();
@@ -1383,35 +1316,17 @@
 
             function normalizeDuplicateResult(response, defaultMessage) {
                 const parsed = (typeof response === 'string') ? JSON.parse(response) : response;
+                if (!parsed || typeof parsed !== 'object') return { success: true, message: '' };
 
-                if (!parsed || typeof parsed !== 'object') {
-                    return { success: true, message: '' };
-                }
-
-                // API ชุดใหม่
                 if (typeof parsed.success === 'boolean') {
-                    return {
-                        success: parsed.success,
-                        message: parsed.message || (parsed.success ? '' : defaultMessage)
-                    };
+                    return { success: parsed.success, message: parsed.message || (parsed.success ? '' : defaultMessage) };
                 }
-
-                // API บางชุดตอบเป็น isDuplicate
                 if (typeof parsed.isDuplicate === 'boolean') {
-                    return {
-                        success: !parsed.isDuplicate,
-                        message: parsed.isDuplicate ? (parsed.message || defaultMessage) : ''
-                    };
+                    return { success: !parsed.isDuplicate, message: parsed.isDuplicate ? (parsed.message || defaultMessage) : '' };
                 }
-
-                // API บางชุดตอบเป็น exists
                 if (typeof parsed.exists === 'boolean') {
-                    return {
-                        success: !parsed.exists,
-                        message: parsed.exists ? (parsed.message || defaultMessage) : ''
-                    };
+                    return { success: !parsed.exists, message: parsed.exists ? (parsed.message || defaultMessage) : '' };
                 }
-
                 return { success: true, message: '' };
             }
 
@@ -1421,7 +1336,6 @@
                     const response = await $.get('/ExternalRegistration/CheckDupIDcard?id=' + encodeURIComponent(id));
                     return normalizeDuplicateResult(response, 'เลขบัตรประชาชนนี้มีในระบบแล้ว');
                 } catch (error) {
-                    console.error('Error checking duplicate ID card:', error);
                     return { success: true };
                 }
             }
@@ -1430,7 +1344,6 @@
                     const response = await $.get('/ExternalRegistration/CheckDupTelephone?phone=' + encodeURIComponent(phone));
                     return normalizeDuplicateResult(response, 'เบอร์โทรศัพท์มือถือมีในระบบแล้ว');
                 } catch (error) {
-                    console.error('Error checking duplicate telephone:', error);
                     return { success: true };
                 }
             }
@@ -1441,7 +1354,6 @@
                     const response = await $.get('/ExternalRegistration/CheckDupEmail?email=' + encodeURIComponent(email));
                     return normalizeDuplicateResult(response, 'อีเมลนี้มีในระบบแล้ว');
                 } catch (error) {
-                    console.error('Error checking duplicate email:', error);
                     return { success: true }; 
                 }
             }
@@ -1451,7 +1363,6 @@
                     const response = await $.get('/ExternalRegistration/CheckDupIDcardname?name=' + encodeURIComponent(name));
                     return normalizeDuplicateResult(response, 'ชื่อตามบัตรนี้มีในระบบแล้ว');
                 } catch (error) {
-                    console.error('Error checking duplicate ID card name:', error);
                     return { success: true };
                 }
             }
@@ -1461,12 +1372,11 @@
                     const response = await $.get('/ExternalRegistration/CheckDupBusinessname?name=' + encodeURIComponent(name));
                     return normalizeDuplicateResult(response, 'ชื่อธุรกิจนี้มีในระบบแล้ว');
                 } catch (error) {
-                    console.error('Error checking duplicate business name:', error);
                     return { success: true };
                 }
             }
 
-            // --- Loaders ---
+            // Loaders
             function loadCountries() {
                 $.get('/ExternalRegistration/GetCountries').done(res => {
                      let data = (typeof res === 'string') ? JSON.parse(res) : res;
@@ -1475,7 +1385,7 @@
                      data.forEach(item => {
                          $('#country').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                      });
-                 }).fail(() => {});
+                 });
             }
             function loadCountryBusinesses() {
                  $.get('/ExternalRegistration/GetCountryBusinesses').done(res => {
@@ -1485,7 +1395,7 @@
                      data.forEach(item => {
                          $('#countryBusiness').append(`<option value="${item.M35_PX1}">${item.Thainame || item.EngName}</option>`);
                      });
-                 }).fail(() => {});
+                 });
             }
             function loadTitles() {
                  $.get('/orders/GetTitlename').done(res => {
@@ -1504,19 +1414,16 @@
                 const d = new Date();
                 const day = d.getDate();
                 const month = d.getMonth() + 1;
-                const yearBE = d.getFullYear() + 543; // Convert to พ.ศ.
+                const yearBE = d.getFullYear() + 543;
 
-                // Set values for dropdowns
                 $('#regDay').val(day);
                 $('#regMonth').val(month);
                 $('#regYear').val(yearBE);
                 
-                // Also update hidden field for form submission
                 const formattedDateBE = `${String(day).padStart(2, '0')}-${String(month).padStart(2, '0')}-${yearBE}`;
                 $('#registrationDate').val(formattedDateBE);
             }
             
-            // Update registration date hidden field when dropdowns change
             $('#regDay, #regMonth, #regYear').on('change', function() {
                 var regDay = $('#regDay').val();
                 var regMonth = $('#regMonth').val();
@@ -1549,25 +1456,21 @@
                 const promises = selectors.map(selector => {
                     return new Promise((resolve, reject) => {
                         const element = document.querySelector(selector);
-
-                        // Check if the input element exists and a file was selected
                         if (element && element.files && element.files[0]) {
                             const file = element.files[0];
                             const reader = new FileReader();
-
-                            // When file is successfully read, resolve the promise with the Base64 string
-                            reader.onload = (e) => resolve(e.target.result);
+                            reader.onload = (e) => {
+                                const s = (e.target.result || '').toString();
+                                const parts = s.split(',');
+                                resolve(parts.length > 1 ? parts[1] : parts[0]);
+                            };
                             reader.onerror = (error) => reject(error);
-
                             reader.readAsDataURL(file);
                         } else {
-                            // If the file is optional and wasn't uploaded, return null safely
                             resolve(null);
                         }
                     });
                 });
-
-                // Wait for all files to be read and return the array of results
                 return Promise.all(promises);
             }
         });

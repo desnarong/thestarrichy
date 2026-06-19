@@ -479,27 +479,27 @@
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-bankname" class="form-label" data-key="t-bankname">ธนาคาร</label>
-                                    <select id="info-bankname" class="form-select" aria-label=".form-select-sm" disabled>
+                                    <select id="info-bankname" class="form-select" aria-label=".form-select-sm">
                                     </select>
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-accountnumber" class="form-label" data-key="t-accountnumber">หมายเลขบัญชี</label>
-                                    <input type="text" class="form-control" id="info-accountnumber" disabled>
+                                    <input type="text" class="form-control" id="info-accountnumber">
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-bookbankname" class="form-label" data-key="t-bookbankname">ชื่อบัญชี</label>
-                                    <input type="text" class="form-control" id="info-bookbankname" disabled>
+                                    <input type="text" class="form-control" id="info-bookbankname">
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <div>
                                         <label for="info-branchname" class="form-label" data-key="t-branchname">สาขา</label>
-                                        <input type="text" class="form-control" id="info-branchname" disabled>
+                                        <input type="text" class="form-control" id="info-branchname">
                                     </div>
                                 </div>
                             </div>
@@ -508,13 +508,13 @@
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-beneficiary" class="form-label" data-key="t-beneficiary">ผู้รับประโยชน์</label>
-                                    <input type="text" class="form-control" id="info-beneficiary" disabled>
+                                    <input type="text" class="form-control" id="info-beneficiary">
                                 </div>
                             </div>
                             <div class="col-sm-12 col-md-4">
                                 <div>
                                     <label for="info-beneficiaryidcard" class="form-label" data-key="t-beneficiaryidcard">หมายเลขบัตรผู้รับประโยชน์</label>
-                                    <input type="text" class="form-control" id="info-beneficiaryidcard" disabled>
+                                    <input type="text" class="form-control" id="info-beneficiaryidcard">
                                 </div>
                             </div>
                         </div>
@@ -1041,8 +1041,17 @@
                 //$('#info-bankname').text(member.bankname || '');
                
                 $('#info-accountnumber').val(member.accountnumber || '');
+                if(member.accountnumber)
+                    $('#info-accountnumber').prop('disabled', true);
+
                 $('#info-bookbankname').val(member.bookbankname || '');
+                if(member.bookbankname)
+                    $('#info-bookbankname').prop('disabled', true);
+
                 $('#info-branchname').val(member.branchname || '');
+                if(member.branchname)
+                    $('#info-branchname').prop('disabled', true);
+
                 $('#info-beneficiary').val(member.beneficiary || '');
                 $('#info-beneficiaryidcard').val(member.beneficiaryIDCard || '');
                 $('#info-autotransfer').val(member.autotransfer || 'N');
@@ -1087,13 +1096,13 @@
                 $('#info-applicationsubmitte').attr('src', member.memberApplicationPicture || 'N/A');
 
                 // Disable upload inputs if documents are already uploaded
-                if (member.memberIDPicture && member.memberIDPicture !== 'N/A') {
+                if (member.memberIDPicture && member.memberIDPicture !== 'N/A' && member.memberIDPicture !== '') {
                     $('#info-uploadcopyidcard').prop('disabled', true);
                 }
-                if (member.memberBookPicture && member.memberBookPicture !== 'N/A') {
+                if (member.memberBookPicture && member.memberBookPicture !== 'N/A' && member.memberIDPicture !== '') {
                     $('#info-uploadcopybankaccountbook').prop('disabled', true);
                 }
-                if (member.memberApplicationPicture && member.memberApplicationPicture !== 'N/A') {
+                if (member.memberApplicationPicture && member.memberApplicationPicture !== 'N/A' && member.memberIDPicture !== '') {
                     $('#info-uploadapplicationsubmitte').prop('disabled', true);
                 }
 
@@ -1140,6 +1149,7 @@
                     $bankselect.find('option').each(function () {
                         if ($(this).text().trim() === selectedBankText.trim()) {
                             $(this).prop('selected', true);
+                            $(this).prop('disabled', true);
                             return false; // ออกจาก each เมื่อเจอแล้ว
                         }
                     });
