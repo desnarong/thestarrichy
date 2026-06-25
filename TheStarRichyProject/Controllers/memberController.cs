@@ -256,11 +256,48 @@ namespace TheStarRichyProject.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateMemberProfile([FromBody] JObject requestBody)
+        [HttpPost]
+        [RequestSizeLimit(25_000_000)]
+        public async Task<IActionResult> UpdateMemberProfile(
+            [FromForm] string? payload,
+            [FromForm] IFormFile? profileImage,
+            [FromForm] IFormFile? copyIdCard,
+            [FromForm] IFormFile? copyBankBook,
+            [FromForm] IFormFile? applicationForm)
         {
             try
             {
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+
+                var savedUrls = new Dictionary<string, string?>();
+                var hasFile = profileImage != null || copyIdCard != null || copyBankBook != null || applicationForm != null;
+
+                JObject payloadObj;
+                try { payloadObj = JObject.Parse(payload ?? "{}"); } catch { payloadObj = new JObject(); }
+
+                if (hasFile)
+                {
+                    string memberCode = payloadObj["memberCode"]?.ToString() ?? "unknown";
+                    string safeMemberCode = Regex.Replace(memberCode, "[^a-zA-Z0-9_-]", "");
+                    string rootPath = Path.Combine(_config["Imagespath"], "Memberpicture", safeMemberCode);
+                    if (!Directory.Exists(rootPath)) Directory.CreateDirectory(rootPath);
+
+                    savedUrls["profileImage"] = await SaveUploadFileAsync(profileImage, rootPath, "profile");
+                    savedUrls["copyIdCard"] = await SaveUploadFileAsync(copyIdCard, rootPath, "idcard");
+                    savedUrls["copyBankBook"] = await SaveUploadFileAsync(copyBankBook, rootPath, "bankbook");
+                    savedUrls["applicationForm"] = await SaveUploadFileAsync(applicationForm, rootPath, "application");
+
+                    // อัปเดต documentInfo ใน payload ด้วย URL ที่ save ได้
+                    var docInfo = payloadObj["documentInfo"] as JObject ?? new JObject();
+                    if (savedUrls["profileImage"] != null) docInfo["profileImageUrl"] = savedUrls["profileImage"];
+                    if (savedUrls["copyIdCard"] != null) docInfo["idCardImageUrl"] = savedUrls["copyIdCard"];
+                    if (savedUrls["copyBankBook"] != null) docInfo["bankBookImageUrl"] = savedUrls["copyBankBook"];
+                    if (savedUrls["applicationForm"] != null) docInfo["applicationFormImageUrl"] = savedUrls["applicationForm"];
+                    payloadObj["documentInfo"] = docInfo;
+                }
+
+                var passkey = _config["Api:Passkey"]!;
+                var token = Request.Cookies[CookieHelper.UserKey];
                 var options = new RestClientOptions(_config["Api:Url"]!)
                 {
                     ThrowOnAnyError = false,
@@ -273,23 +310,32 @@ namespace TheStarRichyProject.Controllers
                         return httpClientHandler;
                     }
                 };
-
-                var passkey = _config["Api:Passkey"]!;
-                var token = Request.Cookies[CookieHelper.UserKey];
                 var client = new RestClient(options);
                 var apiRequest = new RestRequest("/Member/profile", Method.Put);
                 apiRequest.AddHeader("X-Passkey", passkey);
                 apiRequest.AddHeader("Authorization", $"Bearer {token}");
                 apiRequest.AddHeader("Accept", "application/json");
-                apiRequest.AddStringBody(requestBody?.ToString() ?? "{}", "application/json");
+                apiRequest.AddStringBody(payloadObj.ToString(), "application/json");
 
                 var response = await client.ExecuteAsync(apiRequest);
-                if (response.IsSuccessful)
+                if (!response.IsSuccessful)
                 {
-                    return Ok(response.Content);
+                    return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode), response.Content);
                 }
 
-                return StatusCode((int)(response.StatusCode == 0 ? HttpStatusCode.BadGateway : response.StatusCode), response.Content);
+                // ส่ง urls กลับไปให้ frontend อัปเดตรูป preview
+                var result = JObject.Parse(response.Content ?? "{}");
+                if (hasFile)
+                {
+                    result["urls"] = JObject.FromObject(new
+                    {
+                        profileImage = savedUrls.GetValueOrDefault("profileImage"),
+                        copyIdCard = savedUrls.GetValueOrDefault("copyIdCard"),
+                        copyBankBook = savedUrls.GetValueOrDefault("copyBankBook"),
+                        applicationForm = savedUrls.GetValueOrDefault("applicationForm")
+                    });
+                }
+                return Ok(result);
             }
             catch (Exception ex)
             {

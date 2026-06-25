@@ -1041,17 +1041,8 @@
                 //$('#info-bankname').text(member.bankname || '');
                
                 $('#info-accountnumber').val(member.accountnumber || '');
-                if(member.accountnumber)
-                    $('#info-accountnumber').prop('disabled', true);
-
                 $('#info-bookbankname').val(member.bookbankname || '');
-                if(member.bookbankname)
-                    $('#info-bookbankname').prop('disabled', true);
-
                 $('#info-branchname').val(member.branchname || '');
-                if(member.branchname)
-                    $('#info-branchname').prop('disabled', true);
-
                 $('#info-beneficiary').val(member.beneficiary || '');
                 $('#info-beneficiaryidcard').val(member.beneficiaryIDCard || '');
                 $('#info-autotransfer').val(member.autotransfer || 'N');
@@ -1095,17 +1086,6 @@
                 $('#info-copybankaccountbook').attr('src', member.memberBookPicture || 'N/A');
                 $('#info-applicationsubmitte').attr('src', member.memberApplicationPicture || 'N/A');
 
-                // Disable upload inputs if documents are already uploaded
-                if (member.memberIDPicture && member.memberIDPicture !== 'N/A' && member.memberIDPicture !== '') {
-                    $('#info-uploadcopyidcard').prop('disabled', true);
-                }
-                if (member.memberBookPicture && member.memberBookPicture !== 'N/A' && member.memberIDPicture !== '') {
-                    $('#info-uploadcopybankaccountbook').prop('disabled', true);
-                }
-                if (member.memberApplicationPicture && member.memberApplicationPicture !== 'N/A' && member.memberIDPicture !== '') {
-                    $('#info-uploadapplicationsubmitte').prop('disabled', true);
-                }
-
                 $('#info-flagsendidcard').prop('checked', (member.memberIDPicture ? true : false));
                 $('#info-flagsendbookbank').prop('checked', (member.memberBookPicture ? true : false));
                 $('#info-registerfrombranch').prop('checked', (member.registerfromBranch ? true : false));
@@ -1113,6 +1093,8 @@
 
                 await loadBanks(member.bankname || '');
                 await loadTitleNames(member.title || '');
+                applyBankFieldLock();       // << เพิ่ม
+                applyDocumentUploadLock();  // << เพิ่ม
             } else {
                 console.error('No token found');
                 return null;
@@ -1127,35 +1109,33 @@
         try {
             const response = await fetch('/Member/GetBanks', {
                 method: 'GET',
-                credentials: 'include' // ส่ง Cookie ไปด้วย
+                credentials: 'include'
             });
 
             const data = await response.json();
             if (data) {
                 const $bankselect = $('#info-bankname');
-                $bankselect.empty(); // เคลียร์ option เดิมก่อน
+                $bankselect.empty();
 
-                let optionsHtml = ``;
+                let optionsHtml = '';
                 $.each(data, function (index, item) {
                     let id = item.M17_PX1;
                     let dlname = language === 'th' ? item.Thainame : item.Engname;
                     optionsHtml += `<option value="${id}">${dlname}</option>`;
                 });
-
                 $bankselect.append(optionsHtml);
 
-                // 🔽 เลือก option ตามข้อความ (text)
-                if (selectedBankText) {
+                if (!isEmptyValue(selectedBankText)) {
                     $bankselect.find('option').each(function () {
                         if ($(this).text().trim() === selectedBankText.trim()) {
                             $(this).prop('selected', true);
-                            $(this).prop('disabled', true);
-                            return false; // ออกจาก each เมื่อเจอแล้ว
+                            $bankselect.prop('disabled', true); // lock ถ้ามีค่าจริง
+                            return false;
                         }
                     });
                 }
 
-                $bankselect.trigger('change'); // trigger change ถ้าต้องการ
+                $bankselect.trigger('change');
             } else {
                 console.error('No data found');
             }
@@ -1578,6 +1558,46 @@
         })
     })
 
+    function getBankFieldValue($el) {
+        // ถ้า field disable ให้ส่งค่าเดิมที่มีอยู่ (ห้ามส่ง null เพราะจะลบข้อมูล)
+        // ถ้า field enable ให้ส่งค่าที่ผู้ใช้กรอก
+        const val = $el.val() || '';
+        return val || null;
+    }
+
+    function buildBankInfoPayload() {
+        const bankInfo = {};
+        const bankSelect = document.getElementById('info-bankname');
+        const selectedOption = bankSelect?.options[bankSelect?.selectedIndex];
+        const bankDisabled = selectedOption?.disabled || bankSelect?.disabled;
+
+        bankInfo.bankCode = bankDisabled
+            ? getBankFieldValue($('#info-bankname'))
+            : ($('#info-bankname').val() || null);
+
+        bankInfo.accountNumber = $('#info-accountnumber').prop('disabled')
+            ? getBankFieldValue($('#info-accountnumber'))
+            : ($('#info-accountnumber').val() || null);
+
+        bankInfo.accountName = $('#info-bookbankname').prop('disabled')
+            ? getBankFieldValue($('#info-bookbankname'))
+            : ($('#info-bookbankname').val() || null);
+
+        bankInfo.branchName = $('#info-branchname').prop('disabled')
+            ? getBankFieldValue($('#info-branchname'))
+            : ($('#info-branchname').val() || null);
+
+        bankInfo.beneficiary = $('#info-beneficiary').prop('disabled')
+            ? getBankFieldValue($('#info-beneficiary'))
+            : ($('#info-beneficiary').val() || null);
+
+        bankInfo.beneficiaryIdCard = $('#info-beneficiaryidcard').prop('disabled')
+            ? getBankFieldValue($('#info-beneficiaryidcard'))
+            : ($('#info-beneficiaryidcard').val() || null);
+
+        return bankInfo;
+    }
+
     document.getElementById("btn-docupdate").addEventListener("click", async function () {
         Swal.fire({
             title: "ยืนยัน",
@@ -1596,60 +1616,71 @@
                 return;
             }
 
-            const hasFileToUpload = uploadState.profileImage || uploadState.copyIdCard || uploadState.copyBankBook || uploadState.applicationForm;
-            if (!hasFileToUpload) {
-                Swal.fire({
-                    title: "ไม่มีไฟล์",
-                    text: "กรุณาเลือกไฟล์ที่ต้องการอัปโหลดอย่างน้อย 1 รายการ",
-                    icon: "warning",
-                    customClass: {
-                        confirmButton: "btn btn-primary w-xs mt-2"
-                    },
-                    buttonsStyling: !1
-                });
-                return;
-            }
-
             try {
-                const formData = new FormData();
-                if (memberinfo?.membercode) {
-                    formData.append('memberCode', memberinfo.membercode);
+                const hasFileToUpload = uploadState.profileImage || uploadState.copyIdCard || uploadState.copyBankBook || uploadState.applicationForm;
+
+                const payload = {
+                    bankInfo: buildBankInfoPayload(),
+                    updateScope: 'bank'
+                };
+
+                if (hasFileToUpload) {
+                    payload.updateScope = 'bankAndDocument';
                 }
+
+                // เพิ่ม memberCode ใน payload สำหรับสร้าง path รูป
+                payload.memberCode = memberinfo?.membercode || 'unknown';
+
+                // ส่ง request เดียว: FormData รวม JSON payload + ไฟล์
+                const formData = new FormData();
+                formData.append('payload', JSON.stringify(payload));
 
                 if (uploadState.profileImage) formData.append('profileImage', uploadState.profileImage);
                 if (uploadState.copyIdCard) formData.append('copyIdCard', uploadState.copyIdCard);
                 if (uploadState.copyBankBook) formData.append('copyBankBook', uploadState.copyBankBook);
                 if (uploadState.applicationForm) formData.append('applicationForm', uploadState.applicationForm);
 
-                const response = await fetch('/Member/UploadMemberDocuments', {
+                const response = await fetch('/Member/UpdateMemberProfile', {
                     method: 'POST',
-                    body: formData,
-                    credentials: 'include'
+                    credentials: 'include',
+                    body: formData
                 });
 
-                const result = await response.json();
-                if (!response.ok || !result?.success) {
-                    throw new Error(result?.message || 'Upload failed');
+                const raw = await response.text();
+                let result = null;
+                try {
+                    result = JSON.parse(raw);
+                } catch {
+                    result = { success: response.ok, message: raw || '' };
                 }
 
-                if (result.urls?.profileImage) {
-                    $('#user-profile-image').attr('src', result.urls.profileImage);
-                }
-                if (result.urls?.copyIdCard) {
-                    $('#info-copyidcard').attr('src', result.urls.copyIdCard);
-                    $('#info-flagsendidcard').prop('checked', true);
-                }
-                if (result.urls?.copyBankBook) {
-                    $('#info-copybankaccountbook').attr('src', result.urls.copyBankBook);
-                    $('#info-flagsendbookbank').prop('checked', true);
-                }
-                if (result.urls?.applicationForm) {
-                    $('#info-applicationsubmitte').attr('src', result.urls.applicationForm);
-                    $('#info-registerfrombranch').prop('checked', true);
+                if (!response.ok || result?.success === false) {
+                    throw new Error(result?.message || 'ไม่สามารถอัปเดตข้อมูลได้');
                 }
 
-                await submitMemberProfileUpdate('document');
+                // อัปเดตรูป preview ถ้ามี URL กลับมา
+                if (result.urls) {
+                    if (result.urls.profileImage) {
+                        //$('#user-profile-image').attr('src', result.urls.profileImage);
+                    }
+                    if (result.urls.copyIdCard) {
+                        //$('#info-copyidcard').attr('src', result.urls.copyIdCard);
+                        $('#info-flagsendidcard').prop('checked', true);
+                        $('#info-uploadcopyidcard').prop('disabled', true);
+                    }
+                    if (result.urls.copyBankBook) {
+                        //$('#info-copybankaccountbook').attr('src', result.urls.copyBankBook);
+                        $('#info-flagsendbookbank').prop('checked', true);
+                        $('#info-uploadcopybankaccountbook').prop('disabled', true);
+                    }
+                    if (result.urls.applicationForm) {
+                        //$('#info-applicationsubmitte').attr('src', result.urls.applicationForm);
+                        $('#info-registerfrombranch').prop('checked', true);
+                        $('#info-uploadapplicationsubmitte').prop('disabled', true);
+                    }
+                }
 
+                // reset state และ input แต่ไม่แตะ src
                 uploadState.profileImage = null;
                 uploadState.copyIdCard = null;
                 uploadState.copyBankBook = null;
@@ -1661,7 +1692,7 @@
 
                 Swal.fire({
                     title: "สำเร็จ",
-                    text: "อัปโหลดเอกสารและบันทึกข้อมูลเรียบร้อยแล้ว",
+                    text: "อัปเดตข้อมูลธนาคารและเอกสารเรียบร้อยแล้ว",
                     icon: "success",
                     customClass: {
                         confirmButton: "btn btn-primary w-xs mt-2"
@@ -1671,7 +1702,7 @@
             } catch (error) {
                 Swal.fire({
                     title: "เกิดข้อผิดพลาด",
-                    text: error?.message || "ไม่สามารถอัปโหลดไฟล์ได้",
+                    text: error?.message || "ไม่สามารถอัปเดตข้อมูลได้",
                     icon: "error",
                     customClass: {
                         confirmButton: "btn btn-primary w-xs mt-2"
@@ -1681,6 +1712,95 @@
             }
         })
     })
+
+    function isEmptyValue(val) {
+        if (!val) return true;
+        const trimmed = String(val).trim();
+        return trimmed === '' || trimmed === '-' || trimmed.toUpperCase() === 'N/A';
+    }
+
+    function applyBankFieldLock() {
+        const member = memberinfo;
+        if (!member) return;
+
+        // ธนาคาร: unlock เฉพาะถ้าค่าเป็น N/A หรือว่าง
+        if (isEmptyValue(member.bankname)) {
+            $('#info-bankname').prop('disabled', false);
+        } else {
+            $('#info-bankname').prop('disabled', true);
+        }
+
+        // เลขบัญชี: ตัวเลขเท่านั้น 10-15 หลัก (logic lock เดิม)
+        if (isEmptyValue(member.accountnumber)) {
+            $('#info-accountnumber').prop('disabled', false);
+        } else {
+            $('#info-accountnumber').prop('disabled', true);
+        }
+        $('#info-accountnumber')
+            .attr('maxlength', 15)
+            .off('input.banklock')
+            .on('input.banklock', function () {
+                const cleaned = $(this).val().replace(/\D/g, '').slice(0, 15);
+                $(this).val(cleaned);
+            })
+            .off('blur.banklock')
+            .on('blur.banklock', function () {
+                const val = $(this).val();
+                if (val.length > 0 && (val.length < 10 || val.length > 15)) {
+                    $(this).addClass('is-invalid');
+                    if (!$(this).next('.invalid-feedback').length) {
+                        $(this).after('<div class="invalid-feedback">กรุณากรอกเลขบัญชี 10-15 หลัก</div>');
+                    }
+                } else {
+                    $(this).removeClass('is-invalid');
+                    $(this).next('.invalid-feedback').remove();
+                }
+            });
+
+        // ชื่อบัญชี: lock เสมอ ดึงจาก idcardname
+        $('#info-bookbankname').val(member.idcardname || member.bookbankname || '');
+        $('#info-bookbankname').prop('disabled', true);
+
+        // สาขา: unlock เสมอ
+        $('#info-branchname').prop('disabled', false);
+
+        // ผู้รับประโยชน์: lock เสมอ ไม่ว่ากรณีใด
+        $('#info-beneficiary').prop('disabled', true);
+        $('#info-beneficiaryidcard').prop('disabled', true);
+    }
+
+    function applyDocumentUploadLock() {
+        const member = memberinfo;
+        if (!member) return;
+
+        function isValidImageUrl(url) {
+            if (!url) return false;
+            const t = String(url).trim();
+            return t !== '' && t.toUpperCase() !== 'N/A' && t !== '-';
+        }
+
+        function bindDocField(imgSelector, inputSelector, url) {
+            if (isValidImageUrl(url)) {
+                $(imgSelector).attr('src', url);
+                $(imgSelector).off('error.doclock load.doclock');
+                $(imgSelector).on('error.doclock', function () {
+                    $(inputSelector).prop('disabled', false);
+                    $(this).off('error.doclock load.doclock');
+                });
+                $(imgSelector).on('load.doclock', function () {
+                    $(inputSelector).prop('disabled', true);
+                    $(this).off('error.doclock load.doclock');
+                });
+            } else {
+                $(imgSelector).attr('src', '');
+                $(inputSelector).prop('disabled', false);
+            }
+        }
+
+        bindDocField('#info-copyidcard',          '#info-uploadcopyidcard',          member.memberIDPicture);
+        bindDocField('#info-copybankaccountbook', '#info-uploadcopybankaccountbook', member.memberBookPicture);
+        bindDocField('#info-applicationsubmitte', '#info-uploadapplicationsubmitte', member.memberApplicationPicture);
+    }
 
     // Load member info when page loads using jQuery
     $(document).ready(function () {
@@ -1692,6 +1812,7 @@
             await loadMemberInfo();
         })();
     });
+
 </script>
 @section scripts{
     <!-- App js -->
