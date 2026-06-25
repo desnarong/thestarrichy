@@ -475,7 +475,7 @@
 
       var DETAIL_URL_MAP={sponser:'sponser',rebate:'rebate',binary:'binary',matching:'matching',mobile:'mobile'};
       var DETAIL_COLS={
-        sponser:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['DLCode','dlCode','Membercode','memberCode'],renderPrefix:'G'},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
+        sponser:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['DLCode','dlCode','Membercode','memberCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
         rebate:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'คะแนน',k:['PV','pv'],num:true,fmt:'fmt0'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'รายได้',k:['Amount','amount','Income','income'],num:true,fmt:'fmt2'},{title:'เลขที่บิล',k:['BillNO','BillNo','billNo']},{title:'วันที่',k:['BillDate','billDate'],dt:true}],
         binary:[{title:'วันที่',k:['CalculateDate','calculateDate'],dt:true},{title:'คะแนนซ้าย',k:['LeftPV','leftPV'],num:true,fmt:'fmt0'},{title:'คะแนนขวา',k:['RightPV','rightPV'],num:true,fmt:'fmt0'},{title:'ตัดซ้าย',k:['CalcLeftPV','calcLeftPV'],num:true,fmt:'fmt0'},{title:'ตัดขวา',k:['CalcRightPV','calcRightPV'],num:true,fmt:'fmt0'},{title:'% คำนวณ Weak',k:['weak','Weak'],num:true,fmt:'fmt0'},{title:'% คำนวณ Strong',k:['strong','Strong'],num:true,fmt:'fmt0'},{title:'รายได้ Weak',k:['TMBBonus','tmbBonus'],num:true,fmt:'fmt2'},{title:'รายได้ Strong',k:['StrongBonus','strongBonus'],num:true,fmt:'fmt2'},{title:'รายได้ Binary',k:['BinaryBonus','binaryBonus'],num:true,fmt:'fmt2'}],
         matching:[{title:'ชั้นที่',k:['Levelcode','levelcode','DLLevel','dlLevel']},{title:'รหัสสมาชิก',k:['Membercode','memberCode','DLCode','dlCode']},{title:'ชื่อสมาชิก',k:['DLName','dlName','MemberName','memberName']},{title:'รายได้',k:['Income','income'],num:true,fmt:'fmt2'},{title:'% จ่าย',k:['PercentPayMent','percentPayment'],num:true,fmt:'fmt0'},{title:'แมทชิ่งโบนัส',k:['Amount','amount'],num:true,fmt:'fmt2'}],
@@ -549,8 +549,6 @@
               tbody += '<td class="text-center" data-order="' + isoDate(v) + '">' + fmtDate(v) + '</td>';
             } else if (c.num) {
               tbody += '<td class="text-end">' + (c.fmt === 'fmt0' ? fmt0(v) : fmt2(v)) + '</td>';
-            } else if (c.renderPrefix) {
-              tbody += '<td class="text-center">' + c.renderPrefix + esc(String(v)) + '</td>';
             } else {
               tbody += '<td class="text-center">' + esc(String(v)) + '</td>';
             }
