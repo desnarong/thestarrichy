@@ -148,32 +148,47 @@ namespace TheStarRichyApi.Services
         }
 
         /// <summary>
-        /// สร้าง DataTable สำหรับ TVP dbo.SalesDetailType
-        /// ปรับชื่อคอลัมน์ให้ตรงกับ Type จริงใน SQL Server
+        /// สร้าง DataTable สำหรับ TVP dbo.SalesDetailType (15 columns)
         /// </summary>
         private DataTable CreateSalesDetailTable(List<SyncOrderDetail> details)
         {
             var dt = new DataTable();
 
-            // คอลัมน์ต้องเรียงและตั้งชื่อตรงกับ dbo.SalesDetailType
-            dt.Columns.Add("ProductID", typeof(string));
-            dt.Columns.Add("ProductName", typeof(string));
-            dt.Columns.Add("UnitPrice", typeof(decimal));
-            dt.Columns.Add("PV", typeof(decimal));
-            dt.Columns.Add("Qty", typeof(int));
-            dt.Columns.Add("BillNo", typeof(string));
-            dt.Columns.Add("ProductSet", typeof(string));
+            // 15 คอลัมน์ต้องเรียงและตั้งชื่อตรงกับ dbo.SalesDetailType
+            dt.Columns.Add("SeqNo", typeof(int));
+            dt.Columns.Add("SaleID", typeof(string));
+            dt.Columns.Add("CustomerCode", typeof(string));
+            dt.Columns.Add("SaleDate", typeof(DateTime));
+            dt.Columns.Add("Billtype", typeof(string));
+            dt.Columns.Add("ItemCode", typeof(string));
+            dt.Columns.Add("Qty", typeof(decimal));
+            dt.Columns.Add("Price_unit", typeof(decimal));
+            dt.Columns.Add("PV_unit", typeof(decimal));
+            dt.Columns.Add("TotalAmount", typeof(decimal));
+            dt.Columns.Add("TotalPV", typeof(decimal));
+            dt.Columns.Add("CreateBy", typeof(string));
+            dt.Columns.Add("CreateDate", typeof(DateTime));
+            dt.Columns.Add("ReferorderID", typeof(string));
+            dt.Columns.Add("Mainset", typeof(string));
 
             foreach (var item in details)
             {
                 dt.Rows.Add(
-                    item.ProductID ?? string.Empty,
-                    item.ProductName ?? string.Empty,
-                    item.UnitPrice,
-                    item.PV,
+                    item.SeqNo,
+                    item.SaleID ?? string.Empty,
+                    item.CustomerCode ?? string.Empty,
+                    item.SaleDate,
+                    item.Billtype ?? string.Empty,
+                    item.ItemCode ?? string.Empty,
                     item.Qty,
-                    item.BillNo ?? string.Empty,
-                    item.ProductSet ?? string.Empty
+                    item.Price_unit,
+                    item.PV_unit,
+                    item.TotalAmount,
+                    item.TotalPV,
+                    item.CreateBy ?? string.Empty,
+                    item.CreateDate,
+                    item.ReferorderID ?? string.Empty,
+                    item.Mainset ?? string.Empty
                 );
             }
 

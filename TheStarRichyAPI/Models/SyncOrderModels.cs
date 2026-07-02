@@ -16,17 +16,25 @@ namespace TheStarRichyApi.Models
     }
 
     /// <summary>
-    /// รายการสินค้าสำหรับ TVP dbo.SalesDetailType
+    /// รายการสินค้าสำหรับ TVP dbo.SalesDetailType (15 columns ตรงตาม DB)
     /// </summary>
     public class SyncOrderDetail
     {
-        public string ProductID { get; set; } = string.Empty;
-        public string ProductName { get; set; } = string.Empty;
-        public decimal UnitPrice { get; set; }
-        public decimal PV { get; set; }
-        public int Qty { get; set; }
-        public string BillNo { get; set; } = string.Empty;
-        public string ProductSet { get; set; } = string.Empty;
+        public int SeqNo { get; set; }
+        public string SaleID { get; set; } = string.Empty;
+        public string CustomerCode { get; set; } = string.Empty;
+        public DateTime SaleDate { get; set; } = DateTime.Now;
+        public string Billtype { get; set; } = string.Empty;
+        public string ItemCode { get; set; } = string.Empty;
+        public decimal Qty { get; set; }
+        public decimal Price_unit { get; set; }
+        public decimal PV_unit { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal TotalPV { get; set; }
+        public string CreateBy { get; set; } = string.Empty;
+        public DateTime CreateDate { get; set; } = DateTime.Now;
+        public string ReferorderID { get; set; } = string.Empty;
+        public string Mainset { get; set; } = string.Empty;
     }
 
     /// <summary>

@@ -89,24 +89,41 @@ namespace TheStarRichyProject.Controllers
                 var saleNo = $"SO-{DateTime.Now:yyyyMMdd}-{DateTime.Now:HHmmss}";
 
                 // Build API request
+                var now = DateTime.Now;
+                var seq = 0;
                 var apiRequest = new
                 {
                     SaleNo = saleNo,
                     Membercode = payload.MemberCode,
                     Billtype = billtype,
-                    SaleDate = DateTime.Now,
+                    SaleDate = now,
                     CreateBy = createBy,
                     PV = payload.TotalPV,
                     Amount = payload.TotalAmount,
-                    Detail = payload.Items.Select(i => new
+                    Detail = payload.Items.Select(i =>
                     {
-                        ProductID = i.ProductID ?? "",
-                        ProductName = i.ProductName ?? "",
-                        UnitPrice = i.UnitPrice,
-                        PV = i.PV,
-                        Qty = i.Qty,
-                        BillNo = i.BillNo ?? "",
-                        ProductSet = i.ProductSet ?? ""
+                        seq++;
+                        var qty = (decimal)i.Qty;
+                        var price = i.UnitPrice;
+                        var pvUnit = i.PV;
+                        return new
+                        {
+                            SeqNo = seq,
+                            SaleID = saleNo,
+                            CustomerCode = payload.MemberCode,
+                            SaleDate = now,
+                            Billtype = billtype,
+                            ItemCode = i.ProductID ?? "",
+                            Qty = qty,
+                            Price_unit = price,
+                            PV_unit = pvUnit,
+                            TotalAmount = price * qty,
+                            TotalPV = pvUnit * qty,
+                            CreateBy = createBy,
+                            CreateDate = now,
+                            ReferorderID = i.BillNo ?? "",
+                            Mainset = i.ProductSet ?? ""
+                        };
                     }).ToList()
                 };
 

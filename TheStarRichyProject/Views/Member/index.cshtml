@@ -1716,7 +1716,7 @@
     function isEmptyValue(val) {
         //if (!val) return true;
         const trimmed = String(val).trim();
-        return trimmed === '' || trimmed === '-' || trimmed.toUpperCase() === 'N/A';
+        return trimmed === '' || trimmed === '-' || trimmed.toUpperCase() === 'N/A' || trimmed.toUpperCase() === 'ไม่ระบุธนาคาร';
     }
 
     function applyBankFieldLock() {
