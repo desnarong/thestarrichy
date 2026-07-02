@@ -89,6 +89,7 @@ builder.Services.AddScoped<IProductListForHurryService, ProductListForHurryServi
 // Cart
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ISaleOrderSyncService, SaleOrderSyncService>();
 builder.Services.AddScoped<IBranchService, BranchService>();
 builder.Services.AddScoped<IKbankWebhookService, KbankWebhookService>();
 

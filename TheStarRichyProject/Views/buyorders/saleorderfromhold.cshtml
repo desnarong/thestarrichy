@@ -1,356 +1,706 @@
-﻿@{
-    ViewData["Title"] = "แจงยอดสินค้า";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿﻿@{
+ViewData["Title"] = "แจงยอดสินค้า";
+Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+<link rel="stylesheet" href="~/assets/css/saleorderfromhold.css" />
 
 <div class="row mb-3">
     <div class="col-12">
         <div class="card shadow-sm border-0">
             <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">
                 <i class="bx bx-cart fs-4 text-white"></i>
-                <h5 class="mb-0 text-white fw-semibold">แจงยอดสินค้า</h5>
+                <h5 class="mb-0 text-white fw-semibold">แจงยอดสินค้า </h5>
+                <span class="ms-auto text-white-50 small" id="billDisplay">เลขที่บิล: <span id="billNo">-</span></span>
             </div>
             <div class="card-body py-3">
-                <div class="row g-3 mb-3">
+                <!-- Member Search -->
+                <div class="row g-3 align-items-end mb-3 member-search-row">
                     <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="card border-0 text-center py-2 px-3" style="background:#e3f2fd;border:2px solid #42a5f5 !important;">
-                            <div class="text-muted small">รวมเงินทั้งหมด</div>
-                            <div class="fs-4 fw-bold text-primary" id="sumAmount">0.00</div>
-                            <div class="text-muted" style="font-size:.7rem;">บาท</div>
+                        <label class="form-label mb-1 small fw-semibold">🔍 รหัสสมาชิก</label>
+                        <div class="pos-search-box">
+                            <i class="bx bx-search search-icon"></i>
+                            <input type="text" class="form-control" id="memberCode" placeholder="ระบุรหัสสมาชิก">
                         </div>
                     </div>
                     <div class="col-sm-6 col-md-4 col-lg-3">
-                        <div class="card border-0 text-center py-2 px-3" style="background:#e8f5e9;border:2px solid #66bb6a !important;">
-                            <div class="text-muted small">รวม PV ทั้งหมด</div>
-                            <div class="fs-4 fw-bold text-success" id="sumPV">0</div>
-                            <div class="text-muted" style="font-size:.7rem;">PV</div>
+                        <label class="form-label mb-1 small fw-semibold">👤 ชื่อสมาชิก</label>
+                        <input type="text" class="form-control" id="memberName" placeholder="ชื่อสมาชิก" readonly style="background:#f5f5f5;">
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-responsive" id="btnSearch" style="background:#1565c0;border-color:#1565c0;color:#fff;border-radius:6px;padding:8px 28px;">
+                            <i class="bx bx-search me-1"></i>ค้นหา
+                        </button>
+                        <button class="btn btn-responsive btn-secondary" id="btnReset" style="border-radius:6px;padding:8px 24px;">
+                            <i class="bx bx-reset me-1"></i>รีเซ็ต
+                        </button>
+                    </div>
+                    <div class="col-auto ms-auto">
+                        <div class="d-flex align-items-center gap-3">
+                            <div>
+                                <label class="form-label mb-1 small fw-semibold">📅 วันที่</label>
+                                <input type="text" class="form-control" id="billDate" style="min-width:120px;background:#f5f5f5;" readonly>
+                            </div>
+                            <div>
+                                <label class="form-label mb-1 small fw-semibold">🏷️ ประเภท</label>
+                                <select class="form-select" id="purchaseType" style="min-width:130px;">
+                                    <option value="topup">Topup/รักษายอด</option>
+                                    <option value="hurry">Hurry Active</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="row align-items-end g-2 mb-2">
-                    <div class="col-auto">
-                        <label class="form-label mb-1 small fw-semibold">ประเภทการซื้อ</label>
-                        <div class="d-flex gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="purchase_type" id="topup_maintenance" value="topup" checked>
-                                <label class="form-check-label" for="topup_maintenance">เติมเงิน/รักษายอด</label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="purchase_type" id="hurry_active" value="hurry">
-                                <label class="form-check-label" for="hurry_active">Hurry Active</label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Hidden field for logged-in member code (auto-load on page start) -->
+                <input type="hidden" id="loggedInMemberCode" value="@ViewBag.LoggedInMemberCode" />
 
-                <div class="row align-items-end g-2 mb-1">
-                    <div class="col-auto">
-                        <label class="form-label mb-1 small fw-semibold">รหัสสมาชิก</label>
-                        <input type="text" class="form-control form-control-sm" id="memberCode" placeholder="ระบุรหัส สมาชิก" style="min-width:160px;">
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label mb-1 small fw-semibold">ชื่อ สมาชิก</label>
-                        <input type="text" class="form-control form-control-sm" id="memberName" placeholder="ระบุชื่อ สมาชิก" style="min-width:200px;" readonly>
-                    </div>
-                    <div class="col-auto align-self-end">
-                        <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
-                        <button class="btn btn-sm" id="btnSearch" style="background:#1565c0;border-color:#1565c0;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
-                    </div>
-                    <div class="col-auto ms-4">
-                        <label class="form-label mb-1 small fw-semibold">
-                            เลขที่บิลแจง
-                        </label>
-                        <input type="text" class="form-control form-control-sm" id="billNo" style="min-width:180px;" readonly>
-                    </div>
-                    <div class="col-auto">
-                        <label class="form-label mb-1 small fw-semibold">
-                            วันที่แจง
-                        </label>
-                        <input type="text" class="form-control form-control-sm" id="billDate" style="min-width:130px;" disabled>
-                    </div>
-                </div>
-                <small class="text-muted d-block">
-                    <i class="bx bx-info-circle me-1"></i>กรอกข้อมูลเพื่อค้นหา
-                </small>
+                <!-- Alert Message -->
+                <div class="alert alert-secondary py-2 mb-2" id="msg">⏳ กำลังโหลดข้อมูลสมาชิก...</div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="card shadow-sm border-0">
-            <div class="card-header d-flex align-items-center justify-content-between" style="background:#e3f2fd;border-bottom:2px solid #42a5f5;">
-                <h5 class="mb-0 fw-semibold text-primary">
-                    <i class="bx bx-table me-2"></i>รายการสินค้า &nbsp;<span class="badge bg-primary" id="rowCount">0</span>
+<!-- Main POS Section -->
+<div class="row g-3 pb-4 mb-2">
+    <!-- Product List (Left) -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header d-flex align-items-center justify-content-between product-grid-header" style="background:#e3f2fd;border-bottom:2px solid #42a5f5;">
+                <h5 class="mb-0 fw-bold text-primary" style="font-size:1.15rem;">
+                    <i class="bx bx-package me-2"></i>สินค้าค้างจ่าย (Hold)
+                    <span class="badge bg-primary ms-2" id="productCount">0</span>
+                </h5>
+                <div>
+                    <input type="text" class="form-control" id="productSearch" placeholder="🔍 ค้นหาสินค้า..." style="width:200px;border-radius:8px;">
+                </div>
+            </div>
+            <div class="card-body p-2">
+                <div class="pos-product-grid" id="productList">
+                    <div class="text-center text-muted py-4">ไม่มีสินค้า</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cart & Summary (Right) -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header" style="background:#e8f5e9;border-bottom:2px solid #66bb6a;">
+                <h5 class="mb-0 fw-bold text-success" style="font-size:1.15rem;">
+                    <i class="bx bx-shopping-bag me-2"></i>ตะกร้าสินค้า
+                    <span class="badge bg-success ms-2" id="cartCount">0</span>
                 </h5>
             </div>
-            <div class="card-body">
-                <div class="alert alert-secondary py-2 mb-2" id="msg">พบข้อมูล 0 รายการ</div>
-                <div class="table-responsive">
-                    <table id="mainTable" class="table table-bordered table-sm table-hover align-middle" style="font-size:.78rem;white-space:nowrap;">
-                        <style>
-                            table.table-hover tbody tr:hover {
-                                background-color: #e0e0e0 !important;
-                                transition: background-color 0.2s ease;
-                            }
-                        </style>
-                    </table>
+            <div class="card-body p-2">
+                <!-- Cart Items -->
+                <div class="pos-cart-scroll" id="cartItems">
+                    <div class="text-center text-muted py-4">ยังไม่มีสินค้าในตะกร้า</div>
+                </div>
+
+                <!-- Summary -->
+                <hr class="my-2">
+                <div class="row g-2">
+                    <div class="col-6">
+                        <div class="pos-summary-card" style="background:linear-gradient(135deg,#1565c0,#42a5f5);">
+                            <div class="label">💰 รวมเงินสุทธิ</div>
+                            <div class="value" id="cartTotal">0.00</div>
+                            <div class="label">บาท</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="pos-summary-card" style="background:linear-gradient(135deg,#2e7d32,#66bb6a);">
+                            <div class="label">⭐ รวม PV</div>
+                            <div class="value" id="cartPV">0</div>
+                            <div class="label">PV</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="d-flex gap-2 mt-2 pos-action-row">
+                    <button class="btn btn-danger flex-grow-1" id="btnClearCart" style="border-radius:6px;padding:10px 16px;">
+                        <i class="bx bx-trash me-1"></i>ล้างตะกร้า
+                    </button>
+                    <button class="btn btn-success flex-grow-1" id="btnConfirmOrder" style="border-radius:6px;padding:10px 16px;">
+                        <i class="bx bx-check-circle me-1"></i>ยืนยันรายการ
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+<!-- ====== Order Confirm / Success Modal ====== -->
+<div class="modal fade" id="orderModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header" id="orderModalHeader">
+                <h5 class="modal-title" id="orderModalTitle">ยืนยันรายการ</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="orderModalBody">
+                <!-- Dynamic content populated by JS -->
+            </div>
+            <div class="modal-footer" id="orderModalFooter">
+                <!-- Dynamic buttons populated by JS -->
+            </div>
+        </div>
+    </div>
+</div>
 <script>
-$(function () {
-    var mainTbl = null;
+    $(function () {
+        // ====== State ======
+        var mainTbl = null;
+        var allProducts = [];          // สินค้าทั้งหมดจาก API
+        var cart = [];               // ตะกร้า [{ product, qty }]
+        var currentMember = null;    // ข้อมูลสมาชิกที่ค้นหา
 
-    // ตั้งค่าวันที่แจงเป็นวันปัจจุบัน (dd/mm/yyyy)
-    (function () {
-        var now = new Date();
-        var dd = String(now.getDate()).padStart(2, '0');
-        var mm = String(now.getMonth() + 1).padStart(2, '0');
-        var yyyy = now.getFullYear();
-        $('#billDate').val(dd + '/' + mm + '/' + yyyy);
-    })();
-
-    function norm(raw) {
-        var d = raw;
-        if (typeof d === 'string') {
-            try { d = JSON.parse(d); } catch (e) { return []; }
-        }
-        if (d && Array.isArray(d.data)) return d.data;
-        if (d && Array.isArray(d.result)) return d.result;
-        return Array.isArray(d) ? d : [];
-    }
-
-    function p(o, k, def) {
-        def = def === undefined ? '' : def;
-        for (var i = 0; i < k.length; i++) {
-            if (o && o[k[i]] != null) return o[k[i]];
-        }
-        return def;
-    }
-
-    function num(v) {
-        var n = parseFloat(v);
-        return isNaN(n) ? 0 : n;
-    }
-
-    function fmt2(v) {
-        return num(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
-
-    function fmt0(v) {
-        return Math.round(num(v)).toLocaleString('th-TH');
-    }
-
-    function fmtDate(v) {
-        if (!v || typeof v === 'object') return '-';
-        var d = new Date(v);
-        if (isNaN(d.getTime())) return String(v);
-        var day = String(d.getDate()).padStart(2, '0');
-        var month = String(d.getMonth() + 1).padStart(2, '0');
-        var year = d.getFullYear();
-        return day + '/' + month + '/' + year;
-    }
-
-    function esc(s) {
-        return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-    }
-
-    function extractMember(res) {
-        var rows = norm(res);
-        if (rows.length > 0) return rows[0];
-        // { success, data: { ... } } — data เป็น object เดี่ยว
-        if (res && res.data && typeof res.data === 'object' && !Array.isArray(res.data)) return res.data;
-        // object เดี่ยวตรงๆ
-        if (res && typeof res === 'object' && !Array.isArray(res) && (res.DLcode || res.Membercode || res.membercode)) return res;
-        return null;
-    }
-
-    // auto-fill ชื่อสมาชิกเมื่อออกจากช่องรหัส
-    // $('#memberCode').on('blur', function () {
-    //     var code = $(this).val().trim();
-    //     if (!code) { $('#memberName').val(''); return; }
-    //     $.ajax({
-    //         url: '/buyorders/FindMemberForSale',
-    //         type: 'GET',
-    //         data: { membercode: code },
-    //         success: function (res) {
-    //             var member = extractMember(res);
-    //             if (member) {
-    //                 var name = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
-    //                 $('#memberName').val(name);
-    //             } else {
-    //                 $('#memberName').val('');
-    //             }
-    //         },
-    //         error: function () { $('#memberName').val(''); }
-    //     });
-    // });
-
-    function loadData() {
-        var membercode = $('#memberCode').val().trim();
-        if (!membercode) {
-            $('#msg').removeClass('alert-danger alert-success alert-secondary').addClass('alert-warning').text('กรุณาระบุรหัสสมาชิกก่อนค้นหา').show();
-            return;
+        // ====== Utility ======
+        function norm(raw) {
+            var d = raw;
+            if (typeof d === 'string') { try { d = JSON.parse(d); } catch (e) { return []; } }
+            if (d && Array.isArray(d.data)) return d.data;
+            if (d && Array.isArray(d.result)) return d.result;
+            return Array.isArray(d) ? d : [];
         }
 
-        $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('กำลังโหลดข้อมูล...').show();
+        function p(o, keys, def) {
+            def = def === undefined ? '' : def;
+            for (var i = 0; i < keys.length; i++) {
+                if (o && o[keys[i]] != null) return o[keys[i]];
+            }
+            return def;
+        }
 
-        // Step 1: ตรวจสอบ/ค้นหาสมาชิก
-        $.ajax({
-            url: '/buyorders/FindMemberForSale',
-            type: 'GET',
-            data: { membercode: membercode },
-            success: function (res) {
-                   
-                var member = extractMember(res);
-                         console.log(member);
-                if (!member) {
-                    $('#msg').removeClass('alert-secondary').addClass('alert-warning').text('ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัส');
-                    $('#memberName').val('');
-                    return;
+        function num(v) { var n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+        function fmt2(v) { return num(v).toLocaleString('th-TH', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function fmt0(v) { return Math.round(num(v)).toLocaleString('th-TH'); }
+
+        function esc(s) { return s == null ? '' : String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+        function fmtDate(v) {
+            if (!v) return '-';
+            var d = new Date(v);
+            if (isNaN(d.getTime())) return String(v);
+            return String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + d.getFullYear();
+        }
+
+        function extractMember(res) {
+            var rows = norm(res);
+            if (rows.length > 0) return rows[0];
+            if (res && res.data && typeof res.data === 'object' && !Array.isArray(res.data)) return res.data;
+            if (res && typeof res === 'object' && !Array.isArray(res) && (res.DLcode || res.Membercode)) return res;
+            return null;
+        }
+
+        // ====== Date ======
+        (function () {
+            var now = new Date();
+            $('#billDate').val(
+                String(now.getDate()).padStart(2,'0') + '/' +
+                String(now.getMonth()+1).padStart(2,'0') + '/' +
+                now.getFullYear()
+            );
+        })();
+
+        // ====== Render: Product List (Table) ======
+        function renderProducts(filter) {
+            var container = $('#productList');
+            var search = (filter || $('#productSearch').val() || '').toLowerCase().trim();
+
+            var filtered = allProducts.filter(function (p) {
+                var code = p.ProductID || p.productID || '';
+                var name = p.ProductName || p.productName || '';
+                return code.toLowerCase().includes(search) || name.toLowerCase().includes(search);
+            });
+
+            if (filtered.length === 0) {
+                container.html('<div class="text-center text-muted py-4">ไม่พบสินค้า</div>');
+                $('#productCount').text(0);
+                return;
+            }
+
+            var html = '<div style="overflow-x:auto;">';
+            html += '<table class="table table-striped table-hover table-sm align-middle mb-0" style="font-size:0.85rem;">';
+            html += '<thead class="table-primary" style="position:sticky;top:0;z-index:1;">';
+            html += '<tr>';
+            html += '<th style="white-space:nowrap;">รหัสสินค้า</th>';
+            html += '<th style="white-space:nowrap;">ชื่อสินค้า</th>';
+            html += '<th style="white-space:nowrap;text-align:right;">ราคา/หน่วย</th>';
+            html += '<th style="white-space:nowrap;text-align:right;">PV/หน่วย</th>';
+            html += '<th style="white-space:nowrap;text-align:right;">คงเหลือ</th>';
+            html += '<th style="white-space:nowrap;">เลขที่บิล Hold</th>';
+            html += '<th style="white-space:nowrap;">วันหมดอายุบิล</th>';
+            html += '<th style="white-space:nowrap;">รหัสสินค้าชุด</th>';
+            html += '<th style="white-space:nowrap;text-align:center;">จัดการ</th>';
+            html += '</tr></thead><tbody>';
+
+            filtered.forEach(function (prod, idx) {
+                var code = p(prod, ['ProductID', 'productID'], '');
+                var name = p(prod, ['ProductName', 'productName'], '');
+                var price = num(p(prod, ['UnitPrice', 'unitPrice'], 0));
+                var pv = num(p(prod, ['PV', 'pv'], 0));
+                var remain = num(p(prod, ['Remain', 'remain'], 0));
+                var billNo = p(prod, ['BillNo', 'billNo', 'Billno'], '-');
+                var expire = fmtDate(p(prod, ['ExpireDate', 'expireDate'], ''));
+                var setCode = p(prod, ['ProductSet', 'productSet'], '');
+
+                // check if already in cart
+                var inCart = cart.some(function (c) { return c.product.ProductID === prod.ProductID && c.product.BillNo === prod.BillNo; });
+
+                var rowClass = '';
+                if (inCart) rowClass = ' table-success';
+                else if (remain <= 0) rowClass = ' table-secondary';
+
+                html += '<tr class="pos-product-row' + rowClass + '" data-idx="' + idx + '" style="cursor:pointer;">';
+                html += '<td style="white-space:nowrap;"><span class="code-id">' + esc(code) + '</span></td>';
+                html += '<td>' + esc(name) + '</td>';
+                html += '<td style="text-align:right;white-space:nowrap;">' + fmt2(price) + '</td>';
+                html += '<td style="text-align:right;white-space:nowrap;">' + fmt0(pv) + '</td>';
+                html += '<td style="text-align:right;white-space:nowrap;">' + fmt0(remain) + '</td>';
+                html += '<td style="white-space:nowrap;">' + esc(billNo) + '</td>';
+                html += '<td style="white-space:nowrap;">' + (expire !== '-' ? '<span class="badge bg-warning text-dark">' + expire + '</span>' : '-') + '</td>';
+                html += '<td style="white-space:nowrap;">' + (setCode ? '<span class="code-id">' + esc(setCode) + '</span>' : '-') + '</td>';
+                html += '<td style="text-align:center;white-space:nowrap;">';
+                if (inCart) {
+                    html += '<span class="btn-in-cart"><i class="bx bx-check"></i> ในตะกร้า</span>';
+                } else if (remain > 0) {
+                    html += '<button class="btn btn-primary btn-sm add-to-cart" data-idx="' + idx + '"><i class="bx bx-plus"></i> หยิบ</button>';
+                } else {
+                    html += '<span class="badge bg-secondary">หมด</span>';
                 }
-                var dlcode = p(member, ['DLcode', 'dlcode', 'DLCode', 'Membercode', 'membercode'], membercode);
-                var dlname = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
-                $('#memberName').val(dlname);
+                html += '</td></tr>';
+            });
 
-                // Step 2: ดึงข้อมูล Hold Orders
-                $.ajax({
-                    url: '/buyorders/GetSaleOrderFromHold',
-                    type: 'GET',
-                    data: { membercode: dlcode },
-                    success: function (json) {
-                        console.log('[GetSaleOrderFromHold] raw json:', json);
-                        var rows = norm(json);
-                        console.log('[GetSaleOrderFromHold] norm rows:', rows.length, rows);
-                        buildTable(rows);
-                    },
-                    error: function () {
-                        $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการดึงข้อมูล');
+            html += '</tbody></table></div>';
+
+            container.html(html);
+            $('#productCount').text(filtered.length);
+
+            // Event: Add to cart (button click)
+            container.find('.add-to-cart').on('click', function (e) {
+                e.stopPropagation();
+                var idx = $(this).data('idx');
+                var prod = allProducts[idx];
+                if (prod) addToCart(prod);
+            });
+
+            // Event: Click row to add (if not in cart and available)
+            container.find('.pos-product-row').on('click', function () {
+                var idx = $(this).data('idx');
+                var prod = allProducts[idx];
+                if (prod) {
+                    var inCart = cart.some(function (c) { return c.product.ProductID === prod.ProductID && c.product.BillNo === prod.BillNo; });
+                    if (!inCart && num(prod.Remain || prod.remain || 0) > 0) {
+                        addToCart(prod);
                     }
-                });
-            },
-            error: function () {
-                $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('เกิดข้อผิดพลาดในการค้นหาสมาชิก');
+                }
+            });
+        }
+
+        // ====== Cart Functions ======
+        function addToCart(prod) {
+            // Check if already in cart
+            var existing = cart.find(function (c) { return c.product.ProductID === prod.ProductID && c.product.BillNo === prod.BillNo; });
+            if (existing) {
+                showToast('สินค้านี้อยู่ในตะกร้าแล้ว', 'warning');
+                return;
             }
-        });
-    }
 
-    function buildTable(rows) {
-        console.log('[buildTable] rows count:', rows.length, 'sample:', rows[0]);
-        if (mainTbl) { mainTbl.destroy(); mainTbl = null; }
-        $('#mainTable').empty();
-
-        var thead = '<thead class="text-center" style="background:#f5f5f5;font-size:.75rem;"><tr>' +
-            '<th style="width:40px;">#</th>' +
-            '<th>รหัสสินค้า</th>' +
-            '<th>ชื่อสินค้า</th>' +
-            '<th>ราคาขาย</th>' +
-            '<th>จำนวน PV</th>' +
-            '<th>จำนวน</th>' +
-            '<th>รวมเงิน</th>' +
-            '<th>รวม PV</th>' +
-            '<th>จำนวนคงเหลือ</th>' +
-            '<th>เลขที่บิล Hold</th>' +
-            '<th>วันหมดอายุบิล</th>' +
-            '<th>รหัสชุดสินค้า</th>' +
-            '</tr></thead>';
-
-        var tbody = '<tbody>';
-        var totalAmount = 0;
-        var totalPV = 0;
-
-        rows.forEach(function (r, i) {
-            var productCode = p(r, ['ProductID', 'productID'], '');
-            var productName = p(r, ['ProductName', 'productName'], '');
-            var price       = num(p(r, ['UnitPrice', 'unitPrice'], 0));
-            var pv          = num(p(r, ['PV', 'pv'], 0));
-            var remain      = num(p(r, ['Remain', 'remain'], 0));
-            var billNo      = p(r, ['BillNo', 'billNo', 'Billno'], '-');
-            var expireDate  = fmtDate(p(r, ['ExpireDate', 'expireDate'], ''));
-            var productSet  = p(r, ['ProductSet', 'productSet'], '');
-            var amount      = price * remain;
-            var pvTotal     = pv * remain;
-
-            totalAmount += amount;
-            totalPV += pvTotal;
-
-            tbody += '<tr>' +
-                '<td class="text-center">' + (i + 1) + '</td>' +
-                '<td class="text-center">' + esc(productCode) + '</td>' +
-                '<td>' + esc(productName) + '</td>' +
-                '<td class="text-end">' + fmt2(price) + '</td>' +
-                '<td class="text-center">' + fmt0(pv) + '</td>' +
-                '<td class="text-center">' + fmt0(remain) + '</td>' +
-                '<td class="text-end fw-bold text-primary">' + fmt2(amount) + '</td>' +
-                '<td class="text-center fw-bold text-success">' + fmt0(pvTotal) + '</td>' +
-                '<td class="text-center">' + fmt0(remain) + '</td>' +
-                '<td class="text-center">' + esc(billNo) + '</td>' +
-                '<td class="text-center">' + expireDate + '</td>' +
-                '<td class="text-center">' + esc(productSet) + '</td>' +
-                '</tr>';
-        });
-        tbody += '</tbody>';
-
-        var tfoot = '<tfoot><tr class="fw-bold">' +
-            '<td colspan="6" class="text-end bg-primary text-white">รวมทั้งหมด</td>' +
-            '<td class="text-end bg-primary text-white">' + fmt2(totalAmount) + ' บาท</td>' +
-            '<td class="text-center bg-primary text-white">' + fmt0(totalPV) + ' PV</td>' +
-            '<td colspan="4"></td>' +
-            '</tr></tfoot>';
-
-        $('#mainTable').html(thead + tbody + tfoot);
-
-        mainTbl = $('#mainTable').DataTable({
-            paging: true,
-            pageLength: 25,
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, 'ทั้งหมด']],
-            ordering: true,
-            searching: false,
-            info: true,
-            language: {
-                emptyTable: 'ไม่พบข้อมูล',
-                zeroRecords: 'ไม่พบข้อมูล',
-                lengthMenu: 'แสดง _MENU_ รายการ',
-                info: '_START_-_END_ จาก _TOTAL_',
-                paginate: { first: '«', last: '»', next: '›', previous: '‹' }
+            var remain = num(prod.Remain || prod.remain || 0);
+            if (remain <= 0) {
+                showToast('สินค้าหมดแล้ว', 'danger');
+                return;
             }
+
+            cart.push({
+                product: prod,
+                qty: 1
+            });
+
+            renderCart();
+            renderProducts();
+            showToast('✅ เพิ่ม ' + (prod.ProductName || prod.productName || '') + ' ลงตะกร้า', 'success');
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+            renderProducts();
+        }
+
+        function updateQty(index, delta) {
+            var item = cart[index];
+            if (!item) return;
+            var newQty = item.qty + delta;
+            var maxQty = num(item.product.Remain || item.product.remain || 0);
+            if (newQty < 1) {
+                removeFromCart(index);
+                return;
+            }
+            if (newQty > maxQty) {
+                showToast('จำนวนเกินคงเหลือ (' + maxQty + ')', 'warning');
+                return;
+            }
+            item.qty = newQty;
+            renderCart();
+            renderProducts();
+        }
+
+        function clearCart() {
+            if (cart.length === 0) return;
+            if (!confirm('ต้องการล้างตะกร้าสินค้าทั้งหมดใช่หรือไม่?')) return;
+            cart = [];
+            renderCart();
+            renderProducts();
+            showToast('🗑️ ล้างตะกร้าเรียบร้อย', 'info');
+        }
+
+        function renderCart() {
+            var container = $('#cartItems');
+            var totalAmount = 0;
+            var totalPV = 0;
+
+            if (cart.length === 0) {
+                container.html('<div class="text-center text-muted py-4">🛒 ยังไม่มีสินค้าในตะกร้า</div>');
+                $('#cartCount').text(0);
+                $('#cartTotal').text('0.00');
+                $('#cartPV').text('0');
+                return;
+            }
+
+            var html = '';
+            cart.forEach(function (item, idx) {
+                var prod = item.product;
+                var code = p(prod, ['ProductID', 'productID'], '');
+                var name = p(prod, ['ProductName', 'productName'], '');
+                var price = num(p(prod, ['UnitPrice', 'unitPrice'], 0));
+                var pv = num(p(prod, ['PV', 'pv'], 0));
+                var qty = item.qty;
+                var subtotal = price * qty;
+                var subPV = pv * qty;
+                totalAmount += subtotal;
+                totalPV += subPV;
+
+                html += '<div class="pos-cart-item d-flex align-items-center gap-2">';
+                html += '<div class="flex-grow-1" style="min-width:0;">';
+                html += '<div class="cart-item-name"><span class="code-id" style="font-size:0.75rem;">' + esc(code) + '</span> <span style="font-weight:600;">' + esc(name) + '</span></div>';
+                html += '<div class="cart-item-meta text-muted">' + fmt2(price) + ' บาท | ⭐ ' + fmt0(pv) + ' PV</div>';
+                html += '</div>';
+                html += '<div class="d-flex align-items-center gap-1">';
+                html += '<button class="qty-btn qty-minus" data-idx="' + idx + '">−</button>';
+                html += '<span class="qty-display">' + qty + '</span>';
+                html += '<button class="qty-btn qty-plus" data-idx="' + idx + '">+</button>';
+                html += '</div>';
+                html += '<div class="item-total text-end" style="min-width:70px;">' + fmt2(subtotal) + '</div>';
+                html += '<button class="btn btn-outline-danger remove-item" data-idx="' + idx + '"><i class="bx bx-x"></i></button>';
+                html += '</div>';
+            });
+
+            container.html(html);
+            $('#cartCount').text(cart.length);
+            $('#cartTotal').text(fmt2(totalAmount));
+            $('#cartPV').text(fmt0(totalPV));
+
+            // Events
+            container.find('.qty-plus').on('click', function () { updateQty($(this).data('idx'), 1); });
+            container.find('.qty-minus').on('click', function () { updateQty($(this).data('idx'), -1); });
+            container.find('.remove-item').on('click', function () { removeFromCart($(this).data('idx')); });
+        }
+
+        // ====== Find Member (separate from product list) ======
+        function loadData() {
+            var membercode = $('#memberCode').val().trim();
+            if (!membercode) {
+                showToast('กรุณาระบุรหัสสมาชิก', 'warning');
+                return;
+            }
+
+            $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('⏳ กำลังค้นหาสมาชิก...');
+
+            $.ajax({
+                url: '/buyorders/FindMemberForSale',
+                type: 'GET',
+                data: { membercode: membercode },
+                success: function (res) {
+                    var member = extractMember(res);
+                    if (!member) {
+                        $('#msg').removeClass('alert-secondary').addClass('alert-warning').text('⚠️ ไม่พบข้อมูลสมาชิก กรุณาตรวจสอบรหัส');
+                        $('#memberName').val('');
+                        return;
+                    }
+                    currentMember = member;
+                    var dlname = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
+                    $('#memberName').val(dlname);
+                    $('#msg').removeClass('alert-secondary').addClass('alert-success').text('✅ พบสมาชิก: ' + dlname);
+                    showToast('✅ พบสมาชิก ' + dlname, 'success');
+                },
+                error: function () {
+                    $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('❌ เกิดข้อผิดพลาดในการค้นหาสมาชิก');
+                    showToast('เกิดข้อผิดพลาดในการค้นหาสมาชิก', 'danger');
+                }
+            });
+        }
+
+        // ====== Confirm Order (Modal-based) ======
+        function confirmOrder() {
+            if (cart.length === 0) {
+                showToast('⚠️ กรุณาเลือกสินค้าอย่างน้อย 1 รายการ', 'warning');
+                return;
+            }
+            if (!currentMember) {
+                showToast('⚠️ กรุณาค้นหาสมาชิกก่อน', 'warning');
+                return;
+            }
+
+            // Build order data
+            var orderData = cart.map(function (item) {
+                return {
+                    ProductID: item.product.ProductID || item.product.productID,
+                    ProductName: item.product.ProductName || item.product.productName,
+                    UnitPrice: num(item.product.UnitPrice || item.product.unitPrice || 0),
+                    PV: num(item.product.PV || item.product.pv || 0),
+                    Qty: item.qty,
+                    Remain: num(item.product.Remain || item.product.remain || 0),
+                    BillNo: item.product.BillNo || item.product.billNo || '',
+                    ProductSet: item.product.ProductSet || item.product.productSet || ''
+                };
+            });
+
+            var totalAmount = 0;
+            var totalPV = 0;
+            cart.forEach(function (item) {
+                totalAmount += num(item.product.UnitPrice || item.product.unitPrice || 0) * item.qty;
+                totalPV += num(item.product.PV || item.product.pv || 0) * item.qty;
+            });
+
+            // Build payload
+            var payload = {
+                MemberCode: currentMember.DLcode || currentMember.dlcode || currentMember.Membercode || '',
+                MemberName: $('#memberName').val(),
+                PurchaseType: $('#purchaseType').val(),
+                Items: orderData,
+                TotalAmount: totalAmount,
+                TotalPV: totalPV
+            };
+
+            // Show confirmation modal
+            showConfirmModal(payload);
+        }
+
+        // ====== Modal: Show Confirm ======
+        function showConfirmModal(payload) {
+            var itemsHtml = '';
+            payload.Items.forEach(function (item) {
+                itemsHtml += '<div class="modal-product-item">' +
+                    '<div>' +
+                    '<div class="modal-product-name">' + esc(item.ProductName) + '</div>' +
+                    '<div class="modal-product-details">' + fmt2(item.UnitPrice) + ' บาท × ' + item.Qty + ' | ⭐ ' + fmt0(item.PV * item.Qty) + ' PV</div>' +
+                    '</div>' +
+                    '<div class="modal-product-price">' + fmt2(item.UnitPrice * item.Qty) + ' บาท</div>' +
+                    '</div>';
+            });
+
+            var bodyHtml =
+                '<div class="text-center mb-3">' +
+                '<h5>ยืนยันรายการแจงยอดสินค้า</h5>' +
+                '<p class="text-muted mb-0">สมาชิก: <strong>' + esc(payload.MemberName) + '</strong></p>' +
+                '<p class="text-muted">ประเภท: ' + (payload.PurchaseType === 'hurry' ? 'Hurry Active' : 'เติมเงิน/รักษายอด') + '</p>' +
+                '</div>' +
+                '<h6 class="fw-semibold"><i class="bx bx-package me-1"></i>รายการสินค้า</h6>' +
+                '<div class="modal-product-list">' + itemsHtml + '</div>' +
+                '<hr class="my-2">' +
+                '<div class="modal-summary-row"><span>💰 รวมเงินสุทธิ</span><span>' + fmt2(payload.TotalAmount) + ' บาท</span></div>' +
+                '<div class="modal-summary-row"><span>⭐ PV รวม</span><span>' + fmt0(payload.TotalPV) + ' PV</span></div>';
+
+            $('#orderModalTitle').text('📋 ยืนยันรายการ');
+            $('#orderModalBody').html(bodyHtml);
+            $('#orderModalFooter').html(
+                '<button type="button" class="btn btn-secondary" data-bs-dismiss="modal" style="border-radius:6px;padding:8px 24px;">ยกเลิก</button>' +
+                '<button type="button" class="btn btn-success" id="modalBtnConfirm" style="border-radius:6px;padding:8px 24px;"><i class="bx bx-check-circle me-1"></i>ยืนยันรายการ</button>'
+            );
+
+            // Bind confirm action
+            $('#modalBtnConfirm').off('click').on('click', function () {
+                executeConfirm(payload);
+            });
+
+            // Show modal
+            $('#orderModal').modal('show');
+        }
+
+        // ====== Execute Confirm (AJAX) ======
+        function executeConfirm(payload) {
+            $('#modalBtnConfirm').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>กำลังบันทึก...');
+
+            $.ajax({
+                url: '/buyorders/ConfirmSaleOrder',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(payload),
+                success: function (res) {
+                    var billNo = (res && (res.billNo || res.BillNo || res.data?.billNo || res.data?.BillNo)) || 'BILL' + new Date().getTime().toString().slice(-8);
+                    showSuccessModal(payload, billNo);
+                    reloadProducts();
+                },
+                error: function () {
+                    $('#modalBtnConfirm').prop('disabled', false).html('<i class="bx bx-check-circle me-1"></i>ยืนยันรายการ');
+                    showToast('❌ เกิดข้อผิดพลาดในการบันทึก', 'danger');
+                    $('#orderModal').modal('hide');
+                }
+            });
+        }
+
+        // ====== Modal: Show Success ======
+        function showSuccessModal(payload, billNo) {
+            var itemsHtml = '';
+            payload.Items.forEach(function (item) {
+                itemsHtml += '<div class="modal-product-item">' +
+                    '<div>' +
+                    '<div class="modal-product-name">' + esc(item.ProductName) + '</div>' +
+                    '<div class="modal-product-details">' + fmt2(item.UnitPrice) + ' บาท × ' + item.Qty + ' | ⭐ ' + fmt0(item.PV * item.Qty) + ' PV</div>' +
+                    '</div>' +
+                    '<div class="modal-product-price">' + fmt2(item.UnitPrice * item.Qty) + ' บาท</div>' +
+                    '</div>';
+            });
+
+            var bodyHtml =
+                '<div class="text-center mb-3">' +
+                '<div class="success-icon"><i class="bx bx-check"></i></div>' +
+                '<h4 class="text-success fw-bold">✅ บันทึกรายการสำเร็จ!</h4>' +
+                '<p class="text-muted">เลขที่บิล: <strong>' + esc(billNo) + '</strong></p>' +
+                '<p class="text-muted">สมาชิก: <strong>' + esc(payload.MemberName) + '</strong></p>' +
+                '</div>' +
+                '<h6 class="fw-semibold"><i class="bx bx-package me-1"></i>รายการสินค้า</h6>' +
+                '<div class="modal-product-list">' + itemsHtml + '</div>' +
+                '<hr class="my-2">' +
+                '<div class="modal-summary-row"><span>💰 รวมเงินสุทธิ</span><span>' + fmt2(payload.TotalAmount) + ' บาท</span></div>' +
+                '<div class="modal-summary-row"><span>⭐ PV รวม</span><span>' + fmt0(payload.TotalPV) + ' PV</span></div>';
+
+            $('#orderModalTitle').text('✅ บันทึกรายการสำเร็จ');
+            $('#orderModalBody').html(bodyHtml);
+            $('#orderModalFooter').html(
+                '<button type="button" class="btn btn-primary" data-bs-dismiss="modal" style="border-radius:6px;padding:8px 24px;"><i class="bx bx-check me-1"></i>ปิด</button>'
+            );
+
+            // Update bill display
+            $('#billNo').text(billNo);
+            $('#msg').removeClass('alert-secondary').addClass('alert-success').text('✅ บันทึกรายการสำเร็จ! เลขที่บิล: ' + billNo);
+            showToast('✅ บันทึกรายการสำเร็จ!', 'success');
+
+            // Re-show modal (it was hidden during AJAX)
+            $('#orderModal').modal('show');
+        }
+
+        // ====== Reload products (after confirm success or page load) ======
+        function reloadProducts() {
+            var loggedInCode = $('#loggedInMemberCode').val();
+            if (!loggedInCode) return;
+            $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('⏳ กำลังโหลดสินค้าค้างจ่าย...');
+            $.ajax({
+                url: '/buyorders/GetSaleOrderFromHold',
+                type: 'GET',
+                data: { membercode: loggedInCode },
+                success: function (json) {
+                    allProducts = norm(json);
+                    cart = [];
+                    renderCart();
+                    renderProducts();
+                    $('#msg').removeClass('alert-secondary alert-warning alert-danger')
+                        .addClass(allProducts.length > 0 ? 'alert-success' : 'alert-secondary')
+                        .text(allProducts.length > 0 ? '✅ พบสินค้าค้างจ่าย ' + allProducts.length + ' รายการ' : 'ℹ️ ไม่มีสินค้าค้างจ่าย');
+                    if (allProducts.length > 0) {
+                        showToast('พบสินค้าค้างจ่าย ' + allProducts.length + ' รายการ', 'success');
+                    }
+                },
+                error: function () {
+                    $('#msg').removeClass('alert-secondary').addClass('alert-danger').text('❌ เกิดข้อผิดพลาดในการโหลดสินค้า');
+                }
+            });
+        }
+
+        // ====== Toast ======
+        function showToast(msg, type) {
+            type = type || 'info';
+            var colors = {
+                success: '#2e7d32',
+                warning: '#e65100',
+                danger: '#c62828',
+                info: '#1565c0'
+            };
+            var bg = colors[type] || colors.info;
+            var toast = $('<div class="pos-toast" style="top:16px;">' +
+                '<div class="toast show" role="alert" style="background:' + bg + ';color:#fff;">' +
+                '<div class="toast-body d-flex align-items-center">' +
+                '<span class="flex-grow-1">' + msg + '</span>' +
+                '<button type="button" class="btn-close btn-close-white ms-3 flex-shrink-0" data-bs-dismiss="toast"></button>' +
+                '</div></div></div>');
+            $('body').append(toast);
+            setTimeout(function () { toast.fadeOut(300, function () { $(this).remove(); }); }, 3000);
+            toast.find('.btn-close').on('click', function () { toast.fadeOut(300, function () { $(this).remove(); }); });
+        }
+
+        // ====== Events ======
+        $('#btnSearch').on('click', loadData);
+
+        $('#memberCode').on('keypress', function (e) {
+            if (e.which === 13) loadData();
         });
 
-        $('#sumAmount').text(fmt2(totalAmount));
-        $('#sumPV').text(fmt0(totalPV));
-        $('#rowCount').text(rows.length);
-        $('#msg').removeClass('alert-secondary alert-warning alert-danger')
-            .addClass(rows.length > 0 ? 'alert-success' : 'alert-secondary')
-            .text('พบข้อมูล ' + rows.length + ' รายการ');
-    }
+        $('#btnReset').on('click', function () {
+            $('#memberCode').val('');
+            $('#memberName').val('');
+            currentMember = null;
+            $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('🔄 รีเซ็ตการค้นหาสมาชิกแล้ว');
+            showToast('🔄 รีเซ็ตการค้นหาสมาชิก', 'info');
+        });
 
-    $('#btnSearch').on('click', loadData);
+        $('#btnClearCart').on('click', clearCart);
 
-    $('#btnReset').on('click', function () {
-        $('#memberCode').val('');
-        $('#memberName').val('');
-        $('#billNo').val('');
-        if (mainTbl) { mainTbl.destroy(); mainTbl = null; }
-        $('#mainTable').empty();
-        $('#rowCount').text(0);
-        $('#sumAmount').text('0.00');
-        $('#sumPV').text('0');
-        $('#msg').removeClass('alert-danger alert-success alert-warning').addClass('alert-secondary').text('พบข้อมูล 0 รายการ').show();
+        $('#btnConfirmOrder').on('click', confirmOrder);
+
+        // Product search filter
+        $('#productSearch').on('keyup', function () {
+            renderProducts($(this).val());
+        });
+
+        // ====== Init ======
+        renderProducts();
+        renderCart();
+        $('#billNo').text('-');
+
+        // ====== Auto-load for logged-in member ======
+        var loggedInCode = $('#loggedInMemberCode').val();
+        if (loggedInCode) {
+            $('#memberCode').val(loggedInCode);
+            // Load member info
+            $.ajax({
+                url: '/buyorders/FindMemberForSale',
+                type: 'GET',
+                data: { membercode: loggedInCode },
+                success: function (res) {
+                    var member = extractMember(res);
+                    if (member) {
+                        currentMember = member;
+                        var dlname = p(member, ['DlName', 'dlName', 'DLName', 'Membername', 'membername', 'MemberName', 'Name', 'name'], '');
+                        $('#memberName').val(dlname);
+                    }
+                },
+                error: function () {
+                    // Non-critical, products will still load
+                }
+            });
+            // Load hold orders
+            reloadProducts();
+        } else {
+            $('#msg').removeClass('alert-secondary').addClass('alert-warning').text('⚠️ กรุณาเข้าสู่ระบบก่อนใช้งาน');
+        }
     });
-
-    $('#memberCode').on('keypress', function (e) {
-        if (e.which === 13) loadData();
-    });
-});
 </script>
 
-@section scripts{
+@section scripts {
     <script src="~/assets/js/app.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 }

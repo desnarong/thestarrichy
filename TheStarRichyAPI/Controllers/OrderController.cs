@@ -15,13 +15,16 @@ namespace TheStarRichyApi.Controllers
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private readonly ISaleOrderSyncService _saleOrderSyncService;
         private readonly ILogger<OrderController> _logger;
 
         public OrderController(
             IOrderService orderService,
+            ISaleOrderSyncService saleOrderSyncService,
             ILogger<OrderController> logger)
         {
             _orderService = orderService;
+            _saleOrderSyncService = saleOrderSyncService;
             _logger = logger;
         }
 
@@ -333,6 +336,62 @@ namespace TheStarRichyApi.Controllers
                 {
                     Success = false,
                     Message = "เกิดข้อผิดพลาด"
+                });
+            }
+        }
+
+        /// <summary>
+        /// Sync order ไป T05 (จาก Hold)
+        /// POST: /api/Order/sync-to-t05
+        /// </summary>
+        [HttpPost("sync-to-t05")]
+        public async Task<IActionResult> SyncOrderToT05([FromBody] SyncOrderToT05Request request)
+        {
+            try
+            {
+                if (!await _saleOrderSyncService.ValidatePasskeyAsync())
+                {
+                    return Unauthorized(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "Invalid Passkey"
+                    });
+                }
+
+                if (request == null || string.IsNullOrEmpty(request.Membercode))
+                {
+                    return BadRequest(new ApiResponse<object>
+                    {
+                        Success = false,
+                        Message = "กรุณาระบุข้อมูลให้ครบถ้วน"
+                    });
+                }
+
+                var result = await _saleOrderSyncService.SyncToT05Async(request);
+
+                if (result.Success)
+                {
+                    return Ok(new ApiResponse<SyncOrderToT05Response>
+                    {
+                        Success = true,
+                        Message = result.Message,
+                        Data = result
+                    });
+                }
+
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = result.Message
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error syncing order to T05");
+                return StatusCode(500, new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = "เกิดข้อผิดพลาดในการ sync order"
                 });
             }
         }
