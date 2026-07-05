@@ -142,13 +142,13 @@
                                         </li>
                                     }
 
-                                    @if (permissions.Righttohold.ToString() == "0" || (permissions.Righttohold.ToString() == "1" && permissions.MemberTypeCode.ToString() != "00" && permissions.MemberTypeCode.ToString() != "01"))
+                                    @if (permissions.Righttohold.ToString() == "0" || (permissions.Righttohold.ToString() == "1" && permissions.MemberType.ToString() != "00" && permissions.MemberType.ToString() != "01"))
                                     {
                                         <li class="nav-item">
                                             <a href="@Url.Action("buyholdorder", "orders")" class="nav-link" data-key="t-buyholdorder"> ซื้อสินค้าแบบ Hold ยอด </a>
                                         </li>
                                     }
-                                    @if (permissions.Righttohold.ToString() == "0" || (permissions.Righttohold.ToString() == "1" && permissions.MemberTypeCode.ToString() != "00" && permissions.MemberTypeCode.ToString() != "01"))
+                                    @if (permissions.Righttohold.ToString() == "0" || (permissions.Righttohold.ToString() == "1" && permissions.MemberType.ToString() != "00" && permissions.MemberType.ToString() != "01"))
                                     {
                                         <li class="nav-item">
                                             <a href="@Url.Action("saleorderfromhold", "buyorders")" class="nav-link" data-key="t-saleorderfromhold"> แจงยอด </a>
