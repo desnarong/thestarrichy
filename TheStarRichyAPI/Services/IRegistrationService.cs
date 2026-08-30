@@ -25,7 +25,7 @@ namespace TheStarRichyApi.Services
         /// <summary>
         /// ค้นหาข้อมูลผู้อ้างอิง
         /// </summary>
-        Task<FindReferrerResponse> FindReferrerAsync(string referrerCode);
+        Task<FindReferrerResponse> FindReferrerAsync(string referrerCode, string uplineCode);
 
         // Validation methods for external registration
         Task<ValidationResponse> CheckBlacklistAsync(string idCardNumber);

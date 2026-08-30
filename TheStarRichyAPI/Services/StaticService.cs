@@ -101,7 +101,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -161,7 +161,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -221,7 +221,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -281,7 +281,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -341,7 +341,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -402,7 +402,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 
@@ -462,7 +462,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 

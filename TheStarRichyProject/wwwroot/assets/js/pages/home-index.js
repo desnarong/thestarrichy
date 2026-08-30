@@ -80,6 +80,7 @@ $(document).ready(function () {
                 $('#positionName').text(member.positionName || 'N/A');//position1
                 $('#thaiName').text(member.thaiName || 'N/A');//thaiName
                 $('#sponsername').text(member.sponsername || 'N/A');//sponsername
+                $('#memberType').text(member.memberType || 'N/A');//memberType
                 $('#bwdLeftPV').text(formatNumberWithComma(member.bwdLeftPV || '0'));
                 $('#bwdRightPV').text(formatNumberWithComma(member.bwdRightPV || '0'));
                 $('#presentLeftPV').text(formatNumberWithComma(member.presentLeftPV || '0'));

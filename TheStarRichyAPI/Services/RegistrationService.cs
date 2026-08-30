@@ -67,10 +67,10 @@ namespace TheStarRichyApi.Services
                         command.Parameters.AddWithValue("@Persontype", DBNull.Value);
                         command.Parameters.AddWithValue("@Maritalstatus", DBNull.Value);
                         command.Parameters.AddWithValue("@Spousename", DBNull.Value);
-                        command.Parameters.AddWithValue("@Bankcode", DBNull.Value);
-                        command.Parameters.AddWithValue("@Bankaccountnumber", DBNull.Value);
-                        command.Parameters.AddWithValue("@Bankaccountname", DBNull.Value);
-                        command.Parameters.AddWithValue("@Bankbranch", DBNull.Value);
+                        command.Parameters.AddWithValue("@Bankcode", (object)NormalizeString(request.BankCode) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Bankaccountnumber", (object)NormalizeString(request.BankAccountNumber) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Bankaccountname", (object)NormalizeString(request.BankAccountName) ?? DBNull.Value);
+                        command.Parameters.AddWithValue("@Bankbranch", (object)NormalizeString(request.BankBranch) ?? DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiary", DBNull.Value);
                         command.Parameters.AddWithValue("@beneficiaryidcode", DBNull.Value);
                         command.Parameters.AddWithValue("@idaddress", (object)NormalizeString(request.AddressIdCard) ?? DBNull.Value);
@@ -435,6 +435,10 @@ namespace TheStarRichyApi.Services
                     Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
                     ipAddress = request.ipAddress, // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
                     tambonId = request.tambonId,
+                    BankCode = request.BankCode,
+                    BankAccountNumber = request.BankAccountNumber,
+                    BankAccountName = request.BankAccountName,
+                    BankBranch = request.BankBranch,
                 };
 
                 _logger.LogInformation("External registration from source: {Source}, campaign: {Campaign}",
@@ -616,27 +620,29 @@ namespace TheStarRichyApi.Services
         /// <summary>
         /// ค้นหาข้อมูลผู้อ้างอิง
         /// </summary>
-        public async Task<FindReferrerResponse> FindReferrerAsync(string referrerCode)
+        public async Task<FindReferrerResponse> FindReferrerAsync(string referrerCode, string uplineCode)
         {
             try
             {
                 using (var con = new SqlConnection(_connectionString))
                 {
                     await con.OpenAsync();
-                    //string query = @"Select DLcode, DlName from [CheckMembercode] where (Membercode = @ReferrerCode) AND (DLCode = @ReferrerCode)";
-                    string query = @"SELECT TOP 1 M06_PX1, M06_X5, M06_X34 FROM M06 WHERE M06_PX1 = @ReferrerCode";
+                    string query = @"SELECT TOP 1 aa.Membercode, aa.DLcode, aa.DlName, M06_X4 AS RegisterDate, M06_X59 AS Position
+                                     FROM [000_Member_Binary_LeftRight_Search] aa WITH (NOLOCK)
+                                     JOIN M06 ON aa.DLcode = M06_PX1
+                                     WHERE aa.Membercode = @ReferrerCode AND aa.DLcode = @UplineCode";
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@ReferrerCode", referrerCode);
+                        command.Parameters.AddWithValue("@UplineCode", uplineCode);
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             if (reader.HasRows)
                             {
                                 while (await reader.ReadAsync())
                                 {
-                                    string memberCode = reader.IsDBNull(0) ? string.Empty : reader.GetString(0); // [M06_PX1]
-                                    string memberName = reader.IsDBNull(1) ? string.Empty : reader.GetString(1); // [M06_X5]
-                                    string side = reader.IsDBNull(2) ? string.Empty : reader.GetString(2); // [M06_X34]
+                                    string memberCode = reader.IsDBNull(0) ? string.Empty : reader.GetString(0);
+                                    string memberName = reader.IsDBNull(2) ? string.Empty : reader.GetString(2);
                                     // สามารถเพิ่ม Side ใน response ได้ถ้าต้องการ
                                     return new FindReferrerResponse
                                     {
@@ -644,8 +650,6 @@ namespace TheStarRichyApi.Services
                                         MemberCode = memberCode,
                                         MemberName = memberName,
                                         Message = "พบข้อมูลผู้อ้างอิง",
-                                        // เพิ่ม property Side ถ้ามีใน DTO
-                                        // Side = side
                                     };
                                 }
                             }
@@ -1349,6 +1353,10 @@ namespace TheStarRichyApi.Services
                     Memberpic = request.Memberpic, // ⭐ ต้องเพิ่มบรรทัดนี้!
                     ipAddress = request.ipAddress, // ⭐ ต้องเพิ่มบรรทัดนี้ด้วย!
                     tambonId = request.tambonId,
+                    BankCode = request.BankCode,
+                    BankAccountNumber = request.BankAccountNumber,
+                    BankAccountName = request.BankAccountName,
+                    BankBranch = request.BankBranch,
                 };
 
                 _logger.LogInformation("FinalizeRegistration: Memberpic count = {Count}",

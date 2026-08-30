@@ -239,20 +239,20 @@ namespace TheStarRichyApi.Controllers
         /// </summary>
         [HttpGet("findreferrer")]
         [AllowAnonymous]
-        public async Task<IActionResult> FindReferrer([FromQuery] string referrerCode)
+        public async Task<IActionResult> FindReferrer([FromQuery] string referrerCode, [FromQuery] string uplineCode)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(referrerCode))
+                if (string.IsNullOrWhiteSpace(referrerCode) || string.IsNullOrWhiteSpace(uplineCode))
                 {
                     return BadRequest(new FindReferrerResponse
                     {
                         Success = false,
-                        Message = "กรุณาระบุรหัสผู้อ้างอิง"
+                        Message = "กรุณาระบุรหัสผู้แนะนำและรหัสอัพไลน์"
                     });
                 }
 
-                var result = await _registrationService.FindReferrerAsync(referrerCode);
+                var result = await _registrationService.FindReferrerAsync(referrerCode, uplineCode);
                 
                 if (result.Success)
                 {
@@ -265,7 +265,7 @@ namespace TheStarRichyApi.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error finding referrer {ReferrerCode}", referrerCode);
+                _logger.LogError(ex, "Error finding referrer {ReferrerCode} under upline {UplineCode}", referrerCode, uplineCode);
                 return StatusCode(500, new FindReferrerResponse
                 {
                     Success = false,

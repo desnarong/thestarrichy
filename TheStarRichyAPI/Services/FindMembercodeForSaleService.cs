@@ -7,7 +7,7 @@ namespace TheStarRichyApi.Services
 {
     public interface IFindMembercodeForSaleService
     {
-        Task<List<dynamic>> GetDisplayAsync(string dlcode);
+        Task<List<dynamic>> GetDisplayAsync(string referrerCode, string? uplineCode);
     }
     public class FindMembercodeForSaleService : IFindMembercodeForSaleService
     {
@@ -22,14 +22,14 @@ namespace TheStarRichyApi.Services
         public async Task<string> GetPermissionAsync(string column, string memberCode)
         {
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
-            string MemberPermission = "";
+            string MemberPermission = "N";
 
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-                    string query = $"SELECT {column}  from M06_permission where M06_PX1=@Membercode";
+                    string query = $"SELECT {column}  from M06_permission where Membercode=@Membercode";
 
                     using (SqlCommand command = new SqlCommand(query, con))
                     {
@@ -105,7 +105,7 @@ namespace TheStarRichyApi.Services
 
             return password;
         }
-        public async Task<List<dynamic>> GetDisplayAsync(string dlcode)
+        public async Task<List<dynamic>> GetDisplayAsync(string referrerCode, string? uplineCode)
         {
             // Get Passkey from header
             string passkey = _httpContextAccessor.HttpContext.Request.Headers["X-Passkey"];
@@ -140,8 +140,6 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    string Memberpermission = await GetPermissionAsync("M16", memberCode);
-
                     string query = "SELECT  top 1 aa.Membercode, aa.DLcode,aa.DlName,M06_X4 as RegisterDate,M06_X59 as Position ";
                     query += " FROM [000_Member_Binary_LeftRight_Search] aa (nolock) join M06 on aa.DLcode=M06_PX1";
 
@@ -150,14 +148,29 @@ namespace TheStarRichyApi.Services
                     //    query += "  join [000_Member_SponserTeam] bb  (nolock) on bb.Membercode=aa.Membercode and bb.DLCode=aa.MemberLeftCode  ";
                     //}
 
-                    query += " where aa.Membercode = @Membercode and aa.DLcode=@SearchDLcode";
+                    if (string.IsNullOrWhiteSpace(uplineCode))
+                    {
+                        query += " where aa.Membercode = @Membercode and aa.DLcode = @SearchDLcode";
+                    }
+                    else
+                    {
+                        query += " where aa.Membercode = @ReferrerCode and aa.DLcode = @UplineCode";
+                    }
 
 
 
                     using (var command = new SqlCommand(query, con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
-                        command.Parameters.AddWithValue("@SearchDLcode", dlcode);
+                        if (string.IsNullOrWhiteSpace(uplineCode))
+                        {
+                            command.Parameters.AddWithValue("@Membercode", memberCode);
+                            command.Parameters.AddWithValue("@SearchDLcode", referrerCode);
+                        }
+                        else
+                        {
+                            command.Parameters.AddWithValue("@ReferrerCode", referrerCode);
+                            command.Parameters.AddWithValue("@UplineCode", uplineCode);
+                        }
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {
@@ -171,7 +184,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     //RegisterDate = FormatDate(reader["RegisterDate"]);
                                     rowDict[columnName] = columnValue;
                                 }

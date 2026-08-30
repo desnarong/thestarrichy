@@ -312,7 +312,7 @@ $(function(){
 
   function buildTable(rows){
     if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
-    var cols=['#','เลขที่ใบเสร็จ','วันที่','เลขที่อ้างอิง','รหัส Hybrid Gold','เลขที่บิล HOLD',
+    var cols=['#','เลขที่ใบเสร็จ','วันที่','เลขที่อ้างอิง','รหัสศูนย์','รหัสโมบาย','รหัส Hybrid Gold','เลขที่บิล HOLD',
       'รหัสสินค้า','ชื่อสินค้า','รหัสสินค้าชุด','ประเภทซื้อ','จำนวน','ราคา/หน่วย',
       'ยอดเงิน','PV','สถานะบิล','สถานะการรับ','วันที่รับ/ส่ง',
       'วันหมดอายุบิล','ยอดแจง','คงเหลือ',
@@ -328,6 +328,8 @@ $(function(){
         '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
         '<td class="text-center" data-order="'+isoDate(p(r,['BillDate','billDate']))+'">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
         '<td>'+esc(p(r,['ReferenceNo','referenceNo']))+'</td>'+
+        '<td>'+esc(p(r,['CenterID','centerID','centerId']))+'</td>'+
+        '<td>'+esc(p(r,['MobileID','mobileID','mobileId']))+'</td>'+
         '<td>'+esc(p(r,['HybridGOLDID','hybridGoldId','hybridGOLDID']))+'</td>'+
         '<td>'+esc(p(r,['HOLDORDERID','holdOrderId','holdOrderID']))+'</td>'+
         '<td>'+esc(p(r,['ProductID','productID','productId']))+'</td>'+

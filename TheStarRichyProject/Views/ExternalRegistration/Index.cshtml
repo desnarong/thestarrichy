@@ -245,6 +245,40 @@
                                 <div class="col-12 col-lg-6">
                                     <div class="card border-0 shadow-sm mb-4">
                                         <div class="card-header bg-light">
+                                            <h5 class="mb-0" data-key="t-bank-information">ข้อมูลธนาคาร</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร</label>
+                                                <div class="col-md-7">
+                                                    <select name="bank" id="bankCode" class="form-control">
+                                                        <option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="bankAccountNumber" placeholder="กรอกเลขที่บัญชี" maxlength="15" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="bankAccountName" placeholder="ชื่อบัญชีจะใช้ชื่อเดียวกับชื่อบนบัตร" disabled />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="bankBranch" placeholder="กรอกสาขา" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="card border-0 shadow-sm mb-4">
+                                        <div class="card-header bg-light">
                                             <h5 class="mb-0" data-key="t-upload-documents">อัปโหลดเอกสาร <small class="text-muted">(ไม่บังคับ)</small></h5>
                                         </div>
                                         <div class="card-body">
@@ -481,6 +515,17 @@
 
             const cleanDocNum = docNum.replace(/[\s-]/g, '');
 
+            // ไทย (รหัสประเทศ 66): ต้องเป็นเลขบัตรประชาชน 13 หลัก + ผ่าน checksum เท่านั้น
+            const isThai = $('#country').val() === '66';
+            if (isThai) {
+                if (!/^\d{13}$/.test(cleanDocNum) || !validateThaiID(cleanDocNum)) {
+                    validationEl.text('เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลักที่ถูกต้อง').addClass('validation-error');
+                    return false;
+                }
+                validationEl.text('').css('color', '');
+                return true;
+            }
+
             if (/^\d{13}$/.test(cleanDocNum)) {
                 let sum = 0;
                 for (let i = 0; i < 12; i++) {
@@ -661,6 +706,7 @@
             loadCountries();
             loadCountryBusinesses();
             loadTitles();
+            loadBanks();
             loadMasterAddresses(); 
             setRegistrationDate();
             
@@ -760,6 +806,7 @@
                     $('#businessName').val($(this).val());
                     validateBusinessName();
                 }
+                $('#bankAccountName').val($(this).val());
                 validateIdCardName();
             });
 
@@ -788,6 +835,7 @@
 
             $('#mobile').on('input', function() { this.value = this.value.replace(/\D/g, ''); validateMobile(); });
             $('#homePhone').on('input', function() { this.value = this.value.replace(/\D/g, ''); });
+            $('#bankAccountNumber').on('input', function() { this.value = this.value.replace(/\D/g, ''); });
 
             $('#email').on('input', validateEmail);
             $('#lineId').on('input', validateLineId);
@@ -1084,6 +1132,10 @@
 
                 $('#simpleRegistrationForm')[0].reset();
                 $('#referrerName').val('');
+                $('#bankCode').val('N/A');
+                $('#bankAccountNumber').val('');
+                $('#bankAccountName').val('');
+                $('#bankBranch').val('');
 
                 $('#regDay').val(selectedRegDay);
                 $('#regMonth').val(selectedRegMonth);
@@ -1114,6 +1166,11 @@
                     birthDate = `${birthYearCE}-${monthStr}-${dayStr}`;
                 }
 
+                var rawDocNumber = ($('#documentNumber').val() || "").replace(/[- ]/g, '');
+                var isThaiCountry = $('#country').val() === '66';
+                // ✅ ถ้าไม่ได้เลือกประเทศไทย และเลขเอกสารไม่ครบ 13 หลัก ให้เติม 0 ข้างหน้า
+                var paddedDocNumber = (!isThaiCountry && rawDocNumber && rawDocNumber.length < 13) ? rawDocNumber.padStart(13, '0') : rawDocNumber;
+
                 return {
                     country: $('#country').val(),
                     countryBusiness: $('#countryBusiness').val(),
@@ -1123,7 +1180,7 @@
                     title: $('#title').val(),
                     idCardName: $('#idCardName').val(),
                     businessName: $('#businessName').val(),
-                    documentNumber: ($('#documentNumber').val() || "").replace(/[- ]/g, ''),
+                    documentNumber: paddedDocNumber,
                     mobile: $('#mobile').val(),
                     homePhone: $('#homePhone').val(),
                     email: $('#email').val(),
@@ -1140,6 +1197,10 @@
                     districtCode: $('#simpleDistrict').val(),
                     subdistrictCode: $('#simpleSubdistrict').val(),
                     tambonId: parseInt($('#simpleTambonId').val()) || null,
+                    bankCode: $('#bankCode').val(),
+                    bankAccountNumber: $('#bankAccountNumber').val(),
+                    bankAccountName: $('#bankAccountName').val(),
+                    bankBranch: $('#bankBranch').val(),
                     ipAddress: clientIpAddress
                 };
             }
@@ -1408,6 +1469,18 @@
                  }).fail(() => {
                      $('#title').append('<option value="MR">นาย</option><option value="MRS">นาง</option>');
                  });
+            }
+
+            function loadBanks() {
+                $.get('/ExternalRegistration/GetBanks').done(res => {
+                    let data = (typeof res === 'string') ? JSON.parse(res) : res;
+                    data = Array.isArray(data) ? data : (data.data || []);
+                    $('#bankCode').empty().append('<option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>');
+                    data.forEach(item => {
+                        $('#bankCode').append(`<option value="${item.M17_PX1}">${item.Thainame || item.BankName || item.EngName}</option>`);
+                    });
+                    $('#bankCode').val('N/A');
+                });
             }
             
             function setRegistrationDate() {

@@ -625,10 +625,10 @@ function numberToThaiBaht(num) {
             // separator positions after index: 0, 4, 9, 11  (ก่อน index 1,5,10,12)
             var seps={1:true,5:true,10:true,12:true};
             for(var i=0;i<13;i++){
-                if(seps[i]) h+='<span style="width:5px;"></span>';
+                if(seps[i]) h+='<span style="width:5px;border: 0.1rem solid;"></span>';
                 var dig=i<s.length?esc(s[i]):'';
                 h+='<span style="display:inline-flex;align-items:center;justify-content:center;'+
-                   'width:18px;height:20px;border:1px solid #666;font-family:monospace;font-size:10pt;font-weight:700;background:#fff;">'+dig+'</span>';
+                   'width:16px;height:20px;border:1px solid #666;font-family:monospace;font-size:8pt;font-weight:500;background:#fff;">'+dig+'</span>';
             }
             return h+'</span>';
         }
@@ -675,61 +675,61 @@ function numberToThaiBaht(num) {
         var html='<div id="withholdDoc" style="'+S+'font-size:13pt;background:#fff;color:#000;padding:6mm 8mm;max-width:200mm;margin:0 auto;box-sizing:border-box;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">';
 
         // ── ฉบับที่ 1 / 2 ─────────────────────────────────────────────────────
-        html+='<div style="font-size:10.5pt;padding:3px 8px;margin-bottom:6px;line-height:1.7;">';
-        html+='<b>ฉบับที่ 1</b> <span style="font-size:10pt;">(สำหรับผู้ถูกหักภาษี ณ ที่จ่าย ใช้แนบพร้อมกับแบบแสดงรายการภาษี)</span><br>';
-        html+='<b>ฉบับที่ 2</b> <span style="font-size:10pt;">(สำหรับผู้ถูกหักภาษี ณ ที่จ่าย เก็บไว้เป็นหลักฐาน)</span>';
+        html+='<div style="font-size:7pt;padding:3px 8px;">';
+        html+='<b>ฉบับที่ 1</b> <span style="font-size: 7pt;font-style: italic;font-weight:300;">(สำหรับผู้ถูกหักภาษี ณ ที่จ่าย ใช้แนบพร้อมกับแบบแสดงรายการภาษี)</span><br>';
+        html+='<b>ฉบับที่ 2</b> <span style="font-size: 7pt;font-style: italic;font-weight:300;">(สำหรับผู้ถูกหักภาษี ณ ที่จ่าย เก็บไว้เป็นหลักฐาน)</span>';
         html+='</div>';
 
-        html+='<div style="align-items:center;margin-bottom:6px;border:2px solid #333;padding:6px;">';
+        html+='<div style="align-items:center;margin-bottom:6px;border:2px solid #333;padding:0px 6px 6px 6px;">';
         // ── หัวเรื่อง + เลขที่ ────────────────────────────────────────────────
-        html+='<div style="position:relative;text-align:center;margin-bottom:4px;min-height:48px;">';
-        html+='<div style="padding-top:4px;">';
-        html+='<div style="font-size:15pt;font-weight:700;">หนังสือรับรองการหักภาษี ณ ที่จ่าย</div>';
-        html+='<div style="font-size:12pt;">ตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร</div>';
+        html+='<div style="position:relative;text-align:center;">';
+        html+='<div>';
+        html+='<div style="font-size:11pt;font-weight:500;">หนังสือรับรองการหักภาษี ณ ที่จ่าย</div>';
+        html+='<div style="font-size:9pt;font-weight:300;">ตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร</div>';
         html+='</div>';
-        html+='<div style="position:absolute;top:0;right:0;text-align:right;font-size:11.5pt;white-space:nowrap;">';
-        html+='<div style="display:grid;grid-template-columns:auto auto;gap:2px 6px;align-items:center;">';
+        html+='<div style="position:absolute;top: 0px;right:0;text-align:right;font-size:8.5pt;white-space:nowrap;">';
+        html+='<div style="display:grid;grid-template-columns:auto auto;gap:4px 6px;align-items:center;font-weight:300;">';
         html+='<span style="text-align:right;">เล่มที่</span>';
-        html+='<u style="display:inline-block;min-width:72px;text-align:center;font-weight:600;">'+esc(bookNo||'')+'</u>';
+        html+='<u style="display:inline-block;text-align:center;font-weight:600;">'+esc(bookNo||'')+'</u>';
         html+='<span style="text-align:right;">เลขที่</span>';
-        html+='<u style="display:inline-block;min-width:72px;text-align:center;font-weight:700;">'+esc(docNo)+'</u>';
+        html+='<u style="display:inline-block;text-align:center;font-weight:700;">'+esc(docNo)+'</u>';
         html+='</div>';
         html+='</div>';
         html+='</div>';
 
         // ── กล่องผู้มีหน้าที่หักภาษี ─────────────────────────────────────────
-        html+='<div class="card border-2 mb-2" style="border-radius:6px; border-color:#333;">';
-        html+='<div class="card-body p-2">';
-        html+='<div style="display:flex;justify-content:space-between;align-items:center;font-weight:700;padding:2px 4px;font-size:11.5pt;letter-spacing:.2px;margin-bottom:2px;">';
-        html+='<span>ผู้มีหน้าที่หักภาษี ณ ที่จ่าย : -</span>';
-        html+='<span style="white-space:nowrap;">เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)* &nbsp; '+taxBoxes(comTaxID)+'</span>';
+        html+='<div class="card border-2 mb-1" style="border-radius:6px; border-color:#333;font-size:10pt;font-weight:400;">';
+        html+='<div class="card-body p-1">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;font-weight:500;padding:2px 4px;letter-spacing:.2px;margin-bottom:2px;">';
+        html+='<span style="white-space:nowrap;font-size: 8pt;font-weight: 600;">ผู้มีหน้าที่หักภาษี ณ ที่จ่าย : -</span>';
+        html+='<span style="white-space:nowrap;font-size: 8pt;font-weight: 600;">เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)* &nbsp; '+taxBoxes(comTaxID)+'</span>';
         html+='</div>';
-        html+='<div style="padding:2px 4px;font-size:13pt;">';
-        html+='ชื่อ <b style="font-size:13pt;">'+esc(comName)+'</b><br>';
-        html+='<span style="font-size:10pt;color:#555;">(ให้ระบุว่าเป็น บุคคล นิติบุคคล บริษัท สมาคม หรือคณะบุคคล)</span><br>';
+        html+='<div style="padding:2px 2px;font-size: 8pt;font-weight: 600;">';
+        html+='ชื่อ <b style="font-size:9pt;">'+esc(comName)+'</b><br>';
+        html+='<span style="font-size:7pt;color:#555;font-style: italic;">(ให้ระบุว่าเป็น บุคคล นิติบุคคล บริษัท สมาคม หรือคณะบุคคล)</span><br>';
         html+='</div>';
-        html+='<div style="padding:2px 4px;font-size:12pt;margin-top:3px;padding-top:4px;">';
-        html+='ที่อยู่ <b style="font-size:13pt;">'+esc(comAddr)+'</b><br>';
-        html+='<span style="font-size:10pt;color:#555;">(ให้ระบุชื่ออาคาร/หมู่บ้าน ห้องเลขที่ชั้นที่ เลขที่ ตรอก/ซอย หมู่ที่ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด)</span><br>';
+        html+='<div style="padding:2px 2px;font-size: 8pt;font-weight: 600;">';
+        html+='ที่อยู่ <b style="font-size:9pt;">'+esc(comAddr)+'</b><br>';
+        html+='<span style="font-size:7pt;color:#555;font-style: italic;">(ให้ระบุชื่ออาคาร/หมู่บ้าน ห้องเลขที่ชั้นที่ เลขที่ ตรอก/ซอย หมู่ที่ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด)</span><br>';
         
         html+='</div>';
         html+='</div>';
         html+='</div>';
 
         // ── กล่องผู้ถูกหักภาษี ───────────────────────────────────────────────
-        html+='<div class="card border-2 mb-2" style="border-radius:6px; border-color:#333;">';
-        html+='<div class="card-body p-2">';
-        html+='<div style="display:flex;justify-content:space-between;align-items:center;font-weight:700;padding:2px 4px;font-size:11.5pt;letter-spacing:.2px;margin-bottom:2px;">';
-        html+='<span>ผู้ถูกหักภาษี ณ ที่จ่าย : -</span>';
-        html+='<span style="white-space:nowrap;">เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)* &nbsp; '+taxBoxes(custTaxID)+'</span>';
+        html+='<div class="card border-2 mb-1" style="border-radius:6px; border-color:#333;font-size:10pt;font-weight:400;">';
+        html+='<div class="card-body p-1">';
+        html+='<div style="display:flex;justify-content:space-between;align-items:center;font-weight:500;padding:2px 4px;letter-spacing:.2px;margin-bottom:2px;">';
+        html+='<span style="white-space:nowrap;font-size: 8pt;font-weight: 600;">ผู้ถูกหักภาษี ณ ที่จ่าย : -</span>';
+        html+='<span style="white-space:nowrap;font-size: 8pt;font-weight: 600;">เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)* &nbsp; '+taxBoxes(custTaxID)+'</span>';
         html+='</div>';
-        html+='<div style="padding:2px 4px;font-size:13pt;">';
-        html+='ชื่อ <b style="font-size:13pt;">'+esc(custName)+'</b><br>';
-        html+='<span style="font-size:10pt;color:#555;">(ให้ระบุว่าเป็น บุคคล นิติบุคคล บริษัท สมาคม หรือคณะบุคคล)</span><br>';
+        html+='<div style="padding:2px 2px;font-size: 8pt;font-weight: 600;">';
+        html+='ชื่อ <b style="font-size:9pt;">'+esc(custName)+'</b><br>';
+        html+='<span style="font-size:7pt;color:#555;font-style: italic;">(ให้ระบุว่าเป็น บุคคล นิติบุคคล บริษัท สมาคม หรือคณะบุคคล)</span><br>';
         html+='</div>';
-        html+='<div style="padding:2px 4px;font-size:12pt;margin-top:3px;padding-top:4px;">';
-        html+='ที่อยู่ <b style="font-size:13pt;">'+esc(custAddr)+'</b><br>';
-        html+='<span style="font-size:10pt;color:#555;">(ให้ระบุชื่ออาคาร/หมู่บ้าน ห้องเลขที่ชั้นที่ เลขที่ ตรอก/ซอย หมู่ที่ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด)</span><br>';
+        html+='<div style="padding:2px 4px;font-size:8pt;font-weight: 600;">';
+        html+='ที่อยู่ <b style="font-size:9pt;">'+esc(custAddr)+'</b><br>';
+        html+='<span style="font-size:7pt;color:#555;font-style: italic;">(ให้ระบุชื่ออาคาร/หมู่บ้าน ห้องเลขที่ชั้นที่ เลขที่ ตรอก/ซอย หมู่ที่ถนน ตำบล/แขวง อำเภอ/เขต จังหวัด)</span><br>';
         html+='</div>';
         html+='</div>';
         
@@ -741,51 +741,60 @@ function numberToThaiBaht(num) {
             {lbl:'(5) ภ.ง.ด.2ก',chk:false},{lbl:'(6) ภ.ง.ด.3ก',chk:false},
             {lbl:'(7) ภ.ง.ด.53',chk:false}
         ];
-        html+='<div style="font-size:11.5pt;margin:3px 0 4px 0;">';
-        // Row 1: ลำดับที่ + ในแบบ + first 4 checkboxes (all on same row)
-        html+='<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;">';
-        html+='<span>ลำดับที่ <u style="display:inline-block;min-width:55px;text-align:center;font-weight:700;">'+esc(docNo)+'</u></span>';
-        html+='<span>ในแบบ</span>';
+        html+='<div style="font-size:8.5pt; margin:3px 0 4px 10px; display:flex; gap:15px; align-items:flex-start;">';
+        // ฝั่งซ้าย: ลำดับที่ + ในแบบ + ย้ายข้อความสอบยันมาไว้ตรงนี้ดิ่งลงมาข้างล่าง
+        html+='  <div style="display:flex; flex-direction:column; gap:2px; width:35%;">';
+        html+='    <div>';
+        html+='      <span>ลำดับที่ <u style="display:inline-block;min-width:55px;text-align:center;font-weight:700;">'+esc(docNo)+'</u></span>';
+        html+='      <span>ในแบบ</span>';
+        html+='    </div>';
+        html+='    <div style="font-size:7.5pt; color:#666; line-height:1.2;">';
+        html+='      (ให้สามารถอ้างอิงหรือสอบยันกันได้ระหว่างลำดับที่ตามหนังสือรับรองฯ กับแบบยื่นรายการภาษีหัก ณ ที่จ่าย)';
+        html+='    </div>';
+        html+='  </div>';
+
+        // ฝั่งขวา: กล่องข้อความเช็คบ็อกซ์ เรียงแนวนอนตามเดิม 4 และ 3
+        html+='  <div style="display:flex; flex-direction:column; width:65%; gap:2px;">';
+        // Row 1: first 4 checkboxes
+        html+='    <div style="display:flex; align-items:center; flex-wrap:wrap; gap:6px;">';
         formOpts.slice(0,4).forEach(function(f){
-            html+='<span style="display:inline-flex;align-items:center;gap:2px;">'+chkBox(f.chk)+'&nbsp;'+f.lbl+'</span>';
+            html+='    <span style="display:inline-flex;align-items:center;gap:2px;">'+chkBox(f.chk)+'&nbsp;'+f.lbl+'</span>';
         });
-        html+='</div>';
+        html+='    </div>';
         // Row 2: last 3 items
-        html+='<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:2px;">';
+        html+='    <div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-top:2px;">';
         formOpts.slice(4).forEach(function(f){
-            html+='<span style="display:inline-flex;align-items:center;gap:2px;">'+chkBox(f.chk)+'&nbsp;'+f.lbl+'</span>';
+            html+='    <span style="display:inline-flex;align-items:center;gap:2px;">'+chkBox(f.chk)+'&nbsp;'+f.lbl+'</span>';
         });
-        html+='</div>';
-        html+='</div>';
-        html+='<div style="font-size:9.5pt;color:#666;margin-bottom:4px;">';
-        html+='(ให้สามารถอ้างอิงหรือสอบยันกันได้ระหว่างลำดับที่ตามหนังสือรับรองฯ กับแบบยื่นรายการภาษีหัก ณ ที่จ่าย)';
+        html+='    </div>';
+        html+='  </div>';
         html+='</div>';
         html+='</div>';
 
         // ── ตารางประเภทเงินได้ ────────────────────────────────────────────────
-        html+='<div class="card border-2 mb-2" style="border-radius:6px;">';
+        html+='<div class="card border-2 mb-1" style="border-radius:6px; border-color:#333;font-size:10pt;font-weight:400;">';
         html+='<div class="card-body p-0" style="overflow-x:auto;">';
-        html+='<table style="width:100%;border-collapse:collapse;font-size:11.5pt;">';
+        html+='<table style="width:100%;border-collapse:collapse;font-size:6.5pt;">';
         html+='<thead>';
         html+='<tr>';
-        html+='<th style="border-bottom:2px solid #555;padding:4px 6px;">ประเภทเงินได้พึงประเมินที่จ่าย</th>';
-        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:10.5pt;line-height:1.3;">วัน เดือน<br>หรือปีภาษีที่จ่าย</th>';
-        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:10.5pt;line-height:1.3;">จำนวนเงินที่จ่าย</th>';
-        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:10.5pt;line-height:1.3;">ภาษีที่หัก<br>และนำส่งไว้</th>';
+        html+='<th style="border-bottom:2px solid #555;padding:4px 6px;text-align:center;font-size:8.5pt;line-height:1.3;">ประเภทเงินได้พึงประเมินที่จ่าย</th>';
+        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:8.5pt;line-height:1.3;">วัน เดือน<br>หรือปีภาษีที่จ่าย</th>';
+        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:8.5pt;line-height:1.3;">จำนวนเงินที่จ่าย</th>';
+        html+='<th style="border-bottom:2px solid #555;padding:4px 4px;width:105px;text-align:center;font-size:8.5pt;line-height:1.3;">ภาษีที่หัก<br>และนำส่งไว้</th>';
         html+='</tr>';
         html+='</thead>';
         html+='<tbody>';
 
         incomeRows.forEach(function(row){
             var chk=(row.type===incomeType && row.type!==0);
-            var subStyle=row.sub?'background:#fafafa;font-size:10.5pt;':'';
+            var subStyle=row.sub?'background:#fafafa;':'';
             html+='<tr style="'+subStyle+'">';
-            html+='<td style="padding:2px 6px;vertical-align:top;line-height:1.5;border-bottom:1px solid #eee;">'+row.label+'</td>';
-            html+='<td style="border-bottom:1px solid #eee;padding:2px 4px;text-align:center;vertical-align:top;">';
+            html+='<td style="padding:2px 6px;vertical-align:top;line-height:1.5;border-right: 1px solid;">'+row.label+'</td>';
+            html+='<td style="border-bottom:1px solid #eee;border-right: 1px solid;padding:2px 4px;text-align:center;vertical-align:top;">';
             html+=(chk?fmtDateFullYear(payDate):'')+'</td>';
-            html+='<td style="border-bottom:1px solid #eee;padding:2px 6px;text-align:right;vertical-align:top;">';
+            html+='<td style="border-bottom:1px solid #eee;border-right: 1px solid;padding:2px 6px;text-align:right;vertical-align:top;">';
             html+=(chk&&payAmt?'<b>'+fmt2(payAmt)+'</b>':'')+'</td>';
-            html+='<td style="border-bottom:1px solid #eee;padding:2px 6px;text-align:right;vertical-align:top;">';
+            html+='<td style="border-bottom:1px solid #eee;border-right: 1px solid;padding:2px 6px;text-align:right;vertical-align:top;">';
             html+=(chk&&taxAmt?'<b>'+fmt2(taxAmt)+'</b>':'')+'</td>';
             html+='</tr>';
         });
@@ -795,24 +804,23 @@ function numberToThaiBaht(num) {
         html+='<td style="border-top:2px solid #555;padding:3px 8px;text-align:right;font-weight:700;">'+fmt2(payAmt)+'</td>';
         html+='<td style="border-top:2px solid #555;padding:3px 8px;text-align:right;font-weight:700;">'+fmt2(taxAmt)+'</td>';
         html+='</tr>';
+        html+='<tr style="">';
+        // ── รวมเงินตัวอักษร ───────────────────────────────────────────────────
+        html+='<td colspan="2" style="padding:3px 8px;text-align:left;font-weight:700;"><b>รวมเงินภาษีที่หักนำส่ง (ตัวอักษร)</b>&ensp;<span style="font-size:9.5pt;font-weight:700;">'+esc(taxAmtThai)+'</span></td>';
+        html+='</tr>';
         html+='</tbody></table>';
         html+='</div>';
         html+='</div>';
 
-        // ── รวมเงินตัวอักษร ───────────────────────────────────────────────────
-        html+='<div style="border:1px solid #555;border-top:0;padding:3px 8px;font-size:11.5pt;">';
-        html+='<b>รวมเงินภาษีที่หักนำส่ง (ตัวอักษร)</b>&ensp;'+esc(taxAmtThai);
-        html+='</div>';
-
         // ── เงินกองทุน ────────────────────────────────────────────────────────
-        html+='<div style="border:1px solid #555;border-top:0;padding:3px 8px;font-size:10.5pt;color:#333;">';
-        html+='เงินที่จ่ายเข้า <b>กบข./กสจ./กองทุนสงเคราะห์ครูโรงเรียนเอกชน</b>…………………………บาท &nbsp;&nbsp;';
-        html+='<b>กองทุนประกันสังคม</b>…………………………บาท &nbsp;&nbsp;';
-        html+='<b>กองทุนสำรองเลี้ยงชีพ</b>…………………………บาท';
+        html+='<div class="mb-1" style="border:2px solid #555;border-radius:6px;padding:3px 8px;font-size:7.5pt;color:#333;">';
+        html+='<b>เงินที่จ่ายเข้า</b> กบข./กสจ./กองทุนสงเคราะห์ครูโรงเรียนเอกชน………………บาท &nbsp;&nbsp;';
+        html+='<b>กองทุนประกันสังคม</b>…………………บาท &nbsp;&nbsp;';
+        html+='<b>กองทุนสำรองเลี้ยงชีพ</b>…………………บาท';
         html+='</div>';
 
         // ── ผู้จ่ายเงิน ───────────────────────────────────────────────────────
-        html+='<div style="border:1px solid #555;border-top:0;padding:4px 8px;font-size:11.5pt;display:flex;align-items:center;flex-wrap:wrap;gap:12px;">';
+        html+='<div style="border:2px solid #555;border-radius:6px;padding:4px 8px;font-size:7.5pt;display:flex;align-items:center;flex-wrap:wrap;gap:12px;">';
         html+='<b>ผู้จ่ายเงิน</b>';
         var pmodes=[['(1) หัก ณ ที่จ่าย',true],['(2) ออกให้ตลอดไป',false],['(3) ออกให้ครั้งเดียว',false],['(4) อื่น ๆ (ระบุ)……………………………',false]];
         pmodes.forEach(function(m){
@@ -821,37 +829,37 @@ function numberToThaiBaht(num) {
         html+='</div>';
 
         // ── คำเตือน + ลงนาม + ประทับตรา ──────────────────────────────────────
-        html+='<div style="display:flex;gap:8px;margin-top:4px;">';
+        html+='<div style="display:flex;gap:8px;margin-top:4px;font-size:8.5pt;">';
 
         // คำเตือน
-        html+='<div style="border:1.5px solid #333;padding:5px 8px;font-size:10pt;width:220px;flex-shrink:0;">';
-        html+='<b>คำเตือน</b> ผู้มีหน้าที่ออกหนังสือรับรองการหักภาษี ณ ที่จ่าย<br>';
-        html+='ฝ่าฝืนไม่ปฏิบัติตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร ต้องรับโทษทางอาญาตามมาตรา 35 แห่งประมวลรัษฎากร';
+        html+='<div style="border:2px solid #333;border-radius:6px;padding:5px 8px;width:290px;flex-shrink:0;display:flex;gap:8px;align-items:flex-start;font-size:7.5pt;">';
+        html+='<b style="white-space:nowrap;">คำเตือน</b>';
+        html+='<div>ผู้มีหน้าที่ออกหนังสือรับรองการหักภาษี ณ ที่จ่าย ฝ่าฝืนไม่ปฏิบัติตามมาตรา 50 ทวิ แห่งประมวลรัษฎากร ต้องรับโทษทางอาญาตามมาตรา 35 แห่งประมวลรัษฎากร</div>';
         html+='</div>';
 
         // ลงนาม
-        html+='<div style="flex:1;font-size:11.5pt;padding-top:4px;">';
-        html+='<div style="text-align:center;margin-bottom:16px;">ขอรับรองว่าข้อความและตัวเลขดังกล่าวข้างต้นถูกต้องตรงกับความจริงทุกประการ</div>';
+        html+='<div style="flex:1;font-size:7.5pt;padding-top:4px;border:2px solid #333;border-radius:6px;">';
+        html+='<div style="text-align:center;">ขอรับรองว่าข้อความและตัวเลขดังกล่าวข้างต้นถูกต้องตรงกับความจริงทุกประการ</div>';
         html+='<div style="display:flex;justify-content:center;gap:30px;align-items:flex-end;">';
 
         // ลายเซ็น
         html+='<div style="text-align:center;">';
-        html+='<div style="border-bottom:1px solid #333;min-width:200px;height:36px;"></div>';
+        html+='<div style="border-bottom:1px solid #333;min-width:200px;"></div>';
         html+='<div>( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; )</div>';
         html+='<div>ผู้จ่ายเงิน</div>';
         html+='<div>'+esc(fmtDateFull(vatDate))+'</div>';
-        html+='<div style="font-size:10pt;color:#555;">(วัน เดือน ปี ที่ออกหนังสือรับรองฯ)</div>';
+        html+='<div style="font-size:7.5pt;color:#555;">(วัน เดือน ปี ที่ออกหนังสือรับรองฯ)</div>';
         html+='</div>';
 
         // ประทับตรา
         html+='<div style="text-align:center;">';
-        html+='<div style="width:90px;height:90px;border:1.5px dashed #aaa;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:9pt;text-align:center;">ประทับตรา<br>นิติบุคคล<br>(ถ้ามี)</div>';
+        html+='<div style="width:42px;height:42px;border:1.5px dashed #aaa;border-radius:999px;margin:0 auto;display:flex;align-items:center;justify-content:center;color:#bbb;font-size:5pt;text-align:center;">ประทับตรา<br>นิติบุคคล<br>(ถ้ามี)</div>';
         html+='</div>';
 
         html+='</div></div></div></div>';
 
         // ── หมายเหตุ ──────────────────────────────────────────────────────────
-        html+='<div style="margin-top:5px;font-size:9.5pt;color:#444;border-top:1px solid #ddd;padding-top:3px;">';
+        html+='<div style="margin-top:5px;font-size:7.5pt;color:#444;border-top:1px solid #ddd;padding-top:3px;">';
         html+='<b>หมายเหตุ</b> เลขประจำตัวผู้เสียภาษีอากร (13 หลัก)* หมายถึง<br>';
         html+='1. กรณีบุคคลธรรมดาไทย ให้ใช้เลขประจำตัวประชาชนของกรมการปกครอง<br>';
         html+='2. กรณีนิติบุคคล ให้ใช้เลขทะเบียนนิติบุคคลของกรมพัฒนาธุรกิจการค้า<br>';
@@ -883,22 +891,46 @@ function numberToThaiBaht(num) {
         if(!el){alert('ไม่พบเอกสาร');return;}
         var win=window.open('','_blank','width=950,height=750');
         if(!win){alert('กรุณาอนุญาตให้เปิด Popup จาก Browser เพื่อพิมพ์/บันทึก PDF');return;}
-        win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>เอกสาร</title>');
+        win.document.write('<!DOCTYPE html><html><head><meta charset="utf-8"><title>เอกสาร<\/title>');
+            win.document.write('<link href="https://fonts.googleapis.com/css2?family=Sarabun:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800&display=swap" rel="stylesheet">');
+
         win.document.write('<style>');
-        win.document.write('@@import url("https://fonts.googleapis.com/css2?family=Sarabun:wght@@400;700&display=swap");');
-        win.document.write('body{font-family:"Cordia New","CordiaUPC","TH Sarabun New","Sarabun",Arial,sans-serif;font-size:14pt;margin:0;padding:10px;}');
-        win.document.write('.doc-wrap{max-width:100%;}');
-        win.document.write('.doc-company-logo{width:72px;height:72px;display:flex;align-items:center;justify-content:center;}');
-        win.document.write('table{border-collapse:collapse;width:100%;}td,th{border:1px solid #888;padding:2px 5px;vertical-align:top;}');
-        win.document.write('.noborder td,.noborder th{border:none !important;}');
-        win.document.write('.header-band{background:#eee;font-weight:700;text-align:center;}');
-        win.document.write('.amt-col{text-align:right;min-width:80px;}');
-        win.document.write('.section-label{font-size:.7rem;color:#666;}');
-        win.document.write('.chk-box{width:11px;height:11px;border:1px solid #333;display:inline-flex;align-items:center;justify-content:center;}');
-        win.document.write('.checked::after{content:"✔";font-size:8px;}');
-        win.document.write('.field-underline{border:none;border-bottom:1px solid #333;min-width:60px;display:inline-block;}');
-        win.document.write('@@page{margin:10mm;size:A4;}');
-        win.document.write('<\/style><\/head><body>');
+        
+        win.document.write('@@page { size: A4; margin: 0; }'); 
+        win.document.write('body { font-family: "Sarabun"; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; background: #fff !important; color: #000 !important; }');
+
+        // 1. ขนาดคอนเทนเนอร์พิมพ์ A4
+        win.document.write('#' + docId + ' { width: 210mm !important; min-height: 297mm !important; padding: 10mm 10mm !important; margin: 0 auto !important; box-shadow: none !important; border-radius: 0 !important; box-sizing: border-box !important; overflow: visible !important; background: #fff !important; }');
+
+        // 2. บังคับเส้นขอบและพื้นหลังของกล่อง .card และความกระชับของ .card-body
+        win.document.write('.card { --vz-card-border-width: 2px !important; border: 2px solid #333 !important; border-radius: 6px !important; margin-bottom: 4px !important; box-shadow: none !important; background-color: #fff !important; }');
+        win.document.write('.card-body { --vz-card-spacer-y: 4px !important; --vz-card-spacer-x: 6px !important; padding: 4px 6px !important; }');
+        win.document.write('.p-1 { padding: 4px !important; }');
+        win.document.write('.mb-1 { margin-bottom: 4px !important; }');
+
+        // ⭐ 3. แก้ไขและกู้คืนเส้นตาราง (เขียนทับค่า border-width: 0 ของธีม)
+        win.document.write('table { ');
+        win.document.write('    border-collapse: collapse !important; '); // บังคับให้เส้นตารางแนบสนิทกัน ไม่แยก spacing
+        win.document.write('    width: 100% !important; ');
+        win.document.write('    margin-top: 2px !important; ');
+        win.document.write('} ');
+
+        
+
+        // ⭐ 4. จัดการข้อยกเว้นสำหรับแถวที่ไม่เอาเส้นขอบ (.noborder) ตามในโค้ด html ของคุณ
+        win.document.write('.noborder td, .noborder th, .noborder tr { ');
+        win.document.write('    border: none !important; ');
+        win.document.write('    border-width: 0 !important; ');
+        win.document.write('} ');
+
+        // ⭐ 5. บังคับให้สีพื้นหลังของส่วนหัวตารางแสดงผลเด่นชัด (.header-band ที่เป็นสี #eee)
+        win.document.write('.header-band { ');
+        win.document.write('    background-color: #eee !important; ');
+        win.document.write('    font-weight: 700 !important; ');
+        win.document.write('} ');
+
+        win.document.write('<\/style>');
+        win.document.write('<\/head><body>');
         win.document.write(el.outerHTML);
         win.document.write('<\/body><\/html>');
         win.document.close();

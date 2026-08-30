@@ -232,7 +232,7 @@ namespace TheStarRichyProject.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> FindReferrer(string referrerCode)
+        public async Task<IActionResult> GetBanks()
         {
             try
             {
@@ -251,7 +251,49 @@ namespace TheStarRichyProject.Controllers
                 };
 
                 var client = new RestClient(options);
-                var request = new RestRequest($"/Registration/findreferrer?referrerCode={referrerCode}", Method.Get);
+                var request = new RestRequest("/Static/banks", Method.Get);
+                AddHeaders(request);
+
+                var response = await client.ExecuteAsync(request);
+
+                if (response.IsSuccessful)
+                {
+                    return Ok(response.Content);
+                }
+                else
+                {
+                    return Ok(new { success = false, message = "ไม่สามารถโหลดข้อมูลธนาคารได้" });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calling GetBanks API");
+                return StatusCode(500, new { success = false, message = "เกิดข้อผิดพลาดในการโหลดข้อมูลธนาคาร" });
+            }
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> FindReferrer(string referrerCode, string uplineCode)
+        {
+            try
+            {
+                ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+                var options = new RestClientOptions(Config["Api:Url"])
+                {
+                    ThrowOnAnyError = true,
+                    ConfigureMessageHandler = handler =>
+                    {
+                        var httpClientHandler = new HttpClientHandler
+                        {
+                            ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                        };
+                        return httpClientHandler;
+                    }
+                };
+
+                var client = new RestClient(options);
+                var request = new RestRequest($"/Registration/findreferrer?referrerCode={Uri.EscapeDataString(referrerCode)}&uplineCode={Uri.EscapeDataString(uplineCode)}", Method.Get);
 
                 var response = await client.ExecuteAsync(request);
 

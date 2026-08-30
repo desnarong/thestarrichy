@@ -242,7 +242,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
                 var code = p(prod, ['ProductID', 'productID'], '');
                 var name = p(prod, ['ProductName', 'productName'], '');
                 var price = num(p(prod, ['UnitPrice', 'unitPrice'], 0));
-                var pv = num(p(prod, ['PV', 'pv'], 0));
+                var pv = num(p(prod, ['UnitPV', 'Unitpv'], 0));
                 var remain = num(p(prod, ['Remain', 'remain'], 0));
                 var billNo = p(prod, ['BillNo', 'billNo', 'Billno'], '-');
                 var expire = fmtDate(p(prod, ['ExpireDate', 'expireDate'], ''));
@@ -378,7 +378,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
                 var code = p(prod, ['ProductID', 'productID'], '');
                 var name = p(prod, ['ProductName', 'productName'], '');
                 var price = num(p(prod, ['UnitPrice', 'unitPrice'], 0));
-                var pv = num(p(prod, ['PV', 'pv'], 0));
+                var pv = num(p(prod, ['UnitPV', 'Unitpv'], 0));
                 var qty = item.qty;
                 var subtotal = price * qty;
                 var subPV = pv * qty;
@@ -462,7 +462,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
                     ProductID: item.product.ProductID || item.product.productID,
                     ProductName: item.product.ProductName || item.product.productName,
                     UnitPrice: num(item.product.UnitPrice || item.product.unitPrice || 0),
-                    PV: num(item.product.PV || item.product.pv || 0),
+                    PV: num(item.product.UnitPV || item.product.Unitpv || 0),
                     Qty: item.qty,
                     Remain: num(item.product.Remain || item.product.remain || 0),
                     BillNo: item.product.BillNo || item.product.billNo || '',
@@ -474,7 +474,7 @@ Layout = "~/Views/Shared/_Layout.cshtml";
             var totalPV = 0;
             cart.forEach(function (item) {
                 totalAmount += num(item.product.UnitPrice || item.product.unitPrice || 0) * item.qty;
-                totalPV += num(item.product.PV || item.product.pv || 0) * item.qty;
+                totalPV += num(item.product.UnitPV || item.product.Unitpv || 0) * item.qty;
             });
 
             // Build payload

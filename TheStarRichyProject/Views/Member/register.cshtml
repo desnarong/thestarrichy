@@ -5,7 +5,7 @@
     ViewData["Title"] = "สมาชิก";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var cookieValue = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.UserInfoKey);
-    var userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
+    dynamic? userinfo = JsonConvert.DeserializeObject<dynamic>(cookieValue)["memberInfo"][0];
     
     // Get language from cookie (default to 'th' if not set)
     var currentLang = CookieHelper.GetCookie(HttpContextAccessor, CookieHelper.LanguageKey) ?? "th";
@@ -119,9 +119,16 @@
                                                 <label class="col-md-5 col-form-label required" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="input-group">
-                                                        <input type="text" class="form-control" id="simpleReferrerCode" value="@userinfo.membercode" placeholder="กรอกรหัสผู้แนะนำ" required />
-                                                        <button type="button" class="btn btn-primary" id="btnSearchReferrer"><i class="fas fa-search me-2"></i><span data-key="t-search">ค้นหา</span></button>
+                                                        <input type="text" class="form-control" id="simpleReferrerCode" value="@userinfo.membercode" placeholder="กรอกรหัสผู้แนะนำ" required readonly disabled/>
+                                                        <button type="button" class="btn btn-primary" id="btnSearchReferrer" disabled><i class="fas fa-search me-2"></i><span data-key="t-search">ค้นหา</span></button>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label required" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="simpleUplineCode" value="@userinfo.membercode" placeholder="รหัสอัพไลน์" required readonly disabled />
                                                 </div>
                                             </div>
 
@@ -130,11 +137,11 @@
                                                 <div class="col-md-7">
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="position" id="positionLeft" value="left" checked />
-                                                        <label class="form-check-label" for="positionLeft" data-key="t-left">ซ้ายสุด</label>
+                                                        <label class="form-check-label" for="positionLeft" data-key="t-left">ซ้าย</label>
                                                     </div>
                                                     <div class="form-check form-check-inline">
                                                         <input type="radio" class="form-check-input" name="position" id="positionRight" value="right" />
-                                                        <label class="form-check-label" for="positionRight" data-key="t-right">ขวาสุด</label>
+                                                        <label class="form-check-label" for="positionRight" data-key="t-right">ขวา</label>
                                                     </div>
                                                 </div> 
                                             </div>
@@ -267,7 +274,40 @@
                                                     <small class="text-muted mt-1" id="lineIdValidation"></small>
                                                 </div>
                                             </div>
+                                        </div>
+                                    </div>
 
+                                    <div class="card border-0 shadow-sm mb-4">
+                                        <div class="card-header bg-light">
+                                            <h5 class="mb-0" data-key="t-bank-information">ข้อมูลธนาคาร</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร</label>
+                                                <div class="col-md-7">
+                                                    <select name="bank" id="simpleBank" class="form-control">
+                                                        <option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="simpleBankAccountNumber" placeholder="กรอกเลขที่บัญชี" maxlength="15" />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="simpleBankAccountName" placeholder="ชื่อบัญชีจะใช้ชื่อเดียวกับชื่อบนบัตร" disabled />
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label" data-key="t-branch">สาขา</label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="simpleBankBranch" placeholder="กรอกสาขา" />
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -448,11 +488,17 @@
                                                 <label class="col-md-5 col-form-label" data-key="t-referrer-code">รหัสผู้แนะนำ <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
                                                     <div class="input-group">
-                                                        <input type="text" id="fullReferrerCode" class="form-control" placeholder="กรอกรหัสผู้แนะนำ" value="@userinfo.membercode" required />
+                                                        <input type="text" id="fullReferrerCode" class="form-control" placeholder="กรอกรหัสผู้แนะนำ" value="@userinfo.membercode" required readonly disabled />
                                                         <button type="button" class="btn btn-primary" data-key="t-search" id="btnFullSearchReferrer">
                                                             <i class="fas fa-search"></i>
                                                         </button>
                                                     </div>
+                                                </div>
+                                            </div>
+                                            <div class="form-group row mb-3">
+                                                <label class="col-md-5 col-form-label required" data-key="t-upline-code">รหัสอัพไลน์ <span class="text-danger">*</span></label>
+                                                <div class="col-md-7">
+                                                    <input type="text" class="form-control" id="fullUplineCode" value="@userinfo.membercode" placeholder="รหัสอัพไลน์" required readonly disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -611,7 +657,7 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-bank">ธนาคาร <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <select id="fullBank" name="bank" class="form-control" required>
+                                                    <select id="fullBank" name="bank" class="form-control">
                                                         <option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>
                                                     </select>
                                                 </div>
@@ -619,13 +665,13 @@
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-account-number">เลขที่บัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="fullBankAccountNumber" placeholder="กรอกเลขที่บัญชี" required />
+                                                    <input type="text" class="form-control" id="fullBankAccountNumber" placeholder="กรอกเลขที่บัญชี" />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
                                                 <label class="col-md-5 col-form-label" data-key="t-account-name">ชื่อบัญชี <span class="text-danger">*</span></label>
                                                 <div class="col-md-7">
-                                                    <input type="text" class="form-control" id="fullBankAccountName" placeholder="กรอกชื่อบัญชี" required disabled />
+                                                    <input type="text" class="form-control" id="fullBankAccountName" placeholder="กรอกชื่อบัญชี" disabled />
                                                 </div>
                                             </div>
                                             <div class="form-group row mb-3">
@@ -1181,6 +1227,7 @@ $(document).ready(async function () {
     loadFullTitles();
     setFullRegistrationDate();
     loadFullBanks();
+    loadSimpleBanks();
 
     // ✅ ปรับแก้ฟังก์ชัน Preview รูปให้ใช้ FileReader รองรับ Vivo เสถียร 100%
     function handleImagePreview(inputSelector, previewSelector) {
@@ -1252,11 +1299,19 @@ $(document).ready(async function () {
             position = (lastChar === 'L') ? 'left' : 'right';
         }
 
-        $('#simpleReferrerCode').val(memberCode).prop('disabled', true);
-        $('#fullReferrerCode').val(memberCode).prop('disabled', true);
+        $('#simpleUplineCode').val(memberCode);
+        $('#simpleUplineCode').val(memberCode);
+        $('#simpleReferrerCode').prop('disabled', false);
+        $('#simpleReferrerCode').prop('readonly', false);
+
+        $('#fullReferrerCode').val(memberCode).prop('disabled', false);
+        $('#fullReferrerCode').val(memberCode).prop('readonly', false);
+
         $('input[name="position"]').prop('disabled', true);
-        $('#btnSearchReferrer').prop('disabled', true);
-        $('#btnFullSearchReferrer').prop('disabled', true);
+        $('#btnSearchReferrer').prop('disabled', false);
+        $('#btnSearchReferrer').prop('readonly', false);
+        $('#btnFullSearchReferrer').prop('disabled', false);
+        $('#btnFullSearchReferrer').prop('readonly', false);
 
         setTimeout(function() { $('#btnSearchReferrer').trigger('click'); }, 500);
         setTimeout(function() { $('#btnFullSearchReferrer').trigger('click'); }, 500);
@@ -1406,6 +1461,7 @@ $(document).ready(async function () {
             const selectedRegYear = $('#simpleRegYear').val();
 
             $('#simpleRegistrationForm')[0].reset();
+            $('#simpleBankAccountName').val('');
 
             $('#simpleRegDay').val(selectedRegDay);
             $('#simpleRegMonth').val(selectedRegMonth);
@@ -1431,7 +1487,8 @@ $(document).ready(async function () {
     $('#btnFullSearchReferrer').click(function () {
         const referrerCode = $('#fullReferrerCode').val();
         if (referrerCode) {
-            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+            const uplineCode = $('#fullUplineCode').val();
+            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode) + '&uplineCode=' + encodeURIComponent(uplineCode))
                 .done(function(response) {
                     if (response.success) {
                         $('#fullReferrerName').val(response.memberName);
@@ -1452,15 +1509,17 @@ $(document).ready(async function () {
 
     $('#btnSearchReferrer').click(function () {
         const referrerCode = $('#simpleReferrerCode').val();
-        if (referrerCode) {
-            $.get('/ExternalRegistration/findreferrer?referrerCode=' + encodeURIComponent(referrerCode))
+        const uplineCode = $('#simpleUplineCode').val();
+        if (referrerCode && uplineCode) {
+            $.get('/Member/FindMembercodeForSale?memberCode=' + encodeURIComponent(referrerCode) + '&uplineCode=' + encodeURIComponent(uplineCode))
                 .done(function(response) {
-                    if (response.success) {
-                        $('#simpleReferrerName').val(response.memberName);
+                    const data = (typeof response === 'string') ? JSON.parse(response) : response;
+                    if (data && data.success && data.data) {
+                        $('#simpleReferrerName').val(data.data.DlName || '');
                         toastr.success('พบข้อมูลผู้อ้างอิงแล้ว');
                     } else {
                         $('#simpleReferrerName').val('');
-                        toastr.error(response.message || 'ไม่พบข้อมูลผู้อ้างอิง');
+                        toastr.error((data && data.message) || 'ไม่พบข้อมูลผู้อ้างอิง');
                     }
                 })
                 .fail(function() {
@@ -1468,7 +1527,7 @@ $(document).ready(async function () {
                     toastr.error('ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้');
                 });
         } else {
-            toastr.error('กรุณากรอกรหัสผู้อ้างอิง');
+            toastr.error('กรุณากรอกรหัสผู้แนะนำและรหัสอัพไลน์');
         }
     });
 
@@ -1500,7 +1559,7 @@ $(document).ready(async function () {
         }
     });
 
-    $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone').on('input', function () {
+    $('#simpleMobile, #simpleHomePhone, #fullMobile, #fullHomePhone, #simpleBankAccountNumber').on('input', function () {
         this.value = this.value.replace(/\D/g, '');
     });
 
@@ -1512,6 +1571,7 @@ $(document).ready(async function () {
             $('#simpleBusinessName').val($(this).val());
             validateSimpleBusinessName();
         }
+        $('#simpleBankAccountName').val($(this).val());
         validateSimpleFullName();
     });
     $('#simpleBusinessName').on('input', function(){ 
@@ -1751,8 +1811,8 @@ $(document).ready(async function () {
     }
 
     function getPositionLabel(positionValue) {
-        if (positionValue === 'left') return 'ซ้ายสุด';
-        if (positionValue === 'right') return 'ขวาสุด';
+        if (positionValue === 'left') return 'ซ้าย';
+        if (positionValue === 'right') return 'ขวา';
         return '-';
     }
 
@@ -1816,7 +1876,19 @@ $(document).ready(async function () {
         });
 
         const docNumber = ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, '');
-        if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+        const isThaiCountry = $('#simpleCountry').val() === '66';
+        // ✅ ถ้าไม่ได้เลือกประเทศไทย และเลขเอกสารไม่ครบ 13 หลัก ให้เติม 0 ข้างหน้า
+        const paddedDocNumber = (!isThaiCountry && docNumber && docNumber.length < 13) ? docNumber.padStart(13, '0') : docNumber;
+        if (isThaiCountry) {
+            // ไทย: ต้องเป็นเลขบัตรประชาชน 13 หลัก + ผ่าน checksum เท่านั้น
+            if (!/^[0-9]{13}$/.test(docNumber) || !validateThaiID(docNumber)) {
+                $('#simpleDocumentNumber').addClass('is-invalid');
+                $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลักที่ถูกต้อง</span>');
+                isValid = false;
+                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+            }
+        } else if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+            // ต่างชาติ: ถ้ากรอกครบ 13 หลัก ก็ยังตรวจ checksum เหมือนเดิม
             $('#simpleDocumentNumber').addClass('is-invalid');
             $('#documentValidationMessage').html('<span class="text-danger"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</span>');
             isValid = false;
@@ -1896,7 +1968,7 @@ $(document).ready(async function () {
             const formData = {
                 country: $('#simpleCountry').val(),
                 countryBusiness: $('#simpleCountryBusiness').val(),
-                documentNumber: ($('#simpleDocumentNumber').val() || "").replace(/[- ]/g, ''),
+                documentNumber: paddedDocNumber,
                 referrerCode: $('#simpleReferrerCode').val(),
                 position: $('input[name="position"]:checked').val(),
                 title: $('select[name="simpleTitle"]').val(),
@@ -1919,6 +1991,11 @@ $(document).ready(async function () {
                 districtCode: $('#simpleDistrict').val(),
                 subdistrictCode: $('#simpleSubdistrict').val(),
                 tambonId: parseInt($('#simpleTambonId').val()) || null,
+                bankCode: $('#simpleBank').val(),
+                bankAccountNumber: $('#simpleBankAccountNumber').val() || '',
+                bankAccountName: $('#simpleBankAccountName').val() || '',
+                bankBranch: $('#simpleBankBranch').val() || '',
+                uplineCode: $('#simpleUplineCode').val() || '',
                 ipAddress: clientIpAddress
             };
 
@@ -2002,8 +2079,24 @@ $(document).ready(async function () {
 
         const citizenInput = $('#fullDocumentNumber');
         const docNumber = (citizenInput.val() || "").replace(/[- ]/g, '');
+        const isThaiCountry = $('#fullCountry').val() === '66';
+        // ✅ ถ้าไม่ได้เลือกประเทศไทย และเลขเอกสารไม่ครบ 13 หลัก ให้เติม 0 ข้างหน้า
+        const paddedDocNumber = (!isThaiCountry && docNumber && docNumber.length < 13) ? docNumber.padStart(13, '0') : docNumber;
 
-        if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+        if (isThaiCountry) {
+            // ไทย: ต้องเป็นเลขบัตรประชาชน 13 หลัก + ผ่าน checksum เท่านั้น
+            if (!/^[0-9]{13}$/.test(docNumber) || !validateThaiID(docNumber)) {
+                citizenInput.addClass('is-invalid');
+                if (citizenInput.next('.invalid-feedback-custom').length === 0) {
+                    citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนต้องเป็นตัวเลข 13 หลักที่ถูกต้อง</small>');
+                }
+                isValid = false;
+                toastr.error('เลขบัตรประชาชนไม่ถูกต้อง');
+            } else {
+                citizenInput.next('.invalid-feedback-custom').remove();
+            }
+        } else if (/^[0-9]{13}$/.test(docNumber) && !validateThaiID(docNumber)) {
+            // ต่างชาติ: ถ้ากรอกครบ 13 หลัก ก็ยังตรวจ checksum เหมือนเดิม
             citizenInput.addClass('is-invalid');
             if (citizenInput.next('.invalid-feedback-custom').length === 0) {
                 citizenInput.after('<small class="text-danger invalid-feedback-custom mt-1"><i class="fas fa-exclamation-circle"></i> เลขบัตรประชาชนไม่ถูกต้อง</small>');
@@ -2079,13 +2172,14 @@ $(document).ready(async function () {
             country: $('#fullCountry').val(),
             countryBusiness: $('#fullCountryBusiness').val(),
             referrerCode: $('#fullReferrerCode').val(),
+            uplineCode: $('#fullUplineCode').val(),
             position: $('input[name="position"]:checked').val(),
             title: $('#fullTitle').val(),
             language: $('#fullLanguage').val(),
             idCardName: $('#fullNameOnCard').val() || '',
             businessName: $('#fullBusinessName').val() || '',
             birthDate: fullBirthDateStr,
-            documentNumber: docNumber,
+            documentNumber: paddedDocNumber,
             mobile: $('#fullMobile').val() || '',
             homePhone: $('#fullHomePhone').val() || '',
             email: $('#fullEmail').val() || '',
@@ -2320,6 +2414,19 @@ $(document).ready(async function () {
             data.forEach(item => {
                 $('#fullBank').append(`<option value="${item.M17_PX1}">${item.Thainame}</option>`);
             });
+            $('#fullBank').val('N/A');
+        });
+    }
+
+    function loadSimpleBanks() {
+        $.get('/Member/GetBanks').done(res => {
+            let data = (typeof res === 'string') ? JSON.parse(res) : res;
+            data = Array.isArray(data) ? data : (data.data || []);
+            $('#simpleBank').empty().append('<option value="" data-key="t-select-bank">-- เลือกธนาคาร --</option>');
+            data.forEach(item => {
+                $('#simpleBank').append(`<option value="${item.M17_PX1}">${item.Thainame}</option>`);
+            });
+            $('#simpleBank').val('N/A');
         });
     }
 

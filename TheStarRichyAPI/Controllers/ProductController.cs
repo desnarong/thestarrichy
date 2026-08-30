@@ -399,11 +399,11 @@ namespace TheStarRichyApi.Controllers
         /// GET: /Product/findmembercodeforsale?memberCode={memberCode}
         /// </summary>
         [HttpGet("findmembercodeforsale")]
-        public async Task<IActionResult> FindMemberCodeForSale([FromQuery] string memberCode)
+        public async Task<IActionResult> FindMemberCodeForSale([FromQuery] string memberCode, [FromQuery] string? uplineCode)
         {
             try
             {
-                if (string.IsNullOrEmpty(memberCode))
+            if (string.IsNullOrEmpty(memberCode))
                 {
                     return BadRequest(new
                     {
@@ -413,7 +413,7 @@ namespace TheStarRichyApi.Controllers
                 }
 
                 var baseUrl = $"{Request.Scheme}://{Request.Host}";
-                var result = await _findMembercodeForSaleService.GetDisplayAsync(memberCode);
+                var result = await _findMembercodeForSaleService.GetDisplayAsync(memberCode, uplineCode);
 
                 if (result == null || !result.Any())
                 {

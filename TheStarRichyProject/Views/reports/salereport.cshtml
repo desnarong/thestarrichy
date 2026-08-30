@@ -372,7 +372,7 @@ $(function(){
   function buildTable(rows){
     if(tbl){tbl.destroy();tbl=null;} $('#mainTable').empty();
     var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e3f2fd,#bbdefb);font-size:.73rem;"><tr>'+
-      '<th>#</th><th>เลขที่ใบเสร็จ</th><th>วันที่</th><th>เลขที่อ้างอิง</th><th>รหัส Hybrid Gold</th>'+
+      '<th>#</th><th>เลขที่ใบเสร็จ</th><th>วันที่</th><th>เลขที่อ้างอิง</th><th>รหัสศูนย์</th><th>รหัสโมบาย</th><th>รหัส Hybrid Gold</th>'+
       '<th>รหัสนักธุรกิจ</th><th>ชื่อนักธุรกิจ</th><th>ประเภทซื้อ</th>'+
       '<th>ยอดเงิน</th><th>PV</th><th>สถานะการรับ</th><th>วันที่รับ/ส่ง</th>'+
       '<th>ผู้ทำรายการ</th><th>การจ่ายเงิน</th><th>Tracking</th><th>ที่อยู่จัดส่ง</th>'+
@@ -387,6 +387,8 @@ $(function(){
         '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
         '<td class="text-center" data-order="'+isoDate(p(r,['BillDate','billDate']))+'">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
         '<td>' + esc(typeof p(r,['ReferenceNo','referenceNo']) === 'object' ? "" : p(r,['ReferenceNo','referenceNo'])) + '</td>' +
+        '<td>'+esc(p(r,['CenterID','centerID','centerId']))+'</td>'+
+        '<td>'+esc(p(r,['MobileID','mobileID','mobileId']))+'</td>'+
         '<td>'+esc(p(r,['HybridGOLDID','hybridGoldId','hybridGOLDID']))+'</td>'+
         '<td>'+esc(p(r,['Membercode','memberCode','membercode']))+'</td>'+
         '<td>'+esc(p(r,['Membername','memberName','membername']))+'</td>'+

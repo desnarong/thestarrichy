@@ -22,14 +22,14 @@ namespace TheStarRichyApi.Services
         public async Task<string> GetPermissionAsync(string column, string memberCode)
         {
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
-            string MemberPermission = "";
+            string MemberPermission = "N";
 
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-                    string query = $"SELECT {column}  from M06_permission where M06_PX1=@Membercode";
+                    string query = $"SELECT {column}  from M06_permission where Membercode=@Membercode";
 
                     using (SqlCommand command = new SqlCommand(query, con))
                     {
@@ -130,9 +130,7 @@ namespace TheStarRichyApi.Services
 
                     string Memberpermission = await GetPermissionAsync("M16", memberCode);
 
-                    string query = "SELECT [Membercode] ,[CalcMonth] ,[CalcMonth1] ,[SponserBonus] ,[RebateBonus] ,[WeakBonus] ,[MatchingBonus] ," +
-                        "[StrongBonus] ,[AllSaleBonus] ,[MobileBonus] ,[UnilevelBonus] ,[SpecialBonus] ,[TotalBonus], 'รายเดือน/Monthly' AS TypeofBonus " +
-                        "FROM [000_Member_bonus_for_mobile_monthly]  (nolock) ";
+                    string query = "SELECT * FROM [000_Member_bonus_for_mobile_monthly]  (nolock) ";
  
                     query += " where Membercode = @Membercode";
                     query += " ORDER BY CalcMonth desc ,TypeofBonus desc ";
@@ -153,7 +151,7 @@ namespace TheStarRichyApi.Services
                                 for (int i = 0; i < reader.FieldCount; i++)
                                 {
                                     string columnName = reader.GetName(i);
-                                    object columnValue = reader.GetValue(i);
+                                    object columnValue = reader.IsDBNull(i) ? null : reader.GetValue(i);
                                     rowDict[columnName] = columnValue;
                                 }
 

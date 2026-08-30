@@ -32,14 +32,14 @@ namespace TheStarRichyApi.Services
         public async Task<string> GetPermissionAsync(string column, string memberCode)
         {
             string connectionString = _configuration.GetConnectionString("MLMConnectionString");
-            string MemberPermission = "";
+            string MemberPermission = "N";
 
             try
             {
                 using (SqlConnection con = new SqlConnection(connectionString))
                 {
                     await con.OpenAsync();
-                    string query = $"SELECT {column}  from M06_permission where M06_PX1=@Membercode";
+                    string query = $"SELECT {column}  from M06_permission where Membercode=@Membercode";
 
                     using (SqlCommand command = new SqlCommand(query, con))
                     {

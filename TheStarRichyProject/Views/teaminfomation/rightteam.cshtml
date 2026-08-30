@@ -176,6 +176,7 @@
                             <tr>
                                 <th class="text-center" style="min-width:36px;">#</th>
                                 <th style="min-width:60px;">ชั้น</th>
+                                <th style="min-width:60px;">ชั้นการแนะนำ</th>
                                 <th style="min-width:110px;">รหัสสมาชิก</th>
                                 <th style="min-width:140px;">ชื่อสมาชิก</th>
                                 <th style="min-width:95px;">วันสมัคร</th>
@@ -326,7 +327,7 @@ $(document).ready(function () {
 
         // Calculate total members from packages
         var totalMembers = packages.reduce(function (sum, p) {
-            return sum + toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? 0);
+            return sum + toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? p.totalmember ?? 0);
         }, 0);
 
         /* ---- Render package summary cards dynamically ---- */
@@ -344,7 +345,7 @@ $(document).ready(function () {
             // Position cards
             packages.map(function (p) {
                 var posName = p.PositionName ?? p.positionName ?? p.Positionname ?? 'No Position';
-                var tm = toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? 0);
+                var tm = toNum(p.TotalMember ?? p.totalMember ?? p.Totalmember ?? p.totalmember ?? 0);
                 var qualify = ((p.Qualify ?? p.qualify ?? '') + '').toLowerCase().trim();
                 var isQualify = qualify.startsWith('yes');
                 var pv = toNum(p.LastMonthQualifyPV ?? p.lastMonthQualifyPV ?? 0);
@@ -689,6 +690,7 @@ $(document).ready(function () {
                     '<tr class="' + rowCls + '">' +
                     '<td class="text-center">'  + (start + i + 1) + '</td>' +
                     '<td class="text-center">'  + escHtml(m.LevelName    ?? m.levelName    ?? '') + '</td>' +
+                    '<td class="text-center">'  + escHtml(m.Levelname1    ?? m.levelname1    ?? '') + '</td>' +
                     '<td class="text-center"><a href="javascript:void(0)" onclick="openBinaryTeam(\'' + escAttr(m.MemberRightCode ?? m.memberRightCode ?? '') + '\')" class="text-primary fw-bold" style="cursor:pointer;">' + escHtml(m.MemberRightCode ?? m.memberRightCode ?? '') + '</a></td>' +
                     '<td>'                           + escHtml(m.MemberRightName  ?? m.memberRightName  ?? '') + '</td>' +
                     '<td class="text-center">'  + fmtDate(m.RegisterDate ?? m.registerDate ?? m.registerdate) + '</td>' +

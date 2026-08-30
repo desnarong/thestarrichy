@@ -46,6 +46,12 @@ namespace TheStarRichyApi.Models
         public List<string>? Memberpic { get; set; }
 
         public string? ipAddress { get; set; }
+
+        // Bank Information
+        public string? BankCode { get; set; }
+        public string? BankAccountNumber { get; set; }
+        public string? BankAccountName { get; set; }
+        public string? BankBranch { get; set; }
     }
 
     /// <summary>

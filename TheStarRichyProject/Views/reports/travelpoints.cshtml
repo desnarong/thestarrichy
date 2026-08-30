@@ -176,19 +176,19 @@ $(function(){
   }
 
   function buildTable(){
-    var fCut = filterRows(cutData, 'calculatedate');
-    var fPos = filterRows(posData, 'Baldate');
+    var fCut = filterRows(cutData, 'CalculateDate');
+    var fPos = filterRows(posData, 'BalDate');
 
     // Index position history by YYYY-MM
     var posMap={};
-    fPos.forEach(function(r){ var k=mKey(g(r,['Baldate','baldate'])); if(k) posMap[k]=r; });
+    fPos.forEach(function(r){ var k=mKey(g(r,['BalDate','baldate'])); if(k) posMap[k]=r; });
 
     // Gather all month keys (union of both datasets)
     var keySet={};
-    fCut.forEach(function(r){ var k=mKey(g(r,['calculatedate'])); if(k) keySet[k]=true; });
+    fCut.forEach(function(r){ var k=mKey(g(r,['CalculateDate'])); if(k) keySet[k]=true; });
     Object.keys(posMap).forEach(function(k){ keySet[k]=true; });
     var cutMap={};
-    fCut.forEach(function(r){ var k=mKey(g(r,['calculatedate'])); if(k) cutMap[k]=r; });
+    fCut.forEach(function(r){ var k=mKey(g(r,['CalculateDate'])); if(k) cutMap[k]=r; });
 
     var allKeys=Object.keys(keySet).sort(function(a,b){return b.localeCompare(a);});
     var html='';
@@ -212,8 +212,8 @@ $(function(){
         var ranking  = g(p,['Ranking','ranking'],'')||g(c,['Memberposition','memberposition'],'');
         var directTotal = leftPS + rightPS;
         var dateLabel = '';
-        if(g(c,['calculatedate'])) dateLabel = fmtMon(g(c,['calculatedate']));
-        else if(g(p,['Baldate'])) dateLabel = fmtMon(g(p,['Baldate']));
+        if(g(c,['CalculateDate'])) dateLabel = fmtMon(g(c,['CalculateDate']));
+        else if(g(p,['BalDate'])) dateLabel = fmtMon(g(p,['BalDate']));
         else dateLabel = k;
 
         var validRanking = ranking && ranking!=='' && ranking!=='0' && ranking!=='-1' && ranking!=='-';
@@ -254,7 +254,8 @@ $(function(){
     $('#msgStatus').text(allKeys.length>0 ? 'พบ '+allKeys.length+' เดือน' : 'ไม่พบข้อมูล');
   }
 
-  function tryBuild(){ if(loadedCut&&loadedPos) buildTable(); }
+  //function tryBuild(){ if(loadedCut&&loadedPos) buildTable(); }\
+  function tryBuild(){ if(loadedPos) buildTable(); }
 
   $.get('@Url.Action("GetCutPointData","reports")', function(json){
     cutData=norm(json); loadedCut=true; tryBuild();

@@ -132,6 +132,36 @@ namespace TheStarRichyProject.Controllers
             }
             return Error();
         }
+        public async Task<IActionResult> FindMembercodeForSale(string memberCode, string? uplineCode)
+        {
+            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            var options = new RestClientOptions(_config["Api:Url"]!)
+            {
+                ThrowOnAnyError = true,
+                ConfigureMessageHandler = handler =>
+                {
+                    var httpClientHandler = new HttpClientHandler
+                    {
+                        ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                    };
+                    return httpClientHandler;
+                }
+            };
+            var passkey = _config["Api:Passkey"]!;
+            var token = Request.Cookies[CookieHelper.UserKey];
+            var client = new RestClient(options);
+            var request = new RestRequest($"/Product/findmembercodeforsale?memberCode={Uri.EscapeDataString(memberCode)}&uplineCode={Uri.EscapeDataString(uplineCode)}", Method.Get);
+            request.AddHeader("X-Passkey", passkey);
+            request.AddHeader("Authorization", $"Bearer {token}");
+            request.AddHeader("Accept", "application/json");
+            RestResponse response = await client.ExecuteAsync(request);
+            if (response.IsSuccessful)
+            {
+                //Console.WriteLine(response.Content);
+                return Ok(response.Content);
+            }
+            return Ok(new { success = false, message = "ไม่พบข้อมูลสมาชิก" });
+        }
         public async Task<IActionResult> GetCountries()
         {
             ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;

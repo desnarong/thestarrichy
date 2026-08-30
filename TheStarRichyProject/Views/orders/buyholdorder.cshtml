@@ -504,7 +504,7 @@
                     <div class="col-12 col-md-6">
                         <!-- Center Search -->
                         <h6 class="font-weight-bold mb-1">
-                            <i class="bx bx-search-alt"></i> <span data-key="t-hybrid-gold-code">รหัส Hybrid gold</span>
+                            <i class="bx bx-search-alt"></i> <span data-key="t-hybrid-gold-code">รหัส start mobile/hybrid gold</span>
                         </h6>
                         <div class="mb-3">
                             <div class="input-group">
@@ -522,13 +522,13 @@
                             <div class="row mt-1">
                                 <div class="col-12 col-sm-6">
                                     <div class="mt-1">
-                                        <label data-key="t-hybrid-gold-code">รหัส Hybrid gold:</label>
+                                        <label data-key="t-hybrid-gold-code">รหัส start mobile/hybrid gold:</label>
                                         <input type="text" class="form-control" id="resultCenterID" disabled>
                                     </div>
                                 </div>
                                 <div class="col-12 col-sm-6">
                                     <div class="mt-1">
-                                        <label data-key="t-hybrid-gold-name">ชื่อ Hybrid gold:</label>
+                                        <label data-key="t-hybrid-gold-name">ชื่อ:</label>
                                         <input type="text" class="form-control" id="resultCenterName" disabled>
                                     </div>
                                 </div>
@@ -1239,7 +1239,7 @@
             function searchCenterByCode() {
                 const centerCode = $('#centerCodeInput').val().trim();
                 if (!centerCode) {
-                    showMemberError('กรุณาระบุรหัส Hybrid gold');
+                    showMemberError('กรุณาระบุรหัส start mobile/hybrid gold');
                     return;
                 }
 
@@ -1263,8 +1263,8 @@
                             $('#resultCenterID').val(selectedCenter.centerCode).css('background-color', '#d4edda');
                             $('#resultCenterName').val(selectedCenter.centerName).css('background-color', '#d4edda');
                         } else {
-                            showMemberError(response.message || 'ไม่พบรหัส Hybrid gold');
-                            showNotification('warning', response.message || 'ไม่พบรหัส Hybrid gold');
+                            showMemberError(response.message || 'ไม่พบรหัส start mobile/hybrid gold');
+                            showNotification('warning', response.message || 'ไม่พบรหัส start mobile/hybrid gold');
                             $('#resultCenterID').val('');
                             $('#resultCenterName').val('');
                             selectedCenter = null;

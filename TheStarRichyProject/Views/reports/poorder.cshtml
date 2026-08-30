@@ -286,8 +286,8 @@ $(function(){
 
   function buildTable(rows){
     if(tbl){tbl.destroy();tbl=null;}$('#mainTable').empty();
-    var cols=['#','เลขที่ใบสั่งซื้อ','วันที่', 'อ้างอิงเลขที่ใบเสร็จ','รหัส Hybrid Gold','รหัสนักธุรกิจ','ชื่อนักธุรกิจ',
-      'ประเภทซื้อ','ยอดเงิน','PV','การยืนยันออเดอร์','ผู้ทำรายการ','การจ่ายเงิน',
+    var cols=['#','เลขที่ใบสั่งซื้อ','วันที่', 'อ้างอิงเลขที่ใบเสร็จ','รหัสศูนย์','รหัสโมบาย','รหัส Hybrid Gold','รหัสนักธุรกิจ','ชื่อนักธุรกิจ',
+      'ประเภทซื้อ','ยอดเงิน','PV','การยืนยันออเดอร์','สถานะการรับ','ผู้ทำรายการ','การจ่ายเงิน',
       'Tracking','ที่อยู่จัดส่ง','รายละเอียด','Slip 1','Slip 2','Slip 3','Slip 4','Slip 5'];
     var thead='<thead class="text-center" style="background:linear-gradient(135deg,#e8eaf6,#c5cae9);font-size:.73rem;"><tr>'+cols.map(function(c){return'<th>'+c+'</th>';}).join('')+'</tr></thead>';
     var tbody='<tbody>';
@@ -300,6 +300,8 @@ $(function(){
         '<td>'+esc(p(r,['BillNo','billNo']))+'</td>'+
         '<td class="text-center" data-order="'+isoDate(p(r,['BillDate','billDate']))+'">'+fmtDate(p(r,['BillDate','billDate']))+'</td>'+
         '<td>' + esc(typeof p(r,['OrderID','OrderId','orderID','orderId']) === 'object' ? "" : p(r,['OrderID','OrderId','orderID','orderId'])) + '</td>' +
+        '<td>'+esc(p(r,['CenterID','centerID','centerId']))+'</td>'+
+        '<td>'+esc(p(r,['MobileID','mobileID','mobileId']))+'</td>'+
         '<td>'+esc(p(r,['HybridGOLDID','hybridGoldId','hybridGOLDID']))+'</td>'+
         '<td>'+esc(p(r,['Membercode','memberCode','membercode']))+'</td>'+
         '<td>'+esc(p(r,['Membername','memberName','membername']))+'</td>'+
@@ -307,6 +309,7 @@ $(function(){
         '<td class="text-end fw-bold text-success">'+fmt0(p(r,['TotalAmount','totalAmount'],0))+'</td>'+
         '<td class="text-end text-info fw-semibold">'+fmt0(p(r,['TotalPV','totalPV','TotalPv'],0))+'</td>'+
         '<td class="text-center">'+esc(p(r,['BillConfirmType','billConfirmType']))+'</td>'+
+        '<td>'+esc(p(r,['Receive','receive']))+'</td>'+
         '<td>'+esc(p(r,['Createby','createBy','createby']))+'</td>'+
         '<td>'+esc(p(r,['PaymentType','paymentType']))+'</td>'+
         '<td class="text-center">'+trackHtml+'</td>'+
