@@ -140,21 +140,10 @@ namespace TheStarRichyApi.Services
                 {
                     await con.OpenAsync();
 
-                    //string Memberpermission = await GetPermissionAsync("M16", memberCode);
-
-
-                    string query = "SELECT * ";
-                    query += " FROM [000_Member_Position_History]  (nolock) ";
-
-                    query += " where Membercode = @Membercode  ";
-
-                    query += " ORDER BY baldate1 desc  ";
-
-
-                    using (var command = new SqlCommand(query, con))
+                    using (var command = new SqlCommand("SP_Report_TravelPoint", con))
                     {
-                        command.Parameters.AddWithValue("@Membercode", memberCode);
- 
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.Parameters.AddWithValue("@MemberCode", memberCode);
 
                         using (var reader = await command.ExecuteReaderAsync())
                         {

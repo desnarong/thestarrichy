@@ -3,66 +3,6 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="row mb-3">
-  <div class="col-12">
-    <div class="card shadow-sm border-0">
-      <div class="card-header d-flex align-items-center gap-2" style="background:linear-gradient(135deg,#01579b,#039be5);">
-        <i class="bx bx-trip fs-4 text-white"></i>
-        <h5 class="mb-0 text-white fw-semibold">รายงานคะแนนท่องเที่ยว</h5>
-      </div>
-      <div class="card-body py-3">
-        <!-- Stat Cards -->
-        <div class="row g-2 mb-3">
-          <div class="col-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-2" style="background:#e1f5fe;border:2px solid #039be5 !important;">
-              <div class="text-muted" style="font-size:.72rem;">คะแนนซ้ายรวม</div>
-              <div class="fs-5 fw-bold" style="color:#01579b;" id="statLeftPV">-</div>
-              <div class="text-muted" style="font-size:.65rem;">คะแนน</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-2" style="background:#e8f5e9;border:2px solid #43a047 !important;">
-              <div class="text-muted" style="font-size:.72rem;">คะแนนขวารวม</div>
-              <div class="fs-5 fw-bold" style="color:#1b5e20;" id="statRightPV">-</div>
-              <div class="text-muted" style="font-size:.65rem;">คะแนน</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-2" style="background:#fff3e0;border:2px solid #ffa726 !important;">
-              <div class="text-muted" style="font-size:.72rem;">Active ซ้ายรวม</div>
-              <div class="fs-5 fw-bold" style="color:#e65100;" id="statActiveLeft">-</div>
-              <div class="text-muted" style="font-size:.65rem;">คน</div>
-            </div>
-          </div>
-          <div class="col-6 col-md-3">
-            <div class="card border-0 text-center py-2 px-2" style="background:#fce4ec;border:2px solid #e91e63 !important;">
-              <div class="text-muted" style="font-size:.72rem;">Active ขวารวม</div>
-              <div class="fs-5 fw-bold" style="color:#880e4f;" id="statActiveRight">-</div>
-              <div class="text-muted" style="font-size:.65rem;">คน</div>
-            </div>
-          </div>
-        </div>
-        <!-- Filters -->
-        <div class="row align-items-end g-2">
-          <div class="col-auto">
-            <label class="form-label mb-1 small fw-semibold">จากวันที่</label>
-            <input type="date" class="form-control form-control-sm" id="fromDate">
-          </div>
-          <div class="col-auto">
-            <label class="form-label mb-1 small fw-semibold">ถึงวันที่</label>
-            <input type="date" class="form-control form-control-sm" id="toDate">
-          </div>
-          <div class="col-auto align-self-end">
-            <button class="btn btn-sm btn-secondary me-1" id="btnReset"><i class="bx bx-reset me-1"></i>รีเซ็ต</button>
-            <button class="btn btn-sm" id="btnSearch" style="background:#039be5;border-color:#039be5;color:#fff;"><i class="bx bx-search me-1"></i>ค้นหา</button>
-          </div>
-        </div>
-        <small class="text-muted mt-1 d-block"><i class="bx bx-info-circle me-1"></i>ถ้าไม่ระบุวันที่ จะแสดงข้อมูลทั้งหมด</small>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- Main Data Table -->
 <div class="row">
   <div class="col-12">
@@ -76,35 +16,48 @@
       </div>
       <div class="card-body p-2">
         <div class="table-responsive" style="max-height:72vh;overflow-y:auto;">
-          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.72rem;white-space:nowrap;min-width:1380px;">
+          <table class="table table-bordered table-sm table-hover align-middle mb-0" style="font-size:.72rem;white-space:nowrap;min-width:1600px;">
             <thead class="text-center" style="position:sticky;top:0;z-index:2;">
               <tr style="font-size:.68rem;">
                 <th rowspan="2" style="vertical-align:middle;background:#b3e5fc;color:#01579b;min-width:80px;">เดือน</th>
-                <th colspan="2" style="background:#bbdefb;color:#1565c0;">คะแนนซ้าย / ขวา</th>
+                <th rowspan="2" style="vertical-align:middle;background:#b3e5fc;color:#01579b;min-width:120px;">ชื่อโปร</th>
+                <th rowspan="2" style="vertical-align:middle;background:#b3e5fc;color:#01579b;min-width:90px;">วันที่เริ่ม</th>
+                <th rowspan="2" style="vertical-align:middle;background:#b3e5fc;color:#01579b;min-width:90px;">วันที่สิ้นสุด</th>
                 <th colspan="2" style="background:#c8e6c9;color:#2e7d32;">คะแนนมาใหม่</th>
-                <th colspan="2" style="background:#ffe0b2;color:#bf360c;">สายงานแนะนำตรง</th>
-                <th colspan="2" style="background:#f8bbd0;color:#880e4f;">คะแนนบาลานซ์</th>
+                <th colspan="2" style="background:#ffe0b2;color:#bf360c;">คะแนนทีมงานแนะนำตรง</th>
+                <th rowspan="2" style="vertical-align:middle;background:#f8bbd0;color:#880e4f;min-width:80px;">คะแนนบาลานซ์</th>
                 <th colspan="2" style="background:#e1bee7;color:#4a148c;">Active</th>
                 <th rowspan="2" style="vertical-align:middle;background:#b2dfdb;color:#004d40;min-width:90px;">ตำแหน่งคุณวุฒิ<br>ที่ Qualify</th>
                 <th rowspan="2" style="vertical-align:middle;background:#fff9c4;color:#f57f17;min-width:80px;">คะแนนทีมงาน<br>แนะนำตรง</th>
                 <th rowspan="2" style="vertical-align:middle;background:#dcedc8;color:#33691e;min-width:80px;">การรักษายอด</th>
               </tr>
               <tr style="font-size:.67rem;">
-                <th style="background:#e3f2fd;color:#1565c0;">ซ้าย</th>
-                <th style="background:#e3f2fd;color:#0d47a1;">ขวา</th>
                 <th style="background:#e8f5e9;color:#388e3c;">ซ้าย</th>
                 <th style="background:#e8f5e9;color:#1b5e20;">ขวา</th>
                 <th style="background:#fff3e0;color:#e65100;">ซ้าย</th>
                 <th style="background:#fff3e0;color:#bf360c;">ขวา</th>
-                <th style="background:#fce4ec;color:#c2185b;">ซ้าย</th>
-                <th style="background:#fce4ec;color:#880e4f;">ขวา</th>
                 <th style="background:#f3e5f5;color:#7b1fa2;">ซ้าย</th>
                 <th style="background:#f3e5f5;color:#4a148c;">ขวา</th>
               </tr>
             </thead>
             <tbody id="tableBody">
-              <tr><td colspan="14" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>กำลังโหลดข้อมูล...</td></tr>
+              <tr><td colspan="15" class="text-center text-muted py-4"><span class="spinner-border spinner-border-sm me-2"></span>กำลังโหลดข้อมูล...</td></tr>
             </tbody>
+            <tfoot id="tableFoot" class="fw-bold" style="position:sticky;bottom:0;z-index:2;display:none;">
+              <tr style="background:#fff3e0;font-size:.72rem;">
+                <td class="text-center" style="background:#fff8e1;color:#e65100;">รวม</td>
+                <td style="background:#fff8e1;color:#e65100;" colspan="3"></td>
+                <td class="text-end" style="background:#e8f5e9;color:#1b5e20;" id="sumNewLeft">0</td>
+                <td class="text-end" style="background:#e8f5e9;color:#1b5e20;" id="sumNewRight">0</td>
+                <td class="text-end" style="background:#fff3e0;color:#e65100;" id="sumDirectLeft">0</td>
+                <td class="text-end" style="background:#fff3e0;color:#bf360c;" id="sumDirectRight">0</td>
+                <td class="text-end" style="background:#fce4ec;color:#c2185b;" id="sumBalance">0</td>
+                <td class="text-end" style="background:#fff8e1;color:#e65100;" colspan="2"></td>
+                <td style="background:#b2dfdb;color:#004d40;"></td>
+                <td class="text-end" style="background:#fff9c4;color:#f57f17;" id="sumTeamPV">0</td>
+                <td class="text-end" style="background:#dcedc8;color:#33691e;" id="sumMaintain">0</td>
+              </tr>
+            </tfoot>
           </table>
         </div>
       </div>
@@ -119,7 +72,7 @@
 
 <script>
 $(function(){
-  var cutData=[], posData=[], loadedCut=false, loadedPos=false;
+  var travelData=[];
 
   function norm(raw){
     var d=raw;
@@ -140,19 +93,7 @@ $(function(){
   function mKey(v){var d=parseD(v);if(!d)return null;return d.getFullYear()+'-'+(String(d.getMonth()+1).padStart(2,'0'));}
   var MONTH_TH=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
   function fmtMon(v){var d=parseD(v);if(!d)return String(v||'-');return MONTH_TH[d.getMonth()]+' '+(d.getFullYear()+543);}
-
-  function filterRows(rows, dateKey){
-    var f=$('#fromDate').val(), t=$('#toDate').val();
-    if(!f&&!t) return rows;
-    var from=f?new Date(f):null, to=t?new Date(t+'T23:59:59'):null;
-    return rows.filter(function(r){
-      var d=parseD(g(r,[dateKey],''));
-      if(!d) return true;
-      if(from&&d<from) return false;
-      if(to&&d>to) return false;
-      return true;
-    });
-  }
+  function fmtDate(v){var d=parseD(v);if(!d)return String(v||'-');return d.getDate()+' '+MONTH_TH[d.getMonth()]+' '+(d.getFullYear()+543);}
 
   function rankColor(pos){
     if(!pos||pos==='-'||pos==='0'||pos==='-1') return '#9e9e9e';
@@ -176,97 +117,89 @@ $(function(){
   }
 
   function buildTable(){
-    var fCut = filterRows(cutData, 'CalculateDate');
-    var fPos = filterRows(posData, 'BalDate');
-
-    // Index position history by YYYY-MM
-    var posMap={};
-    fPos.forEach(function(r){ var k=mKey(g(r,['BalDate','baldate'])); if(k) posMap[k]=r; });
-
-    // Gather all month keys (union of both datasets)
-    var keySet={};
-    fCut.forEach(function(r){ var k=mKey(g(r,['CalculateDate'])); if(k) keySet[k]=true; });
-    Object.keys(posMap).forEach(function(k){ keySet[k]=true; });
-    var cutMap={};
-    fCut.forEach(function(r){ var k=mKey(g(r,['CalculateDate'])); if(k) cutMap[k]=r; });
-
-    var allKeys=Object.keys(keySet).sort(function(a,b){return b.localeCompare(a);});
+    var rows = travelData;
     var html='';
-    var totL=0,totR=0,totAL=0,totAR=0;
 
-    if(allKeys.length===0){
-      html='<tr><td colspan="14" class="text-center text-muted py-4">ไม่พบข้อมูลในช่วงวันที่ที่เลือก</td></tr>';
+    if(rows.length===0){
+      html='<tr><td colspan="15" class="text-center text-muted py-4">ไม่พบข้อมูลในช่วงวันที่ที่เลือก</td></tr>';
+      $('#tableFoot').hide();
     } else {
-      allKeys.forEach(function(k,idx){
-        var c=cutMap[k]||{};
-        var p=posMap[k]||{};
-        var leftPV   = num(g(c,['LeftPV','leftPV'],0));
-        var rightPV  = num(g(c,['RightPV','rightPV'],0));
-        var fwdL     = num(g(c,['FWDLeftPV','fwdLeftPV'],0));
-        var fwdR     = num(g(c,['FWDRightPV','fwdRightPV'],0));
-        var stepPV   = num(g(c,['StepPV','stepPV'],0));
-        var leftPS   = num(g(p,['LeftPS','leftPS'],0));
-        var rightPS  = num(g(p,['RightPS','rightPS'],0));
-        var leftCnt  = num(g(p,['LeftCount','leftCount'],0));
-        var rightCnt = num(g(p,['RightCount','rightCount'],0));
-        var ranking  = g(p,['Ranking','ranking'],'')||g(c,['Memberposition','memberposition'],'');
-        var directTotal = leftPS + rightPS;
-        var dateLabel = '';
-        if(g(c,['CalculateDate'])) dateLabel = fmtMon(g(c,['CalculateDate']));
-        else if(g(p,['BalDate'])) dateLabel = fmtMon(g(p,['BalDate']));
-        else dateLabel = k;
+      // Accumulators for sums
+      var sumNL=0, sumNR=0, sumDL=0, sumDR=0, sumBal=0, sumTPV=0, sumMP=0;
 
-        var validRanking = ranking && ranking!=='' && ranking!=='0' && ranking!=='-1' && ranking!=='-';
+      rows.forEach(function(r,idx){
+        var reportMonth = g(r,['ReportMonth','reportMonth'],'');
+        var promoCode   = g(r,['PromoCode','promoCode'],'');
+        var promoName   = g(r,['PromoName','promoName'],'');
+        var promoStart  = g(r,['PromoStartDate','promoStartDate'],'');
+        var promoEnd    = g(r,['PromoEndDate','promoEndDate'],'');
+
+        var newLeft     = num(g(r,['NewPointLeft','newPointLeft'],0));
+        var newRight    = num(g(r,['NewPointRight','newPointRight'],0));
+        var directLeft  = num(g(r,['DirectLeft','directLeft'],0));
+        var directRight = num(g(r,['DirectRight','directRight'],0));
+        var balance     = num(g(r,['BalancePoint','balancePoint'],0));
+        var activeLeft  = num(g(r,['ActiveLeft','activeLeft'],0));
+        var activeRight = num(g(r,['ActiveRight','activeRight'],0));
+        var qualifyPos  = g(r,['QualifyPosition','qualifyPosition'],'');
+        var teamPV      = num(g(r,['TeamPV','teamPV'],0));
+        var maintain    = num(g(r,['MaintainPoint','maintainPoint'],0));
+
+        // Accumulate
+        sumNL += newLeft; sumNR += newRight;
+        sumDL += directLeft; sumDR += directRight;
+        sumBal += balance;
+        sumTPV += teamPV; sumMP += maintain;
+
+        // Format date label
+        var dateLabel = reportMonth || '-';
+
+        // Rank badge
+        var validRanking = qualifyPos && qualifyPos!=='' && qualifyPos!=='0' && qualifyPos!=='-1' && qualifyPos!=='-';
         var rankBadge = validRanking
-          ? '<span class="rank-badge" style="background:'+rankColor(ranking)+';">'+esc(ranking)+'</span>'
+          ? '<span class="rank-badge" style="background:'+rankColor(qualifyPos)+';">'+esc(qualifyPos)+'</span>'
           : '<span class="text-muted" style="font-size:.68rem;">-</span>';
 
-        var maintHtml = stepPV>0
-          ? '<span class="badge" style="background:#43a047;font-size:.68rem;">'+fmt0(stepPV)+'</span>'
+        var maintHtml = maintain>0
+          ? '<span class="badge" style="background:#43a047;font-size:.68rem;">'+fmt0(maintain)+'</span>'
           : '<span class="text-muted">-</span>';
 
-        totL+=leftPV; totR+=rightPV; totAL+=leftCnt; totAR+=rightCnt;
         html+='<tr>'+
           '<td class="text-center fw-semibold" style="color:#01579b;">'+esc(dateLabel)+'</td>'+
-          '<td class="text-end" style="color:#1565c0;">'+fmt0(leftPV)+'</td>'+
-          '<td class="text-end" style="color:#0d47a1;">'+fmt0(rightPV)+'</td>'+
-          '<td class="text-end text-muted">-</td>'+
-          '<td class="text-end text-muted">-</td>'+
-          '<td class="text-end" style="color:#e65100;">'+fmt0(leftPS)+'</td>'+
-          '<td class="text-end" style="color:#bf360c;">'+fmt0(rightPS)+'</td>'+
-          '<td class="text-end" style="color:#c2185b;">'+fmt0(fwdL)+'</td>'+
-          '<td class="text-end" style="color:#880e4f;">'+fmt0(fwdR)+'</td>'+
-          '<td class="text-end" style="color:#7b1fa2;">'+fmt0(leftCnt)+'</td>'+
-          '<td class="text-end" style="color:#4a148c;">'+fmt0(rightCnt)+'</td>'+
+          '<td>'+esc(promoName)+'</td>'+
+          '<td class="text-center">'+fmtDate(promoStart)+'</td>'+
+          '<td class="text-center">'+fmtDate(promoEnd)+'</td>'+
+          '<td class="text-end" style="color:#388e3c;">'+fmt0(newLeft)+'</td>'+
+          '<td class="text-end" style="color:#1b5e20;">'+fmt0(newRight)+'</td>'+
+          '<td class="text-end" style="color:#e65100;">'+fmt0(directLeft)+'</td>'+
+          '<td class="text-end" style="color:#bf360c;">'+fmt0(directRight)+'</td>'+
+          '<td class="text-end" style="color:#c2185b;">'+fmt0(balance)+'</td>'+
+          '<td class="text-end" style="color:#7b1fa2;">'+fmt0(activeLeft)+'</td>'+
+          '<td class="text-end" style="color:#4a148c;">'+fmt0(activeRight)+'</td>'+
           '<td class="text-center">'+rankBadge+'</td>'+
-          '<td class="text-end fw-semibold" style="color:#f57f17;">'+fmt0(directTotal)+'</td>'+
+          '<td class="text-end fw-semibold" style="color:#f57f17;">'+fmt0(teamPV)+'</td>'+
           '<td class="text-center">'+maintHtml+'</td>'+
           '</tr>';
       });
+
+      // Update sum footer
+      $('#sumNewLeft').text(fmt0(sumNL));
+      $('#sumNewRight').text(fmt0(sumNR));
+      $('#sumDirectLeft').text(fmt0(sumDL));
+      $('#sumDirectRight').text(fmt0(sumDR));
+      $('#sumBalance').text(fmt0(sumBal));
+      $('#sumTeamPV').text(fmt0(sumTPV));
+      $('#sumMaintain').text(fmt0(sumMP));
+      $('#tableFoot').show();
     }
 
     $('#tableBody').html(html);
-    $('#rowCount').text(allKeys.length);
-    $('#statLeftPV').text(fmt0(totL));
-    $('#statRightPV').text(fmt0(totR));
-    $('#statActiveLeft').text(fmt0(totAL));
-    $('#statActiveRight').text(fmt0(totAR));
-    $('#msgStatus').text(allKeys.length>0 ? 'พบ '+allKeys.length+' เดือน' : 'ไม่พบข้อมูล');
+    $('#rowCount').text(rows.length);
   }
 
-  //function tryBuild(){ if(loadedCut&&loadedPos) buildTable(); }\
-  function tryBuild(){ if(loadedPos) buildTable(); }
-
-  $.get('@Url.Action("GetCutPointData","reports")', function(json){
-    cutData=norm(json); loadedCut=true; tryBuild();
-  }).fail(function(){ cutData=[]; loadedCut=true; tryBuild(); });
-
-  $.get('@Url.Action("GetPositionHistoryData","reports")', function(json){
-    posData=norm(json); loadedPos=true; tryBuild();
-  }).fail(function(){ posData=[]; loadedPos=true; tryBuild(); });
-
-  $('#btnSearch').on('click', buildTable);
-  $('#btnReset').on('click', function(){ $('#fromDate').val(''); $('#toDate').val(''); buildTable(); });
+  $.get('@Url.Action("GetTravelPointsData","reports")', function(json){
+    travelData=norm(json); buildTable();
+  }).fail(function(){ travelData=[]; buildTable(); });
 });
 </script>
 @section scripts{

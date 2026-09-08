@@ -113,7 +113,7 @@ namespace TheStarRichyProject.Controllers
         {
             try
             {
-                var result = await _apiService.GetAsync<dynamic>("/Member/reportbonusbypaymentperiod");
+                var result = await _apiService.GetAsync<dynamic>("/Member/reportpositionhistory");
                 return Ok(result);
             }
             catch (Exception ex)
