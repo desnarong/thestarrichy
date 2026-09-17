@@ -620,21 +620,31 @@ namespace TheStarRichyApi.Services
         /// <summary>
         /// ค้นหาข้อมูลผู้อ้างอิง
         /// </summary>
-        public async Task<FindReferrerResponse> FindReferrerAsync(string referrerCode, string uplineCode)
+        public async Task<FindReferrerResponse> FindReferrerAsync(string referrerCode, string? uplineCode)
         {
             try
             {
                 using (var con = new SqlConnection(_connectionString))
                 {
                     await con.OpenAsync();
-                    string query = @"SELECT TOP 1 aa.Membercode, aa.DLcode, aa.DlName, M06_X4 AS RegisterDate, M06_X59 AS Position
-                                     FROM [000_Member_Binary_LeftRight_Search] aa WITH (NOLOCK)
-                                     JOIN M06 ON aa.DLcode = M06_PX1
-                                     WHERE aa.Membercode = @ReferrerCode AND aa.DLcode = @UplineCode";
+                    // When uplineCode is supplied, find the referrer as a downline of that upline.
+                    // Otherwise look the member up by code alone (DLcode = the member's own code,
+                    // and DlName is the name of the member whose code is DLcode).
+                    string query = string.IsNullOrWhiteSpace(uplineCode)
+                        ? @"SELECT TOP 1 aa.Membercode, aa.DLcode, aa.DlName
+                            FROM [000_Member_Binary_LeftRight_Search] aa WITH (NOLOCK)
+                            WHERE aa.DLcode = @ReferrerCode"
+                        : @"SELECT TOP 1 aa.Membercode, aa.DLcode, aa.DlName, M06_X4 AS RegisterDate, M06_X59 AS Position
+                            FROM [000_Member_Binary_LeftRight_Search] aa WITH (NOLOCK)
+                            JOIN M06 ON aa.DLcode = M06_PX1
+                            WHERE aa.Membercode = @ReferrerCode AND aa.DLcode = @UplineCode";
                     using (var command = new SqlCommand(query, con))
                     {
                         command.Parameters.AddWithValue("@ReferrerCode", referrerCode);
-                        command.Parameters.AddWithValue("@UplineCode", uplineCode);
+                        if (!string.IsNullOrWhiteSpace(uplineCode))
+                        {
+                            command.Parameters.AddWithValue("@UplineCode", uplineCode);
+                        }
                         using (var reader = await command.ExecuteReaderAsync())
                         {
                             if (reader.HasRows)

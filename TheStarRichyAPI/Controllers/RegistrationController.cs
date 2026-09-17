@@ -235,20 +235,23 @@ namespace TheStarRichyApi.Controllers
 
         /// <summary>
         /// ค้นหาข้อมูลผู้อ้างอิง
-        /// GET /Registration/findreferrer?referrerCode=xxx
+        /// GET /Registration/findreferrer?referrerCode=xxx&uplineCode=yyy
+        /// (uplineCode ไม่บังคับ — ถ้าไม่ส่งมาจะค้นหาด้วยรหัสสมาชิกเท่านั้น)
         /// </summary>
         [HttpGet("findreferrer")]
         [AllowAnonymous]
-        public async Task<IActionResult> FindReferrer([FromQuery] string referrerCode, [FromQuery] string uplineCode)
+        public async Task<IActionResult> FindReferrer([FromQuery] string referrerCode, [FromQuery] string? uplineCode)
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(referrerCode) || string.IsNullOrWhiteSpace(uplineCode))
+                // referrerCode is always required; uplineCode is optional.
+                // When uplineCode is omitted, the member is looked up by code alone.
+                if (string.IsNullOrWhiteSpace(referrerCode))
                 {
                     return BadRequest(new FindReferrerResponse
                     {
                         Success = false,
-                        Message = "กรุณาระบุรหัสผู้แนะนำและรหัสอัพไลน์"
+                        Message = "กรุณาระบุรหัสผู้แนะนำ"
                     });
                 }
 

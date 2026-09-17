@@ -278,6 +278,12 @@ namespace TheStarRichyProject.Controllers
         {
             try
             {
+                // referrerCode is required; uplineCode is optional — avoid passing null into Uri.EscapeDataString.
+                if (string.IsNullOrWhiteSpace(referrerCode))
+                {
+                    return Ok(new { success = false, message = "กรุณาระบุรหัสผู้แนะนำ" });
+                }
+
                 ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
                 var options = new RestClientOptions(Config["Api:Url"])
                 {
@@ -293,11 +299,18 @@ namespace TheStarRichyProject.Controllers
                 };
 
                 var client = new RestClient(options);
-                var request = new RestRequest($"/Registration/findreferrer?referrerCode={Uri.EscapeDataString(referrerCode)}&uplineCode={Uri.EscapeDataString(uplineCode)}", Method.Get);
+                var request = new RestRequest("/Registration/findreferrer", Method.Get);
+                // AddQueryParameter safely URL-encodes values.
+                request.AddQueryParameter("referrerCode", referrerCode.Trim());
+                if (!string.IsNullOrWhiteSpace(uplineCode))
+                {
+                    request.AddQueryParameter("uplineCode", uplineCode.Trim());
+                }
+                AddHeaders(request);
 
                 var response = await client.ExecuteAsync(request);
 
-                if (response.IsSuccessful)
+                if (response.IsSuccessful && !string.IsNullOrWhiteSpace(response.Content))
                 {
                     var converter = new ExpandoObjectConverter();
                     dynamic data = JsonConvert.DeserializeObject<ExpandoObject>(response.Content, converter);
@@ -305,7 +318,27 @@ namespace TheStarRichyProject.Controllers
                 }
                 else
                 {
-                    return Ok(new { success = false, message = "ไม่พบข้อมูลผู้แนะนำ" });
+                    // Pass through the API's own message when available (e.g. validation / not found).
+                    var message = "ไม่พบข้อมูลผู้แนะนำ";
+                    if (!string.IsNullOrWhiteSpace(response.Content))
+                    {
+                        try
+                        {
+                            var errorData = JsonNode.Parse(response.Content);
+                            var apiMessage = errorData?["message"]?.GetValue<string>()
+                                          ?? errorData?["Message"]?.GetValue<string>();
+                            if (!string.IsNullOrWhiteSpace(apiMessage))
+                            {
+                                message = apiMessage;
+                            }
+                        }
+                        catch
+                        {
+                            // Ignore malformed error payloads and fall back to the default message.
+                        }
+                    }
+
+                    return Ok(new { success = false, message });
                 }
             }
             catch (Exception ex)
