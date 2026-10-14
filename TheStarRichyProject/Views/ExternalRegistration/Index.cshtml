@@ -788,7 +788,11 @@
                 
                 if (!day || !month || !yearBE) return true;
                 
-                var yearCE = parseInt(yearBE) - 543;
+                var yearCE = parseInt(yearBE);
+                if (currentLang === 'th' && yearBE > 2400) {
+                    yearCE = yearBE - 543;
+                }
+                
                 var birthDate = new Date(yearCE, parseInt(month) - 1, parseInt(day));
                 var age = Math.floor((today - birthDate) / (365.25 * 24 * 60 * 60 * 1000));
                 

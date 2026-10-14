@@ -56,6 +56,9 @@
             justify-content: center;
         }
     }
+    .validation-error{
+        color: red !important;
+    }
 </style>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet" />
 <link href="~/plugins/bootstrap-datepicker/css/bootstrap-datepicker3.standalone.min.css" rel="stylesheet" />
@@ -980,13 +983,16 @@ function validateSimpleFullName() {
     }
     if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
         errorTarget.text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
+        $('#simpleFullName').addClass('is-invalid');
         return false;
     }
     if (val.length < 2 || val.length > 100) {
         errorTarget.text('ชื่อต้องมีความยาว 2-100 ตัวอักษร').addClass('validation-error');
+        $('#simpleFullName').addClass('is-invalid');
         return false;
     }
     errorTarget.text('').removeClass('validation-error');
+
     return true;
 }
 
@@ -1026,6 +1032,12 @@ function validateFullNameOnCard() {
     }
     if (!/^[a-zA-Z0-9\u0E00-\u0E7F\s.]+$/.test(val)) {
         $('#fullNameOnCardValidation').text('กรุณากรอกชื่อเป็นภาษาไทย อังกฤษ หรือตัวเลขเท่านั้น').addClass('validation-error');
+        $('#fullNameOnCard').addClass('is-invalid');
+        return false;
+    }
+    if (val.length < 2 || val.length > 100) {
+        errorTarget.text('ชื่อต้องมีความยาว 2-100 ตัวอักษร').addClass('validation-error');
+        $('#fullNameOnCard').addClass('is-invalid');
         return false;
     }
     $('#fullNameOnCardValidation').text('').removeClass('validation-error');
@@ -1300,21 +1312,21 @@ $(document).ready(async function () {
         }
 
         $('#simpleUplineCode').val(memberCode);
-        $('#simpleUplineCode').val(memberCode);
         $('#simpleReferrerCode').prop('disabled', false);
         $('#simpleReferrerCode').prop('readonly', false);
-
-        $('#fullReferrerCode').val(memberCode).prop('disabled', false);
-        $('#fullReferrerCode').val(memberCode).prop('readonly', false);
+        $('#fullUplineCode').val(memberCode);
+        $('#fullReferrerCode').prop('disabled', false);
+        $('#fullReferrerCode').prop('readonly', false);
 
         $('input[name="position"]').prop('disabled', true);
+        
         $('#btnSearchReferrer').prop('disabled', false);
         $('#btnSearchReferrer').prop('readonly', false);
         $('#btnFullSearchReferrer').prop('disabled', false);
         $('#btnFullSearchReferrer').prop('readonly', false);
 
-        setTimeout(function() { $('#btnSearchReferrer').trigger('click'); }, 500);
-        setTimeout(function() { $('#btnFullSearchReferrer').trigger('click'); }, 500);
+        setTimeout(function() { $('#btnSearchReferrer').trigger('click'); }, 1000);
+        setTimeout(function() { $('#btnFullSearchReferrer').trigger('click'); }, 1000);
 
         if (position === 'left') {
             $('#positionLeft').prop('checked', true);
@@ -1371,10 +1383,10 @@ $(document).ready(async function () {
         for (var m = 1; m <= 12; m++) {
             simpleBirthMonth.append('<option value="' + m + '">' + thaiMonths[m] + '</option>');
         }
-        
+
         var simpleBirthYear = $('#simpleBirthYear');
         simpleBirthYear.empty().append('<option value="">ปี</option>');
-        var minBirthYearCE = currentYearCE - 100;
+        var minBirthYearCE = 2400 - 543;
         var maxBirthYearCE = currentYearCE - 18;
         for (var y = maxBirthYearCE; y >= minBirthYearCE; y--) {
             simpleBirthYear.append('<option value="' + (y + yearOffset) + '">' + (y + yearOffset) + '</option>');
@@ -1925,7 +1937,7 @@ $(document).ready(async function () {
             isValid = false;
         } else {
             var yearCE = parseInt(sBirthYear);
-            if (currentLang === 'th' && yearCE > 2500) yearCE -= 543;
+            if (currentLang === 'th') yearCE -= 543;
             var sAge = Math.floor((today - new Date(yearCE, parseInt(sBirthMonth) - 1, parseInt(sBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
             if (sAge < 18) {
                 $('#simpleBirthYear').addClass('is-invalid');
@@ -2121,7 +2133,7 @@ $(document).ready(async function () {
             isValid = false;
         } else {
             var fYearCE = parseInt(fBirthYear);
-            if (currentLang === 'th' && fYearCE > 2500) fYearCE -= 543;
+            if (currentLang === 'th') fYearCE -= 543;
             var fAge = Math.floor((today - new Date(fYearCE, parseInt(fBirthMonth) - 1, parseInt(fBirthDay))) / (365.25 * 24 * 60 * 60 * 1000));
             if (fAge < 18) {
                 $('#fullBirthYear').addClass('is-invalid');
